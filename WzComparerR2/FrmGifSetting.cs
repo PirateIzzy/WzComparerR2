@@ -15,7 +15,6 @@ namespace WzComparerR2
 {
     public partial class FrmGifSetting : DevComponents.DotNetBar.Office2007Form
     {
-
         public FrmGifSetting()
         {
             InitializeComponent();

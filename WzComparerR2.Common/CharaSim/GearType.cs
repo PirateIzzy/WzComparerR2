@@ -170,7 +170,7 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// 驯兽魔法棒 125
         /// </summary>
-        magicStick = 125,
+        memorialStaff = 125,
         /// <summary>
         /// ESP限制器
         /// </summary>
@@ -282,7 +282,7 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// 哨子 135_81
         /// </summary>
-        whistle = 135281,
+        leaf = 135281,
         /// <summary>
         /// 拳爪 135_82
         /// </summary>
@@ -294,7 +294,7 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// 哨子 135_84
         /// </summary>
-        whistle2 = 135284,
+        leaf2 = 135284,
         /// <summary>
         /// 拳天 135_86
         /// </summary>

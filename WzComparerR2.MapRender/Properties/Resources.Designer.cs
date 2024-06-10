@@ -660,8 +660,10 @@ namespace WzComparerR2.MapRender.Properties
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap UIWindow2_img_Teleport_customBG {
-            get {
+        internal static System.Drawing.Bitmap UIWindow2_img_Teleport_customBG
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("UIWindow2_img_Teleport_customBG", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }

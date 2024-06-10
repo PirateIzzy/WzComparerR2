@@ -152,6 +152,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incAUT: return "SAC : " + sign + value;
 
                 case GearPropType.Etuc: return "Exceptional Enhancement is possible.  (Max" + "\ntime(s):  " + value + ")";
+                case GearPropType.CuttableCount: return "Scissors Usages Available : " + value;
                 default: return null;
             }
         }
@@ -330,12 +331,11 @@ namespace WzComparerR2.CharaSim
                 case GearType.foxPearl: return "Fox Marble";
                 case GearType.chess: return "Chess Piece";
                 case GearType.powerSource: return "Power Source";
-
                 case GearType.energySword: return "Whip Blade";
                 case GearType.desperado: return "Desperado";
-                case GearType.magicStick: return "Beast Tamer Scepter";
-                case GearType.whistle:
-                case GearType.whistle2: return "Whistle";
+                case GearType.memorialStaff: return "Memorial Staff";
+                case GearType.leaf:
+                case GearType.leaf2: return "Leaf";
                 case GearType.boxingClaw: return "Fist";
                 case GearType.kodachi:
                 case GearType.kodachi2: return "Kodachi";
@@ -489,9 +489,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.swordZB:
                 case GearType.swordZL: return GetExtraJobReqString(101);
 
-                case GearType.whistle:
-                case GearType.whistle2:
-                case GearType.magicStick: return GetExtraJobReqString(112);
+                case GearType.leaf:
+                case GearType.leaf2:
+                case GearType.memorialStaff: return GetExtraJobReqString(172);
 
                 case GearType.espLimiter:
                 case GearType.chess: return GetExtraJobReqString(142);
@@ -510,6 +510,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.boxingSky: return GetExtraJobReqString(175);
 
                 case GearType.ornament: return GetExtraJobReqString(162);
+
+                case GearType.chakram:
+                case GearType.hexSeeker: return GetExtraJobReqString(154);
                 default: return null;
             }
         }
@@ -540,7 +543,7 @@ namespace WzComparerR2.CharaSim
                 case 64: return "Cadena only";
                 case 65: return "Angelic Buster only";
                 case 101: return "Zero only";
-                case 112: return "Beast Tamer only";
+                // case 112: return "Beast Tamer only";
                 case 142: return "Kinesis only";
                 case 151: return "Adele only";
                 case 152: return "Illium only";
@@ -548,8 +551,8 @@ namespace WzComparerR2.CharaSim
                 case 155: return "Ark only";
                 case 162: return "Lara only";
                 case 164: return "Hoyoung only";
+                case 172: return "Lynn only";
                 case 175: return "Mo Xuan only";
-
                 default: return null;
             }
         }
@@ -897,8 +900,47 @@ namespace WzComparerR2.CharaSim
                 case 16410: return "Hoyoung(2)";
                 case 16411: return "Hoyoung(3)";
                 case 16412: return "Hoyoung(4)";
+
+                case 17000: return "Lynn";
+                case 17200: return "Lynn(1)";
+                case 17210: return "Lynn(2)";
+                case 17211: return "Lynn(3)";
+                case 17212: return "Lynn(4)";
             }
             return null;
+        }
+
+        private static string ToChineseNumberExpr(int value)
+        {
+            var sb = new StringBuilder(16);
+            bool firstPart = true;
+            if (value < 0)
+            {
+                sb.Append("-");
+                value = -value; // just ignore the exception -2147483648
+            }
+            if (value >= 1_0000_0000)
+            {
+                int part = value / 1_0000_0000;
+                sb.AppendFormat("{0}亿", part);
+                value -= part * 1_0000_0000;
+                firstPart = false;
+            }
+            if (value >= 1_0000)
+            {
+                int part = value / 1_0000;
+                sb.Append(firstPart ? null : " ");
+                sb.AppendFormat("{0}万", part);
+                value -= part * 1_0000;
+                firstPart = false;
+            }
+            if (value > 0)
+            {
+                sb.Append(firstPart ? null : " ");
+                sb.AppendFormat("{0}", value);
+            }
+
+            return sb.Length > 0 ? sb.ToString() : "0";
         }
     }
 }

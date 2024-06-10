@@ -172,6 +172,7 @@
             this.labelItemAutoSaveFolder = new DevComponents.DotNetBar.LabelItem();
             this.buttonItemGif = new DevComponents.DotNetBar.ButtonItem();
             this.itemContainer36 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
@@ -2054,11 +2055,19 @@
             this.itemContainer36.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemContainer36.Name = "itemContainer36";
             this.itemContainer36.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemExtractGifEx,
             this.buttonItemGifSetting});
             // 
             // 
             // 
             this.itemContainer36.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            //
+            // buttonItemExtractGifEx
+            //
+            this.buttonItemExtractGifEx.Name = "buttonItemExtractGifEx";
+            this.buttonItemExtractGifEx.Text = "ExtractGifEx";
+            this.buttonItemExtractGifEx.Tooltip = "对所选节点的全部子节点提取帧动画，而不使用序数节点名称。";
+            this.buttonItemExtractGifEx.Click += new System.EventHandler(this.buttonItemGif_Click);
             // 
             // buttonItemGifSetting
             // 
@@ -3189,6 +3198,7 @@
         private DevComponents.DotNetBar.ItemContainer itemContainer35;
         private DevComponents.DotNetBar.ButtonItem buttonItemGif;
         private DevComponents.DotNetBar.ItemContainer itemContainer36;
+        private DevComponents.DotNetBar.ButtonItem buttonItemExtractGifEx;
         private DevComponents.DotNetBar.ButtonItem buttonItemGifSetting;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
         private System.Windows.Forms.ToolStripMenuItem tsmi2ExpandAll;
@@ -3269,9 +3279,9 @@
         private DevComponents.DotNetBar.ButtonItem buttonItemSaveWithOptions;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
+        private DevComponents.DotNetBar.SuperTooltip superTooltip1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
         private DevComponents.Editors.ComboItem comboItem19;
-        private DevComponents.DotNetBar.SuperTooltip superTooltip1;
     }
 }

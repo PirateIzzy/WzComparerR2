@@ -554,7 +554,6 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-
             //一般属性
             List<GearPropType> props = new List<GearPropType>();
             foreach (KeyValuePair<GearPropType, int> p in Gear.PropsV5) //5转过滤
@@ -615,13 +614,11 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (hasTuc)
             {
-                GearGraphics.DrawString(g, "Remaining Enhancements: " + value + (Gear.Cash ? "" : "\n#c(Available Recoveries: 0)#"), GearGraphics.EquipDetailFont, orange3FontColorTable, 13, 244, ref picH, 15);
-                hasPart2 = true;
-            }
-            if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
-            {
-                TextRenderer.DrawText(g, ItemStringHelper.GetGearPropString(GearPropType.limitBreak, value), GearGraphics.EquipDetailFont, new Point(12, picH), ((SolidBrush)GearGraphics.GreenBrush2).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-                picH += 15;
+                var colorTable = new Dictionary<string, Color>
+                {
+                    { "c", GearGraphics.OrangeBrush3Color }
+                };
+                GearGraphics.DrawString(g, "Remaining Enhancements: " + value + (Gear.Cash ? "" : "\n#c(Available Recoveries: 0)#"), GearGraphics.EquipDetailFont, colorTable, 13, 244, ref picH, 15);
                 hasPart2 = true;
             }
 
@@ -648,24 +645,23 @@ namespace WzComparerR2.CharaSimControl
                 {
                     GearGraphics.DrawPlainText(g, ItemStringHelper.GetGearPropString(GearPropType.superiorEqp, value), GearGraphics.EquipDetailFont, ((SolidBrush)GearGraphics.GreenBrush2).Color, 12, 256, ref picH, 15);//GMS - Superior green line change 
                 }
+            }
+            if (Gear.Props.TryGetValue(GearPropType.CuttableCount, out value) && value > 0) //可使用剪刀
+            {
+                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.CuttableCount, value), GearGraphics.EquipDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                picH += 15;
+                hasPart2 = true;
+            }
 
-                if (!Gear.GetBooleanValue(GearPropType.exceptUpgrade))
-                {
-                    int maxStar = Gear.GetMaxStar();
+            if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
+            {
+                TextRenderer.DrawText(g, ItemStringHelper.GetGearPropString(GearPropType.limitBreak, value), GearGraphics.EquipDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.GreenBrush2).Color, TextFormatFlags.NoPadding);
+                picH += 15;
+                hasPart2 = true;
+            }
 
-                    if (Gear.Star > 0) //星星
-                    {
-                        //TextRenderer.DrawText(g, "APPLIED " + Gear.Star + " STAR ENHANCEMENT (UP TO " + maxStar + ")", GearGraphics.EquipDetailFont, new Point(11, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-                        TextRenderer.DrawText(g, "Star Force:" + Gear.Star + "/" + maxStar + "Stars Infused", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-                        picH += 15;
-                    }
-                    else
-                    {
-                        //TextRenderer.DrawText(g, "Can be enhanced up to " + maxStar + " Star.", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-                        //picH += 15;
-                    }
-                }
-                picH += 0;
+            if (hasTuc && Gear.Hammer > -1)
+            {
                 TextRenderer.DrawText(g, "Hammers Applied", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.EquipDetailFont, Brushes.White, 93, picH + 1);
@@ -870,7 +866,7 @@ namespace WzComparerR2.CharaSimControl
             //绘制倾向
             if (Gear.State == GearState.itemList)
             {
-                string incline = null;
+                StringBuilder incline = new StringBuilder();
                 GearPropType[] inclineTypes = new GearPropType[]{
                     GearPropType.charismaEXP,
                     GearPropType.insightEXP,
@@ -916,21 +912,17 @@ namespace WzComparerR2.CharaSimControl
 
                     if (success && value > 0)
                     {
-                        incline += ", " + value + inclineString[i];
-                        //incline += ", " + value + " " + inclineString[i];
+                        if (incline.Length > 0)
+                        {
+                            incline.Append(", ");
+                        }
+                        incline.Append(value + " " + inclineString[i]); // GMS lists it inverse to CMS, i.e. 90 Ambition instead of Ambition 90
                     }
                 }
 
-                /*if (!string.IsNullOrEmpty(Gear.EpicHs) && sr[Gear.EpicHs] != null)
+                if (incline.Length > 0)
                 {
-                    desc.Add(sr[Gear.EpicHs].Replace("#", "#"));
-                }*/
-
-                desc.Add("");
-
-                if (!string.IsNullOrEmpty(incline))
-                {
-                    desc.Add("#cGrants " + incline.Substring(2) + " EXP when first equipped (up to the daily maximum).");
+                    desc.Add($"#cGrants {incline} EXP when first equipped (up to the daily maximum).");
                 }
 
                 if (Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0))
