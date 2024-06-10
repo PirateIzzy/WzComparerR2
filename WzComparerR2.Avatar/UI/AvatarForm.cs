@@ -1171,7 +1171,7 @@ namespace WzComparerR2.Avatar.UI
             if (this.avatar.Parts.All(part => part == null)
                 || MessageBoxEx.Show("Do you want to create a male character?", "OK") == DialogResult.OK)
             {
-                LoadCode("2000,12000", 0);
+                LoadCode("2000,12000,20000,30000,1040036,1060026", 0);
             }
         }
 
@@ -1180,7 +1180,7 @@ namespace WzComparerR2.Avatar.UI
             if (this.avatar.Parts.All(part => part == null)
                 || MessageBoxEx.Show("Do you want to create a female character?", "OK") == DialogResult.OK)
             {
-                LoadCode("2000,12000", 0);
+                LoadCode("2000,12000,21000,31000,1041046,1061039", 0);
             }
         }
 
