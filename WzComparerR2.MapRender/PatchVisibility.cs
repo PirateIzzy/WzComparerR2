@@ -12,6 +12,7 @@ namespace WzComparerR2.MapRender
             this.dictVisible = new Dictionary<RenderObjectType, bool>();
             this.tagsVisible = new SortedDictionary<string, bool>();
             this.questVisible = new Dictionary<int, int>();
+            this.questexVisible = new Dictionary<Tuple<int, int>, int>();
             foreach (RenderObjectType type in Enum.GetValues(typeof(RenderObjectType)))
             {
                 this.dictVisible[type] = true;
@@ -117,6 +118,7 @@ namespace WzComparerR2.MapRender
         private Dictionary<RenderObjectType, bool> dictVisible;
         private SortedDictionary<string, bool> tagsVisible;
         private Dictionary<int, int> questVisible;
+        private Dictionary<Tuple<int, int>, int> questexVisible;
 
         public bool IsVisible(RenderObjectType type)
         {
@@ -176,6 +178,31 @@ namespace WzComparerR2.MapRender
         public void SetVisible(int questID, int questState)
         {
             this.questVisible[questID] = questState;
+        }
+
+        public bool IsVisible(int questID, int qkey, int questState)
+        {
+            int visible;
+            if (!questexVisible.TryGetValue(new Tuple<int, int>(questID, qkey), out visible))
+            {
+                return true;
+            }
+            return visible == -1 || visible == questState;
+        }
+
+        public bool IsVisibleExact(int questID, int qkey, int questState)
+        {
+            int visible;
+            if (!questexVisible.TryGetValue(new Tuple<int, int>(questID, qkey), out visible))
+            {
+                return false;
+            }
+            return visible == questState;
+        }
+
+        public void SetVisible(int questID, int qkey, int questState)
+        {
+            this.questexVisible[new Tuple<int, int>(questID, qkey)] = questState;
         }
     }
 }

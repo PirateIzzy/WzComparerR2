@@ -724,6 +724,10 @@ namespace WzComparerR2.MapRender
                     {
                         return null;
                     }
+                    if (((ObjItem)item).Questex.Exists(questex => !patchVisibility.IsVisible(questex.Item1, questex.Item2, questex.Item3)))
+                    {
+                        return null;
+                    }
                     return GetMeshObj(obj);
                 }
             }
