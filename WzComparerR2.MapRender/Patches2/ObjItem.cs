@@ -19,7 +19,7 @@ namespace WzComparerR2.MapRender.Patches2
         public bool Light { get; set; }
         public string SpineAni { get; set; }
         public List<Tuple<int, int>> Quest { get; set; }
-        public List<Tuple<int, int, int>> Questex { get; set; }
+        public List<Tuple<int, string, int>> Questex { get; set; }
 
         public ItemView View { get; set; }
 
@@ -66,7 +66,7 @@ namespace WzComparerR2.MapRender.Patches2
                 }
             }
 
-            item.Questex = new List<Tuple<int, int, int>>();
+            item.Questex = new List<Tuple<int, string, int>>();
             if (node.Nodes["questex"] != null)
             {
                 foreach (Wz_Node qnodes in node.Nodes["questex"].Nodes)
@@ -77,7 +77,7 @@ namespace WzComparerR2.MapRender.Patches2
                         Wz_Node vnodes = qnodes.Nodes["value"];
                         if (knodes != null && vnodes != null)
                         {
-                            item.Questex.Add(Tuple.Create(questID, knodes.GetValueEx<int>(0), vnodes.GetValueEx<int>(-1)));
+                            item.Questex.Add(Tuple.Create(questID, knodes.GetValueEx<string>(null), vnodes.GetValueEx<int>(-1)));
                         }
                     }
                 }

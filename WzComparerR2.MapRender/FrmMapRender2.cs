@@ -562,6 +562,7 @@ namespace WzComparerR2.MapRender
                     this.ui.ChatBox.AppendTextHelp(@"/minimap 미니맵 설정");
                     this.ui.ChatBox.AppendTextHelp(@"/scene 장면 설정");
                     this.ui.ChatBox.AppendTextHelp(@"/quest 퀘스트 설정");
+                    this.ui.ChatBox.AppendTextHelp(@"/questex 퀘스트 키의 값 설정");
                     this.ui.ChatBox.AppendTextHelp(@"/date 시각 설정");
                     this.ui.ChatBox.AppendTextHelp(@"/multibgm Multi BGM 설정");
                     break;
@@ -765,7 +766,8 @@ namespace WzComparerR2.MapRender
                             this.ui.ChatBox.AppendTextHelp($"관련된 퀘스트 개수: ({questList.Count()})");
                             foreach (Tuple<int, int> item in questList)
                             {
-                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.Item1}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
                                 string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
                                 this.ui.ChatBox.AppendTextHelp($"  {questName}({item.Item1}) / {item.Item2}");
                             }
@@ -776,7 +778,8 @@ namespace WzComparerR2.MapRender
                             {
                                 this.patchVisibility.SetVisible(questID, questState);
                                 this.mapData.PreloadResource(resLoader);
-                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{questID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
                                 string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
                                 this.ui.ChatBox.AppendTextSystem($"{questName}({questID})의 상태를 {questState}(으)로 변경했습니다.");
                             }
@@ -797,35 +800,38 @@ namespace WzComparerR2.MapRender
                     switch (arguments.ElementAtOrDefault(1))
                     {
                         case "list":
-                            List<Tuple<int, int, int>> questList = this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Questex))
+                            List<Tuple<int, string, int>> questList = this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Questex))
                                 .Distinct().ToList();
-                            this.ui.ChatBox.AppendTextHelp($"관련된 퀘스트 key 개수: ({questList.Count()})");
-                            foreach (Tuple<int, int, int> item in questList)
+                            this.ui.ChatBox.AppendTextHelp($"관련된 퀘스트 키 개수: ({questList.Count()})");
+                            foreach (Tuple<int, string, int> item in questList)
                             {
-                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.Item1}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
                                 string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
-                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.Item1}) / key:{item.Item2}, value:{item.Item3}");
+                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.Item1}) / 키:{item.Item2}, 기본값:{item.Item3}");
                             }
                             break;
 
                         case "set":
-                            if (Int32.TryParse(arguments.ElementAtOrDefault(2), out int questID) && questID > -1 && Int32.TryParse(arguments.ElementAtOrDefault(3), out int qkey) && Int32.TryParse(arguments.ElementAtOrDefault(4), out int questState) && questState >= -1)
+                            string qkey = arguments.ElementAtOrDefault(3);
+                            if (Int32.TryParse(arguments.ElementAtOrDefault(2), out int questID) && questID > -1 && Int32.TryParse(arguments.ElementAtOrDefault(4), out int questState) && questState >= -1 && qkey != null)
                             {
                                 this.patchVisibility.SetVisible(questID, qkey, questState);
                                 this.mapData.PreloadResource(resLoader);
-                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{questID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
                                 string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
-                                this.ui.ChatBox.AppendTextSystem($"{questName}({questID}, key={qkey})의 상태를 {questState}(으)로 변경했습니다.");
+                                this.ui.ChatBox.AppendTextSystem($"{questName}({questID}, 키={qkey})의 값을 {questState}(으)로 변경했습니다.");
                             }
                             else
                             {
-                                this.ui.ChatBox.AppendTextSystem($"정확한 퀘스트 상태를 입력하세요.");
+                                this.ui.ChatBox.AppendTextSystem($"정확한 퀘스트 ID, 키, 값을 입력하세요.");
                             }
                             break;
 
                         default:
-                            this.ui.ChatBox.AppendTextHelp(@"/questex list 관련된 퀘스트 key 목록 보기");
-                            this.ui.ChatBox.AppendTextHelp(@"/questex set (questID) (key) (questState) 해당 퀘스트 Key의 상태 설정");
+                            this.ui.ChatBox.AppendTextHelp(@"/questex list 관련된 퀘스트 키 목록 보기");
+                            this.ui.ChatBox.AppendTextHelp(@"/questex set (questID) (key) (questState) 해당 퀘스트 키의 값 설정");
                             break;
                     }
                     break;
