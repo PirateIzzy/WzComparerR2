@@ -33,7 +33,7 @@ namespace WzComparerR2.CharaSim
         public static void LoadSetItems()
         {
             //搜索setItemInfo.img
-            Wz_Node etcWz = PluginManager.FindWz(Wz_Type.Etc);
+            Wz_Node etcWz = PluginManager.FindWz(Wz_Type.Etc, true);
             if (etcWz == null)
                 return;
             Wz_Node setItemNode = etcWz.FindNodeByPath("SetItemInfo.img", true);
@@ -41,7 +41,7 @@ namespace WzComparerR2.CharaSim
                 return;
 
             //搜索ItemOption.img
-            Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item);
+            Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, true);
             if (itemWz == null)
                 return;
             Wz_Node optionNode = itemWz.FindNodeByPath("ItemOption.img", true);

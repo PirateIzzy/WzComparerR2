@@ -281,6 +281,10 @@ namespace WzComparerR2
                     {
                         if (wz_f.Type == e.WzType)
                         {
+                            if (e.HasChildNodes && wz_f.Node.Nodes.Count <= 0)
+                            {
+                                continue;
+                            }
                             preSearch.Add(wz_f.Node);
                             find = true;
                             //e.WzFile = wz_f;
@@ -2244,7 +2248,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.String)
+                    if (file.Type == Wz_Type.String && file.Node.Nodes.Count > 0)
                     {
                         return file;
                     }
@@ -2259,7 +2263,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.Item)
+                    if (file.Type == Wz_Type.Item && file.Node.Nodes.Count > 0)
                     {
                         return file;
                     }
@@ -2274,7 +2278,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.Etc)
+                    if (file.Type == Wz_Type.Etc && file.Node.Nodes.Count > 0)
                     {
                         return file;
                     }
