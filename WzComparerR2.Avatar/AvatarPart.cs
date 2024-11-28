@@ -68,6 +68,13 @@ namespace WzComparerR2.Avatar
         public int MixColor { get; set; }
         public int MixOpacity { get; set; }
         public bool IsMixing { get { return BaseColor != -1 && BaseColor != MixColor && MixOpacity > 0; } }
+        public Wz_Node effectNode
+        {
+            get
+            {
+                return PluginBase.PluginManager.FindWz("Effect/ItemEff.img/" + this.ID + "/effect");
+            }
+        }
 
         private void LoadInfo()
         {

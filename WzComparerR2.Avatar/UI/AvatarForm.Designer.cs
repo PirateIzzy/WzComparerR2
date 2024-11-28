@@ -47,6 +47,19 @@
             this.chkBodyPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbTamingFrame = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbEmotionFrame = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            // virtual comboboxes for item effects, not shown
+            this.cmbEffectFrames = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            this.cmbActionEffects = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            for (int i = 0; i < 18; i++)
+            {
+                var t1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t1.SelectedIndexChanged += new System.EventHandler(this.cmbEffectFrames_SelectedIndexChanged);
+                cmbEffectFrames[i] = t1;
+
+                var t2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t2.SelectedIndexChanged += new System.EventHandler(this.cmbActionEffect_SelectedIndexChanged);
+                cmbActionEffects[i] = t2;
+            }
             this.cmbBodyFrame = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbActionTaming = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbEmotion = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -782,13 +795,15 @@
         private DevComponents.DotNetBar.LabelX labelX3;
         private DevComponents.DotNetBar.LabelX labelX2;
         private DevComponents.DotNetBar.LabelX labelX1;
-        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbActionBody;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbActionBody; 
+        private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbActionEffects;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkTamingPlay;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEmotionPlay;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkBodyPlay;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbTamingFrame;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEmotionFrame;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbBodyFrame;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbEffectFrames;
         private System.Windows.Forms.Timer timer1;
         private AvatarContainer avatarContainer1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHairCover;
