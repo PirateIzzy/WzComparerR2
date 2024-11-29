@@ -267,8 +267,8 @@
             this.panelDockContainer2.Controls.Add(this.labelX2);
             this.panelDockContainer2.Controls.Add(this.labelX1);
             this.panelDockContainer2.Controls.Add(this.cmbActionBody);
-            this.panelDockContainer2.Controls.Add(this.chkHairShade);
-            this.panelDockContainer2.Controls.Add(this.chkHairCover);
+            //this.panelDockContainer2.Controls.Add(this.chkHairShade);
+            //this.panelDockContainer2.Controls.Add(this.chkHairCover);
             this.panelDockContainer2.Controls.Add(this.chkApplyBRM);
             this.panelDockContainer2.Controls.Add(this.labelX5);
             this.panelDockContainer2.DisabledBackColor = System.Drawing.Color.Empty;
