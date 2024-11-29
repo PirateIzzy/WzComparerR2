@@ -68,13 +68,7 @@ namespace WzComparerR2.Avatar
         public int MixColor { get; set; }
         public int MixOpacity { get; set; }
         public bool IsMixing { get { return BaseColor != -1 && BaseColor != MixColor && MixOpacity > 0; } }
-        public Wz_Node effectNode
-        {
-            get
-            {
-                return PluginBase.PluginManager.FindWz("Effect/ItemEff.img/" + this.ID + "/effect");
-            }
-        }
+        public Wz_Node effectNode { get; set; }
 
         private void LoadInfo()
         {
@@ -95,6 +89,7 @@ namespace WzComparerR2.Avatar
                 {
                     Icon = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(@"Item\Install\0380.img\03801577\info\icon"), PluginBase.PluginManager.FindWz);
                 }
+                this.effectNode = PluginBase.PluginManager.FindWz("Effect/ItemEff.img/" + this.ID + "/effect");
             }
 
             Wz_Node infoNode = this.Node.FindNodeByPath("info");
