@@ -390,10 +390,6 @@ namespace WzComparerR2.Avatar.UI
             //同步角色动作
             selectedItem = this.cmbActionBody.SelectedItem as ComboItem;
             this.avatar.ActionName = selectedItem != null ? selectedItem.Text : null;
-            for (int i = 0; i < 18; i++)
-            {
-                this.avatar.EffectActionName[i] = selectedItem != null ? selectedItem.Text : null;
-            }
             //同步表情
             selectedItem = this.cmbEmotion.SelectedItem as ComboItem;
             this.avatar.EmotionName = selectedItem != null ? selectedItem.Text : null;
@@ -435,7 +431,7 @@ namespace WzComparerR2.Avatar.UI
                 this.avatar.EarType,
                 this.avatar.WeaponType,
                 this.avatar.WeaponIndex,
-                string.Join("_", this.avatar.EffectActionName),
+                this.avatar.ActionName,
                 string.Join("_", effectFrames));
 
             if (!avatarContainer1.HasCache(actionTag))

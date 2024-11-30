@@ -24,7 +24,6 @@ namespace WzComparerR2.Avatar
             {
                 this.EffectActions[i] = new List<string>();
             }
-            this.EffectActionName = new string[18];
             this.Parts = new AvatarPart[18];
             this.EarType = 0;
             this.CapType = "";
@@ -36,7 +35,6 @@ namespace WzComparerR2.Avatar
         public List<string> Emotions { get; private set; }
         public List<string> TamingActions { get; private set; }
         public List<string>[] EffectActions { get; private set; }
-        public string[] EffectActionName { get; set; }
 
         public AvatarPart[] Parts { get; private set; }
         public string ActionName { get; set; }
@@ -676,7 +674,6 @@ namespace WzComparerR2.Avatar
             string actionName = this.ActionName,
                 emotionName = this.EmotionName,
                 tamingActionName = this.TamingActionName;
-            string[] effectActionNames = this.EffectActionName;
             bool bodyFlip = false;
 
             //获取骑宠
@@ -733,11 +730,11 @@ namespace WzComparerR2.Avatar
             {
                 for (int i = 0; i < effectFrames.Length; i++)
                 {
-                    if (!string.IsNullOrEmpty(effectActionNames[i]))
+                    if (!string.IsNullOrEmpty(actionName))
                     {
                         if (effectFrames[i] > -1)
                         {
-                            ActionFrame effectAction = GetEffectFrame(effectActionNames[i], effectFrames[i], i);
+                            ActionFrame effectAction = GetEffectFrame(actionName, effectFrames[i], i);
                             effectActions[i] = effectAction;
                         }
                     }
