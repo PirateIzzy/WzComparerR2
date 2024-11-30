@@ -205,6 +205,14 @@ namespace WzComparerR2.WzLib
 
         private void GetDirTree(WzBinaryReader reader, Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false, string fileName = null, string fallbackFileName = null)
         {
+            var ps = new PartialStream(this.FileStream, this.header.DataStartPosition, this.fileStream.Length - this.header.DataStartPosition, true);
+            ps.Position = 0;
+            var reader = new WzBinaryReader(ps, false);
+            this.GetDirTree(reader, parent, useBaseWz, loadWzAsFolder);
+        }
+
+        private void GetDirTree(WzBinaryReader reader, Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
+        {
             List<string> dirs = new List<string>();
             int count = reader.ReadCompressedInt32();
             var cryptoKey = this.WzStructure.encryption.keys;
