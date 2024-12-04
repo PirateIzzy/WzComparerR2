@@ -660,8 +660,8 @@ namespace WzComparerR2.CharaSimControl
 
             if (Gear.Props.TryGetValue(GearPropType.CuttableCount, out value) && value > 0) //可使用剪刀
             {
-                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.CuttableCount, value), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
-                picH += 16;
+                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.CuttableCount, value), GearGraphics.EquipDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                picH += 15;
                 hasPart2 = true;
             }
 

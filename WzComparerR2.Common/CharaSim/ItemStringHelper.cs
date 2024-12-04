@@ -153,7 +153,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incAUT: return "AUT : " + sign + value;
 
                 case GearPropType.Etuc: return "익셉셔널 강화가 가능합니다. (최대 : " + value + "회)";
-                case GearPropType.CuttableCount: return "可使用剪刀：" + value + "次";
+                case GearPropType.CuttableCount: return "가위 사용 가능 횟수：" + value + "회";
                 default: return null;
             }
         }
