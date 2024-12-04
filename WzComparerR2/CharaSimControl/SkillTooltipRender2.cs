@@ -129,6 +129,7 @@ namespace WzComparerR2.CharaSimControl
             var v6SkillSummaryFontColorTable = new Dictionary<string, Color>()
             {
                 { "c", GearGraphics.SkillSummaryOrangeTextColor },
+                { "$g", GearGraphics.gearCyanColor }, // color for skill prop changes comparison
             };
 
             picH = 0;
@@ -230,61 +231,21 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level > 0)
             {
-                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions);
+                string hStr = null;
 
-                // 스킬 변경점에 초록색 칠하기
+                // set custom color for skill prop changes
                 if (DoSetDiffColor)
                 {
-                    //code from SummaryParser
-                    string h = null;
-                    if (Skill.PreBBSkill) //用level声明的技能
-                    {
-                        string hs;
-                        if (Skill.Common.TryGetValue("hs", out hs))
-                        {
-                            h = sr[hs];
-                        }
-                        else if (sr.SkillH.Count >= Skill.Level)
-                        {
-                            h = sr.SkillH[Skill.Level - 1];
-                        }
-                    }
-                    else
-                    {
-                        if (sr.SkillH.Count > 0)
-                        {
-                            h = sr.SkillH[0];
-                        }
-                    }
-
-                    if (DiffSkillTags.ContainsKey(skillIDstr))
-                    {
-                        foreach (var tags in DiffSkillTags[skillIDstr])
-                        {
-                            h = (h == null ? null : Regex.Replace(h, "#" + tags + @"([^a-zA-Z0-9])", "#g#" + tags + "#$1"));
-                        }
-                    }
-
                     if (Skill.SkillID / 100000 == 4000)
                     {
                         if (Skill.VSkillValue == 2) Skill.Level = 60;
                         if (Skill.VSkillValue == 1) Skill.Level = 30;
                     }
-                    hStr = SummaryParser.GetSkillSummary(h, Skill.Level, Skill.Common, SummaryParams.Default, new SkillSummaryOptions
-                    {
-                        ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
-                        ConvertPerM = this.DisplayPermyriadAsPercent,
-                        IgnoreEvalError = this.IgnoreEvalError,
-                    });
+                    hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions, skillIDstr, this.DiffSkillTags);
                 }
                 else
                 {
-                    hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, new SkillSummaryOptions
-                    {
-                        ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
-                        ConvertPerM = this.DisplayPermyriadAsPercent,
-                        IgnoreEvalError = this.IgnoreEvalError,
-                    });
+                    hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions);
                 }
                 GearGraphics.DrawString(g, "[현재레벨 " + Skill.Level + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (Skill.SkillID / 10000 / 1000 == 10 && Skill.Level == 1 && Skill.ReqLevel > 0)
