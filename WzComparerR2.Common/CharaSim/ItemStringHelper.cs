@@ -586,6 +586,8 @@ namespace WzComparerR2.CharaSim
                     return value == 0 ? "일반펫 (다른 일반펫과 중복 사용불가)" : "멀티펫 (다른 펫과 최대 3개 중복 사용가능)";
                 case ItemPropType.permanent:
                     return value == 0 ? null : "마법의 시간이 끝나지 않는 미라클 펫입니다.";
+                case ItemPropType.mintable:
+                    return GetGearPropString(GearPropType.mintable, value);
                 default:
                     return null;
             }
@@ -634,8 +636,6 @@ namespace WzComparerR2.CharaSim
                 case ItemCoreSpecType.Ctrl_reward:
                 case ItemCoreSpecType.Ctrl_addMission:
                     return desc;
-                case ItemPropType.mintable:
-                    return GetGearPropString(GearPropType.mintable, value);
                 default:
                     return null;
             }
