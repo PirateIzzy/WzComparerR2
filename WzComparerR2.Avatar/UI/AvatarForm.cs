@@ -27,6 +27,20 @@ namespace WzComparerR2.Avatar.UI
             InitializeComponent();
             this.avatar = new AvatarCanvas();
             this.animator = new Animator();
+            // virtual comboboxes for item effects, not shown
+            this.cmbEffectFrames = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            this.cmbActionEffects = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            for (int i = 0; i < 18; i++)
+            {
+                var t1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t1.SelectedIndexChanged += new System.EventHandler(this.cmbEffectFrames_SelectedIndexChanged);
+                cmbEffectFrames[i] = t1;
+
+                var t2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t2.SelectedIndexChanged += new System.EventHandler(this.cmbActionEffect_SelectedIndexChanged);
+                cmbActionEffects[i] = t2;
+            }
+            this.panelDockContainer2.Controls.Remove(this.chkHairShade); // disable chkHairShade
             btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
             FillEarSelection();
@@ -53,6 +67,9 @@ namespace WzComparerR2.Avatar.UI
         bool suspendUpdate;
         bool needUpdate;
         Animator animator;
+        // virtual comboboxes for item effects, not shown
+        private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbActionEffects;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbEffectFrames;
 
         /// <summary>
         /// wz1节点选中事件。
