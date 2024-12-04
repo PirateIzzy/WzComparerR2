@@ -27,7 +27,7 @@ namespace WzComparerR2.CharaSim
         public int diff
         {
             get { return Compare(this); }
-            set { diff = value; }
+            set { }
         }
 
         public Potential[] Options { get; private set; }
