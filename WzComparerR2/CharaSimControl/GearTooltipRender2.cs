@@ -168,10 +168,18 @@ namespace WzComparerR2.CharaSimControl
             {
                 { "c", ((SolidBrush)GearGraphics.OrangeBrush3).Color },
             };
-            int value, value2;
+            var itemPropColorTable = new Dictionary<string, Color>()
+            {
+                { "$y", GearGraphics.gearCyanColor },
+                { "$e", GearGraphics.ScrollEnhancementColor },
+            };
+            int value, value2; ;
 
             picH = 13;
-            DrawStar2(g, ref picH); //绘制星星
+            if (!Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                DrawStar2(g, ref picH); //绘制星星
+            }
 
             //绘制装备名称
             StringResult sr;
@@ -577,7 +585,7 @@ namespace WzComparerR2.CharaSimControl
                 if (value > 0 || Gear.Props[type] > 0)
                 {
                     var propStr = ItemStringHelper.GetGearPropDiffString(type, Gear.Props[type], value);
-                    GearGraphics.DrawString(g, propStr, GearGraphics.EquipDetailFont, 13, 244, ref picH, 15);
+                    GearGraphics.DrawString(g, propStr, GearGraphics.EquipDetailFont, itemPropColorTable, 13, 244, ref picH, 15);
                     hasPart2 = true;
                 }
             }
@@ -610,7 +618,12 @@ namespace WzComparerR2.CharaSimControl
                 TextRenderer.DrawText(g, "강화불가", GearGraphics.EquipDetailFont, new Point(13, picH), Color.White, TextFormatFlags.NoPadding);
                 picH += 15;
             }
-            else if (hasTuc)
+            else if (Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                g.DrawString("无法进行星之力强化", GearGraphics.ItemDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 16;
+            }
+            else if (hasTuc && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 var colorTable = new Dictionary<string, Color>
                 {
@@ -632,7 +645,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //星星锤子
-            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar() > 0)
+            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar() > 0 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 if (Gear.Hammer >= 1)
                 {
@@ -659,7 +672,7 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-            /*if (hasTuc && Gear.Hammer > -1)
+            /*if (hasTuc && Gear.Hammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 g.DrawString("金锤子已提高的强化次数", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH + 2);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -668,8 +681,13 @@ namespace WzComparerR2.CharaSimControl
                 picH += 15;
                 hasPart2 = true;
             }
+            else if (Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption))
+            {
+                g.DrawString("无法设置/重设额外属性", GearGraphics.ItemDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 16;
+            }
 
-            if (hasTuc && Gear.PlatinumHammer > -1)
+            if (hasTuc && Gear.PlatinumHammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 g.DrawString("白金锤强化次数：" + Gear.PlatinumHammer, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
@@ -1278,6 +1296,10 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.onlyEquip, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.onlyEquip, value));
+            }
+            if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.mintable, value));
             }
             if (Gear.Props.TryGetValue(GearPropType.abilityTimeLimited, out value) && value != 0)
             {

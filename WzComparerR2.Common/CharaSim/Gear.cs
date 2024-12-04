@@ -150,13 +150,17 @@ namespace WzComparerR2.CharaSim
 
         public void MakeTimeLimitedPropAvailable()
         {
-            if (AbilityTimeLimited.Count > 0)
+            if (AbilityTimeLimited.Count > 0 && !this.GetBooleanValue(GearPropType.abilityTimeLimited))
             {
+                int diff = 0;
                 foreach(var kv in AbilityTimeLimited)
                 {
-                    this.Props[kv.Key] = this.Props[kv.Key] + kv.Value;
+                    this.Props.TryGetValue(kv.Key, out int oldValue);
+                    this.Props[kv.Key] = oldValue + kv.Value;
+                    diff += kv.Value / Gear.GetPropTypeWeight(kv.Key);
                 }
                 this.Props[GearPropType.abilityTimeLimited] = 1;
+                this.diff += diff;
             }
         }
 
@@ -165,10 +169,11 @@ namespace WzComparerR2.CharaSim
             if (this.StandardProps != null)
             {
                 this.Props.Clear();
-                foreach (var kv in AbilityTimeLimited)
+                foreach (var kv in this.StandardProps)
                 {
                     this.Props[kv.Key] = kv.Value;
                 }
+                this.diff = 0;
             }
         }
 
