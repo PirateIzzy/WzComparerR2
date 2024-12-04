@@ -235,7 +235,7 @@ namespace WzComparerR2.CharaSim
             return GetSkillSummary(skill, skill.Level, sr, param);
         }
 
-        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param, SkillSummaryOptions options = default, string skillID = null, Dictionary<string, List<string>> DiffSkillTags = null)
+        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param, SkillSummaryOptions options = default, bool doHighlight = false, string skillID = null, Dictionary<string, List<string>> DiffSkillTags = null)
         {
             if (skill == null || sr == null)
                 return null;
@@ -258,7 +258,7 @@ namespace WzComparerR2.CharaSim
                 }
                 var levelCommon = level <= skill.levelCommon.Count ? skill.levelCommon[level - 1] : skill.common;
 
-                if (DiffSkillTags != null && skillID != null)
+                if (doHighlight && DiffSkillTags != null && skillID != null)
                 {
                     if (DiffSkillTags.ContainsKey(skillID))
                     {
@@ -278,7 +278,7 @@ namespace WzComparerR2.CharaSim
                     h = sr.SkillH[0];
                 }
 
-                if (DiffSkillTags != null && skillID != null)
+                if (doHighlight && DiffSkillTags != null && skillID != null)
                 {
                     if (DiffSkillTags.ContainsKey(skillID))
                     {

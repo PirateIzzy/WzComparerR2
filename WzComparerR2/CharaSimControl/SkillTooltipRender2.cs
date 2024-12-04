@@ -32,13 +32,17 @@ namespace WzComparerR2.CharaSimControl
         public bool DisplayPermyriadAsPercent { get; set; } = true;
         public bool IgnoreEvalError { get; set; } = false;
         public bool IsWideMode { get; set; } = true;
-        public bool DoSetDiffColor { get; set; } = false;
         public Dictionary<string, List<string>> DiffSkillTags { get; set; } = new Dictionary<string, List<string>>();
         public Wz_Node wzNode { get; set; } = null;
 
         public TooltipRender LinkRidingGearRender { get; set; }
 
         public override Bitmap Render()
+        {
+            return Render(false);
+        }
+
+        public Bitmap Render(bool doHighlight)
         {
             if (this.Skill == null)
             {
@@ -49,7 +53,7 @@ namespace WzComparerR2.CharaSimControl
 
             int picHeight;
             List<int> splitterH;
-            Bitmap originBmp = RenderSkill(region, out picHeight, out splitterH);
+            Bitmap originBmp = RenderSkill(region, out picHeight, out splitterH, doHighlight);
             Bitmap ridingGearBmp = null;
 
             int vehicleID = Skill.VehicleID;
@@ -121,7 +125,7 @@ namespace WzComparerR2.CharaSimControl
             return tooltip;
         }
 
-        private Bitmap RenderSkill(CanvasRegion region, out int picH, out List<int> splitterH)
+        private Bitmap RenderSkill(CanvasRegion region, out int picH, out List<int> splitterH, bool doHighlight = false)
         {
             Bitmap bitmap = new Bitmap(region.Width, DefaultPicHeight);
             Graphics g = Graphics.FromImage(bitmap);
@@ -197,7 +201,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Skill.IsPetAutoBuff)
             {
-                if (DoSetDiffColor && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("IsPetAutoBuff"))
+                if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("IsPetAutoBuff"))
                 {
                     GearGraphics.DrawString(g, "#g펫 버프 자동스킬 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
@@ -231,22 +235,16 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level > 0)
             {
-                string hStr = null;
-
                 // set custom color for skill prop changes
-                if (DoSetDiffColor)
+                if (doHighlight)
                 {
                     if (Skill.SkillID / 100000 == 4000)
                     {
                         if (Skill.VSkillValue == 2) Skill.Level = 60;
                         if (Skill.VSkillValue == 1) Skill.Level = 30;
                     }
-                    hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions, skillIDstr, this.DiffSkillTags);
                 }
-                else
-                {
-                    hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions);
-                }
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions, doHighlight, skillIDstr, this.DiffSkillTags);
                 GearGraphics.DrawString(g, "[현재레벨 " + Skill.Level + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (Skill.SkillID / 10000 / 1000 == 10 && Skill.Level == 1 && Skill.ReqLevel > 0)
                 {
