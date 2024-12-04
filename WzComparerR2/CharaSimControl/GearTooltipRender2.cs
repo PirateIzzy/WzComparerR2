@@ -620,8 +620,8 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
-                g.DrawString("无法进行星之力强化", GearGraphics.ItemDetailFont, GearGraphics.BlockRedBrush, 11, picH);
-                picH += 16;
+                g.DrawString("스타포스 강화 불가", GearGraphics.EquipDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 15;
             }
             else if (hasTuc && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
@@ -672,6 +672,12 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
+            if (Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption))
+            {
+                g.DrawString("추가옵션 설정/재설정 불가", GearGraphics.EquipDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 15;
+            }
+
             /*if (hasTuc && Gear.Hammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 g.DrawString("金锤子已提高的强化次数", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH + 2);
@@ -680,11 +686,6 @@ namespace WzComparerR2.CharaSimControl
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
                 picH += 15;
                 hasPart2 = true;
-            }
-            else if (Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption))
-            {
-                g.DrawString("无法设置/重设额外属性", GearGraphics.ItemDetailFont, GearGraphics.BlockRedBrush, 11, picH);
-                picH += 16;
             }
 
             if (hasTuc && Gear.PlatinumHammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
