@@ -114,6 +114,8 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.sharableOnce: return value == 0 ? null : "월드 내 나의 캐릭터 간 1회 이동 가능\n(이동 후 교환불가)";
                 case GearPropType.onlyEquip: return value == 0 ? null : "고유장착 아이템";
                 case GearPropType.notExtend: return value == 0 ? null : "유효기간 연장 불가";
+                case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "1회 교환 가능\n(거래 후 월드 내 나의 캐릭터 간 이동만 가능)";
+                case GearPropType.mintable: return value == 0 ? null : "민팅 가능";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -162,7 +164,7 @@ namespace WzComparerR2.CharaSim
             var propStr = GetGearPropString(propType, value);
             if (value > standardValue)
             {
-                string subfix = null;
+                string suffix = null;
                 switch (propType)
                 {
                     case GearPropType.incSTR:
@@ -180,8 +182,7 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMDD:
                     case GearPropType.incSpeed:
                     case GearPropType.incJump:
-                        subfix = $"({standardValue} #$+{value - standardValue}#)"; break;
-
+                        suffix = $"({standardValue} #$e+{value - standardValue}#)"; break;
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
@@ -189,9 +190,9 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.damR:
                     case GearPropType.incDAMr:
                     case GearPropType.statR:
-                        subfix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
+                        suffix = $"({standardValue}% #$y+{value - standardValue}%#)"; break;
                 }
-                propStr = "#$" + propStr + "# " + subfix;
+                propStr = "#$y" + propStr + "# " + suffix;
             }
             return propStr;
         }
@@ -575,6 +576,8 @@ namespace WzComparerR2.CharaSim
                     return GetGearPropString(GearPropType.sharableOnce, value);
                 case ItemPropType.exchangeableOnce:
                     return value == 0 ? null : "1회 교환가능 (사용 또는 거래 후 교환불가)";
+                case ItemPropType.accountSharableAfterExchange:
+                    return GetGearPropString(GearPropType.accountSharableAfterExchange, value);
                 case ItemPropType.quest:
                     return value == 0 ? null : "퀘스트 아이템";
                 case ItemPropType.pquest:
@@ -583,6 +586,8 @@ namespace WzComparerR2.CharaSim
                     return value == 0 ? "일반펫 (다른 일반펫과 중복 사용불가)" : "멀티펫 (다른 펫과 최대 3개 중복 사용가능)";
                 case ItemPropType.permanent:
                     return value == 0 ? null : "마법의 시간이 끝나지 않는 미라클 펫입니다.";
+                case ItemPropType.mintable:
+                    return GetGearPropString(GearPropType.mintable, value);
                 default:
                     return null;
             }
@@ -912,8 +917,8 @@ namespace WzComparerR2.CharaSim
                 case 11211: return "林之灵(3次)";
                 case 11212: return "林之灵(4次)";
 
-                case 12005: return "炭治郎";
-                case 12100: return "炭治郎";
+                case 12005: return "카마도 탄지로";
+                case 12100: return "카마도 탄지로";
 
                 case 13000: return "핑크빈";
                 case 13001: return "예티";

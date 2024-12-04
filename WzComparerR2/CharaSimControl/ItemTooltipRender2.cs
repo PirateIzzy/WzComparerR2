@@ -1021,6 +1021,14 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.multiPet, 0));
             }
+            if (item.Props.TryGetValue(ItemPropType.accountSharableAfterExchange, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharableAfterExchange, value));
+            }
+            if (item.Props.TryGetValue(ItemPropType.mintable, out value))
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, value));
+            }
 
             return tags;
         }
