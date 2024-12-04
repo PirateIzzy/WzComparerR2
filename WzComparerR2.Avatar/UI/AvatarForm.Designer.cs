@@ -782,7 +782,7 @@
         private DevComponents.DotNetBar.LabelX labelX3;
         private DevComponents.DotNetBar.LabelX labelX2;
         private DevComponents.DotNetBar.LabelX labelX1;
-        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbActionBody;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbActionBody; 
         private DevComponents.DotNetBar.Controls.CheckBoxX chkTamingPlay;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEmotionPlay;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkBodyPlay;

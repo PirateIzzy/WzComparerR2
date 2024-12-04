@@ -27,6 +27,20 @@ namespace WzComparerR2.Avatar.UI
             InitializeComponent();
             this.avatar = new AvatarCanvas();
             this.animator = new Animator();
+            // virtual comboboxes for item effects, not shown
+            this.cmbEffectFrames = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            this.cmbActionEffects = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            for (int i = 0; i < 18; i++)
+            {
+                var t1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t1.SelectedIndexChanged += new System.EventHandler(this.cmbEffectFrames_SelectedIndexChanged);
+                cmbEffectFrames[i] = t1;
+
+                var t2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t2.SelectedIndexChanged += new System.EventHandler(this.cmbActionEffect_SelectedIndexChanged);
+                cmbActionEffects[i] = t2;
+            }
+            this.panelDockContainer2.Controls.Remove(this.chkHairShade); // disable chkHairShade
             btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
             FillEarSelection();
@@ -53,6 +67,9 @@ namespace WzComparerR2.Avatar.UI
         bool suspendUpdate;
         bool needUpdate;
         Animator animator;
+        // virtual comboboxes for item effects, not shown
+        private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbActionEffects;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbEffectFrames;
 
         /// <summary>
         /// wz1节点选中事件。
@@ -333,6 +350,21 @@ namespace WzComparerR2.Avatar.UI
                     avatar.Longcoat.Visible = false;
                 }
             }
+            else if (part == avatar.Cap) // sets CapType
+            {
+                avatar.CapType = part.VSlot;
+            }
+
+            if (part.effectNode != null) // load Effects
+            {
+                this.avatar.LoadEffects();
+                FillEffectAction();
+
+                if (this.chkBodyPlay.Checked)
+                {
+                    setEffectDelay(false);
+                }
+            }
         }
 
         private void SuspendUpdateDisplay()
@@ -386,6 +418,7 @@ namespace WzComparerR2.Avatar.UI
             this.GetSelectedBodyFrame(out int bodyFrame, out _);
             this.GetSelectedEmotionFrame(out int emoFrame, out _);
             this.GetSelectedTamingFrame(out int tamingFrame, out _);
+            this.GetSelectedEffectFrames(out int[] effectFrames, out _);
 
             //获取武器状态
             selectedItem = this.cmbWeaponType.SelectedItem as ComboItem;
@@ -403,7 +436,7 @@ namespace WzComparerR2.Avatar.UI
                 return;
             }
 
-            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10}",
+            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10},{11}:{12}",
                 this.avatar.ActionName,
                 bodyFrame,
                 this.avatar.EmotionName,
@@ -414,14 +447,16 @@ namespace WzComparerR2.Avatar.UI
                 this.avatar.ShowHairShade ? 1 : 0,
                 this.avatar.EarType,
                 this.avatar.WeaponType,
-                this.avatar.WeaponIndex);
+                this.avatar.WeaponIndex,
+                this.avatar.ActionName,
+                string.Join("_", effectFrames));
 
             if (!avatarContainer1.HasCache(actionTag))
             {
                 try
                 {
                     var actionFrames = avatar.GetActionFrames(avatar.ActionName);
-                    var bone = avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
+                    var bone = avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame, effectFrames);
                     var layers = avatar.CreateFrameLayers(bone);
                     avatarContainer1.AddCache(actionTag, layers);
                 }
@@ -469,6 +504,33 @@ namespace WzComparerR2.Avatar.UI
                 {
                     cmbActionBody.SelectedIndex = i;
                     return;
+                }
+            }
+        }
+
+        private void SelectEffectAction(string actionName)
+        {
+            for (int j = 0; j < cmbActionEffects.Count(); j++)
+            {
+                var defaultIdx = -1;
+                for (int i = 0; i < cmbActionEffects[j].Items.Count; i++)
+                {
+                    ComboItem item = cmbActionEffects[j].Items[i] as ComboItem;
+                    if (item != null && item.Text == actionName)
+                    {
+                        cmbActionEffects[j].SelectedIndex = i;
+                        defaultIdx = -1;
+                        break;
+                    }
+                    if (item != null && item.Text == "default")
+                    {
+                        defaultIdx = i;
+                        continue;
+                    }
+                }
+                if (defaultIdx > -1)
+                {
+                    cmbActionEffects[j].SelectedIndex = defaultIdx;
                 }
             }
         }
@@ -540,6 +602,17 @@ namespace WzComparerR2.Avatar.UI
         private void FillTamingAction()
         {
             FillComboItems(cmbActionTaming, avatar.TamingActions);
+        }
+
+        private void FillEffectAction()
+        {
+            for (int i = 0; i < cmbActionEffects.Length; i++)
+            {
+                FillComboItems(cmbActionEffects[i], avatar.EffectActions[i]);
+            }
+
+            var selectedItem = this.cmbActionBody.SelectedItem as ComboItem;
+            SelectEffectAction(selectedItem.Text ?? "default"); // effect action is bounded to body action
         }
 
         private void FillWeaponTypes()
@@ -878,6 +951,23 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
+        private void FillEffectFrame()
+        {
+            for (int i = 0; i < this.cmbEffectFrames.Length; i++)
+            {
+                ComboItem actionItem = cmbActionEffects[i].SelectedItem as ComboItem;
+                if (actionItem != null)
+                {
+                    var frames = avatar.GetEffectFrames(actionItem.Text, i);
+                    FillComboItems(cmbEffectFrames[i], frames);
+                }
+                else
+                {
+                    cmbEffectFrames[i].Items.Clear();
+                }
+            }
+        }
+
         private void FillWeaponIdx()
         {
             FillComboItems(cmbWeaponIdx, 0, 4);
@@ -988,12 +1078,29 @@ namespace WzComparerR2.Avatar.UI
         {
             return this.GetSelectedActionFrame(this.cmbTamingFrame, out frameIndex, out actionFrame);
         }
+
+        private bool GetSelectedEffectFrames(out int[] frameIndex, out ActionFrame[] actionFrame)
+        {
+            var frameIndexs = new List<int>();
+            var actionFrames = new List<ActionFrame>();
+            foreach (var cmb in this.cmbEffectFrames)
+            {
+                this.GetSelectedActionFrame(cmb, out int fi, out ActionFrame af);
+                frameIndexs.Add(fi);
+                actionFrames.Add(af);
+            }
+            frameIndex = frameIndexs.ToArray();
+            actionFrame = actionFrames.ToArray();
+            return frameIndex.Count(x => x >= 0) > 0 && actionFrame.Count(x => x != null) > 0;
+        }
         #endregion
 
         private void cmbActionBody_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.SuspendUpdateDisplay();
             FillBodyActionFrame();
+            var selectedItem = this.cmbActionBody.SelectedItem as ComboItem;
+            SelectEffectAction(selectedItem.Text ?? "default"); // effect action is bounded to body action
             this.ResumeUpdateDisplay();
             UpdateDisplay();
         }
@@ -1016,6 +1123,14 @@ namespace WzComparerR2.Avatar.UI
             UpdateDisplay();
         }
 
+        private void cmbActionEffect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.SuspendUpdateDisplay();
+            FillEffectFrame();
+            this.ResumeUpdateDisplay();
+            UpdateDisplay();
+        }
+
         private void cmbBodyFrame_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateDisplay();
@@ -1027,6 +1142,11 @@ namespace WzComparerR2.Avatar.UI
         }
 
         private void cmbTamingFrame_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateDisplay();
+        }
+
+        private void cmbEffectFrames_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateDisplay();
         }
@@ -1059,11 +1179,38 @@ namespace WzComparerR2.Avatar.UI
                 {
                     this.animator.BodyDelay = actionFrame.AbsoluteDelay;
                 }
+                setEffectDelay(false);
             }
             else
             {
                 this.animator.BodyDelay = -1;
+                setEffectDelay(true);
                 TimerEnabledCheck();
+            }
+        }
+
+        public void setEffectDelay(bool init = false)
+        {
+            if (init)
+            {
+                for (int i = 0; i < this.animator.EffectDelay.Length; i++)
+                {
+                    this.animator.EffectDelay[i] = -1;
+                }
+            }
+            else
+            {
+                bool effects = this.GetSelectedEffectFrames(out _, out var effectFrame);
+                if (effects)
+                {
+                    for (int i = 0; i < effectFrame.Length; i++)
+                    {
+                        if (effectFrame[i]?.AbsoluteDelay > 0)
+                        {
+                            this.animator.EffectDelay[i] = effectFrame[i].AbsoluteDelay;
+                        }
+                    }
+                }
             }
         }
 
@@ -1147,6 +1294,7 @@ namespace WzComparerR2.Avatar.UI
         private void AnimateUpdate()
         {
             this.SuspendUpdateDisplay();
+            this.animator.SuspendUpdate();
 
             if (this.animator.BodyDelay == 0 && FindNextFrame(cmbBodyFrame) && this.GetSelectedBodyFrame(out _, out var bodyFrame))
             {
@@ -1163,6 +1311,15 @@ namespace WzComparerR2.Avatar.UI
                 this.animator.TamingDelay = tamingFrame.AbsoluteDelay;
             }
 
+            for (int i = 0; i < this.cmbEffectFrames.Length; i++)
+            {
+                if (this.animator.EffectDelay[i] == 0 && FindNextFrame(cmbEffectFrames[i]) && this.GetSelectedActionFrame(cmbEffectFrames[i], out _, out var effectFrame))
+                {
+                    this.animator.EffectDelay[i] = effectFrame.AbsoluteDelay;
+                }
+            }
+
+            this.animator.TrigUpdate();
             this.ResumeUpdateDisplay();
         }
 
@@ -1277,12 +1434,15 @@ namespace WzComparerR2.Avatar.UI
             bool tamingPlaying = chkTamingPlay.Checked && cmbTamingFrame.Items.Count > 1;
 
             int aniCount = new[] { bodyPlaying, emoPlaying, tamingPlaying }.Count(b => b);
+            int effectCount = bodyPlaying ? (GetSelectedEffectFrames(out int[] frameIndex, out ActionFrame[] actionFrame) ? 1 : 0) : 0;
+            aniCount += effectCount; // add effect parts
 
             if (aniCount == 0)
             {
                 this.GetSelectedBodyFrame(out int bodyFrame, out _);
                 this.GetSelectedEmotionFrame(out int emoFrame, out _);
                 this.GetSelectedTamingFrame(out int tamingFrame, out _);
+                this.GetSelectedEffectFrames(out int[] effectFrames, out _);
 
                 // no animation is playing, save as png
                 var dlg = new SaveFileDialog()
@@ -1300,7 +1460,7 @@ namespace WzComparerR2.Avatar.UI
                     return;
                 }
 
-                var bone = this.avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
+                var bone = this.avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame, effectFrames);
                 var frame = this.avatar.DrawFrame(bone);
                 frame.Bitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
             }
@@ -1346,6 +1506,26 @@ namespace WzComparerR2.Avatar.UI
                             return null;
                         }
                     }).ToArray();
+                var effectActFrames = cmbEffectFrames // get ActionFrame array from effect combobox
+                    .Select((cmb, i) =>
+                    {
+                        if (actPlaying[0]) // effect playing is bounded to body playing
+                        {
+                            return cmb.Items.OfType<ComboItem>().Select(cmbItem => new
+                            {
+                                index = int.Parse(cmbItem.Text),
+                                actionFrame = cmbItem.Tag as ActionFrame,
+                            }).ToArray();
+                        }
+                        else if (this.GetSelectedActionFrame(cmb, out var index, out var actionFrame))
+                        {
+                            return new[] { new { index, actionFrame } };
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }).ToArray();
 
                 var gifLayer = new GifLayer();
 
@@ -1369,7 +1549,7 @@ namespace WzComparerR2.Avatar.UI
                                 actionIndices[i] = act[0].index;
                             }
                         }
-                        var bone = this.avatar.CreateFrame(actionIndices[0], actionIndices[1], actionIndices[2]);
+                        var bone = this.avatar.CreateFrame(actionIndices[0], actionIndices[1], actionIndices[2], null);
                         var frameData = this.avatar.DrawFrame(bone);
                         gifLayer.AddFrame(new GifFrame(frameData.Bitmap, frameData.Origin, delay));
                     }
@@ -1377,6 +1557,7 @@ namespace WzComparerR2.Avatar.UI
                 else
                 {
                     // more than 2 animating action parts, for simplicity, we use fixed frame delay.
+                    actFrames = actFrames.Concat(effectActFrames).ToArray();
                     var aniLength = actFrames.Max(layer => layer == null ? 0 : layer.Sum(f => f.actionFrame.AbsoluteDelay));
                     var aniDelay = 30;
 
@@ -1398,7 +1579,7 @@ namespace WzComparerR2.Avatar.UI
                         int[] actionState = new int[actFrames.Length];
                         for (int i = 0; i < actionState.Length; i++)
                         {
-                            actionState[i] = actFrames[i] != null ? 0 : -1;
+                            actionState[i] = actFrames[i] != null ? (actFrames[i].Length < 1 ? -1 : 0) : -1;
                         }
 
                         foreach (int delay in delayEnumerator)
@@ -1414,11 +1595,15 @@ namespace WzComparerR2.Avatar.UI
                             // update state
                             for (int i = 0; i < actionState.Length; i++)
                             {
-                                if (actPlaying[i])
+                                if (actPlaying[i >= 3 ? 0 : i])
                                 {
                                     var act = actFrames[i];
                                     time[i] += delay;
                                     int frameIndex = actionState[i];
+                                    if (act == null || act.Length < 1)
+                                    {
+                                        continue;
+                                    }
                                     while (time[i] >= act[frameIndex].actionFrame.AbsoluteDelay)
                                     {
                                         time[i] -= act[frameIndex].actionFrame.AbsoluteDelay;
@@ -1465,7 +1650,7 @@ namespace WzComparerR2.Avatar.UI
 
                     GifFrame ApplyFrame(int[] actionIndices, int delay)
                     {
-                        var bone = this.avatar.CreateFrame(actionIndices[0], actionIndices[1], actionIndices[2]);
+                        var bone = this.avatar.CreateFrame(actionIndices[0], actionIndices[1], actionIndices[2], actionIndices.Skip(3).ToArray());
                         var frameData = this.avatar.DrawFrame(bone);
                         return new GifFrame(frameData.Bitmap, frameData.Origin, delay);
                     }
@@ -1792,9 +1977,13 @@ namespace WzComparerR2.Avatar.UI
             public Animator()
             {
                 this.delays = new int[3] { -1, -1, -1 };
+                this.effectDelays = Enumerable.Repeat(-1, 18).ToArray();
+                this.suspend = false;
             }
 
             private int[] delays;
+            private int[] effectDelays;
+            private bool suspend;
 
             public int NextFrameDelay { get; private set; }
 
@@ -1828,6 +2017,16 @@ namespace WzComparerR2.Avatar.UI
                 }
             }
 
+            public int[] EffectDelay
+            {
+                get { return this.effectDelays; }
+                set
+                {
+                    this.effectDelays = value;
+                    Update();
+                }
+            }
+
             public void Elapse(int millisecond)
             {
                 for (int i = 0; i < delays.Length; i++)
@@ -1837,10 +2036,19 @@ namespace WzComparerR2.Avatar.UI
                         delays[i] = delays[i] > millisecond ? (delays[i] - millisecond) : 0;
                     }
                 }
+                for (int i = 0; i < effectDelays.Length; i++)
+                {
+                    if (effectDelays[i] >= 0)
+                    {
+                        effectDelays[i] = effectDelays[i] > millisecond ? (effectDelays[i] - millisecond) : 0;
+                    }
+                }
             }
 
             private void Update()
             {
+                if (this.suspend) return;
+
                 int nextFrame = 0;
                 foreach (int delay in this.delays)
                 {
@@ -1849,7 +2057,25 @@ namespace WzComparerR2.Avatar.UI
                         nextFrame = nextFrame <= 0 ? delay : Math.Min(nextFrame, delay);
                     }
                 }
+                foreach (int delay in this.effectDelays)
+                {
+                    if (delay > 0)
+                    {
+                        nextFrame = nextFrame <= 0 ? delay : Math.Min(nextFrame, delay);
+                    }
+                }
                 this.NextFrameDelay = nextFrame;
+            }
+
+            public void SuspendUpdate()
+            {
+                this.suspend = true;
+            }
+
+            public void TrigUpdate()
+            {
+                this.suspend = false;
+                Update();
             }
         }
 
@@ -1910,7 +2136,7 @@ namespace WzComparerR2.Avatar.UI
                 {
                     if (frame.Delay != 0)
                     {
-                        var bone = string.IsNullOrEmpty(avatar.TamingActionName) ? avatar.CreateFrame(frame, faceFrames[emoFrame], null) : avatar.CreateFrame(actionFrames[0], faceFrames[emoFrame], frame);
+                        var bone = string.IsNullOrEmpty(avatar.TamingActionName) ? avatar.CreateFrame(frame, faceFrames[emoFrame], null, null) : avatar.CreateFrame(actionFrames[0], faceFrames[emoFrame], frame, null);
                         var bmp = avatar.DrawFrame(bone);
 
                         Point pos = bmp.OpOrigin;

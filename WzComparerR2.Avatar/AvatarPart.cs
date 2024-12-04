@@ -42,6 +42,7 @@ namespace WzComparerR2.Avatar
 
         public Wz_Node Node { get; private set; }
         public string ISlot { get; private set; }
+        public string VSlot { get; private set; }
         public BitmapOrigin Icon { get; private set; }
         public bool Visible { get; set; }
         public int? ID { get; private set; }
@@ -68,6 +69,7 @@ namespace WzComparerR2.Avatar
         public int MixColor { get; set; }
         public int MixOpacity { get; set; }
         public bool IsMixing { get { return BaseColor != -1 && BaseColor != MixColor && MixOpacity > 0; } }
+        public Wz_Node effectNode { get; set; }
 
         private void LoadInfo()
         {
@@ -88,6 +90,7 @@ namespace WzComparerR2.Avatar
                 {
                     Icon = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(@"Item\Install\0380.img\03801577\info\icon"), PluginBase.PluginManager.FindWz);
                 }
+                this.effectNode = PluginBase.PluginManager.FindWz("Effect/ItemEff.img/" + this.ID + "/effect");
             }
 
             Wz_Node infoNode = this.Node.FindNodeByPath("info");
@@ -102,6 +105,10 @@ namespace WzComparerR2.Avatar
                 {
                     case "islot":
                         this.ISlot = node.GetValue<string>();
+                        break;
+
+                    case "vslot":
+                        this.VSlot = node.GetValue<string>();
                         break;
 
                     case "icon":
