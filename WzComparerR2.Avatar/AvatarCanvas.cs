@@ -374,7 +374,9 @@ namespace WzComparerR2.Avatar
             {
                 return null;
             }
-            AvatarPart part = new AvatarPart(imgNode, forceIcon, forceID, brm, forceAct);
+            AvatarPart part = new AvatarPart(imgNode, forceIcon, forceID, false);
+            part.forceAction = forceAct;
+            part.bodyRelMove = brm;
             
             this.Taming = part;
 
