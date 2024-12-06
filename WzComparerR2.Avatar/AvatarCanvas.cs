@@ -548,19 +548,6 @@ namespace WzComparerR2.Avatar
             }
 
             var actionNode = this.Taming?.Node.Nodes[action]?.ResolveUol();
-            /*
-            if (actionNode == null)
-            {
-                if (action == "effect") // 의자 아이템
-                {
-                    actionNode = this.Taming?.Node.Nodes["effect2"]?.ResolveUol();
-                }
-
-                if (actionNode == null)
-                {
-                    return null;
-                }
-            }*/
 
             var frameNode = actionNode.Nodes[frameIndex.ToString()];
             if (frameNode != null)
