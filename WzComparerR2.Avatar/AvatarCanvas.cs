@@ -539,7 +539,16 @@ namespace WzComparerR2.Avatar
 
         private ActionFrame GetTamingFrame(string action, int frameIndex)
         {
+            if (action == "effect") // 의자 아이템
+            {
+                if ((this.Taming.Node.FindNodeByPath(action)?.Nodes.Count ?? 0) < this.Taming.Node.FindNodeByPath("effect2")?.Nodes.Count)
+                {
+                    action = "effect2";
+                }
+            }
+
             var actionNode = this.Taming?.Node.Nodes[action]?.ResolveUol();
+            /*
             if (actionNode == null)
             {
                 if (action == "effect") // 의자 아이템
@@ -551,7 +560,7 @@ namespace WzComparerR2.Avatar
                 {
                     return null;
                 }
-            }
+            }*/
 
             var frameNode = actionNode.Nodes[frameIndex.ToString()];
             if (frameNode != null)
