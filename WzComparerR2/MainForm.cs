@@ -2257,7 +2257,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.String && this.stringLinker.Load(file))
+                    if (file.Type == Wz_Type.String && this.stringLinker.Load(file, null, null))
                     {
                         return true;
                     }
@@ -2304,11 +2304,11 @@ namespace WzComparerR2
                 {
                     if (file.Type == Wz_Type.Etc && file.Node.Nodes.Count > 0)
                     {
-                        return true;
+                        return file;
                     }
                 }
             }
-            return false;
+            return null;
         }
 
         private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
