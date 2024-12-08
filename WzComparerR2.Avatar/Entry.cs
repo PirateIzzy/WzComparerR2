@@ -84,7 +84,7 @@ namespace WzComparerR2.Avatar
                 {
                     if (frame.Delay != 0)
                     {
-                        var bone = canvas.CreateFrame(frame, faceFrames[0], null);
+                        var bone = canvas.CreateFrame(frame, faceFrames[0], null, null);
                         var bmp = canvas.DrawFrame(bone);
 
                         Point pos = bmp.OpOrigin;
@@ -229,7 +229,7 @@ namespace WzComparerR2.Avatar
                     if (frame.Delay != 0)
                     {
                         //绘制角色主动作
-                        var bone = canvas.CreateFrame(frame, null, null);
+                        var bone = canvas.CreateFrame(frame, null, null, null);
                         var bmp = canvas.DrawFrame(bone);
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         gifCanvas.Layers[0].Frames.Add(f);
@@ -345,7 +345,7 @@ namespace WzComparerR2.Avatar
                     if (frame.Delay != 0)
                     {
                         //绘制角色主动作
-                        var bone = canvas.CreateFrame(frame, null, null);
+                        var bone = canvas.CreateFrame(frame, null, null, null);
                         var bmp = canvas.DrawFrame(bone);
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         actLayer.Frames.Add(f);
@@ -427,7 +427,7 @@ namespace WzComparerR2.Avatar
                     if (frame.Delay != 0)
                     {
                         //绘制角色主动作
-                        var bone = canvas.CreateFrame(frame, faceFrames[0], null);
+                        var bone = canvas.CreateFrame(frame, faceFrames[0], null, null);
                         bone.Position = bodyMove;
                         var bmp = canvas.DrawFrame(bone);
 

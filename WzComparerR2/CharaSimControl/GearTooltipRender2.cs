@@ -168,10 +168,18 @@ namespace WzComparerR2.CharaSimControl
             {
                 { "c", ((SolidBrush)GearGraphics.OrangeBrush3).Color },
             };
-            int value, value2;
+            var itemPropColorTable = new Dictionary<string, Color>()
+            {
+                { "$y", GearGraphics.gearCyanColor },
+                { "$e", GearGraphics.ScrollEnhancementColor },
+            };
+            int value, value2; ;
 
             picH = 13;
-            DrawStar2(g, ref picH); //绘制星星
+            if (!Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                DrawStar2(g, ref picH); //绘制星星
+            }
 
             //绘制装备名称
             StringResult sr;
@@ -612,7 +620,12 @@ namespace WzComparerR2.CharaSimControl
                 TextRenderer.DrawText(g, "Unable to enhance", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 picH += 15;
             }
-            else if (hasTuc)
+            else if (Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                g.DrawString("Cannot Star Force Enhance", GearGraphics.EquipDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 15;
+            }
+            else if (hasTuc && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 var colorTable = new Dictionary<string, Color>
                 {
@@ -634,7 +647,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //星星锤子
-            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar() > 0)
+            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar() > 0 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 if (Gear.Hammer == 2)
                 {
@@ -660,7 +673,13 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-            if (hasTuc && Gear.Hammer > -1)
+            if (Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption))
+            {
+                g.DrawString("Cannot Set/Reset Bonus Stats", GearGraphics.EquipDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 15;
+            }
+
+            if (hasTuc && Gear.Hammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 TextRenderer.DrawText(g, "Hammers Applied", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -670,9 +689,9 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-            picH += 3;//original value is '8'. 3 is perfect.
+            picH += 3; //original value is '8'. 3 is perfect.
 
-            /*if (hasTuc && Gear.PlatinumHammer > -1)
+            /*if (hasTuc && Gear.PlatinumHammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 g.DrawString("白金锤强化次数:" + Gear.PlatinumHammer, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);// CMS 'Platinum Hammer'
                 picH += 16;
@@ -949,7 +968,7 @@ namespace WzComparerR2.CharaSimControl
 
             //判断是否绘制徽章
             Wz_Node medalResNode = null;
-            bool willDrawMedalTag = this.ShowMedalTag
+            bool willDrawMedalTag = this.ShowMedalTag && this.Gear.Sample.Bitmap == null
                 && this.Gear.Props.TryGetValue(GearPropType.medalTag, out value)
                 && this.TryGetMedalResource(value, out medalResNode);
 
@@ -1297,6 +1316,10 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.onlyEquip, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.onlyEquip, value));
+            }
+            if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.mintable, value));
             }
             if (Gear.Props.TryGetValue(GearPropType.abilityTimeLimited, out value) && value != 0)
             {

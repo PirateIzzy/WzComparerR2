@@ -171,9 +171,13 @@
             this.buttonItemAutoSaveFolder = new DevComponents.DotNetBar.ButtonItem();
             this.labelItemAutoSaveFolder = new DevComponents.DotNetBar.LabelItem();
             this.buttonItemGif = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemGif2 = new DevComponents.DotNetBar.ButtonItem();
             this.itemContainer36 = new DevComponents.DotNetBar.ItemContainer();
             this.buttonItemExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer44 = new DevComponents.DotNetBar.ItemContainer();
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonOverlayRect = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -207,6 +211,7 @@
             this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
+            this.chkOutputSkillTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
@@ -1940,7 +1945,8 @@
             this.cmbItemAniNames,
             this.cmbItemSkins,
             this.buttonItemSaveImage,
-            this.buttonItemGif});
+            this.buttonItemGif,
+            this.buttonItemGif2});
             this.ribbonBar5.Location = new System.Drawing.Point(0, 202);
             this.ribbonBar5.Name = "ribbonBar5";
             this.ribbonBar5.Size = new System.Drawing.Size(292, 26);
@@ -2046,6 +2052,15 @@
             this.buttonItemGif.Text = "Extract Animation";
             this.buttonItemGif.Click += new System.EventHandler(this.buttonItemGif_Click);
             // 
+            // buttonItemGif2
+            //
+            this.buttonItemGif2.Name = "buttonItemGif2";
+            this.buttonItemGif2.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer44});
+            this.buttonItemGif2.SubItemsExpandWidth = 14;
+            this.buttonItemGif2.Text = "Enable Animation Overlay";
+            this.buttonItemGif2.Click += new System.EventHandler(this.buttonItemGif2_Click);
+            //
             // itemContainer36
             // 
             // 
@@ -2066,7 +2081,7 @@
             //
             this.buttonItemExtractGifEx.Name = "buttonItemExtractGifEx";
             this.buttonItemExtractGifEx.Text = "ExtractGifEx";
-            this.buttonItemExtractGifEx.Tooltip = "对所选节点的全部子节点提取帧动画，而不使用序数节点名称。";
+            this.buttonItemExtractGifEx.Tooltip = "Extract frame animations for all child nodes of the selected node, without using ordinal node names.";
             this.buttonItemExtractGifEx.Click += new System.EventHandler(this.buttonItemGif_Click);
             // 
             // buttonItemGifSetting
@@ -2074,6 +2089,34 @@
             this.buttonItemGifSetting.Name = "buttonItemGifSetting";
             this.buttonItemGifSetting.Text = "Settings";
             this.buttonItemGifSetting.Click += new System.EventHandler(this.buttonItemGifSetting_Click);
+            //
+            // itemContainer44
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer44.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer44.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer44.Name = "itemContainer44";
+            this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonDisableOverlayAni,
+            this.buttonOverlayRect});
+            // 
+            // 
+            // 
+            this.itemContainer44.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonDisableOverlayAni
+            // 
+            this.buttonDisableOverlayAni.Name = "buttonDisableOverlayAni";
+            this.buttonDisableOverlayAni.Text = "Disable Animation Overlay";
+            this.buttonDisableOverlayAni.Click += new System.EventHandler(this.buttonDisableOverlayAni_Click);
+            // 
+            // buttonOverlayRect
+            // 
+            this.buttonOverlayRect.Name = "buttonOverlayRect";
+            this.buttonOverlayRect.Text = "Add Boundary Rectangle";
+            this.buttonOverlayRect.Click += new System.EventHandler(this.buttonOverlayRect_Click);
             // 
             // textBoxX1
             // 
@@ -2368,6 +2411,7 @@
             // 
             this.superTabControlPanel2.Controls.Add(this.chkHashPngFileName);
             this.superTabControlPanel2.Controls.Add(this.chkEnableDarkMode);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputSkillTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2411,6 +2455,20 @@
             this.superTooltip1.SetSuperTooltip(this.chkEnableDarkMode, new DevComponents.DotNetBar.SuperTooltipInfo("Enable Dark Mode", "", "Outputs the comparison with dark mode HTML.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
             this.chkEnableDarkMode.TabIndex = 9;
             this.chkEnableDarkMode.Text = "Enable Dark Mode";
+            // 
+            // 
+            // chkSaveSkillTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputSkillTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputSkillTooltip.Location = new System.Drawing.Point(430, 34);
+            this.chkOutputSkillTooltip.Name = "chkSaveSkillTooltip";
+            this.chkOutputSkillTooltip.Size = new System.Drawing.Size(135, 23);
+            this.chkOutputSkillTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputSkillTooltip.TabIndex = 11;
+            this.chkOutputSkillTooltip.Text = "Save Skill Tooltip";
             // 
             // chkOutputRemovedImg
             // 
@@ -3197,9 +3255,13 @@
         private DevComponents.DotNetBar.ItemContainer itemContainer34;
         private DevComponents.DotNetBar.ItemContainer itemContainer35;
         private DevComponents.DotNetBar.ButtonItem buttonItemGif;
+        private DevComponents.DotNetBar.ButtonItem buttonItemGif2;
         private DevComponents.DotNetBar.ItemContainer itemContainer36;
         private DevComponents.DotNetBar.ButtonItem buttonItemExtractGifEx;
+        private DevComponents.DotNetBar.ItemContainer itemContainer44;
         private DevComponents.DotNetBar.ButtonItem buttonItemGifSetting;
+        private DevComponents.DotNetBar.ButtonItem buttonDisableOverlayAni;
+        private DevComponents.DotNetBar.ButtonItem buttonOverlayRect;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
         private System.Windows.Forms.ToolStripMenuItem tsmi2ExpandAll;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CollapseAll;
@@ -3281,6 +3343,7 @@
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputSkillTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
         private DevComponents.Editors.ComboItem comboItem19;
     }

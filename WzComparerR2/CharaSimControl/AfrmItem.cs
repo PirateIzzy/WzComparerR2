@@ -570,8 +570,7 @@ namespace WzComparerR2.CharaSimControl
                 Bitmap cashImg = null;
                 Point cashOrigin = new Point(12, 12);
 
-                int value;
-                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out long value) && value > 0)
                 {
                     string resKey = $"CashShop_img_CashItem_label_{value + 3}";
                     cashImg = Resource.ResourceManager.GetObject(resKey) as Bitmap;

@@ -11,15 +11,17 @@ namespace WzComparerR2
         {
         }
 
-        public FindWzEventArgs(Wz_Type type)
+        public FindWzEventArgs(Wz_Type type, bool hasChildNodes)
         {
             this.wzType = type;
+            this.hasChildNodes = hasChildNodes;
         }
 
         private string fullPath;
         private Wz_Type wzType;
         private Wz_File wzFile;
         private Wz_Node wzNode;
+        private bool hasChildNodes;
 
         /// <summary>
         /// 获取或设置要查找wz节点的完全名称，用于输入参数。
@@ -55,6 +57,12 @@ namespace WzComparerR2
         {
             get { return wzNode; }
             set { wzNode = value; }
+        }
+
+        public bool HasChildNodes
+        {
+            get { return hasChildNodes; }
+            set { hasChildNodes = value; }
         }
     }
 }

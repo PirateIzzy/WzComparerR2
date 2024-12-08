@@ -97,7 +97,7 @@ namespace WzComparerR2.CharaSimControl
                                 if (gear != null)
                                 {
                                     gear.Props[GearPropType.timeLimited] = 0;
-                                    int tuc, tucCnt;
+                                    long tuc, tucCnt;
                                     if (Item.Props.TryGetValue(ItemPropType.addTooltip_tuc, out tuc) && Item.Props.TryGetValue(ItemPropType.addTooltip_tucCnt, out tucCnt))
                                     {
                                         Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item);
@@ -109,7 +109,7 @@ namespace WzComparerR2.CharaSimControl
                                                 Wz_Node infoNode = node1.FindNodeByPath(imgClass, true);
                                                 if (infoNode != null)
                                                 {
-                                                    gear.Upgrade(infoNode, tucCnt);
+                                                    gear.Upgrade(infoNode, (int)tucCnt);
 
                                                     break;
                                                 }
@@ -150,10 +150,9 @@ namespace WzComparerR2.CharaSimControl
             };
 
             //图纸相关
-            int recipeID;
-            if (this.item.Specs.TryGetValue(ItemSpecType.recipe, out recipeID))
+            if (this.item.Specs.TryGetValue(ItemSpecType.recipe, out long recipeID))
             {
-                int recipeSkillID = recipeID / 10000;
+                long recipeSkillID = recipeID / 10000;
                 Recipe recipe = null;
                 //寻找配方
                 Wz_Node recipeNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\Recipe_{0}.img\{1}", recipeSkillID, recipeID));
@@ -177,16 +176,16 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            int value;
+            long value;
             if (this.item.Props.TryGetValue(ItemPropType.dressUpgrade, out value))
             {
-                int itemID = value;
-                AppendGearOrItem(itemID);
+                long itemID = value;
+                AppendGearOrItem((int)itemID);
             }
             if (this.item.Props.TryGetValue(ItemPropType.tamingMob, out value))
             {
-                int itemID = value;
-                AppendGearOrItem(itemID);
+                long itemID = value;
+                AppendGearOrItem((int)itemID);
             }
 
             if (this.item.AddTooltips.Count > 0)
@@ -197,11 +196,10 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            int setID;
-            if (this.item.Props.TryGetValue(ItemPropType.setItemID, out setID))
+            if (this.item.Props.TryGetValue(ItemPropType.setItemID, out long setID))
             {
                 SetItem setItem;
-                if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                if (CharaSimLoader.LoadedSetItems.TryGetValue((int)setID, out setItem))
                 {
                     setItemBmp = RenderSetItem(setItem);
                 }
@@ -328,7 +326,8 @@ namespace WzComparerR2.CharaSimControl
             Bitmap tooltip = new Bitmap(290, DefaultPicHeight);
             Graphics g = Graphics.FromImage(tooltip);
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
-            int value;
+            long value;
+            int intvalue;
 
             picH = 10;
             //物品标题
@@ -583,11 +582,10 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
                 {
-                    int setID;
-                    if (item.Props.TryGetValue(ItemPropType.setItemID, out setID))
+                    if (item.Props.TryGetValue(ItemPropType.setItemID, out long setID))
                     {
                         SetItem setItem;
-                        if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                        if (CharaSimLoader.LoadedSetItems.TryGetValue((int)setID, out setItem))
                         {
                             string wonderGradeString = null;
                             string setItemName = setItem.SetItemName;
@@ -787,7 +785,7 @@ namespace WzComparerR2.CharaSimControl
                 && this.Item.Props.TryGetValue(ItemPropType.nickTag, out value)
                 && this.TryGetNickResource(value, out nickResNode);
             string descLeftAlign = sr["desc_leftalign"];
-            int minLev = 0, maxLev = 0;
+            long minLev = 0, maxLev = 0;
             bool willDrawExp = item.Props.TryGetValue(ItemPropType.exp_minLev, out minLev) && item.Props.TryGetValue(ItemPropType.exp_maxLev, out maxLev);
 
             if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.SamplePath != null || willDrawNickTag || willDrawExp)
@@ -808,6 +806,7 @@ namespace WzComparerR2.CharaSimControl
                     foreach (KeyValuePair<ItemCoreSpecType, Wz_Node> p in item.CoreSpecs)
                     {
                         string coreSpec;
+                        intvalue = 0;
                         switch (p.Key)
                         {
                             case ItemCoreSpecType.Ctrl_addMob:
@@ -819,12 +818,12 @@ namespace WzComparerR2.CharaSimControl
                                 }
                                 foreach (Wz_Node addMobNode in p.Value.Nodes)
                                 {
-                                    if (int.TryParse(addMobNode.Text, out value))
+                                    if (int.TryParse(addMobNode.Text, out intvalue))
                                     {
                                         break;
                                     }
                                 }
-                                coreSpec = ItemStringHelper.GetItemCoreSpecString(ItemCoreSpecType.Ctrl_addMob, value, srMob.Name);
+                                coreSpec = ItemStringHelper.GetItemCoreSpecString(ItemCoreSpecType.Ctrl_addMob, intvalue, srMob.Name);
                                 break;
 
                             default:
@@ -890,7 +889,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     long totalExp = 0;
 
-                    for (int i = minLev; i < maxLev; i++)
+                    for (int i = (int)minLev; i < (int)maxLev; i++)
                         totalExp += Character.ExpToNextLevel(i);
 
                     g.DrawLine(Pens.White, 6, picH, tooltip.Width - 7, picH);
@@ -931,7 +930,7 @@ namespace WzComparerR2.CharaSimControl
             //绘制配方需求
             if (item.Specs.TryGetValue(ItemSpecType.recipe, out value))
             {
-                int reqSkill, reqSkillLevel;
+                long reqSkill, reqSkillLevel;
                 if (!item.Specs.TryGetValue(ItemSpecType.reqSkill, out reqSkill))
                 {
                     reqSkill = value / 10000 * 10000;
@@ -949,7 +948,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 17;
 
                 //技能标题
-                if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(reqSkill, out sr))
+                if (StringLinker == null || !StringLinker.StringSkill.TryGetValue((int)reqSkill, out sr))
                 {
                     sr = new StringResult();
                     sr.Name = "- (null)";
@@ -965,7 +964,7 @@ namespace WzComparerR2.CharaSimControl
 
         private List<string> GetItemAttributeString()
         {
-            int value, value2;
+            long value, value2;
             List<string> tags = new List<string>();
 
             if (item.Props.TryGetValue(ItemPropType.quest, out value) && value != 0)
@@ -1018,6 +1017,14 @@ namespace WzComparerR2.CharaSimControl
             else if (item.ItemID / 10000 == 500)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.multiPet, 0));
+            }
+            if (item.Props.TryGetValue(ItemPropType.accountSharableAfterExchange, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharableAfterExchange, value));
+            }
+            if (item.Props.TryGetValue(ItemPropType.mintable, out value))
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, value));
             }
 
             return tags;
@@ -1198,7 +1205,7 @@ namespace WzComparerR2.CharaSimControl
             return level;
         }
 
-        private bool TryGetNickResource(int nickTag, out Wz_Node resNode)
+        private bool TryGetNickResource(long nickTag, out Wz_Node resNode)
         {
             resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/nick/" + nickTag);
             return resNode != null;

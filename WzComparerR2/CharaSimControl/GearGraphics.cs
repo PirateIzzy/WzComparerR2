@@ -108,6 +108,11 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Brush GreenBrush2 = new SolidBrush(Color.FromArgb(204, 255, 0));
         public static readonly Color GrayColor2 = Color.FromArgb(153, 153, 153);
         /// <summary>
+        /// 表示装备属性额外说明中使用的卷轴强化数值画刷。
+        /// </summary>
+        public static readonly Color ScrollEnhancementColor = Color.FromArgb(175, 173, 255);
+        public static readonly Brush ScrollEnhancementBrush = new SolidBrush(ScrollEnhancementColor);
+        /// <summary>
         /// 表示用于绘制“攻击力提升”文字的灰色画刷。
         /// </summary>
         public static readonly Brush GrayBrush2 = new SolidBrush(GrayColor2);
@@ -119,6 +124,10 @@ namespace WzComparerR2.CharaSimControl
         /// 表示套装属性不可用的灰色画刷。
         /// </summary>
         public static readonly Brush SetItemGrayBrush = new SolidBrush(Color.FromArgb(119, 136, 153));
+        /// <summary>
+        /// 表示效果不可用的红色画刷。
+        /// </summary>
+        public static readonly Brush BlockRedBrush = new SolidBrush(Color.FromArgb(255, 0, 102));
         /// <summary>
         /// 表示装备tooltip中金锤子描述文字的颜色画刷。
         /// </summary>
@@ -534,30 +543,38 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawString(tagName, font, brush, left, picH, fmt);
                 }
             }
-            else //  ani mode
+            else // ani mode
             {
+                bool mixedAniMode = wce[1].Bitmap != null && (wce[1].Bitmap.Width > 1 || wce[1].Bitmap.Height > 1);
+
                 offsetY = Math.Min(offsetY, ani0.OpOrigin.Y);
                 height = Math.Max(height, ani0.Rectangle.Bottom);
 
-                int bgWidth = wce[1].Bitmap?.Width ?? 0;
+                int bgWidth = mixedAniMode ? wce[1].Bitmap.Width : nameWidth;
                 int left = center - bgWidth / 2;
                 int right = left + bgWidth;
                 int nameLeft = center - nameWidth / 2;
 
                 picH -= offsetY;
 
-                if (wce[1].Bitmap != null) // draw center only
+                if (mixedAniMode)
                 {
+                    // draw legay center
+                    // Note: item 1143360 (MILESTONE) does not render well, ignore it.
                     g.DrawImage(wce[1].Bitmap, left - wce[1].Origin.X, picH - wce[1].Origin.Y);
+                    // draw ani0 based on bg center position
+                    g.DrawImage(ani0.Bitmap, left - wce[1].Origin.X - ani0.Origin.X, picH - wce[1].Origin.Y - ani0.Origin.Y);
+                    if (!string.IsNullOrEmpty(tagName)) // draw name
+                    {
+                        using var brush = new SolidBrush(color);
+                        // offsetX with bg for better alignment
+                        g.DrawString(tagName, font, brush, nameLeft - wce[1].Origin.X, picH, fmt);
+                    }
                 }
-                // draw ani0 based on bg center position
-                g.DrawImage(ani0.Bitmap, left - wce[1].Origin.X - ani0.Origin.X, picH - wce[1].Origin.Y - ani0.Origin.Y);
-                // draw name
-                if (!string.IsNullOrEmpty(tagName))
+                else
                 {
-                    using var brush = new SolidBrush(color);
-                    // offsetX with bg for better alignment
-                    g.DrawString(tagName, font, brush, nameLeft - wce[1].Origin.X, picH, fmt);
+                    // draw ani0 only
+                    g.DrawImage(ani0.Bitmap, left - ani0.Origin.X, picH - ani0.Origin.Y);
                 }
             }
 
@@ -750,8 +767,6 @@ namespace WzComparerR2.CharaSimControl
                     switch (colorID)
                     {
                         case "c": color = GearGraphics.OrangeBrushColor; break;
-                        case "g": color = GearGraphics.gearGreenColor; break;
-                        case "$": color = GearGraphics.gearCyanColor; break;
                         default: color = this.defaultColor; break;
                     }
                 }

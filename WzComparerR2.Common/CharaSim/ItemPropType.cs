@@ -18,6 +18,7 @@ namespace WzComparerR2.CharaSim
         tradeAvailable,
         accountSharable,
         exchangeableOnce,
+        accountSharableAfterExchange,
         timeLimited,
         setItemID,
         charismaEXP,
@@ -58,5 +59,7 @@ namespace WzComparerR2.CharaSim
         addTooltip_tucCnt,
         pointCost,
         tamingMob,
+        //MSN专属属性
+        mintable,
     }
 }

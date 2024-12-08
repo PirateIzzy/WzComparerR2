@@ -29,7 +29,7 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public static string GetGearPropString(GearPropType propType, int value)
+        public static string GetGearPropString(GearPropType propType, long value)
         {
             return GetGearPropString(propType, value, 0);
         }
@@ -40,7 +40,7 @@ namespace WzComparerR2.CharaSim
         /// <param Name="propType">表示装备属性枚举GearPropType。</param>
         /// <param Name="Value">表示propType属性所对应的值。</param>
         /// <returns></returns>
-        public static string GetGearPropString(GearPropType propType, int value, int signFlag)
+        public static string GetGearPropString(GearPropType propType, long value, int signFlag)
         {
 
             string sign;
@@ -106,7 +106,6 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.limitBreak: return "Damage Cap: " + value.ToString("N0");
                 case GearPropType.reduceReq: return "Required Level: -" + value;
                 case GearPropType.nbdR: return "Damage Against Normal Monsters: +" + value + "%"; //KMST 1069
-
                 case GearPropType.only: return value == 0 ? null : "One-of-a-kind Item";
                 case GearPropType.tradeBlock: return value == 0 ? null : "Untradable";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "Cannot be Traded when equipped";
@@ -114,6 +113,8 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.sharableOnce: return value == 0 ? null : "Tradable once within the same world.\n(Cannot be traded after transfer)"; //old "Can be traded once within account"
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
                 case GearPropType.notExtend: return value == 0 ? null : "Duration cannot be extended.";
+                case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "Tradable once\n(Only tradable to your chars in this world after exchange)";
+                case GearPropType.mintable: return value == 0 ? null : "Mintable";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -163,7 +164,7 @@ namespace WzComparerR2.CharaSim
             var propStr = GetGearPropString(propType, value);
             if (value > standardValue)
             {
-                string subfix = null;
+                string suffix = null;
                 switch (propType)
                 {
                     case GearPropType.incSTR:
@@ -181,8 +182,7 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMDD:
                     case GearPropType.incSpeed:
                     case GearPropType.incJump:
-                        subfix = $"({standardValue} #$+{value - standardValue}#)"; break;
-
+                        suffix = $"({standardValue} #$e+{value - standardValue}#)"; break;
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
@@ -190,9 +190,9 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.damR:
                     case GearPropType.incDAMr:
                     case GearPropType.statR:
-                        subfix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
+                        suffix = $"({standardValue}% #$y+{value - standardValue}%#)"; break;
                 }
-                propStr = "#$" + propStr + "# " + subfix;
+                propStr = "#$y" + propStr + "# " + suffix;
             }
             return propStr;
         }
@@ -557,7 +557,7 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public static string GetItemPropString(ItemPropType propType, int value)
+        public static string GetItemPropString(ItemPropType propType, long value)
         {
             switch (propType)
             {
@@ -575,6 +575,8 @@ namespace WzComparerR2.CharaSim
                     return GetGearPropString(GearPropType.sharableOnce, value);
                 case ItemPropType.exchangeableOnce:
                     return value == 0 ? null : "Tradable once (untradable after using or trading)";
+                case ItemPropType.accountSharableAfterExchange:
+                    return GetGearPropString(GearPropType.accountSharableAfterExchange, value);
                 case ItemPropType.quest:
                     return value == 0 ? null : "Quest Item";
                 case ItemPropType.pquest:
@@ -583,6 +585,8 @@ namespace WzComparerR2.CharaSim
                     return value == 0 ? null : "PERMANENT";//GMS PLACEHOLDER?
                 case ItemPropType.multiPet://GMS string for: "Normal Pet (Cannot be used with other pets)" and "Multi Pet (Can use up to 3 pets at once)"
                     return value == 0 ? "" : "";
+                case ItemPropType.mintable:
+                    return GetGearPropString(GearPropType.mintable, value);
                 default:
                     return null;
             }
@@ -657,83 +661,125 @@ namespace WzComparerR2.CharaSim
                 case 110: return "Fighter";
                 case 111: return "Crusader";
                 case 112: return "Hero";
+                case 113: return "Hero(5)";
+                case 114: return "Hero(6)";
                 case 120: return "Page";
                 case 121: return "White Knight";
                 case 122: return "Paladin";
+                case 123: return "Paladin(5)";
+                case 124: return "Paladin(6)";
                 case 130: return "Spearman";
                 case 131: return "Dragon Knight";
                 case 132: return "Dark Knight";
+                case 133: return "Dark Knight(5)";
+                case 134: return "Dark Knight(6)";
                 case 200: return "Magician";
                 case 210: return "Wizard (Fire,Poison)";
                 case 211: return "Mage (Fire, Poison)";
                 case 212: return "Arch Mage (Fire,Poison)";
+                case 213: return "Arch Mage (Fire,Poison)(5)";
+                case 214: return "Arch Mage (Fire,Poison)(6)";
                 case 220: return "Wizard (Ice,Lightning)";
                 case 221: return "Mage (Ice,Lightning)";
                 case 222: return "Arch Mage (Ice,Lightning)";
+                case 223: return "Arch Mage (Ice,Lightning)(5)";
+                case 224: return "Arch Mage (Ice,Lightning)(6)";
                 case 230: return "Cleric";
                 case 231: return "Priest";
                 case 232: return "Bishop";
+                case 233: return "Bishop(5)";
+                case 234: return "Bishop(6)";
                 case 300: return "Archer";
                 case 301: return "Archer";
                 case 310: return "Hunter";
                 case 311: return "Ranger";
                 case 312: return "Bowmaster";
+                case 313: return "Bowmaster(5)";
+                case 314: return "Bowmaster(6)";
                 case 320: return "Crossbowman";
                 case 321: return "Sniper";
                 case 322: return "Marksman";
+                case 323: return "Marksman(5)";
+                case 324: return "Marksman(6)";
                 case 330: return "Ancient Archer";
                 case 331: return "Soulchaser";
                 case 332: return "Pathfinder";
-                case 333: return "Pathfinder (5)";
+                case 333: return "Pathfinder(5)";
+                case 334: return "Pathfinder(6)";
                 case 400: return "Rogue";
                 case 410: return "Assassin";
                 case 411: return "Hermit";
                 case 412: return "Night Lord";
+                case 413: return "Night Lord(5)";
+                case 414: return "Night Lord(6)";
                 case 420: return "Thief";
                 case 421: return "Chief Bandit";
                 case 422: return "Shadower";
+                case 423: return "Shadower(5)";
+                case 424: return "Shadower(6)";
                 case 430: return "Blade Recruit";
                 case 431: return "Blade Acolyte";
                 case 432: return "Blade Specialist";
                 case 433: return "Blade Loard";
                 case 434: return "Blade Master";
+                case 435: return "Blade Master(5)";
+                case 436: return "Blade Master(6)";
                 case 500: return "Pirate";
                 case 501: return "Pirate";
-                case 508: return "Jett(1)";
                 case 510: return "Brawler";
                 case 511: return "Marauder";
                 case 512: return "Buccaneer";
+                case 513: return "Buccaneer(5)";
+                case 514: return "Buccaneer(6)";
                 case 520: return "Gunslinger";
                 case 521: return "Outlaw";
-                case 522: return "Captain";
+                case 522: return "Corsair";
+                case 523: return "Corsair(5)";
+                case 524: return "Corsair(6)";
                 case 530: return "Cannoneer";
                 case 531: return "Cannon Trooper";
                 case 532: return "Cannon Master";
+                case 533: return "Cannon Master(5)";
+                case 534: return "Cannon Master(6)";
+                case 508: return "Jett(1)";
                 case 570: return "Jett(2)";
                 case 571: return "Jett(3)";
                 case 572: return "Jett(4)";
+
+                case 800:
+                case 900: return "Operator";
 
                 case 1000: return "Noblesse";
                 case 1100: return "Dawn Warrior(1)";
                 case 1110: return "Dawn Warrior(2)";
                 case 1111: return "Dawn Warrior(3)";
                 case 1112: return "Dawn Warrior(4)";
+                case 1113: return "Dawn Warrior(5)";
+                case 1114: return "Dawn Warrior(6)";
                 case 1200: return "Blaze Wizard(1)";
                 case 1210: return "Blaze Wizard(2)";
                 case 1211: return "Blaze Wizard(3)";
                 case 1212: return "Blaze Wizard(4)";
+                case 1213: return "Blaze Wizard(5)";
+                case 1214: return "Blaze Wizard(6)";
                 case 1300: return "Wind Archer(1)";
                 case 1310: return "Wind Archer(2)";
                 case 1311: return "Wind Archer(3)";
                 case 1312: return "Wind Archer(4)";
+                case 1313: return "Wind Archer(5)";
+                case 1314: return "Wind Archer(6)";
                 case 1400: return "Night Walker(1)";
                 case 1410: return "Night Walker(2)";
                 case 1411: return "Night Walker(3)";
                 case 1412: return "Night Walker(4)";
+                case 1413: return "Night Walker(5)";
+                case 1414: return "Night Walker(6)";
                 case 1500: return "Thunder Breaker(1)";
                 case 1510: return "Thunder Breaker(2)";
                 case 1511: return "Thunder Breaker(3)";
                 case 1512: return "Thunder Breaker(4)";
+                case 1513: return "Thunder Breaker(5)";
+                case 1514: return "Thunder Breaker(6)";
 
                 case 2000: return "Legend";
                 case 2001: return "Evan";
@@ -745,6 +791,8 @@ namespace WzComparerR2.CharaSim
                 case 2110: return "Aran(2)";
                 case 2111: return "Aran(3)";
                 case 2112: return "Aran(4)";
+                case 2113: return "Aran(5)";
+                case 2114: return "Aran(6)";
                 case 2200:
                 case 2210: return "Evan(1)";
                 case 2211:
@@ -755,23 +803,32 @@ namespace WzComparerR2.CharaSim
                 case 2216: return "Evan (3)";
                 case 2217:
                 case 2218: return "Evan(4)";
+                case 2219: return "Evan(5)";
+                case 2220: return "Evan(6)";
                 case 2300: return "Mercedes(1)";
                 case 2310: return "Mercedes(2)";
                 case 2311: return "Mercedes(3)";
                 case 2312: return "Mercedes(4)";
+                case 2313: return "Mercedes(5)";
+                case 2314: return "Mercedes(6)";
                 case 2400: return "Phantom(1)";
                 case 2410: return "Phantom(2)";
                 case 2411: return "Phantom(3)";
                 case 2412: return "Phantom(4)";
+                case 2413: return "Phantom(5)";
+                case 2414: return "Phantom(6)";
                 case 2500: return "Shade(1)";
                 case 2510: return "Shade(2)";
                 case 2511: return "Shade(3)";
                 case 2512: return "Shade(4)";
+                case 2513: return "Shade(5)";
+                case 2514: return "Shade(6)";
                 case 2700: return "Luminous(1)";
                 case 2710: return "Luminous(2)";
                 case 2711: return "Luminous(3)";
                 case 2712: return "Luminous(4)";
-
+                case 2713: return "Luminous(5)";
+                case 2714: return "Luminous(6)";
 
                 case 3000: return "Citizen";
                 case 3001: return "Demon";
@@ -779,31 +836,45 @@ namespace WzComparerR2.CharaSim
                 case 3110: return "Demon Slayer(2)";
                 case 3111: return "Demon Slayer(3)";
                 case 3112: return "Demon Slayer(4)";
+                case 3113: return "Demon Slayer(5)";
+                case 3114: return "Demon Slayer(6)";
                 case 3101: return "Demon Avenger(1)";
                 case 3120: return "Demon Avenger(2)";
                 case 3121: return "Demon Avenger(3)";
                 case 3122: return "Demon Avenger(4)";
+                case 3123: return "Demon Avenger(5)";
+                case 3124: return "Demon Avenger(6)";
                 case 3200: return "Battle Mage(1)";
                 case 3210: return "Battle Mage(2)";
                 case 3211: return "Battle Mage(3)";
                 case 3212: return "Battle Mage(4)";
+                case 3213: return "Battle Mage(5)";
+                case 3214: return "Battle Mage(6)";
                 case 3300: return "Wild Hunter(1)";
                 case 3310: return "Wild Hunter(2)";
                 case 3311: return "Wild Hunter(3)";
                 case 3312: return "Wild Hunter(4)";
+                case 3313: return "Wild Hunter(5)";
+                case 3314: return "Wild Hunter(6)";
                 case 3500: return "Mechanic(1)";
                 case 3510: return "Mechanic(2)";
                 case 3511: return "Mechanic(3)";
                 case 3512: return "Mechanic(4)";
+                case 3513: return "Mechanic(5)";
+                case 3514: return "Mechanic(6)";
                 case 3002: return "Xenon";
                 case 3600: return "Xenon(1)";
                 case 3610: return "Xenon(2)";
                 case 3611: return "Xenon(3)";
                 case 3612: return "Xenon(4)";
+                case 3613: return "Xenon(5)";
+                case 3614: return "Xenon(6)";
                 case 3700: return "Blaster(1)";
                 case 3710: return "Blaster(2)";
                 case 3711: return "Blaster(3)";
                 case 3712: return "Blaster(4)";
+                case 3713: return "Blaster(5)";
+                case 3714: return "Blaster(6)";
 
                 case 4001: return "Hayato";
                 case 4002: return "Kanna";
@@ -811,18 +882,22 @@ namespace WzComparerR2.CharaSim
                 case 4110: return "Hayato(2)";
                 case 4111: return "Hayato(3)";
                 case 4112: return "Hayato(4)";
+                case 4113: return "Hayato(5)";
+                case 4114: return "Hayato(6)";
                 case 4200: return "Kanna(1)";
                 case 4210: return "Kanna(2)";
                 case 4211: return "Kanna(3)";
                 case 4212: return "Kanna(4)";
-
+                case 4213: return "Kanna(5)";
+                case 4214: return "Kanna(6)";
 
                 case 5000: return "Mihile";
                 case 5100: return "Mihile(1)";
                 case 5110: return "Mihile(2)";
                 case 5111: return "Mihile(3)";
                 case 5112: return "Mihile(4)";
-
+                case 5113: return "Mihile(5)";
+                case 5114: return "Mihile(6)";
 
                 case 6000: return "Kaiser";
                 case 6001: return "Angelic Buster";
@@ -832,30 +907,43 @@ namespace WzComparerR2.CharaSim
                 case 6110: return "Kaiser(2)";
                 case 6111: return "Kaiser(3)";
                 case 6112: return "Kaiser(4)";
+                case 6113: return "Kaiser(5)";
+                case 6114: return "Kaiser(6)";
                 case 6300: return "Kain(1)";
                 case 6310: return "Kain(2)";
                 case 6311: return "Kain(3)";
                 case 6312: return "Kain(4)";
+                case 6313: return "Kain(5)";
+                case 6314: return "Kain(6)";
                 case 6400: return "Cadena(1)";
                 case 6410: return "Cadena(2)";
                 case 6411: return "Cadena(3)";
                 case 6412: return "Cadena(4)";
+                case 6413: return "Cadena(5)";
+                case 6414: return "Cadena(6)";
                 case 6500: return "Angelic Buster(1)";
                 case 6510: return "Angelic Buster(2)";
                 case 6511: return "Angelic Buster(3)";
                 case 6512: return "Angelic Buster(4)";
+                case 6513: return "Angelic Buster(5)";
+                case 6514: return "Angelic Buster(6)";
 
                 case 10000: return "Zero";
                 case 10100: return "Zero(1)";
                 case 10110: return "Zero(2)";
                 case 10111: return "Zero(3)";
                 case 10112: return "Zero(4)";
+                case 10113: return "Zero(5)";
+                case 10114: return "Zero(6)";
 
                 case 11000: return "Chase";
                 case 11200: return "Beast Tamer(1)";
                 case 11210: return "Beast Tamer(2)";
                 case 11211: return "Beast Tamer(3)";
                 case 11212: return "Beast Tamer(4)";
+
+                case 12005:
+                case 12100: return "Tanjiro Kamado";
 
                 case 13000: return "Pink Bean";
                 case 13001: return "Yetihood";
@@ -868,6 +956,7 @@ namespace WzComparerR2.CharaSim
                 case 14211: return "Kinesis(3)";
                 case 14212: return "Kinesis(4)";
                 case 14213: return "Kinesis(5)";
+                case 14214: return "Kinesis(6)";
 
                 case 15000: return "Illium";
                 case 15001: return "Ark";
@@ -877,18 +966,26 @@ namespace WzComparerR2.CharaSim
                 case 15110: return "Adele(2)";
                 case 15111: return "Adele(3)";
                 case 15112: return "Adele(4)";
+                case 15113: return "Adele(5)";
+                case 15114: return "Adele(6)";
                 case 15200: return "Illium(1)";
                 case 15210: return "Illium(2)";
                 case 15211: return "Illium(3)";
                 case 15212: return "Illium(4)";
+                case 15213: return "Illium(5)";
+                case 15214: return "Illium(6)";
                 case 15400: return "Khali(1)";
                 case 15410: return "Khali(2)";
                 case 15411: return "Khali(3)";
                 case 15412: return "Khali(4)";
+                case 15413: return "Khali(5)";
+                case 15414: return "Khali(6)";
                 case 15500: return "Ark(1)";
                 case 15510: return "Ark(2)";
                 case 15511: return "Ark(3)";
                 case 15512: return "Ark(4)";
+                case 15513: return "Ark(5)";
+                case 15514: return "Ark(6)";
 
                 case 16000: return "Anima Thief";
                 case 16001: return "Lara";
@@ -896,21 +993,27 @@ namespace WzComparerR2.CharaSim
                 case 16210: return "Lara(2)";
                 case 16211: return "Lara(3)";
                 case 16212: return "Lara(4)";
+                case 16213: return "Lara(5)";
+                case 16214: return "Lara(6)";
                 case 16400: return "Hoyoung(1)";
                 case 16410: return "Hoyoung(2)";
                 case 16411: return "Hoyoung(3)";
                 case 16412: return "Hoyoung(4)";
+                case 16413: return "Hoyoung(5)";
+                case 16414: return "Hoyoung(6)";
 
                 case 17000: return "Lynn";
                 case 17200: return "Lynn(1)";
                 case 17210: return "Lynn(2)";
                 case 17211: return "Lynn(3)";
                 case 17212: return "Lynn(4)";
+                case 17213: return "Lynn(5)";
+                case 17214: return "Lynn(6)";
             }
             return null;
         }
 
-        private static string ToChineseNumberExpr(int value)
+        private static string ToChineseNumberExpr(long value)
         {
             var sb = new StringBuilder(16);
             bool firstPart = true;
@@ -921,14 +1024,14 @@ namespace WzComparerR2.CharaSim
             }
             if (value >= 1_0000_0000)
             {
-                int part = value / 1_0000_0000;
+                long part = value / 1_0000_0000;
                 sb.AppendFormat("{0}亿", part);
                 value -= part * 1_0000_0000;
                 firstPart = false;
             }
             if (value >= 1_0000)
             {
-                int part = value / 1_0000;
+                long part = value / 1_0000;
                 sb.Append(firstPart ? null : " ");
                 sb.AppendFormat("{0}万", part);
                 value -= part * 1_0000;

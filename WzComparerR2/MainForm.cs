@@ -281,6 +281,10 @@ namespace WzComparerR2
                     {
                         if (wz_f.Type == e.WzType)
                         {
+                            if (e.HasChildNodes && wz_f.Node.Nodes.Count <= 0)
+                            {
+                                continue;
+                            }
                             preSearch.Add(wz_f.Node);
                             find = true;
                             //e.WzFile = wz_f;
@@ -581,6 +585,84 @@ namespace WzComparerR2
             this.pictureBoxEx1.PictureName = aniName;
         }
 
+        private void buttonItemGif2_Click(object sender, EventArgs e)
+        {
+            // code from buttonItemGif_Click()
+            if (advTree3.SelectedNode == null)
+                return;
+
+            Wz_Node node = advTree3.SelectedNode.AsWzNode();
+            string aniName = "Nested_" + GetSelectedNodeImageName();
+
+            if (node.Value is Wz_Png)
+            {
+                var pngFrameData = this.pictureBoxEx1.LoadPngFrameAnimation(node);
+
+                if (pngFrameData != null)
+                {
+                    this.pictureBoxEx1.ShowOverlayAnimation(pngFrameData, true);
+                    this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemSkins.Visible = false;
+                    this.pictureBoxEx1.PictureName = aniName;
+                }
+
+                return;
+            }
+
+            //添加到动画控件
+            if (node.Text.EndsWith(".atlas", StringComparison.OrdinalIgnoreCase))
+            {
+                /*
+                var spineData = this.pictureBoxEx1.LoadSpineAnimation(node);
+                if (spineData != null)
+                {
+                    this.pictureBoxEx1.ShowAnimation(spineData);
+                    var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
+                    this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemAniNames.Items.Add("");
+                    this.cmbItemAniNames.Items.AddRange(aniItem.Animations.ToArray());
+                    this.cmbItemAniNames.SelectedIndex = 0;
+                    this.cmbItemSkins.Visible = true;
+                    this.cmbItemSkins.Items.Clear();
+                    this.cmbItemSkins.Items.AddRange(aniItem.Skins.ToArray());
+                    this.cmbItemSkins.SelectedIndex = aniItem.Skins.IndexOf(aniItem.SelectedSkin);
+                }
+                */
+                MessageBoxEx.Show("Spine animations cannot be nested.", "Not Supported");
+                return;
+            }
+            else
+            {
+                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node);
+
+                if (frameData != null)
+                {
+                    this.pictureBoxEx1.ShowOverlayAnimation(frameData);
+                    this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemSkins.Visible = false;
+                    this.pictureBoxEx1.PictureName = aniName;
+                }
+                else
+                {
+                    var multiData = this.pictureBoxEx1.LoadMultiFrameAnimation(node);
+
+                    if (multiData != null)
+                    {
+                        /*
+                        this.pictureBoxEx1.ShowAnimation(multiData);
+                        var aniItem = this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator;
+                        this.cmbItemAniNames.Items.Clear();
+                        this.cmbItemAniNames.Items.AddRange(aniItem.Animations.ToArray());
+                        this.cmbItemAniNames.SelectedIndex = 0;
+                        */
+                        MessageBoxEx.Show("Multi-frame animations cannot be nested.", "Not Supported");
+                        return;
+                    }
+                }
+            }
+            //this.pictureBoxEx1.PictureName = aniName;
+        }
+
         private string GetSelectedNodeImageName()
         {
             Wz_Node node = advTree3.SelectedNode.AsWzNode();
@@ -618,6 +700,23 @@ namespace WzComparerR2
             }
         }
 
+        private void buttonDisableOverlayAni_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.ShowOverlayAni)
+            {
+                this.pictureBoxEx1.ShowOverlayAni = false;
+                this.pictureBoxEx1.Items.Clear();
+            }
+        }
+
+        private void buttonOverlayRect_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.ShowOverlayAni)
+            {
+                this.pictureBoxEx1.AddOverlayRect();
+            }
+        }
+
         private void buttonItemAutoSave_Click(object sender, EventArgs e)
         {
             ConfigManager.Reload();
@@ -651,7 +750,7 @@ namespace WzComparerR2
             var aniItem = this.pictureBoxEx1.Items[0];
             var frameData = (aniItem as FrameAnimator)?.Data;
             if (frameData != null && frameData.Frames.Count == 1 
-                && frameData.Frames[0].A0 == 255 && frameData.Frames[0].A1 == 255 && frameData.Frames[0].Delay == 0)
+                && frameData.Frames[0].A0 == 255 && frameData.Frames[0].A1 == 255 && (frameData.Frames[0].Delay == 0 || pictureBoxEx1.ShowOverlayAni))
             {
                 // save still picture as png
                 this.OnSavePngFile(frameData.Frames[0]);
@@ -693,10 +792,48 @@ namespace WzComparerR2
                 }
                 labelItemStatus.Text = "Image saved: " + pngFileName;
             }
+            else if (pictureBoxEx1.ShowOverlayAni && frame.Texture != null) // 애니메이션 중첩
+            {
+                var config = ImageHandlerConfig.Default;
+                string pngFileName = pictureBoxEx1.PictureName + ".png";
+
+                if (config.AutoSaveEnabled)
+                {
+                    pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
+                }
+                else
+                {
+                    var dlg = new SaveFileDialog();
+                    dlg.Filter = "PNG (*.png)|*.png|모든 파일 (*.*)|*.*";
+                    dlg.FileName = pngFileName;
+                    if (dlg.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    pngFileName = dlg.FileName;
+                }
+
+                byte[] frameData = new byte[frame.Texture.Width * frame.Texture.Height * 4];
+                frame.Texture.GetData(frameData);
+                var targetSize = new Point(frame.Texture.Width, frame.Texture.Height);
+                unsafe
+                {
+                    fixed (byte* pFrameBuffer = frameData)
+                    {
+                        using (var bmp = new System.Drawing.Bitmap(targetSize.X, targetSize.Y, targetSize.X * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, new IntPtr(pFrameBuffer)))
+                        {
+                            bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                }
+                labelItemStatus.Text = "Image saved: " + pngFileName;
+            }
             else
             {
                 labelItemStatus.Text = "Failed to save the image.";
             }
+
         }
 
         private void OnSaveGifFile(AnimationItem aniItem, bool options)
@@ -749,7 +886,7 @@ namespace WzComparerR2
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
                 dlg.Title = "Select WZ File";
-                dlg.Filter = "Base.wz|*.wz";
+                dlg.Filter = "MapleStory Data File(Base.wz, *.wz, *.ms)|*.wz;*.ms";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     openWz(dlg.FileName);
@@ -776,9 +913,24 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                if (wz.IsKMST1125WzFormat(wzFilePath))
+                if (string.Equals(Path.GetExtension(wzFilePath), ".ms", StringComparison.OrdinalIgnoreCase))
+                {
+                    wz.LoadMsFile(wzFilePath);
+                }
+                else if (wz.IsKMST1125WzFormat(wzFilePath))
                 {
                     wz.LoadKMST1125DataWz(wzFilePath);
+                    if (string.Equals(Path.GetFileName(wzFilePath), "Base.wz", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string packsDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(wzFilePath)), "Packs");
+                        if (Directory.Exists(packsDir))
+                        {
+                            foreach (var msFile in Directory.GetFiles(packsDir, "*.ms"))
+                            {
+                                wz.LoadMsFile(msFile);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -863,7 +1015,7 @@ namespace WzComparerR2
             }
             catch (FileNotFoundException)
             {
-                MessageBoxEx.Show("File not found..", "Error");
+                MessageBoxEx.Show("File not found.", "Error");
             }
             catch (Exception ex)
             {
@@ -1269,8 +1421,8 @@ namespace WzComparerR2
                     preLoadSound(sound, selectedNode.Text);
                     textBoxX1.Text = "dataLength: " + sound.DataLength + " bytes\r\n" +
                         "offset: " + sound.Offset + "\r\n" +
-                        "time: " + sound.Ms + " ms\r\n" +
-                        "headerLength: " + (sound.Header == null ? 0 : sound.Header.Length) + " bytes\r\n" +
+                        "duration: " + sound.Ms + " ms\r\n" +
+                        "channels: " + sound.Channels + "\r\n" +
                         "freq: " + sound.Frequency + " Hz\r\n" +
                         "type: " + sound.SoundType.ToString();
                     break;
@@ -1386,7 +1538,7 @@ namespace WzComparerR2
                 {
                     foreach (var wzf in wzs.wz_files)
                     {
-                        if (wzf.Type == wzType)
+                        if (wzf.Type == wzType && wzf.OwnerWzFile == null)
                         {
                             allWzFile.Add(wzf.Node);
                         }
@@ -1778,7 +1930,7 @@ namespace WzComparerR2
             }
             else
             {
-                labelItemStatus.Text = "Failed to sort: There is no WZ file open";
+                labelItemStatus.Text = "Failed to sort: There is no WZ file open.";
             }
         }
 
@@ -1800,28 +1952,16 @@ namespace WzComparerR2
                 try
                 {
                     fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write);
-                    FileStream fsWz = img.WzFile.FileStream;
-                    fsWz.Seek(img.Offset, SeekOrigin.Begin);
-                    byte[] buffer = new byte[2048];
-                    int count, size = img.Size;
-                    while (size > 0 &&
-                        (count = fsWz.Read(buffer, 0, Math.Min(size, buffer.Length))) > 0)
-                    {
-                        fs.Write(buffer, 0, count);
-                        size -= count;
-                    }
+                    var s = img.OpenRead();
+                    s.Position = 0;
+                    s.CopyTo(fs);
+                    fs.Close();
                     labelItemStatus.Text = "Exported: " + img.Name;
                 }
                 catch (Exception ex)
                 {
+                    fs?.Close();
                     MessageBoxEx.Show(ex.ToString(), "Error");
-                }
-                finally
-                {
-                    if (fs != null)
-                    {
-                        fs.Close();
-                    }
                 }
             }
         }
@@ -2108,7 +2248,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.String)
+                    if (file.Type == Wz_Type.String && file.Node.Nodes.Count > 0)
                     {
                         return file;
                     }
@@ -2123,7 +2263,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.Item)
+                    if (file.Type == Wz_Type.Item && file.Node.Nodes.Count > 0)
                     {
                         return file;
                     }
@@ -2138,7 +2278,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.Etc)
+                    if (file.Type == Wz_Type.Etc && file.Node.Nodes.Count > 0)
                     {
                         return file;
                     }
@@ -2243,6 +2383,12 @@ namespace WzComparerR2
                 }
             }
             FrmPatcher patcher = new FrmPatcher();
+            var config = WcR2Config.Default;
+            var defaultEnc = config?.WzEncoding?.Value ?? 0;
+            if (defaultEnc != 0)
+            {
+                patcher.PatcherNoticeEncoding = Encoding.GetEncoding(defaultEnc);
+            }
             patcher.Owner = this;
             patcher.Show();
         }
@@ -2262,7 +2408,7 @@ namespace WzComparerR2
             switch (sound.SoundType)
             {
                 case Wz_SoundType.Mp3: soundName += ".mp3"; break;
-                case Wz_SoundType.WavRaw: soundName += ".wav"; break;
+                case Wz_SoundType.Pcm: soundName += ".wav"; break;
             }
             soundPlayer.PlayingSoundName = soundName;
             labelItemSoundTitle.Tooltip = soundName;
@@ -2449,16 +2595,16 @@ namespace WzComparerR2
                     }
                 }
             }
-            else if (item is Wz_Sound wzSound)
+            else if (item is IMapleStoryBlob blob)
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.FileName = advTree3.SelectedNode.Text;
-                if (!dlg.FileName.Contains("."))
+                if (!dlg.FileName.Contains(".") && blob is Wz_Sound wzSound)
                 {
                     switch (wzSound.SoundType)
                     {
                         case Wz_SoundType.Mp3: dlg.FileName += ".mp3"; break;
-                        case Wz_SoundType.WavRaw: dlg.FileName += ".wav"; break;
+                        case Wz_SoundType.Pcm: dlg.FileName += ".pcm"; break;
                     }
                 }
                 dlg.Filter = "All Files (*.*)|*.*";
@@ -2466,60 +2612,12 @@ namespace WzComparerR2
                 {
                     try
                     {
+                        byte[] data = new byte[blob.Length];
+                        blob.CopyTo(data, 0);
                         using (var f = File.Create(dlg.FileName))
                         {
-                            wzSound.WzFile.FileStream.Seek(wzSound.Offset, SeekOrigin.Begin);
-                            byte[] buffer = new byte[4096];
-                            int bytes = wzSound.DataLength;
-                            while (bytes > 0)
-                            {
-                                int count = wzSound.WzFile.FileStream.Read(buffer, 0, Math.Min(buffer.Length, bytes));
-                                if (count > 0)
-                                {
-                                    f.Write(buffer, 0, count);
-                                    bytes -= count;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        this.labelItemStatus.Text = "Saved";
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBoxEx.Show("Failed to save\r\n" + ex.ToString(), "Error");
-                    }
-                }
-            }
-            else if (item is Wz_RawData rawData)
-            {
-                SaveFileDialog dlg = new SaveFileDialog();
-                dlg.FileName = advTree3.SelectedNode.Text;
-                dlg.Filter = "All Files (*.*)|*.*";
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        using (var f = File.Create(dlg.FileName))
-                        {
-                            rawData.WzFile.FileStream.Seek(rawData.Offset, SeekOrigin.Begin);
-                            byte[] buffer = new byte[4096];
-                            int bytes = rawData.Length;
-                            while (bytes > 0)
-                            {
-                                int count = rawData.WzFile.FileStream.Read(buffer, 0, Math.Min(buffer.Length, bytes));
-                                if (count > 0)
-                                {
-                                    f.Write(buffer, 0, count);
-                                    bytes -= count;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
+                            f.Write(data, 0, data.Length);
+                            f.Flush();
                         }
                         this.labelItemStatus.Text = "Saved";
                     }
@@ -3226,6 +3324,7 @@ namespace WzComparerR2
                     comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                     comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
                     comparer.EnableDarkMode = chkEnableDarkMode.Checked;
+                    comparer.OutputSkillTooltip = chkOutputSkillTooltip.Checked;
                     comparer.HashPngFileName = chkHashPngFileName.Checked;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);

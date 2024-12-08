@@ -59,6 +59,8 @@ namespace WzComparerR2
             typedParts = Enum.GetValues(typeof(Wz_Type)).Cast<Wz_Type>().ToDictionary(type => type, type => new List<PatchPartContext>());
         }
 
+        public Encoding PatcherNoticeEncoding { get; set; }
+
         Thread patchThread;
         EventWaitHandle waitHandle;
         bool waiting;
@@ -178,7 +180,7 @@ namespace WzComparerR2
                 item.GetFileLength();
                 if (item.FileLength > 0)
                 {
-                    switch (MessageBoxEx.Show(string.Format("Size: {0:N0} bytes. Last updated: {1:M-d-yyyy HH:mm:ss}\r\nDo you want to download the file now?", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
+                    switch (MessageBoxEx.Show(string.Format("Size: {0:N0} bytes. Last updated: {1:yyyy-MM-dd HH:mm:ss}\r\nDo you want to download the file now?", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
                     {
                         case DialogResult.Yes:
                         #if NET6_0_OR_GREATER
@@ -313,6 +315,7 @@ namespace WzComparerR2
             try
             {
                 patcher = new WzPatcher(patchFile);
+                patcher.NoticeEncoding = this.PatcherNoticeEncoding ?? Encoding.Default;
                 patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
                 AppendStateText($"Patch file name: {patchFile}\r\n");
                 AppendStateText("Analyzing the patch...");
