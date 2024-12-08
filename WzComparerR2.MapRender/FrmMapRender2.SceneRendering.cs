@@ -511,11 +511,8 @@ namespace WzComparerR2.MapRender
                     case LifeItem.LifeType.Npc:
                         if (this.patchVisibility.NpcNameVisible)
                         {
-                            var npcNode = PluginBase.PluginManager.FindWz(string.Format("Npc/{0:D7}.img/info", life.ID));
-                            if ((npcNode?.Nodes["hideName"].GetValueEx(0) ?? 0) != 0)
-                            {
-                                break;
-                            }
+                            if (life.HideName) break;
+
                             string name, desc;
                             if (this.StringLinker?.StringNpc.TryGetValue(life.ID, out sr) ?? false)
                             {
@@ -548,10 +545,11 @@ namespace WzComparerR2.MapRender
                             {
                                 mesh = batcher.MeshPop();
                                 mesh.Position = new Vector2(life.X, life.Cy + 21);
+                                // temporarily ignore font name and size here.
                                 mesh.RenderObject = new TextMesh()
                                 {
                                     Align = Alignment.Center,
-                                    ForeColor = Color.Yellow,
+                                    ForeColor = life.CustomFont?.FontColor ?? Color.Yellow,
                                     BackColor = new Color(Color.Black, 0.7f),
                                     Font = renderEnv.Fonts.NpcDescFont,
                                     Padding = new Margins(2, 2, 2, 2),
