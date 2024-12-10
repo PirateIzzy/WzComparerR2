@@ -348,7 +348,7 @@ namespace WzComparerR2.Comparer
             {
                 Directory.CreateDirectory(srcDirPath);
             }
-            string skillTooltipPath = Path.Combine(outputDir, "스킬 툴팁");
+            string skillTooltipPath = Path.Combine(outputDir, "Skill Tooltip");
 
             FileStream htmlFile = null;
             StreamWriter sw = null;
@@ -387,7 +387,7 @@ namespace WzComparerR2.Comparer
                     this.OutputRemovedImg ? "- Removed Files" : null,
                     this.EnableDarkMode ? "- Enable Dark Mode" : null,
                     "- Compare " + this.Comparer.PngComparison,
-                    this.Comparer.ResolvePngLink ? "- Resolve PNG Link" : null,
+                    this.Comparer.ResolvePngLink ? "- Resolve Link" : null,
                 }.Where(p => p != null)));
                 sw.WriteLine("</table>");
                 sw.WriteLine("</p>");
@@ -557,7 +557,7 @@ namespace WzComparerR2.Comparer
             SkillTooltipRender2[] skillRenderNewOld = new SkillTooltipRender2[2];
             int count = 0;
             int allCount = OutputSkillTooltipIDs.Count;
-            var skillTypeFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
+            var skillTypeFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
@@ -577,12 +577,34 @@ namespace WzComparerR2.Comparer
 
             foreach (var skillID in OutputSkillTooltipIDs)
             {
-                StateInfo = string.Format("{0}/{1} 스킬: {2}", ++count, allCount, skillID);
-                StateDetail = "Skill 변경점을 툴팁 이미지로 출력중...";
+                StateInfo = string.Format("{0}/{1} Skill: {2}", ++count, allCount, skillID);
+                StateDetail = "Outputting skill changes as tooltip images...";
 
                 string skillType = "";
                 string skillNodePath = int.Parse(skillID) / 10000000 == 8 ? String.Format(@"\{0:D}.img\skill\{1:D}", int.Parse(skillID) / 100, skillID) : String.Format(@"\{0:D}.img\skill\{1:D}", int.Parse(skillID) / 10000, skillID);
                 if (int.Parse(skillID) / 10000 == 0) skillNodePath = String.Format(@"\000.img\skill\{0:D7}", skillID);
+                StringResult sr;
+                string skillName;
+                if (skillRenderNewOld[1].StringLinker == null || !skillRenderNewOld[1].StringLinker.StringSkill.TryGetValue(int.Parse(skillID), out sr))
+                {
+                    sr = new StringResultSkill();
+                    sr.Name = "Unknown Skill";
+                }
+                skillName = sr.Name;
+                if (skillRenderNewOld[0].StringLinker == null || !skillRenderNewOld[0].StringLinker.StringSkill.TryGetValue(int.Parse(skillID), out sr))
+                {
+                    sr = new StringResultSkill();
+                    sr.Name = "Unknown Skill";
+                }
+                if (skillName != sr.Name && skillName != "Unknown Skill" && sr.Name != "Unknown Skill")
+                {
+                    skillName += "_" + sr.Name;
+                }
+                else if (skillName == "Unknown Skill")
+                {
+                    skillName = sr.Name;
+                }
+                skillName = RemoveInvalidFileNameChars(skillName);
                 int nullSkillIdx = 0;
 
                 // 변경 전후 툴팁 이미지 생성
@@ -611,7 +633,7 @@ namespace WzComparerR2.Comparer
                 switch (nullSkillIdx)
                 {
                     case 0: // change
-                        skillType = "변경";
+                        skillType = "Change";
 
                         Bitmap ImageNew = skillRenderNewOld[0].Render(true);
                         Bitmap ImageOld = skillRenderNewOld[1].Render(true);
@@ -622,15 +644,15 @@ namespace WzComparerR2.Comparer
                         g.DrawImage(ImageNew, ImageOld.Width, 0);
                         break;
 
-                    case 1: // delete
-                        skillType = "삭제";
+                    case 1: // remove
+                        skillType = "Remove";
 
                         resultImage = skillRenderNewOld[1].Render();
                         g = Graphics.FromImage(resultImage);
                         break;
 
                     case 2: // add
-                        skillType = "추가";
+                        skillType = "Add";
 
                         resultImage = skillRenderNewOld[0].Render();
                         g = Graphics.FromImage(resultImage);
@@ -971,6 +993,13 @@ namespace WzComparerR2.Comparer
                 hex.AppendFormat("{0:x2}", b);
             }
             return hex.ToString();
+        }
+
+        private static string RemoveInvalidFileNameChars(string fileName)
+        {
+            string invalidChars = new string(System.IO.Path.GetInvalidFileNameChars());
+            string regexPattern = $"[{Regex.Escape(invalidChars)}]";
+            return Regex.Replace(fileName, regexPattern, "_");
         }
     }
 }

@@ -1002,17 +1002,25 @@ namespace WzComparerR2.CharaSim
                 case 16413: return "Hoyoung(5)";
                 case 16414: return "Hoyoung(6)";
 
-                case 17000: return "Lynn";
+                case 17000: return "Mo Xuan";
+                case 17001: return "Lynn";
                 case 17200: return "Lynn(1)";
                 case 17210: return "Lynn(2)";
                 case 17211: return "Lynn(3)";
                 case 17212: return "Lynn(4)";
                 case 17213: return "Lynn(5)";
                 case 17214: return "Lynn(6)";
+                case 17500: return "Mo Xuan(1)";
+                case 17510: return "Mo Xuan(2)";
+                case 17511: return "Mo Xuan(3)";
+                case 17512: return "Mo Xuan(4)";
+                case 17513: return "Mo Xuan(5)";
+                case 17514: return "Mo Xuan(6)";
             }
             return null;
         }
 
+        /* Not required for GMS
         private static string ToChineseNumberExpr(long value)
         {
             var sb = new StringBuilder(16);
@@ -1045,5 +1053,6 @@ namespace WzComparerR2.CharaSim
 
             return sb.Length > 0 ? sb.ToString() : "0";
         }
+        */
     }
 }

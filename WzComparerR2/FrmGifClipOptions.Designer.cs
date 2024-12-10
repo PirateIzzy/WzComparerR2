@@ -288,7 +288,7 @@ namespace WzComparerR2
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(74, 20);
             this.labelX2.TabIndex = 1;
-            this.labelX2.Text = "Range";
+            this.labelX2.Text = "Range (px)";
             // 
             // labelX5
             // 
@@ -318,7 +318,7 @@ namespace WzComparerR2
             this.labelX6.Name = "labelX6";
             this.labelX6.Size = new System.Drawing.Size(94, 20);
             this.labelX6.TabIndex = 25;
-            this.labelX6.Text = "Left Coordinates (px)";
+            this.labelX6.Text = "Left Coordinates";
             // 
             // labelX7
             // 
@@ -333,7 +333,7 @@ namespace WzComparerR2
             this.labelX7.Name = "labelX7";
             this.labelX7.Size = new System.Drawing.Size(94, 20);
             this.labelX7.TabIndex = 26;
-            this.labelX7.Text = "Top Coordinates (px)";
+            this.labelX7.Text = "Top Coordinates";
             // 
             // labelX8
             // 
@@ -348,7 +348,7 @@ namespace WzComparerR2
             this.labelX8.Name = "labelX8";
             this.labelX8.Size = new System.Drawing.Size(94, 20);
             this.labelX8.TabIndex = 27;
-            this.labelX8.Text = "Right Coordinates (px)";
+            this.labelX8.Text = "Right Coordinates";
             // 
             // labelX9
             // 
@@ -363,7 +363,7 @@ namespace WzComparerR2
             this.labelX9.Name = "labelX9";
             this.labelX9.Size = new System.Drawing.Size(94, 20);
             this.labelX9.TabIndex = 28;
-            this.labelX9.Text = "Bottom Coordinates (px)";
+            this.labelX9.Text = "Bottom Coordinates";
             // 
             // labelX10
             // 

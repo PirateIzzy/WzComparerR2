@@ -2438,9 +2438,9 @@
             this.chkResolvePngLink.Name = "chkResolvePngLink";
             this.chkResolvePngLink.Size = new System.Drawing.Size(107, 23);
             this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("Resolve PNG Link", "", "Comparison report will analyze and compare linked pictures.\r\nThis will filter out redundant changes.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(190, 100)));
+            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("Resolve Link", "", "Comparison report will analyze and compare linked pictures.\r\nThis will filter out redundant changes.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(190, 100)));
             this.chkResolvePngLink.TabIndex = 9;
-            this.chkResolvePngLink.Text = "Resolve PNG Link";
+            this.chkResolvePngLink.Text = "Resolve Link";
             // 
             // chkEnableDarkMode
             // 

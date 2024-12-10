@@ -134,7 +134,7 @@
             this.tableLayoutPanel1.SetRowSpan(this.labelX1, 5);
             this.labelX1.Size = new System.Drawing.Size(55, 128);
             this.labelX1.TabIndex = 0;
-            this.labelX1.Text = "설정";
+            this.labelX1.Text = "Settings";
             // 
             // labelX2
             // 
@@ -166,7 +166,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(132, 20);
             this.labelX3.TabIndex = 8;
-            this.labelX3.Text = "시작 딜레이 (ms)";
+            this.labelX3.Text = "Start Delay (ms)";
             // 
             // labelX4
             // 
@@ -182,7 +182,7 @@
             this.labelX4.Name = "labelX4";
             this.labelX4.Size = new System.Drawing.Size(132, 20);
             this.labelX4.TabIndex = 9;
-            this.labelX4.Text = "X 이동 (px)";
+            this.labelX4.Text = "X Coordinate (px)";
             // 
             // labelX5
             // 
@@ -198,7 +198,7 @@
             this.labelX5.Name = "labelX5";
             this.labelX5.Size = new System.Drawing.Size(132, 20);
             this.labelX5.TabIndex = 10;
-            this.labelX5.Text = "Y 이동 (px)";
+            this.labelX5.Text = "Y Coordinate (px)";
             // 
             // labelX6
             // 
@@ -214,7 +214,7 @@
             this.labelX6.Name = "labelX6";
             this.labelX6.Size = new System.Drawing.Size(132, 20);
             this.labelX6.TabIndex = 11;
-            this.labelX6.Text = "프레임 선택";
+            this.labelX6.Text = "Select Frame";
             // 
             // labelX7
             // 
@@ -230,7 +230,7 @@
             this.labelX7.Name = "labelX7";
             this.labelX7.Size = new System.Drawing.Size(132, 24);
             this.labelX7.TabIndex = 12;
-            this.labelX7.Text = "PNG 딜레이 (ms)";
+            this.labelX7.Text = "PNG Delay (ms)";
             // 
             // txtDelayOffset
             // 

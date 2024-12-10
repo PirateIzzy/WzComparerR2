@@ -522,7 +522,7 @@
             // 
             // 
             this.chkHairCover.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHairCover.Location = new System.Drawing.Point(5, 142);
+            this.chkHairCover.Location = new System.Drawing.Point(5, 155);
             this.chkHairCover.Name = "chkHairCover";
             this.chkHairCover.Size = new System.Drawing.Size(83, 19);
             this.chkHairCover.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -538,7 +538,7 @@
             // 
             // 
             this.chkApplyBRM.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkApplyBRM.Location = new System.Drawing.Point(5, 128);
+            this.chkApplyBRM.Location = new System.Drawing.Point(5, 135);
             this.chkApplyBRM.Name = "chkApplyBRM";
             this.chkApplyBRM.Size = new System.Drawing.Size(150, 19);
             this.chkApplyBRM.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;

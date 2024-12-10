@@ -66,6 +66,7 @@ namespace WzComparerR2
             try
             {
                 var req = WebRequest.Create(url) as HttpWebRequest;
+                req.UserAgent = "WzComparerR2-GMS/1.0";
                 req.Timeout = 15000;
                 using (var resp = req.GetResponse() as HttpWebResponse)
                 {
@@ -79,6 +80,7 @@ namespace WzComparerR2
                 throw;
             }
         }
+
 
         private void GetFileLengthFtp()
         {
