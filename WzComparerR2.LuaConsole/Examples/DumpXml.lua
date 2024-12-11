@@ -37,7 +37,7 @@ end
 -- enum all wz_images
 for n in enumAllWzNodes(topNode) do
   local value = n.Value
-  if value and type(value) == "userdata" and value:GetType().Name == 'Wz_Image' then
+  if value and type(value) == "userdata" and (value:GetType().Name == 'Wz_Image' or value:GetType().Name == 'Ms_Image') then
     local img = value
 
     --extract wz image
