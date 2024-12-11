@@ -945,7 +945,7 @@ namespace WzComparerR2.MapRender
                         for (int i = 0; i < particle.SubItems.Length; i++)
                         {
                             var subItem = particle.SubItems[i];
-                            if (subItem.Quest.Exists(quest => !resLoader.PatchVisibility.IsVisible(quest.Item1, quest.Item2)))
+                            if (subItem.Quest.Exists(quest => !resLoader.PatchVisibility.IsQuestVisible(quest.ID, quest.State)))
                             {
                                 continue;
                             }
@@ -982,7 +982,7 @@ namespace WzComparerR2.MapRender
             long date = Int64.Parse(Date.ToString("yyyyMMddHHmm"));
             foreach (var conditionNode in node.Nodes.Where(n => n.Text.StartsWith("condition")))
             {
-                if ((conditionNode.Nodes.Any(n => n.Text.All(char.IsDigit)) && conditionNode.Nodes.Where(n => n.Text.All(char.IsDigit)).All(n => resLoader.PatchVisibility.IsVisibleExact(int.Parse(n.Text), Convert.ToInt32(n.Value)))) || (conditionNode.Nodes["dateStart"].GetValueEx<long>(0) <= date && date <= conditionNode.Nodes["dateEnd"].GetValueEx<long>(0)))
+                if ((conditionNode.Nodes.Any(n => n.Text.All(char.IsDigit)) && conditionNode.Nodes.Where(n => n.Text.All(char.IsDigit)).All(n => resLoader.PatchVisibility.IsQuestVisibleExact(int.Parse(n.Text), Convert.ToInt32(n.Value)))) || (conditionNode.Nodes["dateStart"].GetValueEx<long>(0) <= date && date <= conditionNode.Nodes["dateEnd"].GetValueEx<long>(0)))
                 {
                     aniData.Clear();
                     foreach (var conditionedActionNode in conditionNode.Nodes)
