@@ -268,7 +268,6 @@ namespace WzComparerR2.MapRender
             }), KeyCode.D8, ModifierKeys.Control));
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.FrontVisible = !this.patchVisibility.FrontVisible), KeyCode.D9, ModifierKeys.Control));
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.EffectVisible = !this.patchVisibility.EffectVisible), KeyCode.D0, ModifierKeys.Control));
-
             //移动操作
             #region 移动操作
             {
@@ -620,7 +619,7 @@ namespace WzComparerR2.MapRender
                             this.StringLinker.StringMap.TryGetValue(node.Value.MapID, out sr);
                         }
                         this.ui.ChatBox.AppendTextHelp($"  {sr?.Name ?? "(null)"}({node.Value.MapID})");
-                        
+
                         node = node.Previous;
                         historyCount--;
                     }
@@ -924,6 +923,90 @@ namespace WzComparerR2.MapRender
                         default:
                             this.ui.ChatBox.AppendTextHelp(@"/multibgm list Multi BGM 목록 보기");
                             this.ui.ChatBox.AppendTextHelp(@"/multibgm set (multiBgm) 해당 Multi BGM 재생");
+                            break;
+                    }
+                    break;
+
+                case "/quest":
+                    switch (arguments.ElementAtOrDefault(1))
+                    {
+                        case "list":
+                            List<QuestInfo> questList = this?.mapData.Scene.Back.Slots.SelectMany(item => ((BackItem)item).Quest)
+                                .Concat(this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Quest)))
+                                .Concat(this?.mapData.Scene.Npcs.SelectMany(item => item.Quest))
+                                .Concat(this?.mapData.Scene.Front.Slots.SelectMany(item => ((BackItem)item).Quest))
+                                .Concat(this?.mapData.Scene.Effect.Slots.Where(item => item is ParticleItem).SelectMany(item => ((ParticleItem)item).Quest))
+                                .Concat(this?.mapData.Scene.Effect.Slots.Where(item => item is ParticleItem).SelectMany(item => ((ParticleItem)item).SubItems).SelectMany(item => item.Quest))
+                                .Distinct().ToList();
+                            this.ui.ChatBox.AppendTextHelp($"相关任务数量：({questList.Count()})");
+                            foreach (QuestInfo item in questList)
+                            {
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.ID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.ID}");
+                                string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
+                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.ID}) / {item.State}");
+                            }
+                            break;
+
+                        case "set":
+                            if (Int32.TryParse(arguments.ElementAtOrDefault(2), out int questID) && questID > -1 && Int32.TryParse(arguments.ElementAtOrDefault(3), out int questState) && questState >= -1 && questState <= 2)
+                            {
+                                this.patchVisibility.SetQuestVisible(questID, questState);
+                                this.mapData.PreloadResource(resLoader);
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{questID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
+                                string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
+                                this.ui.ChatBox.AppendTextSystem($"{questName}({questID}) 的状态已更改为 {questState}。");
+                            }
+                            else
+                            {
+                                this.ui.ChatBox.AppendTextSystem($"请输入正确的任务状态。");
+                            }
+                            break;
+
+                        default:
+                            this.ui.ChatBox.AppendTextHelp(@"/quest list 查看相关任务列表");
+                            this.ui.ChatBox.AppendTextHelp(@"/quest set (questID) (questState) 设置任务的状态");
+                            break;
+                    }
+                    break;
+
+                case "/questex":
+                    switch (arguments.ElementAtOrDefault(1))
+                    {
+                        case "list":
+                            List<QuestExInfo> questList = this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Questex))
+                                .Distinct().ToList();
+                            this.ui.ChatBox.AppendTextHelp($"相关任务Key的数量：({questList.Count()})");
+                            foreach (QuestExInfo item in questList)
+                            {
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.ID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.ID}");
+                                string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
+                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.ID}) / Key:{item.Key}, Value:{item.State}");
+                            }
+                            break;
+
+                        case "set":
+                            string qkey = arguments.ElementAtOrDefault(3);
+                            if (Int32.TryParse(arguments.ElementAtOrDefault(2), out int questID) && questID > -1 && Int32.TryParse(arguments.ElementAtOrDefault(4), out int questState) && questState >= -1 && qkey != null)
+                            {
+                                this.patchVisibility.SetQuestVisible(questID, qkey, questState);
+                                this.mapData.PreloadResource(resLoader);
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{questID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
+                                string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
+                                this.ui.ChatBox.AppendTextSystem($"{questName}({questID}, Key={qkey}) 的状态已更改为 {questState}。");
+                            }
+                            else
+                            {
+                                this.ui.ChatBox.AppendTextSystem($"请输入正确的任务状态。");
+                            }
+                            break;
+
+                        default:
+                            this.ui.ChatBox.AppendTextHelp(@"/questex list 查看相关任务Key列表");
+                            this.ui.ChatBox.AppendTextHelp(@"/questex set (questID) (key) (questState) 设置任务Key的状态");
                             break;
                     }
                     break;

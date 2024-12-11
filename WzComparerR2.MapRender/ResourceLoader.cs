@@ -22,6 +22,7 @@ namespace WzComparerR2.MapRender
             this.loadedAnimationData = new Dictionary<string, object>();
         }
 
+        public PatchVisibility PatchVisibility { get; set; }
         public IServiceProvider Services { get; protected set; }
         public PatchVisibility PatchVisibility { get; set; }
 
