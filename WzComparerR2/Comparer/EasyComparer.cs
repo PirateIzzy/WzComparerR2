@@ -633,7 +633,7 @@ namespace WzComparerR2.Comparer
                 switch (nullSkillIdx)
                 {
                     case 0: // change
-                        skillType = "Change";
+                        skillType = "Modified";
 
                         Bitmap ImageNew = skillRenderNewOld[0].Render(true);
                         Bitmap ImageOld = skillRenderNewOld[1].Render(true);
@@ -645,14 +645,14 @@ namespace WzComparerR2.Comparer
                         break;
 
                     case 1: // remove
-                        skillType = "Remove";
+                        skillType = "Removed";
 
                         resultImage = skillRenderNewOld[1].Render();
                         g = Graphics.FromImage(resultImage);
                         break;
 
                     case 2: // add
-                        skillType = "Add";
+                        skillType = "Added";
 
                         resultImage = skillRenderNewOld[0].Render();
                         g = Graphics.FromImage(resultImage);
@@ -671,7 +671,7 @@ namespace WzComparerR2.Comparer
                 int picH = 13;
                 GearGraphics.DrawPlainText(g, skillType, skillTypeFont, Color.FromArgb(255, 255, 255), 2, (int)Math.Ceiling(skillTypeTextInfo.Width) + 2, ref picH, 10);
 
-                string imageName = Path.Combine(skillTooltipPath, "Skill_" + skillID + '[' + (ItemStringHelper.GetJobName(int.Parse(skillID) / 10000) ?? "Etc") + "]_" + skillName + "_" + skillType + ".png");
+                string imageName = Path.Combine(skillTooltipPath, "Skill_" + skillID + "_" + skillType + "_[" + (ItemStringHelper.GetJobName(int.Parse(skillID) / 10000) ?? "Etc") + "]_" + skillName + ".png");
                 if (!File.Exists(imageName))
                 {
                     resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);

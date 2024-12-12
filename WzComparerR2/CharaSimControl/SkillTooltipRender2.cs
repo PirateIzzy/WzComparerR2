@@ -133,7 +133,7 @@ namespace WzComparerR2.CharaSimControl
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
             var v6SkillSummaryFontColorTable = new Dictionary<string, Color>()
             {
-                { "c", GearGraphics.SkillSummaryOrangeTextColor },
+                { "c", GearGraphics.OrangeBrushColor },
                 { "$g", GearGraphics.gearCyanColor }, // color for skill prop changes comparison
             };
 
@@ -202,7 +202,7 @@ namespace WzComparerR2.CharaSimControl
                 DateTime time = DateTime.Now.AddDays(7d);
                 string expireStr = "Expiration Date: " + time.ToString("M\\/d\\/yyyy HH:mm");
                 //GearGraphics.DrawString(g, "#c" + expireStr + "#", GearGraphics.ItemDetailFont2, 86, 485, ref picH, 26);//original values, 92, 274, 16. '400' is GMS sync
-                GearGraphics.DrawString(g, "#c" + expireStr + "#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                GearGraphics.DrawString(g, "#c" + expireStr + "#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             if (Skill.RelationSkill != null)
             {
@@ -215,17 +215,17 @@ namespace WzComparerR2.CharaSimControl
                 DateTime time = DateTime.Now.AddMinutes(Skill.RelationSkill.Item2);
                 string expireStr = " Expiration Date: " + time.ToString(@"M\/d\/yyyy HH\:mm") + " UTC"; ;//Change when Permanent Thunder Horse is given to players.
                 //GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? 10 : 86, 485, ref picH, 16);
-                GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             if (Skill.IsPetAutoBuff)
             {
                 if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("IsPetAutoBuff"))
                 {
-                    GearGraphics.DrawString(g, "#gCan add Auto Buff Skill#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                    GearGraphics.DrawString(g, "#gCan add Auto Buff Skill#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
                 else
                 {
-                    GearGraphics.DrawString(g, "#cCan add Auto Buff Skill#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                    GearGraphics.DrawString(g, "#cCan add Auto Buff Skill#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
             }
             if ((Skill.SkillID / 10000 / 1000 == 10 || Skill.SkillID / 10000 / 1000 == 11) && Skill.ReqLevel > 0)
@@ -384,7 +384,14 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (Skill.CombatOrders)
                 {
-                    attr.Add("[Compatible with Combat Orders]");
+                    if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("combatOrders"))
+                    {
+                        attr.Add("#g[Compatible with Combat Orders]#");
+                    }
+                    else
+                    {
+                        attr.Add("[Compatible with Combat Orders]");
+                    }
                 }
                 if (Skill.NotRemoved)
                 {
