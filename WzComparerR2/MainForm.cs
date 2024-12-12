@@ -203,6 +203,8 @@ namespace WzComparerR2
             UpdateCharaSimSettings();
             //wz加载配置
             UpdateWzLoadingSettings();
+            //Translator Configuration Load
+            UpdateTranslateSettings();
 
             //杂项配置
             labelItemAutoSaveFolder.Text = ImageHandlerConfig.Default.AutoSavePictureFolder;
@@ -256,6 +258,20 @@ namespace WzComparerR2
             Wz_Structure.DefaultAutoDetectExtFiles = config.AutoDetectExtFiles;
             Wz_Structure.DefaultImgCheckDisabled = config.ImgCheckDisabled;
             Wz_Structure.DefaultWzVersionVerifyMode = config.WzVersionVerifyMode;
+        }
+
+        void UpdateTranslateSettings()
+        {
+            var config = WcR2Config.Default;
+            Translator.DefaultDesiredLanguage = config.DesiredLanguage;
+            Translator.DefaultMozhiBackend = config.MozhiBackend;
+            Translator.DefaultPreferredTranslateEngine = config.PreferredTranslateEngine;
+            Translator.DefaultTranslateAPIKey = config.NxSecretKey;
+            Translator.DefaultPreferredLayout = config.PreferredLayout;
+            Translator.IsTranslateEnabled = (config.PreferredLayout > 0);
+            Translator.DefaultDetectCurrency = config.DetectCurrency;
+            Translator.DefaultDesiredCurrency = config.DesiredCurrency;
+            Translator.ExchangeTable = null;
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
@@ -3528,6 +3544,7 @@ namespace WzComparerR2
                 frm.Save(WcR2Config.Default);
                 ConfigManager.Save();
                 UpdateWzLoadingSettings();
+                UpdateTranslateSettings();
             }
         }
     }
