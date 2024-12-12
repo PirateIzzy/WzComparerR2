@@ -15,6 +15,9 @@ namespace WzComparerR2.CharaSimControl
 {
     public class CashPackageTooltipRender : TooltipRender
     {
+        private bool isTranslateRequired = Translator.IsTranslateEnabled;
+        private bool isCurrencyConversionEnabled = (Translator.DefaultDesiredCurrency != "none");
+        private string titleLanguage = "";
         public CashPackageTooltipRender()
         {
         }
@@ -144,7 +147,36 @@ namespace WzComparerR2.CharaSimControl
             }
 
             picH = 10;
-            TextRenderer.DrawText(g, CashPackage.name, GearGraphics.ItemNameFont2, new Point(cashBitmap.Width, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
+            string translatedCashPackageName = "";
+            if (isCurrencyConversionEnabled)
+            {
+                if (Translator.DefaultDetectCurrency == "auto")
+                {
+                    titleLanguage = Translator.GetLanguage(CashPackage.name);
+                }
+                else
+                {
+                    titleLanguage = Translator.ConvertCurrencyToLang(Translator.DefaultDetectCurrency);
+                }
+
+            }
+            if (isTranslateRequired)
+            {
+                translatedCashPackageName = Translator.TranslateString(CashPackage.name, true);
+                isTranslateRequired = !(translatedCashPackageName == CashPackage.name);
+            }
+            if (isTranslateRequired)
+            {
+                string[] NameLines = Translator.MergeString(CashPackage.name, translatedCashPackageName, 1, false, true).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                foreach (string line in NameLines)
+                {
+                    TextRenderer.DrawText(g, line, GearGraphics.ItemNameFont, new Point(cashBitmap.Width, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
+                }
+            }
+            else
+            {
+                TextRenderer.DrawText(g, CashPackage.name, GearGraphics.ItemNameFont, new Point(cashBitmap.Width, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
+            }
             picH += 14;
             if (commodityPackage.termStart > 0 || commodityPackage.termEnd != null)
             {
@@ -202,12 +234,78 @@ namespace WzComparerR2.CharaSimControl
             int right = cashBitmap.Width - 18;
             if (CashPackage.desc != null && CashPackage.desc.Length > 0)
                 CashPackage.desc += "";
+            string translatedCashPackageDesc = "";
+            if (isTranslateRequired)
+            {
+                switch (Translator.DefaultPreferredLayout)
+                {
+                    case 1:
+                        translatedCashPackageDesc = Translator.TranslateString(CashPackage.desc) + Environment.NewLine;
+                        break;
+                    case 2:
+                        translatedCashPackageDesc = Environment.NewLine + Translator.TranslateString(CashPackage.desc);
+                        break;
+                    case 3:
+                        translatedCashPackageDesc = Translator.TranslateString(CashPackage.desc);
+                        break;
+                    default:
+                        break;
+                }
+
+            }
             CashPackage.desc += "\n";
-            if (CashPackage.onlyCash == 0)
-                GearGraphics.DrawString(g, CashPackage.desc + "", GearGraphics.ItemDetailFont2, 11, right, ref picH, 16);
-            //GearGraphics.DrawString(g, CashPackage.desc + "\n#(Not applicable to free bonus items) Buy this with Nexon Cash and you can trade it with another user once if unused.", GearGraphics.ItemDetailFont2, 11, right, ref picH, 16);
-            else
-                GearGraphics.DrawString(g, CashPackage.desc + "\n#Can only be purchased with NX.#", GearGraphics.ItemDetailFont2, 11, right, ref picH, 16);
+            switch (Translator.DefaultPreferredLayout)
+            {
+                case 1:
+                    if (isTranslateRequired)
+                    {
+                        GearGraphics.DrawString(g, translatedCashPackageDesc, GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    if (CashPackage.onlyCash == 0)
+                    {
+                        GearGraphics.DrawString(g, CashPackage.desc + "", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    else
+                    {
+                        GearGraphics.DrawString(g, CashPackage.desc + "\n#Can only be purchased with NX.#", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    break;
+                case 2:
+                    if (isTranslateRequired)
+                    {
+                        GearGraphics.DrawString(g, CashPackage.desc, GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    if (CashPackage.onlyCash == 0)
+                    {
+                        GearGraphics.DrawString(g, translatedCashPackageDesc + "", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    else
+                    {
+                        GearGraphics.DrawString(g, translatedCashPackageDesc + "\n#Can only be purchased with NX.#", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    break;
+                case 3:
+                    if (CashPackage.onlyCash == 0)
+                    {
+                        GearGraphics.DrawString(g, translatedCashPackageDesc + "", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    else
+                    {
+                        GearGraphics.DrawString(g, translatedCashPackageDesc + "\n#Can only be purchased with NX.#", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    break;
+                default:
+                    if (CashPackage.onlyCash == 0)
+                    {
+                        GearGraphics.DrawString(g, CashPackage.desc + "", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    else
+                    {
+                        GearGraphics.DrawString(g, CashPackage.desc + "\n#Can only be purchased with NX.#", GearGraphics.ItemDetailFont, 11, right, ref picH, 16);
+                    }
+                    break;
+
+            }
 
             bool hasLine = false;
             picH -= 0;//default is 4
@@ -263,7 +361,14 @@ namespace WzComparerR2.CharaSimControl
                     Wz_Node iconNode = null;
                     if (StringLinker.StringEqp.TryGetValue(commodity.ItemId, out sr))
                     {
-                        name = sr.Name;
+                        if (isTranslateRequired)
+                        {
+                            name = Translator.MergeString(sr.Name, Translator.TranslateString(sr.Name), 1, false, true);
+                        }
+                        else
+                        {
+                            name = sr.Name;
+                        }
                         string[] fullPaths = sr.FullPath.Split('\\');
                         iconNode = PluginBase.PluginManager.FindWz(string.Format(@"Character\{0}\{1:D8}.img\info\iconRaw", String.Join("\\", new List<string>(fullPaths).GetRange(2, fullPaths.Length - 3).ToArray()), commodity.ItemId));
                     }
@@ -409,6 +514,15 @@ namespace WzComparerR2.CharaSimControl
             if (totalOriginalPrice == totalPrice)
             {
                 TextRenderer.DrawText(g, totalPrice + " NX", GearGraphics.ItemDetailFont, new Point(35, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+                if (isCurrencyConversionEnabled)
+                {
+                    string exchangedPrice = Translator.GetConvertedCurrency(totalPrice, titleLanguage);
+                    if (!String.IsNullOrEmpty(exchangedPrice))
+                    {
+                        picH += 17;
+                        TextRenderer.DrawText(g, exchangedPrice, GearGraphics.ItemDetailFont, new Point(95, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+                    }
+                }
             }
             else
             {
@@ -416,6 +530,15 @@ namespace WzComparerR2.CharaSimControl
                 TextRenderer.DrawText(g, totalOriginalPrice + " NX", GearGraphics.ItemDetailFont, new Point(35, picH), Color.Red, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 g.DrawImage(Resource.CSDiscount_arrow, 35 + TextRenderer.MeasureText(g, totalOriginalPrice + " NX", GearGraphics.ItemDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width + 5, picH + 1);
                 DrawDiscountNum(g, "-" + (int)((100 - 100.0 * totalPrice / totalOriginalPrice)) + "%", cashBitmap.Width - 40, picH - 1, StringAlignment.Near);
+                if (isCurrencyConversionEnabled)
+                {
+                    string exchangedPrice = Translator.GetConvertedCurrency(totalPrice, titleLanguage);
+                    if (!String.IsNullOrEmpty(exchangedPrice))
+                    {
+                        picH += 17;
+                        TextRenderer.DrawText(g, exchangedPrice, GearGraphics.ItemDetailFont, new Point(128, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+                    }
+                }
             }
             picH += 11;
 
