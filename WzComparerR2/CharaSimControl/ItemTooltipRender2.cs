@@ -323,6 +323,7 @@ namespace WzComparerR2.CharaSimControl
 
         private Bitmap RenderItem(out int picH)
         {
+            bool isTranslateRequired = Translator.IsTranslateEnabled;
             Bitmap tooltip = new Bitmap(290, DefaultPicHeight);
             Graphics g = Graphics.FromImage(tooltip);
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
@@ -343,7 +344,14 @@ namespace WzComparerR2.CharaSimControl
             {
                 itemName += " (" + nameAdd + ")";
             }
-
+            if (isTranslateRequired)
+            {
+                string translatedItemName = Translator.MergeString(itemName, Translator.TranslateString(itemName, true), 0, false, true);
+                if (translatedItemName != itemName)
+                {
+                    itemName = translatedItemName;
+                }
+            }
             //SizeF titleSize = TextRenderer.MeasureText(g, sr.Name.Replace(Environment.NewLine, ""), GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
             SizeF titleSize = TextRenderer.MeasureText(g, itemName, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
             titleSize.Width += 9 * 2;//9 was 12
@@ -667,11 +675,27 @@ namespace WzComparerR2.CharaSimControl
             }
             if (!string.IsNullOrEmpty(desc))
             {
-                GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
+                if (isTranslateRequired)
+                {
+                    string mergedDesc = Translator.MergeString(desc, Translator.TranslateString(desc), 2);
+                    GearGraphics.DrawString(g, mergedDesc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                }
+                else
+                {
+                    GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                }
             }
             if (!string.IsNullOrEmpty(sr.AutoDesc))
             {
-                GearGraphics.DrawString(g, sr.AutoDesc, GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
+                if (isTranslateRequired)
+                {
+                    string mergedAutoDesc = Translator.MergeString(sr.AutoDesc, Translator.TranslateString(sr.AutoDesc), 2);
+                    GearGraphics.DrawString(g, mergedAutoDesc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                }
+                else
+                {
+                    GearGraphics.DrawString(g, sr.AutoDesc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                }
             }
             if (item.Props.TryGetValue(ItemPropType.tradeAvailable, out value) && value > 0)
             {
@@ -797,7 +821,15 @@ namespace WzComparerR2.CharaSimControl
                 if (!string.IsNullOrEmpty(descLeftAlign))
                 {
                     picH += 12;
-                    GearGraphics.DrawString(g, descLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
+                    if (isTranslateRequired)
+                    {
+                        string mergedDescLeftAlign = Translator.MergeString(descLeftAlign, Translator.TranslateString(descLeftAlign), 2);
+                        GearGraphics.DrawString(g, mergedDescLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
+                    }
+                    else
+                    {
+                        GearGraphics.DrawString(g, descLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
+                    }
                 }
                 if (item.CoreSpecs.Count > 0)
                 {

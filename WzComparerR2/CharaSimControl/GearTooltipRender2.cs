@@ -189,6 +189,15 @@ namespace WzComparerR2.CharaSimControl
                 sr.Name = "(null)";
             }
             string gearName = sr.Name;
+            bool isTranslateRequired = Translator.IsTranslateEnabled;
+            if (isTranslateRequired)
+            {
+                string translatedGearName = Translator.MergeString(gearName, Translator.TranslateString(gearName, true), 0, false, true);
+                if (translatedGearName != gearName)
+                {
+                    gearName = translatedGearName;
+                }
+            }
             switch (Gear.GetGender(Gear.ItemID))
             {
                 case 0: gearName += " (Male)"; break;
@@ -879,7 +888,23 @@ namespace WzComparerR2.CharaSimControl
 
             if (!string.IsNullOrEmpty(Gear.EpicHs) && sr[Gear.EpicHs] != null)
             {
-                desc.Add(sr[Gear.EpicHs].Replace("#", " #"));
+                switch (Translator.DefaultPreferredLayout)
+                {
+                    case 1:
+                        desc.Add(Translator.TranslateString(sr[Gear.EpicHs]).Replace("#", " #"));
+                        desc.Add(sr[Gear.EpicHs].Replace("#", " #"));
+                        break;
+                    case 2:
+                        desc.Add(sr[Gear.EpicHs].Replace("#", " #"));
+                        desc.Add(Translator.TranslateString(sr[Gear.EpicHs]).Replace("#", " #"));
+                        break;
+                    case 3:
+                        desc.Add(Translator.TranslateString(sr[Gear.EpicHs]).Replace("#", " #"));
+                        break;
+                    default:
+                        desc.Add(sr[Gear.EpicHs].Replace("#", " #"));
+                        break;
+                }
             }
 
             //绘制倾向
@@ -1005,8 +1030,16 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {
-                    //GearGraphics.DrawString(g, sr.Desc, GearGraphics.EquipDetailFont2, 13, 223, ref picH, 15, ((SolidBrush)GearGraphics.OrangeBrush2).Color);
-                    GearGraphics.DrawString(g, sr.Desc.Replace("#", " #"), GearGraphics.EquipDetailFont2, orange2FontColorTable, 10, 243, ref picH, 15);
+                    if (isTranslateRequired)
+                    {
+                        string translatedDesc = Translator.MergeString(sr.Desc.Replace("#", " #"), Translator.TranslateString(sr.Desc).Replace("#", " #"), 2);
+                        GearGraphics.DrawString(g, translatedDesc, GearGraphics.EquipDetailFont2, orange2FontColorTable, 10, 243, ref picH, 15);
+                    }
+                    else
+                    {
+
+                        GearGraphics.DrawString(g, sr.Desc.Replace("#", " #"), GearGraphics.EquipDetailFont2, orange2FontColorTable, 10, 243, ref picH, 15);
+                    }
                 }
                 if (!string.IsNullOrEmpty(levelDesc))
                 {

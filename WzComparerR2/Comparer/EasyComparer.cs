@@ -557,7 +557,7 @@ namespace WzComparerR2.Comparer
             SkillTooltipRender2[] skillRenderNewOld = new SkillTooltipRender2[2];
             int count = 0;
             int allCount = OutputSkillTooltipIDs.Count;
-            var skillTypeFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
+            var skillTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
@@ -668,8 +668,8 @@ namespace WzComparerR2.Comparer
                 }
 
                 var skillTypeTextInfo = g.MeasureString(skillType, GearGraphics.ItemDetailFont2);
-                int picH = 13;
-                GearGraphics.DrawPlainText(g, skillType, skillTypeFont, Color.FromArgb(255, 255, 255), 2, (int)Math.Ceiling(skillTypeTextInfo.Width) + 2, ref picH, 10);
+                int picH = 0;
+                GearGraphics.DrawPlainText(g, skillType, skillTypeFont, Color.FromArgb(255, 255, 255), 80, (int)Math.Ceiling(skillTypeTextInfo.Width) + 80, ref picH, 10);
 
                 string imageName = Path.Combine(skillTooltipPath, "Skill_" + skillID + "_" + skillType + "_[" + (ItemStringHelper.GetJobName(int.Parse(skillID) / 10000) ?? "Etc") + "]_" + skillName + ".png");
                 if (!File.Exists(imageName))
