@@ -565,14 +565,14 @@ namespace WzComparerR2.CharaSim
             {
                 switch (specJob)
                 {
-                    case 1: extraJobNames.AddRange(new[] { "英雄", "圣骑士" }); break;
-                    case 2: extraJobNames.AddRange(new[] { "冰雷魔导师", "火毒魔导师", "主教" }); break;
-                    case 4: extraJobNames.Add("侠盗"); break;
-                    case 11: extraJobNames.Add("魂骑士"); break;
-                    case 12: extraJobNames.Add("炎术士"); break;
-                    case 22: extraJobNames.Add("龙神"); break;
-                    case 32: extraJobNames.Add("唤灵斗师"); break;
-                    case 172: extraJobNames.Add("森林小主"); break;
+                    case 1: extraJobNames.AddRange(new[] { "히어로", "팔라딘" }); break;
+                    case 2: extraJobNames.AddRange(new[] { "아크메이지(썬,콜)", "아크메이지(불,독)", "비숍" }); break;
+                    case 4: extraJobNames.Add("섀도어"); break;
+                    case 11: extraJobNames.Add("소울마스터"); break;
+                    case 12: extraJobNames.Add("플레임위자드"); break;
+                    case 22: extraJobNames.Add("에반"); break;
+                    case 32: extraJobNames.Add("배틀메이지"); break;
+                    case 172: extraJobNames.Add("숲의아이"); break;
                     default: extraJobNames.Add(specJob.ToString()); break;
                 }
             }
@@ -580,7 +580,7 @@ namespace WzComparerR2.CharaSim
             {
                 return null;
             }
-            return string.Join("、", extraJobNames) + "可穿戴装备";
+            return string.Join(", ", extraJobNames) + " 착용 가능";
         }
 
         public static string GetItemPropString(ItemPropType propType, long value)
