@@ -6,6 +6,7 @@ using WzComparerR2.WzLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using DevComponents.DotNetBar;
+using WzComparerR2.Rendering;
 
 namespace WzComparerR2.Animation
 {
@@ -88,7 +89,7 @@ namespace WzComparerR2.Animation
                 return null;
         }
 
-        public static FrameAnimationData CreateRectData(Point lt, Point rb, int delay, GraphicsDevice graphicsDevice, Color bgColor, Color rectColor, Color outlineColor)
+        public static FrameAnimationData CreateRectData(Point lt, Point rb, int delay, GraphicsDevice graphicsDevice, Color rectColor, Color outlineColor)
         {
             int outline = 2;
 
@@ -131,6 +132,8 @@ namespace WzComparerR2.Animation
 
             rectangleTexture = (Texture2D)renderTarget;
 
+            spriteBatch.Dispose();
+
             Point origin = new Point(-lt.X, -lt.Y);
             var tmpFrame = new Frame(rectangleTexture, origin, 0, delay, true);
             var tmpFrameAnimationData = new FrameAnimationData();
@@ -143,7 +146,7 @@ namespace WzComparerR2.Animation
 
         }
 
-        public static FrameAnimationData MergeAnimationData(FrameAnimationData baseData, FrameAnimationData addData, GraphicsDevice graphicsDevice, Color bgColor, int delayOffset, int moveX, int moveY, int frameStart, int frameEnd)
+        public static FrameAnimationData MergeAnimationData(FrameAnimationData baseData, FrameAnimationData addData, GraphicsDevice graphicsDevice, int delayOffset, int moveX, int moveY, int frameStart, int frameEnd)
         {
             var anime = new FrameAnimationData();
             int baseCount = 0;
@@ -229,7 +232,7 @@ namespace WzComparerR2.Animation
                         Point newOrigin;
                         globalDelay += thisDelay;
 
-                        Frame thisFrame = new Frame(MergeFrameTextures(baseData.Frames[baseCount], addData.Frames[addCount], graphicsDevice, out newOrigin, bgColor),
+                        Frame thisFrame = new Frame(MergeFrameTextures(baseData.Frames[baseCount], addData.Frames[addCount], graphicsDevice, out newOrigin),
                             newOrigin, baseData.Frames[baseCount].Z, thisDelay, baseData.Frames[baseCount].Blend);
 
                         anime.Frames.Add(thisFrame);
@@ -272,7 +275,7 @@ namespace WzComparerR2.Animation
                 return null;
         }
 
-        private static Texture2D MergeFrameTextures(Frame frame1, Frame frame2, GraphicsDevice graphicsDevice, out Point newOrigin, Color bgColor)
+        private static Texture2D MergeFrameTextures(Frame frame1, Frame frame2, GraphicsDevice graphicsDevice, out Point newOrigin)
         {
             Texture2D texture1 = frame1.Texture;
             Texture2D texture2 = frame2.Texture;
@@ -291,30 +294,33 @@ namespace WzComparerR2.Animation
             int width = texture1.Width + dl + dr;
             int height = texture1.Height + dt + db;
             newOrigin = new Point(frame1.Origin.X + dl, frame1.Origin.Y + dt);
+            var offsetX = newOrigin.X - frame2.Origin.X - dl;
+            var offsetY = newOrigin.Y - frame2.Origin.Y - dt;
 
             RenderTarget2D renderTarget = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
             SpriteBatch spriteBatch = new SpriteBatch(graphicsDevice);
+            PngEffect pngEffect = new PngEffect(graphicsDevice);
+            pngEffect.Overlay = true;
 
             graphicsDevice.SetRenderTarget(renderTarget);
-            graphicsDevice.Clear(bgColor);
+            graphicsDevice.Clear(Color.Transparent);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, new BlendState()
-            {
-                AlphaSourceBlend = Blend.One,
-                AlphaDestinationBlend = Blend.InverseSourceAlpha,
-                AlphaBlendFunction = BlendFunction.Add,
-                ColorSourceBlend = Blend.SourceAlpha,
-                ColorDestinationBlend = Blend.InverseSourceAlpha,
-                ColorBlendFunction = BlendFunction.Add,
-            }
-            );
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(texture1, new Vector2(dl, dt), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.End();
 
-            spriteBatch.Draw(texture1, new Vector2(dl, dt), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
+            pngEffect.Parameters["TextureDst"].SetValue(texture1);
+            pngEffect.Parameters["scaler"].SetValue(new Vector2((float)texture2.Width / texture1.Width, (float)texture2.Height / texture1.Height));
+            pngEffect.Parameters["offset"].SetValue(new Vector2((float)offsetX / texture1.Width, (float)offsetY / texture1.Height));
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, null, null, null, pngEffect, null);
             spriteBatch.Draw(texture2, new Vector2(newOrigin.X - frame2.Origin.X, newOrigin.Y - frame2.Origin.Y), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-
             spriteBatch.End();
 
             graphicsDevice.SetRenderTarget(null);
+
+            pngEffect.Dispose();
+            spriteBatch.Dispose();
 
             return renderTarget;
         }
