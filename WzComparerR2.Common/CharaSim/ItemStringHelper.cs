@@ -874,16 +874,16 @@ namespace WzComparerR2.CharaSim
 
                 case 4001: return "하야토";
                 case 4002: return "칸나";
-                case 4100: return "하야토(1次)";
-                case 4110: return "하야토(2次)";
-                case 4111: return "하야토(3次)";
-                case 4112: return "하야토(4次)";
-                case 4114: return "하야토(6次)";
-                case 4200: return "칸나(1次)";
-                case 4210: return "칸나(2次)";
-                case 4211: return "칸나(3次)";
-                case 4212: return "칸나(4次)";
-                case 4214: return "칸나(6次)";
+                case 4100: return "하야토(1차)";
+                case 4110: return "하야토(2차)";
+                case 4111: return "하야토(3차)";
+                case 4112: return "하야토(4차)";
+                case 4114: return "하야토(6차)";
+                case 4200: return "칸나(1차)";
+                case 4210: return "칸나(2차)";
+                case 4211: return "칸나(3차)";
+                case 4212: return "칸나(4차)";
+                case 4214: return "칸나(6차)";
 
 
                 case 5000: return "미하일";
@@ -941,10 +941,10 @@ namespace WzComparerR2.CharaSim
                 case 10114: return "제로(6차)";
 
                 case 11000: return "비스트테이머";
-                case 11200: return "비스트테이머(1次)";
-                case 11210: return "비스트테이머(2次)";
-                case 11211: return "비스트테이머(3次)";
-                case 11212: return "비스트테이머(4次)";
+                case 11200: return "비스트테이머(1차)";
+                case 11210: return "비스트테이머(2차)";
+                case 11211: return "비스트테이머(3차)";
+                case 11212: return "비스트테이머(4차)";
 
                 case 12005: return "카마도 탄지로";
                 case 12100: return "카마도 탄지로";
