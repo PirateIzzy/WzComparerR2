@@ -676,7 +676,7 @@ namespace WzComparerR2.Comparer
 
                 if (change && !match.Success)
                 {
-                    match = Regex.Match(node.FullPathToFile, @"^Skill\\_Canvas\\\d+.img\\skill\\(\d+)\\icon$"); // 스킬 아이콘 변경 체크
+                    match = Regex.Match(node.FullPathToFile, @"^Skill\\_Canvas\\\d+.img\\skill\\(\d+)\\(icon)$"); // 스킬 아이콘 변경 체크
                 }
             }
 

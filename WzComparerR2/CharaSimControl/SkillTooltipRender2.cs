@@ -201,7 +201,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Skill.IsSequenceOn)
             {
-                if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("IsSequenceOn"))
+                if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("isSequenceOn"))
                 {
                     GearGraphics.DrawString(g, "#$g스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
@@ -212,7 +212,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Skill.IsPetAutoBuff)
             {
-                if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("IsPetAutoBuff"))
+                if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("isPetAutoBuff"))
                 {
                     GearGraphics.DrawString(g, "#$g펫 버프 자동스킬 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
