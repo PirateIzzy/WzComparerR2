@@ -168,9 +168,13 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         energySword = 124,
         /// <summary>
-        /// 驯兽魔法棒 125
+        /// 驯兽魔法棒 1252
         /// </summary>
-        magicStick = 125,
+        magicStick = 1252,
+        /// <summary>
+        /// 驯兽魔法棒 1259
+        /// </summary>
+        magicStick2 = 1259,
         /// <summary>
         /// ESP限制器
         /// </summary>

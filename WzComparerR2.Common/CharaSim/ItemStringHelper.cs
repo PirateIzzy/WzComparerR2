@@ -266,7 +266,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.katara: return "블레이드";
                 case GearType.magicArrow: return "마법화살";
                 case GearType.card: return "카드";
-                case GearType.box: return "宝盒";
+                case GearType.box: return "보석함";
                 case GearType.orb: return "오브";
                 case GearType.novaMarrow: return "용의 정수";
                 case GearType.soulBangle: return "소울링";
@@ -295,15 +295,15 @@ namespace WzComparerR2.CharaSim
                 case GearType.emblem: return "엠블렘";
                 case GearType.soulShield: return "소울실드";
                 case GearType.demonShield: return "포스실드";
-                case GearType.totem: return "图腾";
+                case GearType.totem: return "토템";
                 case GearType.petEquip: return "펫장비";
                 case GearType.taming:
                 case GearType.taming2:
                 case GearType.taming3: 
                 case GearType.tamingChair: return "라이딩";
                 case GearType.saddle: return "안장";
-                case GearType.katana: return "武士刀";
-                case GearType.fan: return "折扇";
+                case GearType.katana: return "카타나";
+                case GearType.fan: return "부채";
                 case GearType.swordZB: return "대검";
                 case GearType.swordZL: return "태도";
                 case GearType.weapon: return "무기";
@@ -334,12 +334,13 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.energySword: return "에너지소드";
                 case GearType.desperado: return "데스페라도";
-                case GearType.magicStick: return "记忆长杖";
+                case GearType.magicStick: return "메모리얼 스태프";
+                case GearType.magicStick2: return "셉터";
                 case GearType.whistle:
-                case GearType.whistle2: return "飞越";
-                case GearType.boxingClaw: return "拳爪";
+                case GearType.whistle2: return "리프";
+                case GearType.boxingClaw: return "피스트";
                 case GearType.kodachi:
-                case GearType.kodachi2:  return "小太刀";
+                case GearType.kodachi2:  return "와키자시";
                 case GearType.espLimiter: return "ESP 리미터";
 
                 case GearType.GauntletBuster: return "건틀렛 리볼버";
@@ -360,8 +361,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.tuner: return "튜너";
                 case GearType.bracelet: return "브레이슬릿";
 
-                case GearType.boxingCannon: return "拳封";
-                case GearType.boxingSky: return "拳天";
+                case GearType.boxingCannon: return "무권";
+                case GearType.boxingSky: return "권환";
 
                 case GearType.breathShooter: return "브레스 슈터";
                 case GearType.weaponBelt: return "웨폰 벨트";
@@ -433,7 +434,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.connonGunPowder: 
                 case GearType.connonGunPowder2: return "캐논 슈터 직업군 착용 가능";
                 case GearType.box:
-                case GearType.boxingClaw: return "龙的传人可穿戴装备";
+                case GearType.boxingClaw: return "용의 전인 착용 가능";
                 case GearType.relic: return "패스파인더 직업군 착용 가능";
 
                 //1xxx
@@ -472,8 +473,8 @@ namespace WzComparerR2.CharaSim
                 //4xxx
                 case GearType.katana:
                 case GearType.kodachi:
-                case GearType.kodachi2: return "剑豪可穿戴装备";
-                case GearType.fan: return "阴阳师可穿戴装备";
+                case GearType.kodachi2: return "하야토 착용 가능";
+                case GearType.fan: return "칸나 착용 가능";
 
                 //5xxx
                 case GearType.soulShield: return "미하일 착용 가능";
@@ -493,7 +494,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.whistle:
                 case GearType.whistle2:
-                case GearType.magicStick: return GetExtraJobReqString(112);
+                case GearType.magicStick: return GetExtraJobReqString(172);
+
+                case GearType.magicStick2: return GetExtraJobReqString(112);
 
                 case GearType.espLimiter:
                 case GearType.chess: return GetExtraJobReqString(142);
@@ -537,15 +540,15 @@ namespace WzComparerR2.CharaSim
                 case 31: return "데몬 직업군 착용 가능";
                 case 36: return "제논 착용 가능";
                 case 37: return "블래스터 착용 가능";
-                case 41: return "剑豪可穿戴装备";
-                case 42: return "阴阳师可穿戴装备";
+                case 41: return "하야토 착용 가능";
+                case 42: return "칸나 착용 가능";
                 case 51: return "미하일 착용 가능";
                 case 61: return "카이저 착용 가능";
                 case 63: return "카인 착용 가능";
                 case 64: return "카데나 착용 가능";
                 case 65: return "엔젤릭 버스터 착용 가능";
                 case 101: return "제로 착용 가능";
-                case 112: return "琳可穿戴装备";
+                case 112: return "비스트테이머 착용 가능";
                 case 142: return "키네시스 착용 가능";
                 case 151: return "아델 착용 가능";
                 case 152: return "일리움 착용 가능";
@@ -553,7 +556,8 @@ namespace WzComparerR2.CharaSim
                 case 155: return "아크 착용 가능";
                 case 162: return "라라 착용 가능";
                 case 164: return "호영 착용 가능";
-                case 175: return "墨玄可穿戴装备";
+                case 172: return "린 착용 가능";
+                case 175: return "묵현 착용 가능";
                 default: return null;
             }
         }
@@ -572,7 +576,7 @@ namespace WzComparerR2.CharaSim
                     case 12: extraJobNames.Add("플레임위자드"); break;
                     case 22: extraJobNames.Add("에반"); break;
                     case 32: extraJobNames.Add("배틀메이지"); break;
-                    case 172: extraJobNames.Add("숲의아이"); break;
+                    case 172: extraJobNames.Add("린"); break;
                     default: extraJobNames.Add(specJob.ToString()); break;
                 }
             }
@@ -868,18 +872,18 @@ namespace WzComparerR2.CharaSim
                 case 3712: return "블래스터(4차)";
                 case 3714: return "블래스터(6차)";
 
-                case 4001: return "剑豪";
-                case 4002: return "阴阳师";
-                case 4100: return "剑豪(1次)";
-                case 4110: return "剑豪(2次)";
-                case 4111: return "剑豪(3次)";
-                case 4112: return "剑豪(4次)";
-                case 4114: return "剑豪(6次)";
-                case 4200: return "阴阳师(1次)";
-                case 4210: return "阴阳师(2次)";
-                case 4211: return "阴阳师(3次)";
-                case 4212: return "阴阳师(4次)";
-                case 4214: return "阴阳师(6次)";
+                case 4001: return "하야토";
+                case 4002: return "칸나";
+                case 4100: return "하야토(1次)";
+                case 4110: return "하야토(2次)";
+                case 4111: return "하야토(3次)";
+                case 4112: return "하야토(4次)";
+                case 4114: return "하야토(6次)";
+                case 4200: return "칸나(1次)";
+                case 4210: return "칸나(2次)";
+                case 4211: return "칸나(3次)";
+                case 4212: return "칸나(4次)";
+                case 4214: return "칸나(6次)";
 
 
                 case 5000: return "미하일";
@@ -936,11 +940,11 @@ namespace WzComparerR2.CharaSim
                 case 10112: return "제로(4차)";
                 case 10114: return "제로(6차)";
 
-                case 11000: return "林之灵";
-                case 11200: return "林之灵(1次)";
-                case 11210: return "林之灵(2次)";
-                case 11211: return "林之灵(3次)";
-                case 11212: return "林之灵(4次)";
+                case 11000: return "비스트테이머";
+                case 11200: return "비스트테이머(1次)";
+                case 11210: return "비스트테이머(2次)";
+                case 11211: return "비스트테이머(3次)";
+                case 11212: return "비스트테이머(4次)";
 
                 case 12005: return "카마도 탄지로";
                 case 12100: return "카마도 탄지로";
@@ -995,12 +999,18 @@ namespace WzComparerR2.CharaSim
                 case 16412: return "호영(4차)";
                 case 16414: return "호영(6차)";
 
-                case 17000: return "墨玄";
-                case 17500: return "墨玄(1차)";
-                case 17510: return "墨玄(2차)";
-                case 17511: return "墨玄(3차)";
-                case 17512: return "墨玄(4차)";
-                case 17514: return "墨玄(6차)";
+                case 17000: return "묵현";
+                case 17001: return "린";
+                case 17200: return "린(1차)";
+                case 17210: return "린(2차)";
+                case 17211: return "린(3차)";
+                case 17212: return "린(4차)";
+                case 17214: return "린(6차)";
+                case 17500: return "묵현(1차)";
+                case 17510: return "묵현(2차)";
+                case 17511: return "묵현(3차)";
+                case 17512: return "묵현(4차)";
+                case 17514: return "묵현(6차)";
 
                     
                 case 40000: return "5차";
