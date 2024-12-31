@@ -133,7 +133,7 @@ namespace WzComparerR2.CharaSimControl
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
             var v6SkillSummaryFontColorTable = new Dictionary<string, Color>()
             {
-                { "c", GearGraphics.SkillSummaryOrangeTextColor },
+                { "c", GearGraphics.OrangeBrushColor },
                 { "$g", GearGraphics.gearCyanColor },
             };
 
@@ -528,7 +528,7 @@ namespace WzComparerR2.CharaSimControl
 
                 if (attr.Count > 0)
                 {
-                    skillDescEx.Add("#c" + string.Join(", ", attr.ToArray()) + "#");
+                    skillDescEx.Add("#c" + string.Join("\n", attr.ToArray()) + "#");
                 }
             }
 

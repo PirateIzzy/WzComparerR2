@@ -352,7 +352,7 @@ namespace WzComparerR2.Comparer
 
             FileStream htmlFile = null;
             StreamWriter sw = null;
-            StateInfo = "Creating" + type;
+            StateInfo = "Creating " + type;
             StateDetail = "Creating output files";
             try
             {
