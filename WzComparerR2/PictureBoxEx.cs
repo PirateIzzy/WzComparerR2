@@ -201,8 +201,7 @@ namespace WzComparerR2
 
             var config = ImageHandlerConfig.Default;
             var newAniItem = new FrameAnimator(FrameAnimationData.MergeAnimationData(baseAniItem.Data, aniItem.Data,
-                    this.GraphicsDevice, System.Drawing.Color.FromArgb(config.BackgroundType.Value == ImageBackgroundType.Transparent ? 0 : 255, config.BackgroundColor.Value).ToXnaColor(),
-                    delayOffset, moveX, moveY, frameStart, frameEnd));
+                    this.GraphicsDevice, delayOffset, moveX, moveY, frameStart, frameEnd));
 
             this.Items.Add(newAniItem);
 
@@ -250,7 +249,7 @@ namespace WzComparerR2
                 Color rectColor = System.Drawing.Color.FromArgb(rectBlend, config.OverlayRectColor.Value).ToXnaColor();
                 Color outlineColor = System.Drawing.Color.FromArgb(outlineBlend, config.OverlayRectColor.Value).ToXnaColor();
 
-                var aniItemData = FrameAnimationData.CreateRectData(lt, rb, endTime - startTime, this.GraphicsDevice, bgColor, rectColor, outlineColor);
+                var aniItemData = FrameAnimationData.CreateRectData(lt, rb, endTime - startTime, this.GraphicsDevice, rectColor, outlineColor);
 
                 if (aniItemData == null) return;
 
@@ -261,8 +260,7 @@ namespace WzComparerR2
             this.Items.Clear();
 
             var newAniItem = new FrameAnimator(FrameAnimationData.MergeAnimationData(baseAniItem.Data, aniItem.Data,
-                    this.GraphicsDevice, bgColor,
-                    startTime, 0, 0, 0, 0));
+                    this.GraphicsDevice, startTime, 0, 0, 0, 0));
 
             this.Items.Add(newAniItem);
 

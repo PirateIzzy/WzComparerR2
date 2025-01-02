@@ -15,6 +15,7 @@ namespace WzComparerR2.CharaSim
             Props = new Dictionary<GearPropType, int>();
             VariableStat = new Dictionary<GearPropType, float>();
             AbilityTimeLimited = new Dictionary<GearPropType, int>();
+            ReqSpecJobs = new List<int>();
             Options = new Potential[3];
             AdditionalOptions = new Potential[3];
             Additions = new List<Addition>();
@@ -51,6 +52,7 @@ namespace WzComparerR2.CharaSim
         public Dictionary<GearPropType, int> Props { get; private set; }
         public Dictionary<GearPropType, float> VariableStat { get; private set; }
         public Dictionary<GearPropType, int> AbilityTimeLimited { get; private set; }
+        public List<int> ReqSpecJobs { get; private set; }
 
         /// <summary>
         /// 获取或设置装备的标准属性。
@@ -182,6 +184,21 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public bool IsGenesisWeapon
+        {
+            get
+            {
+                // There's no better way to determine if a weapon is a Genesis weapon, the game itself also uses a hard-coded list to check it.
+                if (IsWeapon(this.type)
+                    && this.Props.TryGetValue(GearPropType.setItemID, out var setItemID)
+                    && 886 <= setItemID && setItemID <= 890)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public void Upgrade(Wz_Node infoNode, int count)
         {
             this.ScrollUp += count;
@@ -238,7 +255,7 @@ namespace WzComparerR2.CharaSim
         public static bool IsLeftWeapon(GearType type)
         {
             return (int)type >= 121 && (int)type <= 139 && type != GearType.katara
-                || ((int)type / 10) == 121;
+                || ((int)type / 10) == 121 || ((int)type / 10) == 125;
         }
 
         public static bool IsSubWeapon(GearType type)
@@ -406,6 +423,9 @@ namespace WzComparerR2.CharaSim
                     return GearType.tuner;
                 case 1214:
                     return GearType.breathShooter;
+                case 1252:
+                case 1259:
+                    return (GearType)(code / 1000);
                 case 1403:
                     return GearType.boxingCannon;
                 case 1404:
@@ -849,6 +869,13 @@ namespace WzComparerR2.CharaSim
                                     {
                                     }
                                 }
+                            }
+                            break;
+
+                        case "reqSpecJobs":
+                            foreach (Wz_Node jobNode in subNode.Nodes)
+                            {
+                                gear.ReqSpecJobs.Add(jobNode.GetValue<int>());
                             }
                             break;
 

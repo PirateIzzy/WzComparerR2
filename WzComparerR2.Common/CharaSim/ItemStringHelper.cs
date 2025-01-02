@@ -113,7 +113,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.sharableOnce: return value == 0 ? null : "Tradable once within the same world.\n(Cannot be traded after transfer)"; //old "Can be traded once within account"
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
                 case GearPropType.notExtend: return value == 0 ? null : "Duration cannot be extended.";
-                case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "Tradable once\n(Only tradable to your chars in this world after exchange)";
+                case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "Tradable once\nOnly tradable to your chars in this world after exch.";
                 case GearPropType.mintable: return value == 0 ? null : "Mintable";
                 case GearPropType.tradeAvailable:
                     switch (value)
@@ -232,13 +232,13 @@ namespace WzComparerR2.CharaSim
                 case GearType.hair:
                 case GearType.hair2:
                 case GearType.hair3: return "Hair";
-                case GearType.faceAccessory: return "FACE ACCESSORY";
-                case GearType.eyeAccessory: return "EYE ACCESSORY";
-                case GearType.earrings: return "EARRINGS";
-                case GearType.pendant: return "PENDANT";
-                case GearType.belt: return "BELT";
-                case GearType.medal: return "MEDAL";
-                case GearType.shoulderPad: return "SHOULDER";
+                case GearType.faceAccessory: return "Face Accessory";
+                case GearType.eyeAccessory: return "Eye Accessory";
+                case GearType.earrings: return "Earrings";
+                case GearType.pendant: return "Pendant";
+                case GearType.belt: return "Belt";
+                case GearType.medal: return "Medal";
+                case GearType.shoulderPad: return "Shoulder";
                 case GearType.cap: return "Hat";
                 case GearType.cape: return "Cape";
                 case GearType.coat: return "Top";
@@ -246,7 +246,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.dragonPendant: return "Dragon Pendant";
                 case GearType.dragonWings: return "Dragon Wing Accessory";
                 case GearType.dragonTail: return "Dragon Tail Accessory";
-                case GearType.glove: return "GLOVES";
+                case GearType.glove: return "Gloves";
                 case GearType.longcoat: return "Outfit";
                 case GearType.machineEngine: return "Mechanic Engine";
                 case GearType.machineArms: return "Mechanic Arm";
@@ -254,7 +254,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.machineBody: return "Mechanic Frame";
                 case GearType.machineTransistors: return "Mechanic Transistor";
                 case GearType.pants: return "Bottom";
-                case GearType.ring: return "RING";
+                case GearType.ring: return "Ring";
                 case GearType.shield: return "Shield";
                 case GearType.shoes: return "Shoes";
                 case GearType.shiningRod: return "Shining Rod";
@@ -284,15 +284,15 @@ namespace WzComparerR2.CharaSim
                 case GearType.throwingGlove: return "Claw";
                 case GearType.knuckle: return "Knuckle";
                 case GearType.gun: return "Gun";
-                case GearType.android: return "ANDROID";
-                case GearType.machineHeart: return "MECHANICAL HEART";
+                case GearType.android: return "Android";
+                case GearType.machineHeart: return "Mechanical Heart";
                 case GearType.pickaxe: return "Mining Tool";
                 case GearType.shovel: return "Herbalism Tool";
-                case GearType.pocket: return "POCKET ITEM";
+                case GearType.pocket: return "Pocket Item";
                 case GearType.dualBow: return "Dual Bowguns";
                 case GearType.handCannon: return "Hand Cannon";
-                case GearType.badge: return "BADGE";
-                case GearType.emblem: return "EMBLEM";
+                case GearType.badge: return "Badge";
+                case GearType.emblem: return "Emblem";
                 case GearType.soulShield: return "Soul Shield";
                 case GearType.demonShield: return "Demon Aegis";
                 //case GearType.totem: return "Totem";
@@ -300,7 +300,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.taming:
                 case GearType.taming2:
                 case GearType.taming3: 
-                case GearType.tamingChair: return "TAMED MONSTER";
+                case GearType.tamingChair: return "Tamed Monster";
                 case GearType.saddle: return "Saddle";
                 case GearType.katana: return "Katana";
                 case GearType.fan: return "Fan";
@@ -334,6 +334,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.energySword: return "Whip Blade";
                 case GearType.desperado: return "Desperado";
                 case GearType.memorialStaff: return "Memorial Staff";
+                case GearType.magicStick: return "Beast Tamer Scepter";
                 case GearType.leaf:
                 case GearType.leaf2: return "Leaf";
                 case GearType.boxingClaw: return "Fist";
@@ -341,8 +342,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.kodachi2: return "Kodachi";
                 case GearType.espLimiter: return "Psy-limiter";
 
-                case GearType.GauntletBuster: return "Arm Cannon";
-                case GearType.ExplosivePill: return "Charge";
+                case GearType.gauntletBuster: return "Arm Cannon";
+                case GearType.explosivePill: return "Charge";
 
                 case GearType.chain2: return "Chain";
                 case GearType.magicGauntlet: return "Lucent Gauntlet";
@@ -464,8 +465,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.controller:
                 case GearType.powerSource:
                 case GearType.energySword: return GetExtraJobReqString(36);
-                case GearType.GauntletBuster:
-                case GearType.ExplosivePill: return GetExtraJobReqString(37);
+                case GearType.gauntletBuster:
+                case GearType.explosivePill: return GetExtraJobReqString(37);
 
                 //4xxx
                 case GearType.katana:
@@ -492,6 +493,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.leaf:
                 case GearType.leaf2:
                 case GearType.memorialStaff: return GetExtraJobReqString(172);
+                case GearType.magicStick: return GetExtraJobReqString(112);
 
                 case GearType.espLimiter:
                 case GearType.chess: return GetExtraJobReqString(142);
@@ -543,7 +545,7 @@ namespace WzComparerR2.CharaSim
                 case 64: return "Cadena only";
                 case 65: return "Angelic Buster only";
                 case 101: return "Zero only";
-                // case 112: return "Beast Tamer only";
+                case 112: return "Beast Tamer only";
                 case 142: return "Kinesis only";
                 case 151: return "Adele only";
                 case 152: return "Illium only";
@@ -555,6 +557,31 @@ namespace WzComparerR2.CharaSim
                 case 175: return "Mo Xuan only";
                 default: return null;
             }
+        }
+
+        public static string GetExtraJobReqString(IEnumerable<int> specJobs)
+        {
+            List<string> extraJobNames = new List<string>();
+            foreach (int specJob in specJobs)
+            {
+                switch (specJob)
+                {
+                    case 1: extraJobNames.AddRange(new[] { "Hero", "Paladin" }); break;
+                    case 2: extraJobNames.AddRange(new[] { "Arch Mage (Ice, Lightning)", "Arch Mage (Fire, Poison)", "Bishop" }); break;
+                    case 4: extraJobNames.Add("Shadower"); break;
+                    case 11: extraJobNames.Add("Dawn Warrior"); break;
+                    case 12: extraJobNames.Add("Blaze Wizard"); break;
+                    case 22: extraJobNames.Add("Evan"); break;
+                    case 32: extraJobNames.Add("Battle Mage"); break;
+                    case 172: extraJobNames.Add("Lynn"); break;
+                    default: extraJobNames.Add(specJob.ToString()); break;
+                }
+            }
+            if (extraJobNames.Count == 0)
+            {
+                return null;
+            }
+            return string.Join(", ", extraJobNames) + " only";
         }
 
         public static string GetItemPropString(ItemPropType propType, long value)
@@ -1016,6 +1043,17 @@ namespace WzComparerR2.CharaSim
                 case 17512: return "Mo Xuan(4)";
                 case 17513: return "Mo Xuan(5)";
                 case 17514: return "Mo Xuan(6)";
+
+                case 40000: return "5th";
+                case 40001: return "5th (Warrior)";
+                case 40002: return "5th (Magician)";
+                case 40003: return "5th (Bowman)";
+                case 40004: return "5th (Thief)";
+                case 40005: return "5th (Pirate)";
+
+                case 50000: return "6th";
+                case 50006: return "6th (Enhanced Node)";
+                case 50007: return "6th (HEXA Stat)";
             }
             return null;
         }

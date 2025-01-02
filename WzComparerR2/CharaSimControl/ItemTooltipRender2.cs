@@ -799,7 +799,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (!string.IsNullOrEmpty(incline))
             {
-                GearGraphics.DrawString(g, "#cGrants " + incline.Substring(2) + " EXP when first equipped (up to the daily maximum).", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                GearGraphics.DrawString(g, "#cGrants " + incline.Substring(2) + " EXP when first equipped\n(up to the daily maximum).", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
             }
 
             picH += 3;
