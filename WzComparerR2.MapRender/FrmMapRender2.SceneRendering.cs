@@ -237,6 +237,10 @@ namespace WzComparerR2.MapRender
                     this.ui.Teleport.CmbMaps.SelectedIndex = 0;
                     this.ui.Teleport.Toggle();
                 }
+                else if (portal.ToName != null && portal.ToName != "")
+                {
+                    BlinkPortal(portal.ToName); // blink
+                }
             }
             else if (item is IlluminantClusterItem)
             {

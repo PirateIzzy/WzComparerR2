@@ -581,14 +581,19 @@ namespace WzComparerR2.MapRender
             }
             else //当前地图
             {
-                viewData.ToMapID = null;
-                viewData.ToPortal = null;
+                BlinkPortal(pName);
+            }
+        }
 
-                var portal = this.mapData.Scene.FindPortal(pName);
-                if (portal != null)
-                {
-                    this.cm.StartCoroutine(OnCameraMoving(new Point(portal.X, portal.Y), 500));
-                }
+        private void BlinkPortal(string pName)
+        {
+            viewData.ToMapID = null;
+            viewData.ToPortal = null;
+
+            var portal = this.mapData.Scene.FindPortal(pName);
+            if (portal != null)
+            {
+                this.cm.StartCoroutine(OnCameraMoving(new Point(portal.X, portal.Y), 500));
             }
         }
 
