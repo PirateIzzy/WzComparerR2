@@ -47,6 +47,7 @@ namespace WzComparerR2.MapRender
             this.patchVisibility.LadderRopeVisible = false;
             this.patchVisibility.SkyWhaleVisible = false;
             this.patchVisibility.IlluminantClusterPathVisible = false;
+            this.patchVisibility.SpringPortalPathVisible = false;
 
             var form = Form.FromHandle(this.Window.Handle) as Form;
             form.Load += Form_Load;
@@ -241,6 +242,7 @@ namespace WzComparerR2.MapRender
                 this.patchVisibility.LadderRopeVisible = !visible;
                 this.patchVisibility.SkyWhaleVisible = !visible;
                 this.patchVisibility.IlluminantClusterPathVisible = !visible;
+                this.patchVisibility.SpringPortalPathVisible = !visible;
             }), KeyCode.D7, ModifierKeys.Control));
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ =>
             {

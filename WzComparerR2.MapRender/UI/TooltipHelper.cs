@@ -122,7 +122,7 @@ namespace WzComparerR2.MapRender.UI
                 case 8: return "스크립트(숨겨짐)";
                 case 9: return "스크립트(접촉시활성)";
                 case 10: return "블링크";
-                case 12: return "弹力装置";
+                case 12: return "점프대";
                 default: return null;
             }
         }
