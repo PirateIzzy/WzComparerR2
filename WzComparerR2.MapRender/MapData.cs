@@ -1059,6 +1059,17 @@ namespace WzComparerR2.MapRender
                         }
                         break;
 
+                    case "move":
+                        if (this.random.NextPercent(0.3f))
+                        {
+                            e.NextState = "stand";
+                        }
+                        else
+                        {
+                            e.NextState = e.CurrentState;
+                        }
+                        break;
+
                     default: 
                         goto case "regen";
                 }
