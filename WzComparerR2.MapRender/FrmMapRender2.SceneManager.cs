@@ -243,7 +243,7 @@ namespace WzComparerR2.MapRender
             return null;
         }
 
-        private Music LoadSoundEff(string path)
+        private Music LoadSoundEff(string path, bool useHolder = false)
         {
             var bgmNode = PluginManager.FindWz(path);
             if (bgmNode != null)
@@ -261,16 +261,25 @@ namespace WzComparerR2.MapRender
                 {
                     bgmNode = uol.HandleUol(bgmNode);
                 }
-                //var bgm = resLoader.Load<Music>(bgmNode);
-                Wz_Sound bgm = bgmNode.GetValue<Wz_Sound>();
-                Music sound = null;
-                if (bgm != null)
-                {
-                    sound = new Music(bgm);
-                }
 
-                sound.IsLoop = false;
-                return sound;
+                if (useHolder)
+                {
+                    var bgm = resLoader.Load<Music>(bgmNode);
+                    bgm.IsLoop = false;
+                    return bgm;
+                }
+                else
+                {
+                    Wz_Sound bgm = bgmNode.GetValue<Wz_Sound>();
+                    Music sound = null;
+                    if (bgm != null)
+                    {
+                        sound = new Music(bgm);
+                    }
+
+                    sound.IsLoop = false;
+                    return sound;
+                }
             }
             return null;
         }
