@@ -272,7 +272,7 @@ namespace WzComparerR2.MapRender
                     var ani = life.View.Animator as StateMachineAnimator;
                     var soundEffPath = $@"Sound\Mob.img\{life.ID:D7}\";
 
-                    if (ani.Data.SelectedState != "die1")
+                    if (ani.Data.SelectedState != "die1" && ani.Data.SelectedState != "regen")
                     {
                         if (life.View.Time % 4 == 0)
                         {

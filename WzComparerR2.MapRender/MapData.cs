@@ -1070,6 +1070,12 @@ namespace WzComparerR2.MapRender
                         }
                         break;
 
+                    case "die1":
+                        if (ani.Data.States.Contains("regen")) e.NextState = "regen";
+                        else if (ani.Data.States.Contains("stand")) e.NextState = "stand";
+                        else if (ani.Data.States.Contains("fly")) e.NextState = "fly";
+                        break;
+
                     default: 
                         goto case "regen";
                 }
