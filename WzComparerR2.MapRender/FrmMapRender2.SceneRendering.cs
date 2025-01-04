@@ -255,6 +255,14 @@ namespace WzComparerR2.MapRender
             {
                 var reactor = (ReactorItem)item;
                 reactor.View.NextStage = reactor.View.Stage + 1;
+
+                Music soundEff = LoadSoundEff($@"Sound\Reactor.img\{reactor.ID}\{reactor.View.Stage}");
+                if (soundEff != null)
+                {
+                    soundEff.Volume = bgm.Volume;
+                    soundEff.Play();
+                    soundEff.soundEffDispose();
+                }
             }
             else if (item is LifeItem)
             {
