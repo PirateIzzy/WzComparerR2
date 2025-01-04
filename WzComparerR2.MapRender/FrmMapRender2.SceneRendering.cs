@@ -270,19 +270,36 @@ namespace WzComparerR2.MapRender
                 if (life.Type == LifeItem.LifeType.Mob)
                 {
                     var ani = life.View.Animator as StateMachineAnimator;
+                    var soundEffPath = $@"Sound\Mob.img\{life.ID:D7}\";
 
-                    //if (ani.Data.SelectedState != "hit1")
-                    if (ani.Data.States.Contains("hit1"))
+                    if (ani.Data.SelectedState != "die1")
                     {
-                        ani.SetAnimation("hit1");
-                    }
+                        if (life.View.Time % 4 == 0)
+                        {
+                            if (ani.Data.States.Contains("die1"))
+                            {
+                                ani.SetAnimation("die1");
+                            }
 
-                    Music soundEff = LoadSoundEff($@"Sound\Mob.img\{life.ID:D7}\Damage");
-                    if (soundEff != null)
-                    {
-                        soundEff.Volume = bgm.Volume;
-                        soundEff.Play();
-                        soundEff.soundEffDispose();
+                            soundEffPath += "Die";
+                        }
+                        else
+                        {
+                            if (ani.Data.States.Contains("hit1"))
+                            {
+                                ani.SetAnimation("hit1");
+                            }
+
+                            soundEffPath += "Damage";
+                        }
+
+                        Music soundEff = LoadSoundEff(soundEffPath);
+                        if (soundEff != null)
+                        {
+                            soundEff.Volume = bgm.Volume;
+                            soundEff.Play();
+                            soundEff.soundEffDispose();
+                        }
                     }
                 }
             }
