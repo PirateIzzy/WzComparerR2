@@ -243,6 +243,38 @@ namespace WzComparerR2.MapRender
             return null;
         }
 
+        private Music LoadSoundEff(string path)
+        {
+            var bgmNode = PluginManager.FindWz(path);
+            if (bgmNode != null)
+            {
+                if (bgmNode.Value == null)
+                {
+                    bgmNode = bgmNode.Nodes.FirstOrDefault(n => n.Value is Wz_Sound || n.Value is Wz_Uol);
+                    if (bgmNode == null)
+                    {
+                        return null;
+                    }
+                }
+
+                while (bgmNode.Value is Wz_Uol uol)
+                {
+                    bgmNode = uol.HandleUol(bgmNode);
+                }
+                //var bgm = resLoader.Load<Music>(bgmNode);
+                Wz_Sound bgm = bgmNode.GetValue<Wz_Sound>();
+                Music sound = null;
+                if (bgm != null)
+                {
+                    sound = new Music(bgm);
+                }
+
+                sound.IsLoop = false;
+                return sound;
+            }
+            return null;
+        }
+
         private void AfterLoadMap(MapData mapData)
         {
             //同步可视化状态

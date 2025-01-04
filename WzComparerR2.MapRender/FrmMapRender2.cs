@@ -462,7 +462,7 @@ namespace WzComparerR2.MapRender
                     int y = (int)point.Y;
                     var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
                     {
-                        return item.rect.Contains(x, y) && (item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem);
+                        return item.rect.Contains(x, y) && (item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem || item.item is LifeItem);
                     });
                     return mouseTarget.item;
                 },

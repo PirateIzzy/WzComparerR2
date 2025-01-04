@@ -256,6 +256,28 @@ namespace WzComparerR2.MapRender
                 var reactor = (ReactorItem)item;
                 reactor.View.NextStage = reactor.View.Stage + 1;
             }
+            else if (item is LifeItem)
+            {
+                var life = (LifeItem)item;
+                if (life.Type == LifeItem.LifeType.Mob)
+                {
+                    var ani = life.View.Animator as StateMachineAnimator;
+
+                    //if (ani.Data.SelectedState != "hit1")
+                    if (ani.Data.States.Contains("hit1"))
+                    {
+                        ani.SetAnimation("hit1");
+                    }
+
+                    Music soundEff = LoadSoundEff($@"Sound\Mob.img\{life.ID:D7}\Damage");
+                    if (soundEff != null)
+                    {
+                        soundEff.Volume = bgm.Volume;
+                        soundEff.Play();
+                        soundEff.soundEffDispose();
+                    }
+                }
+            }
         }
 
         private void DrawScene(GameTime gameTime)
