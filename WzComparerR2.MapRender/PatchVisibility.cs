@@ -74,6 +74,8 @@ namespace WzComparerR2.MapRender
 
         public bool IlluminantClusterPathVisible { get; set; }
 
+        public bool SpringPortalPathVisible { get; set; }
+
         public bool PortalVisible
         {
             get { return IsVisible(RenderObjectType.Portal); }

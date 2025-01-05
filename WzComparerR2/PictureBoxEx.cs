@@ -177,7 +177,7 @@ namespace WzComparerR2
             int moveY = 0;
             int frameStart = 0;
             int frameEnd = 0;
-            int pngDelay = 100;
+            int pngDelay = 120;
 
             // 정보 받아오기
             if (frmOverlayAniOptions.ShowDialog() == DialogResult.OK)

@@ -94,13 +94,13 @@ namespace WzComparerR2.MapRender
                 yield break;
             }
 
-            // backfill toMapID 
+            // Backfill toMapID 
             if (this.viewData.ToMapID == null && this.mapData?.ID != null)
             {
                 this.viewData.ToMapID = this.mapData.ID;
             }
 
-            //记录历史
+            // Recording map history
             if (this.viewData.MapID > -1 && this.viewData.MapID != this.viewData.ToMapID && this.viewData.ToMapID != null)
             {
                 if (this.viewData.IsMoveBack
@@ -145,15 +145,15 @@ namespace WzComparerR2.MapRender
                 return false;
             }
 
-            //开始加载
+            // Start load
             this.resLoader.ClearAnimationCache();
             this.resLoader.BeginCounting();
 
-            //加载地图数据
+            // Load map data
             var mapData = new MapData(this.Services.GetService<IRandom>());
             mapData.Load(this.mapImgLoading.Node, resLoader);
 
-            //处理bgm
+            // Load BGM
             Music newBgm = LoadBgm(mapData);
             Task bgmTask = null;
             bool willSwitchBgm = this.mapData?.Bgm != mapData.Bgm;
@@ -162,10 +162,10 @@ namespace WzComparerR2.MapRender
                 bgmTask = FadeOut(this.bgm, 1000);
             }
 
-            //加载资源
+            // Load Resources
             mapData.PreloadResource(resLoader);
 
-            //准备UI和初始化
+            // Preparing UI and initialization
             this.AfterLoadMap(mapData);
 
             if (bgmTask != null)
@@ -173,11 +173,11 @@ namespace WzComparerR2.MapRender
                 await bgmTask;
             }
 
-            //回收资源
+            // Recycling
             this.resLoader.EndCounting();
             this.resLoader.Recycle();
 
-            //准备场景和bgm
+            // Prepare scene and BGM
             this.mapImg = this.mapImgLoading;
             this.mapImgLoading = null;
             this.mapData = mapData;
@@ -244,15 +244,56 @@ namespace WzComparerR2.MapRender
             return null;
         }
 
+        private Music LoadSoundEff(string path, bool useHolder = false)
+        {
+            var bgmNode = PluginManager.FindWz(path);
+            if (bgmNode != null)
+            {
+                if (bgmNode.Value == null)
+                {
+                    bgmNode = bgmNode.Nodes.FirstOrDefault(n => n.Value is Wz_Sound || n.Value is Wz_Uol);
+                    if (bgmNode == null)
+                    {
+                        return null;
+                    }
+                }
+
+                while (bgmNode.Value is Wz_Uol uol)
+                {
+                    bgmNode = uol.HandleUol(bgmNode);
+                }
+
+                if (useHolder)
+                {
+                    var bgm = resLoader.Load<Music>(bgmNode);
+                    bgm.IsLoop = false;
+                    return bgm;
+                }
+                else
+                {
+                    Wz_Sound bgm = bgmNode.GetValue<Wz_Sound>();
+                    Music sound = null;
+                    if (bgm != null)
+                    {
+                        sound = new Music(bgm);
+                    }
+
+                    sound.IsLoop = false;
+                    return sound;
+                }
+            }
+            return null;
+        }
+
         private void AfterLoadMap(MapData mapData)
         {
-            //同步可视化状态
+            // Synchronize visualization status
             foreach (var portal in mapData.Scene.Portals)
             {
                 portal.View.IsEditorMode = this.patchVisibility.PortalInEditMode;
             }
 
-            //同步UI
+            // Synchronous UI
             this.renderEnv.Camera.WorldRect = mapData.VRect;
 
             this.ui.MirrorFrame.Visibility = mapData.ID / 10000000 == 32 ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Collapsed;
@@ -458,7 +499,7 @@ namespace WzComparerR2.MapRender
         {
             this.sceneManagerState = SceneManagerState.Entering;
 
-            //初始化指向传送门
+            // Initialize portal
             if (!string.IsNullOrEmpty(viewData.Portal))
             {
                 var portal = this.mapData.Scene.FindPortal(viewData.Portal);
@@ -474,7 +515,7 @@ namespace WzComparerR2.MapRender
             }
             viewData.Portal = null;
 
-            //场景渐入
+            // Scene fading in
             this.opacity = 0;
             double time = 500;
             for (double i = 0; i < time; i += cm.GameTime.ElapsedGameTime.TotalMilliseconds)
@@ -491,7 +532,7 @@ namespace WzComparerR2.MapRender
         {
             this.sceneManagerState = SceneManagerState.Exiting;
 
-            //场景渐出
+            // Scene fading out
             this.opacity = 1;
             double time = 500;
             for (double i = 0; i < time; i += cm.GameTime.ElapsedGameTime.TotalMilliseconds)
@@ -545,30 +586,30 @@ namespace WzComparerR2.MapRender
                 this.ui.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
             }
 
-            //需要手动更新数据部分
+            // Manual data update required
             this.renderEnv.Camera.AdjustToWorldRect();
             {
                 var rect = this.renderEnv.Camera.ClipRect;
                 this.ui.Minimap.CameraViewPort = new EmptyKeys.UserInterface.Rect(rect.X, rect.Y, rect.Width, rect.Height);
             }
-            //更新topbar
+            // Update topbar
             UpdateTopBar();
-            //更新ui
+            // Update UI
             this.ui.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
-            //更新场景
+            // Update scene
             if (mapData != null)
             {
                 UpdateAllItems(mapData.Scene, gameTime.ElapsedGameTime);
             }
-            //更新tooltip
+            // Update tooltip
             UpdateTooltip();
         }
 
         private void MoveToPortal(int? toMap, string pName, string fromPName = null, bool isBack = false)
         {
-            if (toMap != null && toMap != this.mapData?.ID) //跳转地图
+            if (toMap != null && toMap != this.mapData?.ID) // Move to map
             {
-                //寻找地图数据
+                // Find map data
                 Wz_Node node;
                 if (MapData.FindMapByID(toMap.Value, out node))
                 {
@@ -587,16 +628,21 @@ namespace WzComparerR2.MapRender
                     this.ui.ChatBox.AppendTextSystem($"You cannot move to map {toMap.Value}.");
                 }
             }
-            else //当前地图
+            else // Current map
             {
-                viewData.ToMapID = null;
-                viewData.ToPortal = null;
+                BlinkPortal(pName);
+            }
+        }
 
-                var portal = this.mapData.Scene.FindPortal(pName);
-                if (portal != null)
-                {
-                    this.cm.StartCoroutine(OnCameraMoving(new Point(portal.X, portal.Y), 500));
-                }
+        private void BlinkPortal(string pName)
+        {
+            viewData.ToMapID = null;
+            viewData.ToPortal = null;
+
+            var portal = this.mapData.Scene.FindPortal(pName);
+            if (portal != null)
+            {
+                this.cm.StartCoroutine(OnCameraMoving(new Point(portal.X, portal.Y), 500));
             }
         }
 

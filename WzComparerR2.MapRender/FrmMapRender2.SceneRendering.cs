@@ -237,6 +237,14 @@ namespace WzComparerR2.MapRender
                     this.ui.Teleport.CmbMaps.SelectedIndex = 0;
                     this.ui.Teleport.Toggle();
                 }
+                else if (portal.IsSpring && (portal.ToName == null || portal.ToName == ""))
+                {
+                    this.cm.StartCoroutine(OnCameraMoving(new Point(portal.X + portal.HorizontalImpact / 5, portal.Y - portal.VerticalImpact / 5), 500)); // spring
+                }
+                else if (portal.ToName != null && portal.ToName != "")
+                {
+                    BlinkPortal(portal.ToName); // blink
+                }
             }
             else if (item is IlluminantClusterItem)
             {
@@ -247,6 +255,53 @@ namespace WzComparerR2.MapRender
             {
                 var reactor = (ReactorItem)item;
                 reactor.View.NextStage = reactor.View.Stage + 1;
+
+                Music soundEff = LoadSoundEff($@"Sound\Reactor.img\{reactor.ID}\{reactor.View.Stage}");
+                if (soundEff != null)
+                {
+                    soundEff.Volume = bgm.Volume;
+                    soundEff.Play();
+                    soundEff.soundEffDispose();
+                }
+            }
+            else if (item is LifeItem)
+            {
+                var life = (LifeItem)item;
+                if (life.Type == LifeItem.LifeType.Mob)
+                {
+                    var ani = life.View.Animator as StateMachineAnimator;
+                    var soundEffPath = $@"Sound\Mob.img\{life.ID:D7}\";
+
+                    if (ani.Data.SelectedState != "die1" && ani.Data.SelectedState != "regen")
+                    {
+                        if (life.View.Time % 4 == 0)
+                        {
+                            if (ani.Data.States.Contains("die1"))
+                            {
+                                ani.SetAnimation("die1");
+                            }
+
+                            soundEffPath += "Die";
+                        }
+                        else
+                        {
+                            if (ani.Data.States.Contains("hit1"))
+                            {
+                                ani.SetAnimation("hit1");
+                            }
+
+                            soundEffPath += "Damage";
+                        }
+
+                        Music soundEff = LoadSoundEff(soundEffPath);
+                        if (soundEff != null)
+                        {
+                            soundEff.Volume = bgm.Volume;
+                            soundEff.Play();
+                            soundEff.soundEffDispose();
+                        }
+                    }
+                }
             }
         }
 
@@ -420,6 +475,46 @@ namespace WzComparerR2.MapRender
                         lines.Add(new Point(end.X - 5, end.Y + 8));
                         lines.Add(end);
                         lines.Add(new Point(end.X + 5, end.Y + 8));
+                    }
+                }
+
+                if (lines.Count > 0)
+                {
+                    var meshItem = this.batcher.MeshPop();
+                    meshItem.RenderObject = new LineListMesh(lines.ToArray(), color, 1);
+                    this.batcher.Draw(meshItem);
+                    this.batcher.MeshPush(meshItem);
+                }
+            }
+
+            if (patchVisibility.SpringPortalPathVisible)
+            {
+                var lines = new List<Point>();
+                var portalList = this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>();
+                var arrowScaler = 15;
+                var barScaler = 0;
+                foreach (var item in portalList)
+                {
+                    if (!item.IsSpring) continue;
+
+                    var angle = Math.Atan2(item.VerticalImpact, item.HorizontalImpact);
+                    var sin = Math.Sin(angle);
+                    var cos = Math.Cos(angle);
+                    Point arrow1 = new Point((int)((cos + sin) * -arrowScaler), (int)((cos - sin) * -arrowScaler));
+                    Point arrow2 = new Point((int)((sin - cos) * arrowScaler), (int)((cos + sin) * arrowScaler));
+
+                    foreach (var d in new[] { -3, 0, 3 })
+                    {
+                        var d2 = Math.Abs(d) * barScaler + 1;
+                        Point start = new Point(item.X + d * 15, item.Y);
+                        Point end = new Point((int)(item.X + item.HorizontalImpact / (d2 * 5) + d * 15), (int)(item.Y - item.VerticalImpact / (d2 * 5)));
+
+                        lines.Add(start);
+                        lines.Add(end);
+                        lines.Add(end);
+                        lines.Add(new Point((int)(end.X + arrow1.X / d2), (int)(end.Y + arrow1.Y / d2)));
+                        lines.Add(end);
+                        lines.Add(new Point((int)(end.X + arrow2.X / d2), (int)(end.Y + arrow2.Y / d2)));
                     }
                 }
 
@@ -893,6 +988,35 @@ namespace WzComparerR2.MapRender
             mesh.FlipX = obj.Flip;
             mesh.Z0 = obj.Z;
             mesh.Z1 = obj.Index;
+
+            if (obj.MoveW != 0 || obj.MoveH != 0)
+            {
+                double movingX = 0;
+                double movingY = 0;
+                double time = obj.View.Time / Math.PI / 1000 * 4 / obj.MoveP * 5000;
+
+                switch (obj.MoveType)
+                {
+                    case 0: // none
+                        break;
+                    case 1:
+                    case 2: // line
+                        movingX = obj.MoveW * Math.Cos(time);
+                        movingY = obj.MoveH * Math.Cos(time);
+                        break;
+
+                    case 3: // circle
+                        movingX = obj.MoveW * Math.Cos(time);
+                        movingY = obj.MoveH * Math.Sin(time);
+                        break;
+
+                    default:
+                        break;
+                }
+
+                mesh.Position += new Vector2((float)movingX, (float)movingY);
+            }
+
             return mesh;
         }
 
