@@ -400,8 +400,8 @@ namespace WzComparerR2.MapRender.UI
                             this.StringLinker?.StringNpc.TryGetValue(npcID, out sr);
                             string npcText = sr?.Name ?? npcID.ToString();
                             var npcInfo = PluginManager.FindWz(string.Format("Npc/{0:D7}.img/info", npcID));
-                            var hide = npcInfo.Nodes["hide"].GetValueEx<int>(0);
-                            var hideName = npcInfo.Nodes["hideName"].GetValueEx<int>(0);
+                            var hide = npcInfo?.Nodes["hide"].GetValueEx<int>(0);
+                            var hideName = npcInfo?.Nodes["hideName"].GetValueEx<int>(0);
                             if ((hide != 0 || hideName != 0) && npcNames.Contains(npcText))
                             {
                                 npcNames[npcNames.IndexOf(npcText)] = "";
