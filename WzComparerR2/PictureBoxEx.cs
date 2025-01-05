@@ -617,7 +617,15 @@ namespace WzComparerR2
                 }
                 catch (Exception ex)
                 {
-                    context.Message = $"오류: {ex.Message}";
+                    if (ex is AggregateException aggrEx && aggrEx.InnerExceptions.Count == 1)
+                    {
+                        context.Message = $"오류: {aggrEx.InnerExceptions[0].Message}";
+                    }
+                    else
+                    {
+                        context.Message = $"오류: {ex.Message}";
+                    }
+                    context.FullMessage = ex.ToString();
                     throw;
                 }
                 finally
