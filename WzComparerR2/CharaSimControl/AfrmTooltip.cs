@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Controls;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.CharaSimControl
 {

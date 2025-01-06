@@ -17,6 +17,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.PluginBase;
 using WzComparerR2.Config;
 using WzComparerR2.Controls;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.Avatar.UI
 {
@@ -2165,7 +2166,7 @@ namespace WzComparerR2.Avatar.UI
 
             async Task ExportJob(IProgressDialogContext context, CancellationToken cancellationToken)
             {
-                IEnumerable<Action> actionEnumerator = avatar.Actions;
+                IEnumerable<AvatarCommon.Action> actionEnumerator = avatar.Actions;
                 var step1 = actionEnumerator.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
 
                 var step2 = step1.Select(item => ExportGif(item.Name));

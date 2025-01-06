@@ -11,6 +11,7 @@ using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -51,6 +52,7 @@ namespace WzComparerR2.CharaSimControl
         public TooltipRender LinkRecipeItemRender { get; set; }
         public TooltipRender SetItemRender { get; set; }
         public TooltipRender CashPackageRender { get; set; }
+        private AvatarCanvas avatar { get; set; }
 
         public override Bitmap Render()
         {
@@ -781,7 +783,7 @@ namespace WzComparerR2.CharaSimControl
             long minLev = 0, maxLev = 0;
             bool willDrawExp = item.Props.TryGetValue(ItemPropType.exp_minLev, out minLev) && item.Props.TryGetValue(ItemPropType.exp_maxLev, out maxLev);
 
-            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || willDrawNickTag || willDrawExp)
+            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || item.ShowCosmetic || willDrawNickTag || willDrawExp)
             {
                 if (picH < iconY + 84)
                 {
@@ -847,6 +849,57 @@ namespace WzComparerR2.CharaSimControl
                         g.DrawImage(sample.Bitmap, (tooltip.Width - sample.Bitmap.Width) / 2, picH);
                         picH += sample.Bitmap.Height;
                         picH += 2;
+                    }
+                }
+                if (this.item.Specs.TryGetValue(ItemSpecType.cosmetic, out value) && value > 0)
+                {
+                    Wz_Node cosmetic = null;
+                    Wz_Node body = null;
+                    Wz_Node head = null;
+                    if (value < 1000)
+                    {
+                        body = PluginManager.FindWz($@"Character\00002{value:D3}.img");
+                        head = PluginManager.FindWz($@"Character\00012{value:D3}.img");
+                    }
+                    else
+                    {
+                        cosmetic = PluginManager.FindWz($@"Character\Hair\{value:D8}.img") ??
+                            PluginManager.FindWz($@"Character\Face\{value:D8}.img");
+                        body = PluginManager.FindWz(@"Character\00002015.img");
+                        head = PluginManager.FindWz(@"Character\00012015.img");
+                    }
+                    Wz_Node coat = PluginManager.FindWz(@"Character\Coat\01042194.img");
+                    Wz_Node pants = PluginManager.FindWz(@"Character\Pants\01062153.img");
+
+                    if (body != null && head != null)
+                    {
+                        if (this.avatar == null)
+                        {
+                            this.avatar = new AvatarCanvas();
+                            this.avatar.LoadZ();
+                            this.avatar.LoadActions();
+                            this.avatar.LoadEmotions();
+                        }
+
+                        this.avatar.AddPart(body);
+                        this.avatar.AddPart(head);
+                        if (coat != null) this.avatar.AddPart(coat);
+                        if (pants != null) this.avatar.AddPart(pants);
+                        if (cosmetic != null) this.avatar.AddPart(cosmetic);
+
+                        this.avatar.ActionName = "stand1";
+                        this.avatar.EmotionName = "default";
+
+                        var bone = this.avatar.CreateFrame(0, 0, 0, null);
+                        var frame = this.avatar.DrawFrame(bone);
+
+                        if (frame.Bitmap != null)
+                        {
+                            g.DrawImage(frame.Bitmap, (tooltip.Width - frame.Bitmap.Width) / 2, picH);
+                            picH += frame.Bitmap.Height;
+                            picH += 2;
+                        }
+                        Array.Clear(this.avatar.Parts, 0, this.avatar.Parts.Length);
                     }
                 }
                 if (item.SamplePath != null)

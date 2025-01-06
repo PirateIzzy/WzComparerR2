@@ -9,7 +9,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.CharaSim;
 using System.Text.RegularExpressions;
 
-namespace WzComparerR2.Avatar
+namespace WzComparerR2.AvatarCommon
 {
     public class AvatarCanvas
     {
