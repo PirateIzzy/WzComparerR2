@@ -949,9 +949,9 @@ namespace WzComparerR2.AvatarCommon
                     {
                         continue;
                     }
-                    if (childNode.Text == "hairShade")
+                    if (linkNode.Text == "hairShade")
                     {
-                        linkNode = childNode.FindNodeByPath("0");
+                        linkNode = linkNode.FindNodeByPath("0");
                         if (linkNode == null)
                         {
                             continue;
