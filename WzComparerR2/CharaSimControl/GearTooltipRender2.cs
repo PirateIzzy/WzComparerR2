@@ -36,7 +36,7 @@ namespace WzComparerR2.CharaSimControl
         private CharacterStatus charStat;
 
         public Gear Gear { get; set; }
-        private AvatarCanvas avatar;
+        private AvatarCanvasManager avatar;
 
         public override object TargetItem
         {
@@ -453,54 +453,28 @@ namespace WzComparerR2.CharaSimControl
                 {
                     if (this.avatar == null)
                     {
-                        this.avatar = new AvatarCanvas();
-                        this.avatar.LoadZ();
-                        this.avatar.LoadActions();
-                        this.avatar.LoadEmotions();
+                        this.avatar = new AvatarCanvasManager();
                     }
 
                     var skin = costume?.Nodes["skin"]?.Nodes["0"].GetValueEx<int>(2015);
                     var hair = costume?.Nodes["hair"]?.Nodes["0"].GetValueEx<int>(30000);
                     var face = costume?.Nodes["face"]?.Nodes["0"].GetValueEx<int>(20000);
 
-                    Wz_Node bodyNode = PluginBase.PluginManager.FindWz($@"Character\0000{skin:D4}.img")
-                        ?? PluginBase.PluginManager.FindWz($@"Character\00002000.img");
-                    Wz_Node headNode = PluginBase.PluginManager.FindWz($@"Character\0001{skin:D4}.img")
-                        ?? PluginBase.PluginManager.FindWz($@"Character\00012000.img");
-                    Wz_Node hairNode = PluginBase.PluginManager.FindWz($@"Character\Hair\{hair:D8}.img");
-                    Wz_Node faceNode = PluginBase.PluginManager.FindWz($@"Character\Face\{face:D8}.img");
-
-                    this.avatar.AddPart(bodyNode);
-                    this.avatar.AddPart(headNode);
-                    this.avatar.AddPart(hairNode);
-                    this.avatar.AddPart(faceNode);
+                    this.avatar.addBodyFromSkin4((int)skin);
+                    this.avatar.addGears([(int)hair, (int)face]);
 
                     if (basic != null)
                     {
                         foreach (var node in basic.Nodes)
                         {
-                            var gearType = Regex.Replace(node.Text, "^[a-z]", m => m.Value.ToUpper());
-                            if (gearType == "Gloves")
-                            {
-                                gearType = "Glove";
-                            }
                             var gearID = node.GetValueEx<int>(0);
-                            Wz_Node gearNode = PluginBase.PluginManager.FindWz($@"Character\{gearType}\{gearID:D8}.img");
-
-                            if (gearNode != null)
-                            {
-                                this.avatar.AddPart(gearNode);
-                            }
+                            this.avatar.addGear(gearID);
                         }
                     }
 
-                    this.avatar.ActionName = "stand1";
-                    this.avatar.EmotionName = "default";
+                    appearance = this.avatar.getBitmapOrigin();
 
-                    var bone = this.avatar.CreateFrame(0, 0, 0, null);
-                    appearance = this.avatar.DrawFrame(bone);
-
-                    Array.Clear(this.avatar.Parts, 0, this.avatar.Parts.Length);
+                    this.avatar.clearCanvas();
                 }
                 //BitmapOrigin appearance = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(morphID != 0 ? string.Format("Morph/{0:D4}.img/stand/0", morphID) : "Npc/0010300.img/stand/0"), PluginBase.PluginManager.FindWz);
 
