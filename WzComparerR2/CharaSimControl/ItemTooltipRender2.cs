@@ -61,8 +61,8 @@ namespace WzComparerR2.CharaSimControl
             //绘制道具
             int picHeight;
             Bitmap itemBmp = RenderItem(out picHeight);
-            Bitmap recipeInfoBmp = null;
-            List<Bitmap> recipeItemBmps = new List<Bitmap>();
+            List<Bitmap> recipeInfoBmps = new();
+            List<Bitmap> recipeItemBmps = new();
             Bitmap setItemBmp = null;
             Bitmap levelBmp = null;
             int levelHeight = 0;
@@ -93,7 +93,7 @@ namespace WzComparerR2.CharaSimControl
                             Wz_Node imgNode = node0.FindNodeByPath(imgName, true);
                             if (imgNode != null)
                             {
-                                Gear gear = Gear.CreateFromNode(imgNode, path=>PluginManager.FindWz(path));
+                                Gear gear = Gear.CreateFromNode(imgNode, path => PluginManager.FindWz(path));
                                 if (gear != null)
                                 {
                                     gear.Props[GearPropType.timeLimited] = 0;
@@ -150,28 +150,31 @@ namespace WzComparerR2.CharaSimControl
             };
 
             //图纸相关
-            if (this.item.Specs.TryGetValue(ItemSpecType.recipe, out long recipeID))
+            if (this.item.Recipes.Count > 0)
             {
-                long recipeSkillID = recipeID/10000;
-                Recipe recipe = null;
-                //寻找配方
-                Wz_Node recipeNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\Recipe_{0}.img\{1}", recipeSkillID, recipeID));
-                if (recipeNode != null)
+                foreach (int recipeID in this.item.Recipes)
                 {
-                    recipe = Recipe.CreateFromNode(recipeNode);
-                }
-                //生成配方图像
-                if (recipe != null)
-                {
-                    if (this.LinkRecipeInfo)
+                    int recipeSkillID = recipeID / 10000;
+                    Recipe recipe = null;
+                    //寻找配方
+                    Wz_Node recipeNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\Recipe_{0}.img\{1}", recipeSkillID, recipeID));
+                    if (recipeNode != null)
                     {
-                        recipeInfoBmp = RenderLinkRecipeInfo(recipe);
+                        recipe = Recipe.CreateFromNode(recipeNode);
                     }
-
-                    if (this.LinkRecipeItem)
+                    //生成配方图像
+                    if (recipe != null)
                     {
-                        int itemID = recipe.MainTargetItemID;
-                        AppendGearOrItem(itemID);
+                        if (this.LinkRecipeInfo)
+                        {
+                            recipeInfoBmps.Add(RenderLinkRecipeInfo(recipe));
+                        }
+
+                        if (this.LinkRecipeItem)
+                        {
+                            int itemID = recipe.MainTargetItemID;
+                            AppendGearOrItem(itemID);
+                        }
                     }
                 }
             }
@@ -208,35 +211,35 @@ namespace WzComparerR2.CharaSimControl
             //计算布局
             Size totalSize = new Size(itemBmp.Width, picHeight);
             Point recipeInfoOrigin = Point.Empty;
-            List<Point> recipeItemOrigins = new List<Point>();
+            Point recipeItemOrigin = Point.Empty;
             Point setItemOrigin = Point.Empty;
             Point levelOrigin = Point.Empty;
 
             if (recipeItemBmps.Count > 0)
             {
-                if (recipeInfoBmp != null)
+                // layout:
+                //   item        |  recipeItem
+                //   recipeInfo  |
+                recipeItemOrigin.X = totalSize.Width;
+                totalSize.Width += recipeItemBmps.Max(bmp => bmp.Width);
+
+                if (recipeInfoBmps.Count > 0)
                 {
-                    recipeItemOrigins.Add(new Point(totalSize.Width, 0));
-                    recipeInfoOrigin.X = itemBmp.Width - recipeInfoBmp.Width;
+                    recipeInfoOrigin.X = itemBmp.Width - recipeInfoBmps.Max(bmp => bmp.Width);
                     recipeInfoOrigin.Y = picHeight;
-                    totalSize.Width += recipeItemBmps[0].Width;
-                    totalSize.Height = Math.Max(picHeight + recipeInfoBmp.Height, recipeItemBmps[0].Height);
+                    totalSize.Height = Math.Max(picHeight + recipeInfoBmps.Sum(bmp => bmp.Height), recipeItemBmps.Sum(bmp => bmp.Height));
                 }
                 else
                 {
-                    int itemCnt = recipeItemBmps.Count;
-                    for (int i = 0; i < itemCnt; ++i)
-                    {
-                        recipeItemOrigins.Add(new Point(totalSize.Width, 0));
-                        totalSize.Width += recipeItemBmps[i].Width;
-                        totalSize.Height = Math.Max(picHeight, recipeItemBmps[i].Height);
-                    }
+                    totalSize.Height = Math.Max(picHeight, recipeItemBmps.Sum(bmp => bmp.Height));
                 }
             }
-            else if (recipeInfoBmp != null)
+            else if (recipeInfoBmps.Count > 0)
             {
-                totalSize.Width += recipeInfoBmp.Width;
-                totalSize.Height = Math.Max(picHeight, recipeInfoBmp.Height);
+                // layout:
+                //   item  |  recipeInfo
+                totalSize.Width += recipeInfoBmps.Max(bmp => bmp.Width);
+                totalSize.Height = Math.Max(picHeight, recipeInfoBmps.Sum(bmp => bmp.Height));
                 recipeInfoOrigin.X = itemBmp.Width;
             }
             if (setItemBmp != null)
@@ -272,20 +275,24 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //绘制配方
-            if (recipeInfoBmp != null)
+            if (recipeInfoBmps.Count > 0)
             {
-                g.DrawImage(recipeInfoBmp, recipeInfoOrigin.X, recipeInfoOrigin.Y,
-                    new Rectangle(Point.Empty, recipeInfoBmp.Size), GraphicsUnit.Pixel);
+                for (int i = 0, y = recipeInfoOrigin.Y; i < recipeInfoBmps.Count; i++)
+                {
+                    g.DrawImage(recipeInfoBmps[i], recipeInfoOrigin.X, y,
+                        new Rectangle(Point.Empty, recipeInfoBmps[i].Size), GraphicsUnit.Pixel);
+                    y += recipeInfoBmps[i].Height;
+                }
             }
 
             //绘制产出道具
             if (recipeItemBmps.Count > 0)
             {
-                int itemCnt = recipeItemBmps.Count;
-                for (int i = 0; i < itemCnt; ++i)
+                for (int i = 0, y = recipeItemOrigin.Y; i < recipeItemBmps.Count; i++)
                 {
-                    g.DrawImage(recipeItemBmps[i], recipeItemOrigins[i].X, recipeItemOrigins[i].Y,
+                    g.DrawImage(recipeItemBmps[i], recipeItemOrigin.X, y,
                         new Rectangle(Point.Empty, recipeItemBmps[i].Size), GraphicsUnit.Pixel);
+                    y += recipeItemBmps[i].Height;
                 }
             }
 
@@ -306,11 +313,10 @@ namespace WzComparerR2.CharaSimControl
 
             if (itemBmp != null)
                 itemBmp.Dispose();
-            if (recipeInfoBmp != null)
-                recipeInfoBmp.Dispose();
+            if (recipeInfoBmps.Count > 0)
+                recipeInfoBmps.ForEach(bmp => bmp.Dispose());
             if (recipeItemBmps.Count > 0)
-                foreach (Bitmap recipeItemBmp in recipeItemBmps)
-                    recipeItemBmp.Dispose();
+                recipeItemBmps.ForEach(bmp => bmp.Dispose());
             if (setItemBmp != null)
                 setItemBmp.Dispose();
             if (levelBmp != null)
@@ -319,7 +325,6 @@ namespace WzComparerR2.CharaSimControl
             g.Dispose();
             return tooltip;
         }
-
 
         private Bitmap RenderItem(out int picH)
         {
@@ -926,12 +931,12 @@ namespace WzComparerR2.CharaSimControl
 
 
             //绘制配方需求
-            if (item.Specs.TryGetValue(ItemSpecType.recipe, out value))
+            if (item.Recipes.Count > 0)
             {
                 long reqSkill, reqSkillLevel;
                 if (!item.Specs.TryGetValue(ItemSpecType.reqSkill, out reqSkill))
                 {
-                    reqSkill = value / 10000 * 10000;
+                    reqSkill = item.Recipes[0] / 10000 * 10000;
                 }
 
                 if (!item.Specs.TryGetValue(ItemSpecType.reqSkillLevel, out reqSkillLevel))
