@@ -480,10 +480,17 @@ namespace WzComparerR2.CharaSimControl
                         foreach (var node in basic.Nodes)
                         {
                             var gearType = Regex.Replace(node.Text, "^[a-z]", m => m.Value.ToUpper());
+                            if (gearType == "Gloves")
+                            {
+                                gearType = "Glove";
+                            }
                             var gearID = node.GetValueEx<int>(0);
                             Wz_Node gearNode = PluginBase.PluginManager.FindWz($@"Character\{gearType}\{gearID:D8}.img");
 
-                            this.avatar.AddPart(gearNode);
+                            if (gearNode != null)
+                            {
+                                this.avatar.AddPart(gearNode);
+                            }
                         }
                     }
 
@@ -500,9 +507,9 @@ namespace WzComparerR2.CharaSimControl
                 //appearance.Bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
 
                 var imgrect = new Rectangle(Math.Max(appearance.Origin.X - 50, 0),
-                    0 + Math.Max(appearance.Origin.Y - 100, 0),
-                    Math.Min(appearance.Bitmap.Width, appearance.Origin.X + 50),
-                    Math.Min(appearance.Origin.Y, 100) + Math.Max(appearance.Origin.Y - 100, 0));
+                    Math.Max(appearance.Origin.Y - 100, 0),
+                    Math.Min(appearance.Bitmap.Width, appearance.Origin.X + 50) - Math.Max(appearance.Origin.X - 50, 0),
+                    Math.Min(appearance.Origin.Y, 100));
 
                 g.DrawImage(appearance.Bitmap, 88 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
                 picH += 100;
