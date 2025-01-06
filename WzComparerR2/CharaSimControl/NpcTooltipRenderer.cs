@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
+using WzComparerR2.AvatarCommon;
+using WzComparerR2.WzLib;
 using static WzComparerR2.CharaSimControl.RenderHelper;
 
 namespace WzComparerR2.CharaSimControl
@@ -25,6 +27,7 @@ namespace WzComparerR2.CharaSimControl
         }
 
         public Npc NpcInfo { get; set; }
+        private AvatarCanvasManager avatar { get; set; }
 
         public override Bitmap Render()
         {
@@ -80,6 +83,31 @@ namespace WzComparerR2.CharaSimControl
             Rectangle imgRect = Rectangle.Empty;
             Rectangle textRect = Measure(propBlocks);
             Bitmap npcImg = NpcInfo.Default.Bitmap;
+            if (NpcInfo.IsComponentNPC)
+            {
+                if (this.avatar == null)
+                {
+                    this.avatar = new AvatarCanvasManager();
+                }
+
+                var skin = NpcInfo.Component.Nodes["skin"].GetValueEx<int>(0);
+                this.avatar.addBodyFromSkin3(skin);
+
+                foreach (var node in NpcInfo.Component.Nodes)
+                {
+                    var gearID = node.GetValueEx<int>(0);
+                    this.avatar.addGear(gearID);
+                }
+
+                var img = this.avatar.getBitmapOrigin();
+                if (img.Bitmap != null)
+                {
+                    NpcInfo.Default = img;
+                    npcImg = img.Bitmap;
+                }
+
+                this.avatar.clearCanvas();
+            }
             if (npcImg != null)
             {
                 if (npcImg.Width > 250 || npcImg.Height > 300) //进行缩放

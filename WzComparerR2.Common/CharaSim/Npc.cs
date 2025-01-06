@@ -21,6 +21,16 @@ namespace WzComparerR2.CharaSim
 
         public BitmapOrigin Default { get; set; }
 
+        public Wz_Node Component { get; set; }
+
+        public bool IsComponentNPC
+        {
+            get
+            {
+                return this.Component != null;
+            }
+        }
+
         //public LifeAnimateCollection Animates { get; private set; }
 
         public static Npc CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
@@ -45,6 +55,7 @@ namespace WzComparerR2.CharaSim
                     {
                         case "shop": npcInfo.Shop = propNode.GetValueEx<int>(0) != 0; break;
                         case "link": npcInfo.Link = propNode.GetValueEx<int>(0); break;
+                        case "component": npcInfo.Component = propNode; break;
                         case "default": npcInfo.Default = BitmapOrigin.CreateFromNode(propNode, findNode); break;
                     }
                 }

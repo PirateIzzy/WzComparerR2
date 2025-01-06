@@ -17,11 +17,9 @@ namespace WzComparerR2.AvatarCommon
             this.canvas.LoadZ();
             this.canvas.LoadActions();
             this.canvas.LoadEmotions();
-            this.characWz = PluginManager.FindWz(Wz_Type.Character);
         }
 
         private AvatarCanvas canvas;
-        private Wz_Node characWz;
 
         public void addBodyFromSkin3(int skin)
         {
@@ -94,7 +92,8 @@ namespace WzComparerR2.AvatarCommon
             string imgName = id.ToString("D8") + ".img";
             Wz_Node imgNode = null;
 
-            foreach (var node1 in this.characWz.Nodes)
+            var characWz = PluginManager.FindWz(Wz_Type.Character);
+            foreach (var node1 in characWz.Nodes)
             {
                 if (node1.Text.Contains("_Canvas"))
                 {

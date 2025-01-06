@@ -351,10 +351,6 @@ namespace WzComparerR2.Avatar.UI
                     avatar.Longcoat.Visible = false;
                 }
             }
-            else if (part == avatar.Cap) // sets CapType
-            {
-                avatar.CapType = part.VSlot;
-            }
 
             if (part.effectNode != null) // load Effects
             {
