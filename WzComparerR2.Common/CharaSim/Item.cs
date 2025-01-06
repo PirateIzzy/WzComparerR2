@@ -19,6 +19,7 @@ namespace WzComparerR2.CharaSim
         }
 
         public int Level { get; set; }
+        public int? DamageSkinID { get; set; }
         public string ConsumableFrom { get; set; }
         public string EndUseDate { get; set; }
         public string SamplePath { get; set; }
@@ -97,6 +98,10 @@ namespace WzComparerR2.CharaSim
 
                         case "lv":
                             item.Level = Convert.ToInt32(subNode.Value);
+                            break;
+
+                        case "damageSkinID":
+                            item.DamageSkinID = Convert.ToInt32(subNode.Value);
                             break;
 
                         case "consumableFrom":

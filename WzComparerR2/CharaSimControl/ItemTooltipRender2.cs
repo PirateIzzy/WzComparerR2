@@ -781,7 +781,7 @@ namespace WzComparerR2.CharaSimControl
             long minLev = 0, maxLev = 0;
             bool willDrawExp = item.Props.TryGetValue(ItemPropType.exp_minLev, out minLev) && item.Props.TryGetValue(ItemPropType.exp_maxLev, out maxLev);
 
-            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.SamplePath != null || willDrawNickTag || willDrawExp)
+            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || willDrawNickTag || willDrawExp)
             {
                 if (picH < iconY + 84)
                 {
@@ -837,6 +837,17 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
                     picH += item.Sample.Bitmap.Height;
                     picH += 2;
+                }
+                else if (item.DamageSkinID != null)
+                {
+                    Wz_Node sampleNode = PluginManager.FindWz($@"Etc\DamageSkin.img\{item.DamageSkinID}\sample");
+                    if (sampleNode != null)
+                    {
+                        BitmapOrigin sample = BitmapOrigin.CreateFromNode(sampleNode, PluginManager.FindWz);
+                        g.DrawImage(sample.Bitmap, (tooltip.Width - sample.Bitmap.Width) / 2, picH);
+                        picH += sample.Bitmap.Height;
+                        picH += 2;
+                    }
                 }
                 if (item.SamplePath != null)
                 {
