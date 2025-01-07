@@ -858,6 +858,7 @@ namespace WzComparerR2.Comparer
                         string colName = col == 0 ? "new" : (col == 1 ? "old" : col.ToString());
                         string fileName = fullPath.Replace('\\', '.');
                         string suffix = "_" + colName + ".png";
+                        string canvas = "_Canvas";
 
                         if (this.HashPngFileName)
                         {
@@ -880,11 +881,21 @@ namespace WzComparerR2.Comparer
                         }
 
                         fileName = fileName + suffix;
+                        string outputDirName = new DirectoryInfo(outputDir).Name;
+                        bool isCanvas = fileName.Contains(canvas);
+                        if (isCanvas)
+                        {
+                            outputDir = Path.Combine(outputDir, canvas);
+                            if (!Directory.Exists(outputDir))
+                            {
+                                Directory.CreateDirectory(outputDir);
+                            }
+                        }
                         using (Bitmap bmp = png.ExtractPng())
                         {
                             bmp.Save(Path.Combine(outputDir, fileName), System.Drawing.Imaging.ImageFormat.Png);
                         }
-                        return string.Format("<img src=\"{0}/{1}\" />", new DirectoryInfo(outputDir).Name, WebUtility.UrlEncode(fileName));
+                        return string.Format("<img src=\"{0}/{1}\" />", isCanvas ? Path.Combine(outputDirName, canvas) : outputDirName, WebUtility.UrlEncode(fileName));
                     }
                     else
                     {

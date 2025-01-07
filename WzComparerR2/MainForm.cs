@@ -2,31 +2,32 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using System.Linq;
-using System.IO;
-using System.Xml;
-using Timer = System.Timers.Timer;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml;
+using static Microsoft.Xna.Framework.MathHelper;
+using Timer = System.Timers.Timer;
+using DevComponents.AdvTree;
 using DevComponents.DotNetBar;
 using DevComponents.DotNetBar.Controls;
-using DevComponents.AdvTree;
-using WzComparerR2.WzLib;
-using WzComparerR2.Common;
-using WzComparerR2.CharaSimControl;
-using WzComparerR2.PluginBase;
-using WzComparerR2.CharaSim;
-using WzComparerR2.Comparer;
-using WzComparerR2.Controls;
-using WzComparerR2.Rendering;
-using WzComparerR2.Config;
+
 using WzComparerR2.Animation;
-using static Microsoft.Xna.Framework.MathHelper;
+using WzComparerR2.CharaSim;
+using WzComparerR2.CharaSimControl;
+using WzComparerR2.Common;
+using WzComparerR2.Comparer;
+using WzComparerR2.Config;
+using WzComparerR2.Controls;
+using WzComparerR2.Encoders;
+using WzComparerR2.PluginBase;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2
 {
@@ -710,6 +711,9 @@ namespace WzComparerR2
         {
             FrmGifSetting frm = new FrmGifSetting();
             frm.Load(ImageHandlerConfig.Default);
+            frm.FFmpegBinPathHint = FFmpegEncoder.DefaultExecutionFileName;
+            frm.FFmpegArgumentHint = FFmpegEncoder.DefaultArgumentFormat;
+            frm.FFmpegDefaultExtensionHint = FFmpegEncoder.DefaultOutputFileExtension;
             if (frm.ShowDialog() == DialogResult.OK)
             {
                 ConfigManager.Reload();
@@ -857,12 +861,13 @@ namespace WzComparerR2
         private void OnSaveGifFile(AnimationItem aniItem, bool options)
         {
             var config = ImageHandlerConfig.Default;
-            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
+            using var encoder = AnimateEncoderFactory.CreateEncoder(config);
+            var cap = encoder.Compatibility;
 
             string aniName = this.cmbItemAniNames.SelectedItem as string;
             string aniFileName = pictureBoxEx1.PictureName
                     + (string.IsNullOrEmpty(aniName) ? "" : ("." + aniName))
-                    + encParams.FileExtension;
+                    + cap.DefaultExtension;
 
             if (config.AutoSaveEnabled)
             {
@@ -879,8 +884,8 @@ namespace WzComparerR2
             else
             {
                 var dlg = new SaveFileDialog();
-
-                dlg.Filter = string.Format("{0} (*{1})|*{1}|All Files (*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
+                string extensionFilter = string.Join(";", cap.SupportedExtensions.Select(ext => $"*{ext}"));
+                dlg.Filter = string.Format("{0} (*{1})|*{1}|All Files (*.*)|*.*", encoder.Name, extensionFilter);
                 dlg.FileName = aniFileName;
 
                 if (dlg.ShowDialog() != DialogResult.OK)
@@ -891,7 +896,7 @@ namespace WzComparerR2
             }
 
             var clonedAniItem = (AnimationItem)aniItem.Clone();
-            if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniFileName, config, options))
+            if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniFileName, config, encoder, options))
             {
                 labelItemStatus.Text = "Image saved: " + aniFileName;
             }

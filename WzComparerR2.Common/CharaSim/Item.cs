@@ -15,9 +15,11 @@ namespace WzComparerR2.CharaSim
             this.Specs = new Dictionary<ItemSpecType, long>();
             this.CoreSpecs = new Dictionary<ItemCoreSpecType, Wz_Node>();
             this.AddTooltips = new List<int>();
+            this.Recipes = new List<int>();
         }
 
         public int Level { get; set; }
+        public int? DamageSkinID { get; set; }
         public string ConsumableFrom { get; set; }
         public string EndUseDate { get; set; }
         public string SamplePath { get; set; }
@@ -28,6 +30,7 @@ namespace WzComparerR2.CharaSim
         public Dictionary<ItemSpecType, long> Specs { get; private set; }
         public Dictionary<ItemCoreSpecType, Wz_Node> CoreSpecs { get; private set; }
         public List<int> AddTooltips { get; internal set; } // Additional Tooltips
+        public List<int> Recipes { get; private set; }
 
         public bool Cash
         {
@@ -95,6 +98,10 @@ namespace WzComparerR2.CharaSim
 
                         case "lv":
                             item.Level = Convert.ToInt32(subNode.Value);
+                            break;
+
+                        case "damageSkinID":
+                            item.DamageSkinID = Convert.ToInt32(subNode.Value);
                             break;
 
                         case "consumableFrom":
@@ -248,8 +255,21 @@ namespace WzComparerR2.CharaSim
             {
                 foreach (Wz_Node subNode in specNode.Nodes)
                 {
-                    ItemSpecType type;
-                    if (Enum.TryParse(subNode.Text, out type))
+                    if (subNode.Text == "recipe")
+                    {
+                        if (subNode.Value == null && subNode.Nodes.Count > 0)
+                        {
+                            foreach (var recipeNode in subNode.Nodes)
+                            {
+                                item.Recipes.Add(recipeNode.GetValue<int>());
+                            }
+                        }
+                        else
+                        {
+                            item.Recipes.Add(subNode.GetValue<int>());
+                        }
+                    }
+                    else if(Enum.TryParse(subNode.Text, out ItemSpecType type))
                     {
                         try
                         {
