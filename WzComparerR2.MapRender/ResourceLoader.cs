@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Content;
 using WzComparerR2.Animation;
 using WzComparerR2.Rendering;
 using WzComparerR2.Common;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.MapRender
 {
@@ -85,6 +86,22 @@ namespace WzComparerR2.MapRender
             if (!loadedAnimationData.TryGetValue(assetName, out aniData))
             {
                 aniData = InnerLoadAnimationData(node);
+                if (aniData == null)
+                {
+                    return null;
+                }
+                loadedAnimationData[assetName] = aniData;
+            }
+            return aniData;
+        }
+
+        public object LoadAvatarAnimationData(Wz_Node node, string action)
+        {
+            object aniData;
+            string assetName = string.Join("\\", new[] { node.FullPathToFile, action });
+            if (!loadedAnimationData.TryGetValue(assetName, out aniData))
+            {
+                aniData = InnerLoadAvatarAnimationData(node, action);
                 if (aniData == null)
                 {
                     return null;
@@ -349,6 +366,36 @@ namespace WzComparerR2.MapRender
                         return new RepeatableFrameAnimationData(frames) { Repeat = repeat };
                     }
                 }
+            }
+            return null;
+        }
+
+        private object InnerLoadAvatarAnimationData(Wz_Node node, string action)
+        {
+            if (node != null && (node = node.ResolveUol()) != null)
+            {
+                var frames = new List<Frame>();
+
+                var avatar = new AvatarCanvasManager();
+
+                var skin = node.Nodes["skin"].GetValueEx<int>(0);
+                avatar.addBodyFromSkin3(skin);
+
+                foreach (var component in node.Nodes)
+                {
+                    var gearID = component.GetValueEx<int>(0);
+                    avatar.addGear(gearID);
+                }
+
+                for (int i = 0; i < avatar.getActionFrameCount(action + "1"); i++)
+                {
+                    var frame = avatar.getTexture2DFrame(action + "1", "default", i, 0, 0, this.GraphicsDevice);
+                    frames.Add(frame);
+                }
+
+                avatar.clearCanvas();
+
+                return new RepeatableFrameAnimationData(frames) { Repeat = true };
             }
             return null;
         }
