@@ -7,6 +7,8 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
+using WzComparerR2.WzLib;
+using WzComparerR2.AvatarCommon;
 using static WzComparerR2.CharaSimControl.RenderHelper;
 
 namespace WzComparerR2.CharaSimControl
@@ -25,6 +27,7 @@ namespace WzComparerR2.CharaSimControl
         }
 
         public Mob MobInfo { get; set; }
+        private AvatarCanvasManager avatar { get; set; }
 
         public override Bitmap Render()
         {
@@ -151,6 +154,31 @@ namespace WzComparerR2.CharaSimControl
             Rectangle imgRect = Rectangle.Empty;
             Rectangle textRect = Measure(propBlocks);
             Bitmap mobImg = MobInfo.Default.Bitmap;
+            if (MobInfo.IsAvatarLook)
+            {
+                if (this.avatar == null)
+                {
+                    this.avatar = new AvatarCanvasManager();
+                }
+
+                var skin = MobInfo.AvatarLook.Nodes["skin"].GetValueEx<int>(0);
+                this.avatar.addBodyFromSkin3(skin);
+
+                foreach (var node in MobInfo.AvatarLook.Nodes)
+                {
+                    var gearID = node.GetValueEx<int>(0);
+                    this.avatar.addGear(gearID);
+                }
+
+                var img = this.avatar.getBitmapOrigin();
+                if (img.Bitmap != null)
+                {
+                    MobInfo.Default = img;
+                    mobImg = img.Bitmap;
+                }
+
+                this.avatar.clearCanvas();
+            }
             if (mobImg != null)
             {
                 if (mobImg.Width > 250 || mobImg.Height > 300) //进行缩放
