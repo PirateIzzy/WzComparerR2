@@ -89,14 +89,26 @@ namespace WzComparerR2.CharaSimControl
                 {
                     this.avatar = new AvatarCanvasManager();
                 }
-
-                var skin = NpcInfo.Component.Nodes["skin"].GetValueEx<int>(0);
-                this.avatar.AddBodyFromSkin3(skin);
-
+                
                 foreach (var node in NpcInfo.Component.Nodes)
                 {
-                    var gearID = node.GetValueEx<int>(0);
-                    this.avatar.AddGear(gearID);
+                    switch (node.Text)
+                    {
+                        case "skin":
+                            var skin = node.GetValueEx<int>(0);
+                            this.avatar.AddBodyFromSkin3(skin);
+                            break;
+
+                        case "ear":
+                            var type = node.GetValueEx<int>(0);
+                            this.avatar.SetEarType(type);
+                            break;
+
+                        default:
+                            var gearID = node.GetValueEx<int>(0);
+                            this.avatar.AddGear(gearID);
+                            break;
+                    }
                 }
 
                 var img = this.avatar.GetBitmapOrigin();

@@ -378,13 +378,25 @@ namespace WzComparerR2.MapRender
 
                 var avatar = new AvatarCanvasManager();
 
-                var skin = node.Nodes["skin"].GetValueEx<int>(0);
-                avatar.AddBodyFromSkin3(skin);
-
                 foreach (var component in node.Nodes)
                 {
-                    var gearID = component.GetValueEx<int>(0);
-                    avatar.AddGear(gearID);
+                    switch (node.Text)
+                    {
+                        case "skin":
+                            var skin = node.GetValueEx<int>(0);
+                            avatar.AddBodyFromSkin3(skin);
+                            break;
+
+                        case "ear":
+                            var type = node.GetValueEx<int>(0);
+                            avatar.SetEarType(type);
+                            break;
+
+                        default:
+                            var gearID = node.GetValueEx<int>(0);
+                            avatar.AddGear(gearID);
+                            break;
+                    }
                 }
 
                 for (int i = 0; i < avatar.GetActionFrameCount(action + "1"); i++)

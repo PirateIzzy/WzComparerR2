@@ -72,6 +72,11 @@ namespace WzComparerR2.AvatarCommon
             }
         }
 
+        public void SetEarType(int type)
+        {
+            this.canvas.EarType = type;
+        }
+
         public void AddGear(int id)
         {
             var gearNode = FindNodeByGearID(id);
@@ -204,6 +209,7 @@ namespace WzComparerR2.AvatarCommon
         public void ClearCanvas()
         {
             Array.Clear(this.canvas.Parts, 0, this.canvas.Parts.Length);
+            SetEarType(0);
         }
     }
 }
