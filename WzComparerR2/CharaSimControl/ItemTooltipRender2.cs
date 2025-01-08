@@ -362,7 +362,7 @@ namespace WzComparerR2.CharaSimControl
                 using (Graphics tempG = Graphics.FromImage(dummyImg))
                 {
                     SizeF titleSize = TextRenderer.MeasureText(tempG, itemName, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
-                    titleSize.Width += 12 * 2;
+                    titleSize.Width += 12.5F;
                     if (titleSize.Width > DefualtWidth)
                     {
                         tooltipWidth = (int)Math.Ceiling(titleSize.Width);
@@ -377,7 +377,7 @@ namespace WzComparerR2.CharaSimControl
             //绘制标题
             bool hasPart2 = false;
             format.Alignment = StringAlignment.Center;
-            TextRenderer.DrawText(g, itemName, GearGraphics.ItemNameFont2, new Point(tooltip.Width, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
+            TextRenderer.DrawText(g, itemName, GearGraphics.ItemNameFont2, new Point(tooltip.Width + 2, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
             picH += 21;
 
             if (Item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
@@ -385,16 +385,16 @@ namespace WzComparerR2.CharaSimControl
                 switch (value)
                 {
                     case 1:
-                        TextRenderer.DrawText(g, "원더 블랙", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "원더 블랙", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 4:
-                        TextRenderer.DrawText(g, "루나 스윗", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), GearGraphics.itemPinkColor, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "루나 스윗", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), GearGraphics.itemPinkColor, TextFormatFlags.HorizontalCenter);
                         break;
                     case 5:
-                        TextRenderer.DrawText(g, "루나 드림", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "루나 드림", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 6:
-                        TextRenderer.DrawText(g, "루나 쁘띠", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), GearGraphics.itemPurpleColor, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "루나 쁘띠", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), GearGraphics.itemPurpleColor, TextFormatFlags.HorizontalCenter);
                         break;
                     default:
                         picH -= 15;
@@ -404,12 +404,12 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (Item.Props.TryGetValue(ItemPropType.BTSLabel, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "BTS 라벨", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), Color.FromArgb(187, 102, 238), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "BTS 라벨", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), Color.FromArgb(187, 102, 238), TextFormatFlags.HorizontalCenter);
                 picH += 15;
             }
             else if (Item.Props.TryGetValue(ItemPropType.BLACKPINKLabel, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "BLACKPINK 라벨", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), Color.FromArgb(255, 136, 170), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "BLACKPINK 라벨", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), Color.FromArgb(255, 136, 170), TextFormatFlags.HorizontalCenter);
                 picH += 15;
             }
 
@@ -424,7 +424,7 @@ namespace WzComparerR2.CharaSimControl
                     var newStr = (attrStr != null ? (attrStr + ", ") : null) + attrList[i];
                     if (TextRenderer.MeasureText(g, newStr, font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width > tooltip.Width - 7 || (attrList[i].Contains('\n') && attrStr != null))
                     {
-                        TextRenderer.DrawText(g, attrStr, GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
+                        TextRenderer.DrawText(g, attrStr, GearGraphics.ItemDetailFont, new Point(tooltip.Width + 2, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
                         picH += 16;
                         attrStr = attrList[i];
                     }
@@ -437,7 +437,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     foreach (string attrLine in attrStr.Split('\n'))
                     {
-                        TextRenderer.DrawText(g, attrLine, GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
+                        TextRenderer.DrawText(g, attrLine, GearGraphics.ItemDetailFont, new Point(tooltip.Width + 2, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
                         picH += 19;
                     }
                     picH -= 3;
@@ -499,7 +499,7 @@ namespace WzComparerR2.CharaSimControl
                 //g.DrawString(expireTime, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
                 foreach (string expireTimeLine in expireTime.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    TextRenderer.DrawText(g, expireTimeLine, GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), Color.White, TextFormatFlags.HorizontalCenter);
+                    TextRenderer.DrawText(g, expireTimeLine, GearGraphics.ItemDetailFont, new Point(tooltip.Width + 2, picH), Color.White, TextFormatFlags.HorizontalCenter);
                     picH += 16;
                 }
                 if (expireTime.Contains('\n'))
@@ -559,7 +559,7 @@ namespace WzComparerR2.CharaSimControl
             value = 0;
             if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) || item.ItemID / 10000 == 301 || item.ItemID / 1000 == 5204)
             {
-                picH += 4;
+                //picH += 4;
                 g.DrawImage(Resource.ToolTip_Equip_Can_reqLEV, 100, picH);
                 GearGraphics.DrawGearDetailNumber(g, 150, picH, value.ToString(), true);
                 picH += 15;
@@ -569,7 +569,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 3;
             }
 
-            int right = tooltip.Width - 18;
+            int right = tooltip.Width - 30;
 
             string desc = null;
             if (item.Level > 0)
@@ -744,7 +744,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     GearGraphics.DrawString(g, "Lv. " + l0 + " 이상 : " + string.Join(", ", commandLev.Where(i => i.Value == l0).Select(i => i.Key).OrderBy(s => s)), GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
                 }
-                GearGraphics.DrawString(g, "Tip. 펫의 레벨이 15가 되면 특정 말을 하도록 시킬 수 있습니다.", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                GearGraphics.DrawString(g, "Tip. 펫의 레벨이 15가 되면 특정 말을 하도록 시킬 수 있습니다. 펫이 하는 말은 다른 유저에게 보이지 않습니다.", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
                 GearGraphics.DrawString(g, "#c예) /펫 [할 말]#", GearGraphics.ItemDetailFont, new Dictionary<string, Color>() { { "c", ((SolidBrush)GearGraphics.OrangeBrush4).Color } }, 100, right, ref picH, 16);
             }
 
@@ -873,7 +873,8 @@ namespace WzComparerR2.CharaSimControl
                     var frame = this.avatar.GetBitmapOrigin();
                     if (frame.Bitmap != null)
                     {
-                        g.DrawImage(frame.Bitmap, (tooltip.Width - frame.Bitmap.Width) / 2, picH);
+                        picH += 9;
+                        g.DrawImage(frame.Bitmap, tooltip.Width / 2 - frame.Origin.X, picH);
                         picH += frame.Bitmap.Height;
                         picH += 2;
                     }
@@ -1008,7 +1009,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 6;
             }
 
-            picH = Math.Max(iconY + 94, picH + 6);
+            picH = Math.Max(iconY + 103, picH + 15);
             return tooltip;
         }
 
