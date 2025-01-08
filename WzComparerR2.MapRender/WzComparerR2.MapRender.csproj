@@ -42,7 +42,10 @@
       <Private>false</Private>
       <ExcludeAssets>all</ExcludeAssets>
     </ProjectReference>
-    <ProjectReference Include="..\WzComparerR2\WzComparerR2.csproj" />
+    <ProjectReference Include="..\WzComparerR2\WzComparerR2.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
     <Reference Include="DevComponents.DotNetBar2">
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>false</Private>

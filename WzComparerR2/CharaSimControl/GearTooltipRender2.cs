@@ -11,7 +11,6 @@ using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.WzLib;
 using WzComparerR2.AvatarCommon;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace WzComparerR2.CharaSimControl
 {
