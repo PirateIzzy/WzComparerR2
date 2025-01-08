@@ -459,21 +459,21 @@ namespace WzComparerR2.CharaSimControl
                     var hair = costume?.Nodes["hair"]?.Nodes["0"].GetValueEx<int>(30000);
                     var face = costume?.Nodes["face"]?.Nodes["0"].GetValueEx<int>(20000);
 
-                    this.avatar.addBodyFromSkin4((int)skin);
-                    this.avatar.addGears([(int)hair, (int)face]);
+                    this.avatar.AddBodyFromSkin4((int)skin);
+                    this.avatar.AddGears([(int)hair, (int)face]);
 
                     if (basic != null)
                     {
                         foreach (var node in basic.Nodes)
                         {
                             var gearID = node.GetValueEx<int>(0);
-                            this.avatar.addGear(gearID);
+                            this.avatar.AddGear(gearID);
                         }
                     }
 
-                    appearance = this.avatar.getBitmapOrigin();
+                    appearance = this.avatar.GetBitmapOrigin();
 
-                    this.avatar.clearCanvas();
+                    this.avatar.ClearCanvas();
                 }
                 //BitmapOrigin appearance = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(morphID != 0 ? string.Format("Morph/{0:D4}.img/stand/0", morphID) : "Npc/0010300.img/stand/0"), PluginBase.PluginManager.FindWz);
 

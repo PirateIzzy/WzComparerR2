@@ -860,17 +860,17 @@ namespace WzComparerR2.CharaSimControl
 
                     if (value < 1000)
                     {
-                        this.avatar.addBodyFromSkin3((int)value);
+                        this.avatar.AddBodyFromSkin3((int)value);
                     }
                     else
                     {
-                        this.avatar.addBodyFromSkin4(2015);
-                        this.avatar.addHairOrFace((int)value);
+                        this.avatar.AddBodyFromSkin4(2015);
+                        this.avatar.AddHairOrFace((int)value, true);
                     }
 
-                    this.avatar.addGears([1042194, 1062153]);
+                    this.avatar.AddGears([1042194, 1062153]);
 
-                    var frame = this.avatar.getBitmapOrigin();
+                    var frame = this.avatar.GetBitmapOrigin();
                     if (frame.Bitmap != null)
                     {
                         g.DrawImage(frame.Bitmap, (tooltip.Width - frame.Bitmap.Width) / 2, picH);
@@ -878,7 +878,7 @@ namespace WzComparerR2.CharaSimControl
                         picH += 2;
                     }
 
-                    this.avatar.clearCanvas();
+                    this.avatar.ClearCanvas();
                 }
                 if (item.SamplePath != null)
                 {

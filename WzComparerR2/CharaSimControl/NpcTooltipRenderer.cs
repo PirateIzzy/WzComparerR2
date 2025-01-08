@@ -91,22 +91,22 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 var skin = NpcInfo.Component.Nodes["skin"].GetValueEx<int>(0);
-                this.avatar.addBodyFromSkin3(skin);
+                this.avatar.AddBodyFromSkin3(skin);
 
                 foreach (var node in NpcInfo.Component.Nodes)
                 {
                     var gearID = node.GetValueEx<int>(0);
-                    this.avatar.addGear(gearID);
+                    this.avatar.AddGear(gearID);
                 }
 
-                var img = this.avatar.getBitmapOrigin();
+                var img = this.avatar.GetBitmapOrigin();
                 if (img.Bitmap != null)
                 {
                     NpcInfo.Default = img;
                     npcImg = img.Bitmap;
                 }
 
-                this.avatar.clearCanvas();
+                this.avatar.ClearCanvas();
             }
             if (npcImg != null)
             {

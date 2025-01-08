@@ -25,7 +25,7 @@ namespace WzComparerR2.AvatarCommon
 
         private AvatarCanvas canvas;
 
-        public void addBodyFromSkin3(int skin)
+        public void AddBodyFromSkin3(int skin)
         {
             var a = $@"Character\00002{skin:D3}.img";
             Wz_Node bodyNode = PluginBase.PluginManager.FindWz($@"Character\00002{skin:D3}.img")
@@ -37,7 +37,7 @@ namespace WzComparerR2.AvatarCommon
             this.canvas.AddPart(headNode);
         }
 
-        public void addBodyFromSkin4(int skin)
+        public void AddBodyFromSkin4(int skin)
         {
             Wz_Node bodyNode = PluginBase.PluginManager.FindWz($@"Character\0000{skin:D4}.img")
                         ?? PluginBase.PluginManager.FindWz($@"Character\00002000.img");
@@ -48,17 +48,31 @@ namespace WzComparerR2.AvatarCommon
             this.canvas.AddPart(headNode);
         }
 
-        public void addHairOrFace(int id)
+        public void AddHairOrFace(int id, bool cosmetic = false)
         {
-            var gearNode = PluginManager.FindWz($@"Character\Hair\{id:D8}.img") ??
-                PluginManager.FindWz($@"Character\Face\{id:D8}.img");
+            int hairColor = 0;
+            int faceColor = 0;
+            if (cosmetic)
+            {
+                if ((id + 9) / 10 == id / 10)
+                {
+                    hairColor = 7;
+                }
+                if ((id + 900) / 1000 == id / 1000)
+                {
+                    faceColor = 100;
+                }
+            }
+
+            var gearNode = PluginManager.FindWz($@"Character\Hair\{id + hairColor:D8}.img") ??
+                PluginManager.FindWz($@"Character\Face\{id + faceColor:D8}.img");
             if (gearNode != null)
             {
                 this.canvas.AddPart(gearNode);
             }
         }
 
-        public void addGear(int id)
+        public void AddGear(int id)
         {
             var gearNode = FindNodeByGearID(id);
             if (gearNode != null)
@@ -67,20 +81,20 @@ namespace WzComparerR2.AvatarCommon
             }
         }
 
-        public void addGears(int[] ids)
+        public void AddGears(int[] ids)
         {
             foreach (var id in ids)
             {
-                addGear(id);
+                AddGear(id);
             }
         }
 
-        public BitmapOrigin getBitmapOrigin()
+        public BitmapOrigin GetBitmapOrigin()
         {
-            return getBitmapOrigin("stand1", "default", 0, 0, 0);
+            return GetBitmapOrigin("stand1", "default", 0, 0, 0);
         }
 
-        public BitmapOrigin getBitmapOrigin(string actionName, string emotionName, int bodyFrame, int faceFrame, int tamingFrame)
+        public BitmapOrigin GetBitmapOrigin(string actionName, string emotionName, int bodyFrame, int faceFrame, int tamingFrame)
         {
             this.canvas.ActionName = actionName;
             this.canvas.EmotionName = emotionName;
@@ -91,12 +105,12 @@ namespace WzComparerR2.AvatarCommon
             return bitmapOrigin;
         }
 
-        public Frame getTexture2DFrame(string actionName, string emotionName, int bodyFrame, int faceFrame, int tamingFrame, GraphicsDevice graphicsDevice)
+        public Frame GetTexture2DFrame(string actionName, string emotionName, int bodyFrame, int faceFrame, int tamingFrame, GraphicsDevice graphicsDevice)
         {
-            var bitmapOrigin = getBitmapOrigin(actionName, emotionName, bodyFrame, faceFrame, tamingFrame);
+            var bitmapOrigin = GetBitmapOrigin(actionName, emotionName, bodyFrame, faceFrame, tamingFrame);
             Texture2D texture = bitmapOrigin.Bitmap.ToTexture(graphicsDevice);
 
-            Frame frame = new Frame(texture, new Point(bitmapOrigin.Origin.X, bitmapOrigin.Origin.Y), 0, getActionFrameDelay(actionName, bodyFrame), false);
+            Frame frame = new Frame(texture, new Point(bitmapOrigin.Origin.X, bitmapOrigin.Origin.Y), 0, GetActionFrameDelay(actionName, bodyFrame), false);
 
             return frame;
         }
@@ -148,7 +162,7 @@ namespace WzComparerR2.AvatarCommon
             return null;
         }
 
-        public int getActionFrameCount(string actionName)
+        public int GetActionFrameCount(string actionName)
         {
             Action action = this.canvas.Actions.Find(act => act.Name == actionName);
             if (action == null)
@@ -166,7 +180,7 @@ namespace WzComparerR2.AvatarCommon
             return node.Nodes.Count;
         }
 
-        public int getActionFrameDelay(string actionName, int bodyFrame)
+        public int GetActionFrameDelay(string actionName, int bodyFrame)
         {
             Action action = this.canvas.Actions.Find(act => act.Name == actionName);
             if (action == null)
@@ -187,7 +201,7 @@ namespace WzComparerR2.AvatarCommon
             return node.GetValueEx<int>(0);
         }
 
-        public void clearCanvas()
+        public void ClearCanvas()
         {
             Array.Clear(this.canvas.Parts, 0, this.canvas.Parts.Length);
         }

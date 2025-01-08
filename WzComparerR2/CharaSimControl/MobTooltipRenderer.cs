@@ -162,22 +162,22 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 var skin = MobInfo.AvatarLook.Nodes["skin"].GetValueEx<int>(0);
-                this.avatar.addBodyFromSkin3(skin);
+                this.avatar.AddBodyFromSkin3(skin);
 
                 foreach (var node in MobInfo.AvatarLook.Nodes)
                 {
                     var gearID = node.GetValueEx<int>(0);
-                    this.avatar.addGear(gearID);
+                    this.avatar.AddGear(gearID);
                 }
 
-                var img = this.avatar.getBitmapOrigin();
+                var img = this.avatar.GetBitmapOrigin();
                 if (img.Bitmap != null)
                 {
                     MobInfo.Default = img;
                     mobImg = img.Bitmap;
                 }
 
-                this.avatar.clearCanvas();
+                this.avatar.ClearCanvas();
             }
             if (mobImg != null)
             {

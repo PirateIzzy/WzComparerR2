@@ -379,21 +379,21 @@ namespace WzComparerR2.MapRender
                 var avatar = new AvatarCanvasManager();
 
                 var skin = node.Nodes["skin"].GetValueEx<int>(0);
-                avatar.addBodyFromSkin3(skin);
+                avatar.AddBodyFromSkin3(skin);
 
                 foreach (var component in node.Nodes)
                 {
                     var gearID = component.GetValueEx<int>(0);
-                    avatar.addGear(gearID);
+                    avatar.AddGear(gearID);
                 }
 
-                for (int i = 0; i < avatar.getActionFrameCount(action + "1"); i++)
+                for (int i = 0; i < avatar.GetActionFrameCount(action + "1"); i++)
                 {
-                    var frame = avatar.getTexture2DFrame(action + "1", "default", i, 0, 0, this.GraphicsDevice);
+                    var frame = avatar.GetTexture2DFrame(action + "1", "default", i, 0, 0, this.GraphicsDevice);
                     frames.Add(frame);
                 }
 
-                avatar.clearCanvas();
+                avatar.ClearCanvas();
 
                 return new RepeatableFrameAnimationData(frames) { Repeat = true };
             }
