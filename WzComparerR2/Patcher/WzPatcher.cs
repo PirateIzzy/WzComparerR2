@@ -356,7 +356,7 @@ namespace WzComparerR2.Patcher
             }
             else  //按照调整后顺序执行
             {
-                //this.ValidateFileHash(mapleStoryFolder, cancellationToken);
+                this.ValidateFileHash(mapleStoryFolder, cancellationToken);
 
                 foreach (PatchPartContext part in this.patchParts)
                 {
