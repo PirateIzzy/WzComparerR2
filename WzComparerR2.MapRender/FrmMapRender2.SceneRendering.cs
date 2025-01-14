@@ -994,7 +994,6 @@ namespace WzComparerR2.MapRender
                 double movingX = 0;
                 double movingY = 0;
                 double time = obj.View.Time / Math.PI / 1000 * 4 / obj.MoveP * 5000;
-
                 switch (obj.MoveType)
                 {
                     case 0: // none
@@ -1004,16 +1003,13 @@ namespace WzComparerR2.MapRender
                         movingX = obj.MoveW * Math.Cos(time);
                         movingY = obj.MoveH * Math.Cos(time);
                         break;
-
                     case 3: // circle
                         movingX = obj.MoveW * Math.Cos(time);
                         movingY = obj.MoveH * Math.Sin(time);
                         break;
-
                     default:
                         break;
                 }
-
                 mesh.Position += new Vector2((float)movingX, (float)movingY);
             }
 

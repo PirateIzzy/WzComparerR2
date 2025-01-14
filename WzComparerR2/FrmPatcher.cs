@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevComponents.AdvTree;
 using DevComponents.DotNetBar;
@@ -61,11 +62,8 @@ namespace WzComparerR2
 
         public Encoding PatcherNoticeEncoding { get; set; }
 
-        Thread patchThread;
-        EventWaitHandle waitHandle;
-        bool waiting;
-        string loggingFileName;
-        bool isUpdating;
+        private bool isUpdating;
+        private PatcherSession patcherSession;
 
         private PatcherSetting SelectedPatcherSetting => comboBoxEx1.SelectedItem as PatcherSetting;
 
@@ -211,9 +209,9 @@ namespace WzComparerR2
 
         private void FrmPatcher_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (patchThread != null && patchThread.IsAlive)
+            if (this.patcherSession != null && !this.patcherSession.IsCompleted)
             {
-                patchThread.Abort();
+                this.patcherSession.Cancel();
             }
             ConfigManager.Reload();
             WcR2Config.Default.PatcherSettings.Clear();
@@ -237,7 +235,7 @@ namespace WzComparerR2
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "패치 파일 열기";
             dlg.Filter = "패치 파일 (*.patch;*.exe)|*.patch;*.exe";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtPatchFile.Text = dlg.FileName;
             }
@@ -247,7 +245,7 @@ namespace WzComparerR2
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.Description = "메이플스토리 폴더를 선택하세요.";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtMSFolder.Text = dlg.SelectedPath;
             }
@@ -255,76 +253,84 @@ namespace WzComparerR2
 
         private void buttonXPatch_Click(object sender, EventArgs e)
         {
-            if (patchThread != null)
+            if (this.patcherSession != null)
             {
-                if (waiting)
+                if (this.patcherSession.State == PatcherTaskState.WaitForContinue)
                 {
-                    waitHandle.Set();
-                    waiting = false;
+                    this.patcherSession.Continue();
                     return;
                 }
-                else
+                else if (!this.patcherSession.PatchExecTask.IsCompleted)
                 {
                     MessageBoxEx.Show("이미 패치가 진행중입니다.");
                     return;
                 }
             }
-            compareFolder = null;
+            string compareFolder = null;
             if (chkCompare.Checked)
             {
                 FolderBrowserDialog dlg = new FolderBrowserDialog();
                 dlg.Description = "비교 결과를 저장할 폴더를 선택하세요.";
-                if (dlg.ShowDialog() != DialogResult.OK)
+                if (dlg.ShowDialog(this) != DialogResult.OK)
                 {
                     return;
                 }
                 compareFolder = dlg.SelectedPath;
             }
 
-            patchFile = txtPatchFile.Text;
-            msFolder = txtMSFolder.Text;
-            prePatch = chkPrePatch.Checked;
-            deadPatch = chkDeadPatch.Checked;
-
-            patchThread = new Thread(() => ExecutePatch(patchFile, msFolder, prePatch));
-            patchThread.Priority = ThreadPriority.Highest;
-            waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-            waiting = false;
-            patchThread.Start();
-            panelEx2.Visible = true;
-            expandablePanel2.Height = 340;
+            var session = new PatcherSession()
+            {
+                PatchFile = txtPatchFile.Text,
+                MSFolder = txtMSFolder.Text,
+                PrePatch = chkPrePatch.Checked,
+                DeadPatch = chkDeadPatch.Checked,
+            };
+            session.LoggingFileName = Path.Combine(session.MSFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
+            session.PatchExecTask = Task.Run(() => this.ExecutePatchAsync(session, session.CancellationToken));
+            this.patcherSession = session;
         }
 
-        string patchFile;
-        string msFolder;
-        string compareFolder;
-        bool prePatch ;
-        bool deadPatch;
         string htmlFilePath;
         FileStream htmlFile;
         StreamWriter sw;
         Dictionary<Wz_Type, List<PatchPartContext>> typedParts;
 
-        private void ExecutePatch(string patchFile, string msFolder, bool prePatch)
+        private async Task ExecutePatchAsync(PatcherSession session, CancellationToken cancellationToken)
         {
+            void AppendStateText(string text)
+            {
+                this.Invoke(new Action<string>(t => this.txtPatchState.AppendText(t)), text);
+                if (session.LoggingFileName != null)
+                {
+                    File.AppendAllText(session.LoggingFileName, text, Encoding.UTF8);
+                }
+            }
+
+            this.Invoke(() =>
+            {
+                this.advTreePatchFiles.Nodes.Clear();
+                this.txtNotice.Clear();
+                this.txtPatchState.Clear();
+                this.panelEx2.Visible = true;
+                this.expandablePanel2.Height = 340;
+            });
+
             WzPatcher patcher = null;
-            advTreePatchFiles.Nodes.Clear();
-            txtNotice.Clear();
-            txtPatchState.Clear();
-            this.loggingFileName = Path.Combine(msFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
+            session.State = PatcherTaskState.Prepatch;
+
             try
             {
-                patcher = new WzPatcher(patchFile);
+                patcher = new WzPatcher(session.PatchFile);
                 patcher.NoticeEncoding = this.PatcherNoticeEncoding ?? Encoding.Default;
-                patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
-                AppendStateText($"패치 파일명: {patchFile}\r\n");
+                patcher.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, AppendStateText);
+                AppendStateText($"패치 파일명: {session.PatchFile}\r\n");
                 AppendStateText("패치 확인중...");
-                patcher.OpenDecompress();
+                patcher.OpenDecompress(cancellationToken);
                 AppendStateText("완료\r\n");
-                //if (prePatch)
+                //if (session.PrePatch)
                 {
                     AppendStateText("패치 준비중... \r\n");
-                    long decompressedSize = patcher.PrePatch();
+                    long decompressedSize = patcher.PrePatch(cancellationToken);
                     if (patcher.IsKMST1125Format.Value)
                     {
                         AppendStateText("패치 유형: KMST1125\r\n");
@@ -334,55 +340,66 @@ namespace WzComparerR2
                         }
                     }
                     AppendStateText(string.Format("패치용량: {0:N0}B...\r\n", decompressedSize));
-                    AppendStateText(string.Format("패치할 파일 개수: {0}개...\r\n",
-                        patcher.PatchParts == null ? -1 : patcher.PatchParts.Count));
-                    txtNotice.Text = patcher.NoticeText;
-                    foreach (PatchPartContext part in patcher.PatchParts)
+                    AppendStateText(string.Format("패치할 파일 개수: {0}개...\r\n", patcher.PatchParts.Count));
+
+                    this.Invoke(() =>
                     {
-                        advTreePatchFiles.Nodes.Add(CreateFileNode(part));
-                        advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Enabled = prePatch;
-                        if (prePatch && part.Type == 1)
+                        this.advTreePatchFiles.BeginUpdate();
+                        this.txtNotice.Text = patcher.NoticeText;
+                        foreach (PatchPartContext part in patcher.PatchParts)
                         {
-                            advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Checked = File.Exists(Path.Combine(msFolder, part.FileName));
+                            this.advTreePatchFiles.Nodes.Add(CreateFileNode(part));
+                            advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Enabled = session.PrePatch;
+                            if (session.PrePatch && part.Type == 1)
+                            {
+                                advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Checked = File.Exists(Path.Combine(session.MSFolder, part.FileName));
+                            }
                         }
-                    }
+                        //this.advTreePatchFiles.Enabled = true;
+                        this.advTreePatchFiles.EndUpdate();
+                    });
                 }
-                if (prePatch)
+                if (session.PrePatch)
                 {
-                    //advTreePatchFiles.Enabled = true;
                     AppendStateText("패치할 파일을 선택한 후 패치 버튼을 눌러주세요...\r\n");
-                    waiting = true;
-                    waitHandle.WaitOne();
-                    //advTreePatchFiles.Enabled = false;
-                    patcher.PatchParts.Clear();
-                    for (int i = 0, j = advTreePatchFiles.Nodes.Count; i < j; i++)
+
+                    session.State = PatcherTaskState.WaitForContinue;
+                    await session.WaitForContinueAsync();
+                    this.Invoke(() =>
                     {
-                        if (advTreePatchFiles.Nodes[i].Checked)
+                        this.advTreePatchFiles.Enabled = false;
+                    });
+                    session.State = PatcherTaskState.Patching;
+                    patcher.PatchParts.Clear();
+                    foreach (Node node in this.advTreePatchFiles.Nodes)
+                    {
+                        if (node.Checked && node.Tag is PatchPartContext part)
                         {
-                            patcher.PatchParts.Add(advTreePatchFiles.Nodes[i].Tag as PatchPartContext);
+                            patcher.PatchParts.Add(part);
                         }
-                        advTreePatchFiles.Nodes[i].Enabled = false;
+                        node.Enabled = false;
                     }
                     patcher.PatchParts.Sort((part1, part2) => part1.Offset.CompareTo(part2.Offset));
                 }
                 AppendStateText("패치중...\r\n");
-                DateTime time = DateTime.Now;
-                patcher.Patch(msFolder);
-                if (sw != null)
+                var sw = Stopwatch.StartNew();
+                patcher.Patch(session.MSFolder, cancellationToken);
+                sw.Stop();
+                if (this.sw != null)
                 {
-                    sw.WriteLine("</table>");
-                    sw.WriteLine("</p>");
+                    this.sw.WriteLine("</table>");
+                    this.sw.WriteLine("</p>");
 
                     //html结束
-                    sw.WriteLine("</body>");
-                    sw.WriteLine("</html>");
+                    this.sw.WriteLine("</body>");
+                    this.sw.WriteLine("</html>");
 
                     try
                     {
-                        if (sw != null)
+                        if (this.sw != null)
                         {
-                            sw.Flush();
-                            sw.Close();
+                            this.sw.Flush();
+                            this.sw.Close();
                         }
                     }
                     catch
@@ -390,12 +407,12 @@ namespace WzComparerR2
                     }
                 }
                 AppendStateText("완료\r\n");
-                TimeSpan interval = DateTime.Now - time;
-                MessageBoxEx.Show(this, "패치완료: 소요 시간 " + interval.ToString(), "패치 도구");
+                session.State = PatcherTaskState.Complete;
+                MessageBoxEx.Show(this, "패치완료: 소요 시간 " + sw.Elapsed, "패치 도구");
             }
-            catch (ThreadAbortException)
+            catch (OperationCanceledException)
             {
-                MessageBoxEx.Show("패치가 중단되었습니다.", "패치 도구");
+                MessageBoxEx.Show(this.Owner, "패치가 중단되었습니다.", "패치 도구");
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -409,6 +426,7 @@ namespace WzComparerR2
             }
             finally
             {
+                session.State = PatcherTaskState.Complete;
                 try
                 {
                     if (sw != null)
@@ -436,43 +454,39 @@ namespace WzComparerR2
                 {
                     parts.Clear();
                 }
-
                 if (patcher != null)
                 {
                     patcher.Close();
                     patcher = null;
                 }
-                patchThread = null;
-                waitHandle = null;
                 GC.Collect();
-
                 panelEx2.Visible = false;
                 expandablePanel2.Height = 157;
             }
         }
 
-        private void patcher_PatchingStateChanged(object sender, PatchingEventArgs e)
+        private void patcher_PatchingStateChanged(object sender, PatchingEventArgs e, PatcherSession session, Action<string> logFunc)
         {
             switch (e.State)
             {
                 case PatchingState.PatchStart:
-                    AppendStateText("[" + e.Part.FileName + "] 패치중\r\n");
+                    logFunc("[" + e.Part.FileName + "] 패치중\r\n");
                     break;
                 case PatchingState.VerifyOldChecksumBegin:
-                    AppendStateText("  패치 전 체크섬 확인...");
+                    logFunc("  패치 전 체크섬 확인...");
                     progressBarX1.Maximum = (int)e.Part.OldFileLength;
                     break;
                 case PatchingState.VerifyOldChecksumEnd:
-                    AppendStateText("  완료\r\n");
+                    logFunc("  완료\r\n");
                     break;
                 case PatchingState.VerifyNewChecksumBegin:
-                    AppendStateText("  패치 후 체크섬 확인...");
+                    logFunc("  패치 후 체크섬 확인...");
                     break;
                 case PatchingState.VerifyNewChecksumEnd:
-                    AppendStateText("  완료\r\n");
+                    logFunc("  완료\r\n");
                     break;
                 case PatchingState.TempFileCreated:
-                    AppendStateText("  임시 파일 작성 시작...\r\n");
+                    logFunc("  임시 파일 작성 시작...\r\n");
                     progressBarX1.Maximum = e.Part.NewFileLength;
                     break;
                 case PatchingState.TempFileBuildProcessChanged:
@@ -480,14 +494,14 @@ namespace WzComparerR2
                     progressBarX1.Text = string.Format("{0:N0}/{1:N0}", e.CurrentFileLength, e.Part.NewFileLength);
                     break;
                 case PatchingState.TempFileClosed:
-                    AppendStateText("  임시 파일 작성 완료...\r\n");
+                    logFunc("  임시 파일 작성 완료...\r\n");
                     progressBarX1.Value = 0;
                     progressBarX1.Maximum = 0;
                     progressBarX1.Text = string.Empty;
 
                     typedParts[e.Part.WzType].Add(e.Part);
 
-                    if (!string.IsNullOrEmpty(this.compareFolder)
+                    if (!string.IsNullOrEmpty(session.CompareFolder)
                         //&& e.Part.Type == 1
                         && Path.GetExtension(e.Part.FileName).Equals(".wz", StringComparison.OrdinalIgnoreCase)
                         && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase)
@@ -497,7 +511,7 @@ namespace WzComparerR2
                         Wz_Structure wzold = new Wz_Structure();
                         try
                         {
-                            AppendStateText("  파일 비교...\r\n");
+                            logFunc("  파일 비교...\r\n");
                             EasyComparer comparer = new EasyComparer();
                             comparer.OutputPng = chkOutputPng.Checked;
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
@@ -505,17 +519,17 @@ namespace WzComparerR2
                             comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
                             comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
-                            comparer.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
+                            comparer.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, logFunc);
                             //wznew.Load(e.Part.TempFilePath, false);
                             //wzold.Load(e.Part.OldFilePath, false);
-                            //comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);
+                            //comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder);
                             string tempDir = e.Part.TempFilePath;
-                            while (Path.GetDirectoryName(tempDir) != msFolder)
+                            while (Path.GetDirectoryName(tempDir) != session.MSFolder)
                             {
                                 tempDir = Path.GetDirectoryName(tempDir);
                             }
                             string newWzFilePath = Path.Combine(tempDir, "Data", e.Part.WzType.ToString(), e.Part.WzType + ".wz");
-                            string oldWzFilePath = Path.Combine(msFolder, "Data", e.Part.WzType.ToString(), e.Part.WzType + ".wz");
+                            string oldWzFilePath = Path.Combine(session.MSFolder, "Data", e.Part.WzType.ToString(), e.Part.WzType + ".wz");
                             bool isNewKMST1125WzFormat = wznew.IsKMST1125WzFormat(newWzFilePath, oldWzFilePath); // TODO: check if deleted
                             bool isOldKMST1125WzFormat = wzold.IsKMST1125WzFormat(oldWzFilePath);
                             if (isNewKMST1125WzFormat) 
@@ -540,15 +554,15 @@ namespace WzComparerR2
                             {
                                 foreach (PatchPartContext part in ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType))
                                 {
-                                    if (part.Type != 0 && File.Exists(Path.Combine(msFolder, part.FileName)))
+                                    if (part.Type != 0 && File.Exists(Path.Combine(session.MSFolder, part.FileName)))
                                     {
-                                        wzold.Load(Path.Combine(msFolder, part.FileName), false);
+                                        wzold.Load(Path.Combine(session.MSFolder, part.FileName), false);
                                     }
                                 }
                             }
                             if (sw == null)
                             {
-                                htmlFilePath = Path.Combine(this.compareFolder, "index.html");
+                                htmlFilePath = Path.Combine(session.CompareFolder, "index.html");
 
                                 htmlFile = new FileStream(htmlFilePath, FileMode.Create, FileAccess.Write);
                                 sw = new StreamWriter(htmlFile, Encoding.UTF8);
@@ -567,15 +581,15 @@ namespace WzComparerR2
                             }
                             if (isNewKMST1125WzFormat && isOldKMST1125WzFormat)
                             {
-                                comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder, sw);
+                                comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder, sw);
                             }
                             else if (!isNewKMST1125WzFormat && !isOldKMST1125WzFormat)
                             {
-                                comparer.EasyCompareWzStructures(wznew, wzold, this.compareFolder, sw);
+                                comparer.EasyCompareWzStructures(wznew, wzold, session.CompareFolder, sw);
                             }
                             else if (isNewKMST1125WzFormat && !isOldKMST1125WzFormat)
                             {
-                                comparer.EasyCompareWzStructuresToWzFiles(wznew.wz_files[0], wzold, this.compareFolder, sw);
+                                comparer.EasyCompareWzStructuresToWzFiles(wznew.wz_files[0], wzold, session.CompareFolder, sw);
                             }
                             else
                             {
@@ -584,7 +598,7 @@ namespace WzComparerR2
                         }
                         catch (Exception ex)
                         {
-                            AppendStateText(ex.ToString());
+                            logFunc(ex.ToString());
                         }
                         finally
                         {
@@ -593,27 +607,27 @@ namespace WzComparerR2
                             GC.Collect();
                         }
 
-                        if (this.deadPatch && typedParts[e.Part.WzType].Count == ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType).Count())
+                        if (session.DeadPatch && typedParts[e.Part.WzType].Count == ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType).Count())
                         {
                             foreach (PatchPartContext part in typedParts[e.Part.WzType].Where(part => part.Type == 1))
                             {
                                 ((WzPatcher)sender).SafeMove(part.TempFilePath, part.OldFilePath);
                             }
-                            AppendStateText("  파일 적용...\r\n");
+                            logFunc("  파일 적용...\r\n");
                         }
                     }
 
-                    if (string.IsNullOrEmpty(this.compareFolder) && this.deadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
+                    if (string.IsNullOrEmpty(session.CompareFolder) && session.DeadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
                     {
                         if (patcher.IsKMST1125Format.Value)
                         {
                             // TODO: we should build the file dependency tree to make sure all old files could be overridden safely.
-                            AppendStateText("  (즉시 패치) 파일 적용 연기...\r\n");
+                            logFunc("  (즉시 패치) 파일 적용 연기...\r\n");
                         }
                         else
                         {
                             patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
-                            AppendStateText("  (즉시 패치) 파일 적용...\r\n");
+                            logFunc("  (즉시 패치) 파일 적용...\r\n");
                         }
                     }
                     break;
@@ -630,23 +644,14 @@ namespace WzComparerR2
                     progressBarX1.Text = string.Empty;
                     break;
                 case PatchingState.PrepareVerifyOldChecksumBegin:
-                    AppendStateText($"패치 전 체크섬 확인: {e.Part.FileName}");
+                    logFunc($"패치 전 체크섬 확인: {e.Part.FileName}");
                     break;
                 case PatchingState.PrepareVerifyOldChecksumEnd:
-                    AppendStateText(" 완료\r\n");
+                    logFunc(" 완료\r\n");
                     break;
                 case PatchingState.ApplyFile:
-                    AppendStateText($"파일 적용: {e.Part.FileName}\r\n");
+                    logFunc($"파일 적용: {e.Part.FileName}\r\n");
                     break;
-            }
-        }
-
-        private void AppendStateText(string text)
-        {
-            this.Invoke((Action<string>)(t => { this.txtPatchState.AppendText(t); }), text);
-            if (this.loggingFileName != null)
-            {
-                File.AppendAllText(this.loggingFileName, text, Encoding.UTF8);
             }
         }
 
@@ -679,7 +684,7 @@ namespace WzComparerR2
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "패치 파일 열기";
             dlg.Filter = "패치 파일 (*.patch;*.exe)|*.patch;*.exe";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtPatchFile2.Text = dlg.FileName;
             }
@@ -689,7 +694,7 @@ namespace WzComparerR2
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.Description = "메이플스토리 폴더를 선택하세요.";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtMSFolder2.Text = dlg.SelectedPath;
             }
@@ -711,7 +716,7 @@ namespace WzComparerR2
             dlg.InitialDirectory = Path.GetDirectoryName(txtPatchFile2.Text);
             dlg.FileName = Path.GetFileNameWithoutExtension(txtPatchFile2.Text) + "_reverse.patch";
 
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 try
                 {
@@ -725,6 +730,60 @@ namespace WzComparerR2
                 {
                 }
             }
+        }
+
+        class PatcherSession
+        {
+            public PatcherSession()
+            {
+                this.cancellationTokenSource = new CancellationTokenSource();
+            }
+
+            public string PatchFile;
+            public string MSFolder;
+            public string CompareFolder;
+            public bool PrePatch;
+            public bool DeadPatch;
+
+            public Task PatchExecTask;
+            public string LoggingFileName;
+            public PatcherTaskState State;
+
+            public CancellationToken CancellationToken => this.cancellationTokenSource.Token;
+            private CancellationTokenSource cancellationTokenSource;
+            private TaskCompletionSource<bool> tcsWaiting;
+
+            public bool IsCompleted => this.PatchExecTask?.IsCompleted ?? true;
+
+            public void Cancel()
+            {
+                this.cancellationTokenSource.Cancel();
+            }
+
+            public async Task WaitForContinueAsync()
+            {
+                var tcs = new TaskCompletionSource<bool>();
+                this.tcsWaiting = tcs;
+                this.cancellationTokenSource.Token.Register(() => tcs.TrySetCanceled());
+                await tcs.Task;
+            }
+
+            public void Continue()
+            {
+                if (this.tcsWaiting != null)
+                {
+                    this.tcsWaiting.SetResult(true);
+                }
+            }
+        }
+
+        enum PatcherTaskState
+        {
+            NotStarted = 0,
+            Prepatch = 1,
+            WaitForContinue = 2,
+            Patching = 3,
+            Complete = 4,
         }
     }
 }

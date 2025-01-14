@@ -98,7 +98,6 @@ namespace WzComparerR2.MapRender.Patches2
 
             string path = $@"Map\Obj\{item.OS}.img\{item.L0}\{item.L1}\{item.L2}\0";
             var obj_node = PluginManager.FindWz(path);
-
             if (obj_node != null)
             {
                 item.MoveType = obj_node.Nodes["moveType"].GetValueEx(0);

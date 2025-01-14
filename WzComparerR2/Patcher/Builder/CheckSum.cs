@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace WzComparerR2.Patcher.Builder
@@ -58,53 +58,6 @@ namespace WzComparerR2.Patcher.Builder
             }
         }
 
-        public static uint ComputeHash2(Stream stream, int length)
-        {
-            return ComputeHash2(stream, length, 0);
-        }
-
-        private static uint ComputeHash2_(Stream stream, int length, uint rollingChecksum)
-        {
-            byte[] buffer = new byte[0x8000];
-
-            while (length > 0)
-            {
-                int count = stream.Read(buffer, 0, Math.Min(buffer.Length, length));
-                if (count == 0)
-                    break;
-
-                for (int i = 0; i < count; i++)
-                {
-                    uint IndexLookup = ((rollingChecksum >> 0x18) ^ buffer[i]);
-                    rollingChecksum = (uint)((rollingChecksum << 0x08) ^ sbox[IndexLookup]);
-                }
-
-                length -= count;
-            }
-            return rollingChecksum;
-        }
-
-        public static unsafe uint ComputeHash2(Stream stream, int length, uint crc)
-        {
-            byte[] buffer = new byte[0x8000];
-            uint[] table = sbox;
-
-            fixed (byte* pBuffer = buffer)
-            {
-                while (length > 0)
-                {
-                    int count = stream.Read(buffer, 0, Math.Min(buffer.Length, length));
-                    if (count == 0)
-                    {
-                        break;
-                    }
-                    crc = ComputeHash(pBuffer, 0, count, crc);
-                    length -= count;
-                }
-            }
-            return crc;
-        }
-
         public static uint ComputeHash2(byte[] data, int startIndex, int count, uint crc)
         {
             for (int i = startIndex, i0 = startIndex + count; i < i0; i++)
@@ -115,27 +68,12 @@ namespace WzComparerR2.Patcher.Builder
             return crc;
         }
 
-        public static uint ComputeHash(Stream stream, long length, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
+        public static uint ComputeHash(Stream stream, long length, CancellationToken cancellationToken = default, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
         {
-            FileStream fs = stream as FileStream;
-            if (fs != null && fs.IsAsync)
-            {
-                return ComputeHashAsync(fs, length, 0, PatchingStateChanged);
-            }
-            else
-            {
-                return ComputeHash(stream, length, 0, PatchingStateChanged);
-            }
+            return ComputeHash(stream, length, 0, cancellationToken, PatchingStateChanged);
         }
 
-        public static uint ComputeHashAsync(FileStream stream, long length, uint crc, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
-        {
-            var hash = new AsyncFileHash(stream, length, PatchingStateChanged);
-            crc = hash.Compute(crc);
-            return crc;
-        }
-
-        public static unsafe uint ComputeHash(Stream stream, long length, uint crc, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
+        public static uint ComputeHash(Stream stream, long length, uint crc, CancellationToken cancellationToken = default, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
         {
             byte[] buffer = new byte[0x8000];
             PatchPartContext part = new PatchPartContext("", 0, 0);
@@ -148,6 +86,7 @@ namespace WzComparerR2.Patcher.Builder
 
             while (length > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 int count = stream.Read(buffer, 0, (int)Math.Min(buffer.Length, length));
                 if (count == 0)
                 {
@@ -170,123 +109,39 @@ namespace WzComparerR2.Patcher.Builder
             return crc;
         }
 
-        public static unsafe uint ComputeHash(byte[] data, int startIndex, int count, uint crc)
+        public static uint ComputeHash(byte[] data, int startIndex, int count, uint crc)
         {
-            fixed (byte* pdata = data)
-            {
-                return ComputeHash(pdata, startIndex, count, crc);
-            }
+            return ComputeHash(data.AsSpan(startIndex, count), crc);
         }
 
-        private static unsafe uint ComputeHash(byte* data, int startIndex, int count, uint crc)
+        private static uint ComputeHash(ReadOnlySpan<byte> data, uint crc)
         {
-            fixed (uint* table = sbox)
+            Span<uint> pcrc = stackalloc uint[1] { crc };
+            Span<byte> crcBytes = MemoryMarshal.AsBytes(pcrc);
+            ref uint crcRef = ref pcrc[0];
+            ReadOnlySpan<uint> table = sbox.AsSpan();
+
+            while (data.Length >= 8)
             {
-                byte* pcrc = (byte*)&crc;
-                int endIndex = startIndex + count;
-                while (endIndex - startIndex >= 8)
-                {
-                    byte* p2 = data + startIndex;
-                    crc ^= (uint)((p2[0] << 24) + (p2[1] << 16) + (p2[2] << 8) + p2[3]);
-                    crc = table[pcrc[3] + 0x700]
-                            ^ table[pcrc[2] + 0x600]
-                            ^ table[pcrc[1] + 0x500]
-                            ^ table[pcrc[0] + 0x400]
-                            ^ table[p2[4] + 0x300]
-                            ^ table[p2[5] + 0x200]
-                            ^ table[p2[6] + 0x100]
-                            ^ table[p2[7] + 0x000];
-                    startIndex += 8;
-                }
-
-                for (; startIndex < endIndex; startIndex++)
-                {
-                    crc = (crc << 8) ^ (table[(crc >> 24) ^ data[startIndex]]);
-                }
-            }
-            return crc;
-        }
-
-
-        private class AsyncFileHash
-        {
-            public AsyncFileHash(FileStream fs, long length, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
-            {
-                this.fs = fs;
-                this.length = length;
-                this.crc = 0;
-                this.evCheckSum = new AutoResetEvent(false);
-                this.evCallBack = new AutoResetEvent(true);
-                this.PatchingStateChanged = PatchingStateChanged;
-                this.part = new PatchPartContext("", 0, 0);
-                this.part.NewFileLength = (int)length;
+                crcRef ^= (uint)((data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3]);
+                crcRef = table[crcBytes[3] + 0x700]
+                        ^ table[crcBytes[2] + 0x600]
+                        ^ table[crcBytes[1] + 0x500]
+                        ^ table[crcBytes[0] + 0x400]
+                        ^ table[data[4] + 0x300]
+                        ^ table[data[5] + 0x200]
+                        ^ table[data[6] + 0x100]
+                        ^ table[data[7] + 0x000];
+                data = data.Slice(8);
             }
 
-            FileStream fs;
-            long length;
-            AutoResetEvent evCheckSum;
-            AutoResetEvent evCallBack;
-            uint crc;
-            EventHandler<PatchingEventArgs> PatchingStateChanged;
-            PatchPartContext part;
-            byte[] buffer1 = new byte[0x20000];
-            byte[] buffer2 = new byte[0x20000];
-
-            double patchProc = 0;
-            const double patchProcReportInverval = 0.005;
-            long patchLength = 0;
-            const long patchLengthReportInterval = 1 * 1024 * 1024;
-
-            public uint Compute(uint crc)
+            for (int i = 0; i < data.Length; i++)
             {
-                this.crc = crc;
-                this.Begin(buffer1);
-                this.evCheckSum.WaitOne();
-                return this.crc;
+                uint indexLookup = (crcRef >> 0x18) ^ data[i];
+                crcRef = (crcRef << 8) ^ table[(int)indexLookup];
             }
 
-            private void Begin(byte[] buffer)
-            {
-                IAsyncResult ir = fs.BeginRead(buffer, 0, (int)Math.Min(length, buffer.Length), CallBack, buffer);
-            }
-
-            private void CallBack(IAsyncResult ir)
-            {
-                byte[] buffer = (byte[])ir.AsyncState;
-                int count = fs.EndRead(ir);
-                this.length -= count;
-                bool doEnd = this.length <= 0;
-
-                this.evCallBack.WaitOne();
-                if (!doEnd)
-                {
-                    byte[] nextBuffer = buffer == buffer1 ? buffer2 : buffer1;
-                    Begin(nextBuffer);
-                }
-                this.crc = CheckSum.ComputeHash(buffer, 0, count, this.crc);
-                if (this.PatchingStateChanged != null && this.part.NewFileLength > 0)
-                {
-                    long curLength = this.part.NewFileLength - length;
-                    double curProc = 1.0 * curLength / this.part.NewFileLength;
-                    if (curProc - this.patchProc >= patchProcReportInverval && curLength - this.patchLength >= patchLengthReportInterval)// || curProc >= 1 - patchProcReportInverval)
-                    {
-                        this.PatchingStateChanged(null, new PatchingEventArgs(part, PatchingState.TempFileBuildProcessChanged, curLength));//更新进度改变
-                        this.patchProc = curProc;
-                        this.patchLength = curLength;
-                    }
-                }
-                this.evCallBack.Set();
-
-                if (doEnd)
-                {
-                    this.End();
-                }
-            }
-
-            private void End()
-            {
-                this.evCheckSum.Set();
-            }
+            return crcRef;
         }
     }
 }
