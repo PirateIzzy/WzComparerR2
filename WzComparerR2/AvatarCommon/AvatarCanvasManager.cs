@@ -113,6 +113,11 @@ namespace WzComparerR2.AvatarCommon
         public Frame GetTexture2DFrame(string actionName, string emotionName, int bodyFrame, int faceFrame, int tamingFrame, GraphicsDevice graphicsDevice)
         {
             var bitmapOrigin = GetBitmapOrigin(actionName, emotionName, bodyFrame, faceFrame, tamingFrame);
+            if (bitmapOrigin.Bitmap == null)
+            {
+                return null;
+            }
+
             Texture2D texture = bitmapOrigin.Bitmap.ToTexture(graphicsDevice);
 
             Frame frame = new Frame(texture, new Point(bitmapOrigin.Origin.X, bitmapOrigin.Origin.Y), 0, GetActionFrameDelay(actionName, bodyFrame), false);

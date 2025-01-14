@@ -380,20 +380,20 @@ namespace WzComparerR2.MapRender
 
                 foreach (var component in node.Nodes)
                 {
-                    switch (node.Text)
+                    switch (component.Text)
                     {
                         case "skin":
-                            var skin = node.GetValueEx<int>(0);
+                            var skin = component.GetValueEx<int>(0);
                             avatar.AddBodyFromSkin3(skin);
                             break;
 
                         case "ear":
-                            var type = node.GetValueEx<int>(0);
+                            var type = component.GetValueEx<int>(0);
                             avatar.SetEarType(type);
                             break;
 
                         default:
-                            var gearID = node.GetValueEx<int>(0);
+                            var gearID = component.GetValueEx<int>(0);
                             avatar.AddGear(gearID);
                             break;
                     }
