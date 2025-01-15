@@ -145,7 +145,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMHP_incMMP: return "MaxHP / MaxMP: " + sign + value;
                 case GearPropType.incMHPr_incMMPr: return "MaxHP / MaxMP: " + sign + value + "%";
                 case GearPropType.incPAD_incMAD:
-                case GearPropType.incAD: return "Attack Power && Magic ATT: " + sign + value;
+                case GearPropType.incAD: return "Attack Power & Magic ATT: " + sign + value;
                 case GearPropType.incPDD_incMDD: return "Defense: " + sign + value;
                 //case GearPropType.incACC_incEVA: return "ACC/AVO :" + sign + value;
 
