@@ -17,6 +17,7 @@ namespace WzComparerR2.LuaConsole
 
         internal static Entry Instance { get; private set; }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
         protected override void OnLoad()
         {
             var bar = this.Context.AddRibbonBar("Tools", "Console");
