@@ -367,7 +367,7 @@
             // 
             this.menuRecent.BeginGroup = true;
             this.menuRecent.Name = "menuRecent";
-            this.menuRecent.Text = "최근 파일";
+            this.menuRecent.Text = "Recent Files";
             // 
             // FrmConsole
             // 
