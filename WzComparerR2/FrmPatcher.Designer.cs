@@ -170,9 +170,9 @@
             this.chkDeadPatch.Name = "chkDeadPatch";
             this.chkDeadPatch.Size = new System.Drawing.Size(82, 16);
             this.chkDeadPatch.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkDeadPatch, new DevComponents.DotNetBar.SuperTooltipInfo("Dead Patch", "", "After launching, and after updating each file, the temporary files will be overwritten with the original files. By doing this it will reduce the file required space, but may cause problems.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(200, 140)));
+            this.superTooltip1.SetSuperTooltip(this.chkDeadPatch, new DevComponents.DotNetBar.SuperTooltipInfo("Immediate Patch", "", "After launching, and after updating each file, the temporary files will be overwritten with the original files. By doing this it will reduce the file required space, but may cause problems.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(200, 140)));
             this.chkDeadPatch.TabIndex = 7;
-            this.chkDeadPatch.Text = "Dead Patch";
+            this.chkDeadPatch.Text = "Immediate Patch";
             // 
             // chkPrePatch
             // 
