@@ -55,6 +55,7 @@
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.dockContainerItem3 = new DevComponents.DotNetBar.DockContainerItem();
             this.tabStrip1 = new DevComponents.DotNetBar.TabStrip();
+            this.menuRecent = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar2)).BeginInit();
             this.bar2.SuspendLayout();
@@ -262,6 +263,7 @@
             this.menuNew,
             this.menuOpen,
             this.menuSave,
+            this.menuRecent,
             this.menuExit});
             this.menuFile.Text = "File";
             // 
@@ -276,7 +278,7 @@
             // 
             this.menuOpen.Name = "menuOpen";
             this.menuOpen.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.CtrlO);
-            this.menuOpen.Text = "Open...";
+            this.menuOpen.Text = "Open";
             this.menuOpen.Click += new System.EventHandler(this.menuOpen_Click);
             // 
             // menuSave
@@ -293,6 +295,7 @@
             this.menuExit.Name = "menuExit";
             this.menuExit.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.AltF4);
             this.menuExit.Text = "Exit";
+            this.menuExit.Click += new System.EventHandler(this.menuExit_Click);
             // 
             // menuDebug
             // 
@@ -360,6 +363,12 @@
             this.tabStrip1.TabLayoutType = DevComponents.DotNetBar.eTabLayoutType.FixedWithNavigationBox;
             this.tabStrip1.Text = "tabStrip1";
             // 
+            // menuRecent
+            // 
+            this.menuRecent.BeginGroup = true;
+            this.menuRecent.Name = "menuRecent";
+            this.menuRecent.Text = "Recent Files";
+            // 
             // FrmConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -420,5 +429,6 @@
         private DevComponents.DotNetBar.ButtonItem menuExit;
         private DevComponents.DotNetBar.ButtonItem menuDebug;
         private DevComponents.DotNetBar.ButtonItem menuReset;
+        private DevComponents.DotNetBar.ButtonItem menuRecent;
     }
 }
