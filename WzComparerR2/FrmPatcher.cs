@@ -24,6 +24,7 @@ namespace WzComparerR2
         public FrmPatcher()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(FrmPatcher_FormClosing);
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
@@ -57,11 +58,14 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
-            typedParts = Enum.GetValues(typeof(Wz_Type)).Cast<Wz_Type>().ToDictionary(type => type, type => new List<PatchPartContext>());
         }
 
+        SortedDictionary<string, long> patchedFileSizes = new SortedDictionary<string, long>();
+        List<string> patchedFileIndex = new List<string>();
+        Dictionary<string, string> finishedFileIndex = new Dictionary<string, string>();
         public Encoding PatcherNoticeEncoding { get; set; }
 
+        long availableDiskSpace;
         private bool isUpdating;
         private PatcherSession patcherSession;
 
@@ -178,21 +182,25 @@ namespace WzComparerR2
                 item.GetFileLength();
                 if (item.FileLength > 0)
                 {
-                    switch (MessageBoxEx.Show(string.Format("Size: {0:N0} bytes. Last updated: {1:yyyy-MM-dd HH:mm:ss}\r\nDo you want to download the file now?", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
+                    switch (MessageBoxEx.Show(string.Format("Size: {0:N0} bytes. Last updated: {1:yyyy-MM-dd HH:mm:ss}\r\nDo you want to download the file now?\r\n\r\nYes - Download\r\nNo - Copy URL to Clipboard\r\nCancel - Do not download", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNoCancel))
                     {
                         case DialogResult.Yes:
-                        #if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER
                             Process.Start(new ProcessStartInfo
                             {
                                 UseShellExecute = true,
                                 FileName = txtUrl.Text,
                             });
-                        #else
+#else
                             Process.Start(txtUrl.Text);
-                        #endif
+#endif
                             return;
 
                         case DialogResult.No:
+                            Clipboard.SetText(txtUrl.Text);
+                            return;
+
+                        case DialogResult.Cancel:
                             return;
                     }
                 }
@@ -253,6 +261,14 @@ namespace WzComparerR2
 
         private void buttonXPatch_Click(object sender, EventArgs e)
         {
+            if (!File.Exists(txtMSFolder.Text + "//MapleStory.exe") && !File.Exists(txtMSFolder.Text + "//MapleStoryT.exe"))
+            {
+                DialogResult PatcherPromptResult = MessageBoxEx.Show("The selected folder is not a valid MapleStory folder.\r\nProceed anyway?", "Warning", MessageBoxButtons.YesNo);
+                if (PatcherPromptResult == System.Windows.Forms.DialogResult.No)
+                {
+                    return;
+                }
+            }
             if (this.patcherSession != null)
             {
                 if (this.patcherSession.State == PatcherTaskState.WaitForContinue)
@@ -290,11 +306,6 @@ namespace WzComparerR2
             this.patcherSession = session;
         }
 
-        string htmlFilePath;
-        FileStream htmlFile;
-        StreamWriter sw;
-        Dictionary<Wz_Type, List<PatchPartContext>> typedParts;
-
         private async Task ExecutePatchAsync(PatcherSession session, CancellationToken cancellationToken)
         {
             void AppendStateText(string text)
@@ -325,15 +336,96 @@ namespace WzComparerR2
                 patcher.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, AppendStateText);
                 AppendStateText($"Patch file name: {session.PatchFile}\r\n");
                 AppendStateText("Analyzing the patch...");
-                patcher.OpenDecompress(cancellationToken);
-                AppendStateText("Completed\r\n");
-                //if (session.PrePatch)
+                long patchedAllFileSize = 0;
+                long decompressedSize = patcher.PrePatch(cancellationToken);
+                availableDiskSpace = RemainingDiskSpace(session.MSFolder);
+                this.Invoke(() =>
                 {
-                    AppendStateText("Preparing the patch... \r\n");
-                    long decompressedSize = patcher.PrePatch(cancellationToken);
+                    this.txtNotice.Text = patcher.NoticeText;
+                    foreach (PatchPartContext part in patcher.PatchParts)
+                    {
+                        this.advTreePatchFiles.Nodes.Add(CreateFileNode(part));
+                    }
+                });
+                patcher.OpenDecompress(cancellationToken);
+                StringBuilder diskSpaceMessage = new StringBuilder();
+                patchedFileSizes.Add("ZOther", 0);
+                foreach (PatchPartContext part in patcher.PatchParts)
+                {
+                    switch (part.Type)
+                    {
+                        case 0:
+                        case 1:
+                            patchedAllFileSize += part.NewFileLength;
+                            break;
+                        case 2:
+                            patchedAllFileSize -= part.NewFileLength;
+                            break;
+                    }
                     if (patcher.IsKMST1125Format.Value)
                     {
-                        AppendStateText("Patch size: KMST1125\r\n");
+                        string[] patchedFileDirectory = part.FileName.Split('\\');
+                        if (part.Type == 1 && (patchedFileDirectory[0] == "Data" || patchedFileDirectory[0] == "NxOverlay")) patchedFileIndex.Add(part.FileName);
+                        if (patchedFileDirectory[0] == "Data")
+                        {
+                            if (!patchedFileSizes.ContainsKey(patchedFileDirectory[1])) patchedFileSizes.Add(patchedFileDirectory[1], 0);
+                            switch (part.Type)
+                            {
+                                case 0:
+                                case 1:
+                                    patchedFileSizes[patchedFileDirectory[1]] += part.NewFileLength;
+                                    break;
+                                case 2:
+                                    patchedFileSizes[patchedFileDirectory[1]] -= part.NewFileLength;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            switch (part.Type)
+                            {
+                                case 0:
+                                case 1:
+                                    patchedFileSizes["ZOther"] += part.NewFileLength;
+                                    break;
+                                case 2:
+                                    patchedFileSizes["ZOther"] -= part.NewFileLength;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                foreach (string key in patchedFileSizes.Keys)
+                {
+                    switch (key)
+                    {
+                        case "ZOther":
+                            diskSpaceMessage.AppendLine(string.Format("Required space for other files: {0}", GetBothByteAndGBValue(patchedFileSizes[key])));
+                            break;
+                        default:
+                            diskSpaceMessage.AppendLine(string.Format("Required space for [{0}]: {1}", key, GetBothByteAndGBValue(patchedFileSizes[key])));
+                            break;
+                    }
+                }
+                patchedFileIndex.Sort();
+                diskSpaceMessage.AppendLine(string.Format("Total requires space: {0}", GetBothByteAndGBValue(patchedAllFileSize)));
+                diskSpaceMessage.AppendLine(string.Format("Available disk space: {0}", GetBothByteAndGBValue(availableDiskSpace)));
+                AppendStateText(diskSpaceMessage.ToString());
+                AppendStateText("Completed\r\n");
+                if (patchedAllFileSize > availableDiskSpace)
+                {
+                    DialogResult PatcherPromptResult = MessageBoxEx.Show(this, diskSpaceMessage.ToString() + "\r\nAvailable disk space may insufficient for finishing patching.\r\nProceed anyway?", "Warning", MessageBoxButtons.YesNo);
+                    if (PatcherPromptResult == DialogResult.No)
+                    {
+                        throw new OperationCanceledException("The patch has been canceled.");
+                    }
+                }
+                if (session.PrePatch)
+                {
+                    AppendStateText("Preparing the patch... \r\n");
+                    if (patcher.IsKMST1125Format.Value)
+                    {
+                        AppendStateText("Patch type: KMST1125\r\n");
                         if (patcher.OldFileHash != null)
                         {
                             AppendStateText($"Number of files to check checksum pre-patch: {patcher.OldFileHash.Count}\r\n");
@@ -345,24 +437,11 @@ namespace WzComparerR2
                     this.Invoke(() =>
                     {
                         this.advTreePatchFiles.BeginUpdate();
-                        this.txtNotice.Text = patcher.NoticeText;
-                        foreach (PatchPartContext part in patcher.PatchParts)
-                        {
-                            this.advTreePatchFiles.Nodes.Add(CreateFileNode(part));
-                            advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Enabled = session.PrePatch;
-                            if (session.PrePatch && part.Type == 1)
-                            {
-                                advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Checked = File.Exists(Path.Combine(session.MSFolder, part.FileName));
-                            }
-                        }
-                        //this.advTreePatchFiles.Enabled = true;
+                        this.advTreePatchFiles.Enabled = true;
                         this.advTreePatchFiles.EndUpdate();
                     });
-                }
-                if (session.PrePatch)
-                {
-                    AppendStateText("After selecting a patch file, you may click on the Patch button to start.\r\n");
 
+                    AppendStateText("After selecting a patch file, you may click on the Patch button to start.\r\n");
                     session.State = PatcherTaskState.WaitForContinue;
                     await session.WaitForContinueAsync();
                     this.Invoke(() =>
@@ -377,38 +456,38 @@ namespace WzComparerR2
                         {
                             patcher.PatchParts.Add(part);
                         }
-                        node.Enabled = false;
                     }
-                    patcher.PatchParts.Sort((part1, part2) => part1.Offset.CompareTo(part2.Offset));
                 }
-                AppendStateText("Patching...\r\n");
+                if (patcher.IsKMST1125Format.Value && session.DeadPatch)
+                {
+                    AppendStateText("Immediate Patch Execution Plan\r\n");
+                    session.deadPatchExecutionPlan = new();
+                    session.deadPatchExecutionPlan.Build(patcher.PatchParts);
+                    foreach (var part in patcher.PatchParts)
+                    {
+                        if (session.deadPatchExecutionPlan.Check(part.FileName, out var filesCanInstantUpdate))
+                        {
+                            AppendStateText($"+ Execute file [{part.FileName}]\r\n");
+                            foreach (var fileName in filesCanInstantUpdate)
+                            {
+                                AppendStateText($"  - Apply file [{fileName}]\r\n");
+                            }
+                        }
+                        else
+                        {
+                            AppendStateText($"- Execute file [{part.FileName}], pending application\r\n");
+                        }
+                    }
+                    // disable force validation
+                    patcher.ThrowOnValidationFailed = false;
+                }
+                AppendStateText("Applying patch\r\n");
                 var sw = Stopwatch.StartNew();
                 patcher.Patch(session.MSFolder, cancellationToken);
                 sw.Stop();
-                if (this.sw != null)
-                {
-                    this.sw.WriteLine("</table>");
-                    this.sw.WriteLine("</p>");
-
-                    //html结束
-                    this.sw.WriteLine("</body>");
-                    this.sw.WriteLine("</html>");
-
-                    try
-                    {
-                        if (this.sw != null)
-                        {
-                            this.sw.Flush();
-                            this.sw.Close();
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
                 AppendStateText("Completed\r\n");
                 session.State = PatcherTaskState.Complete;
-                MessageBoxEx.Show(this, "Patch Completed " + sw.Elapsed, "Patcher");
+                MessageBoxEx.Show(this, "Patch Completed. Elapsed time: " + sw.Elapsed, "Patcher");
             }
             catch (OperationCanceledException)
             {
@@ -426,34 +505,10 @@ namespace WzComparerR2
             }
             finally
             {
+                patchedFileSizes.Clear();
+                patchedFileIndex.Clear();
+                finishedFileIndex.Clear();
                 session.State = PatcherTaskState.Complete;
-                try
-                {
-                    if (sw != null)
-                    {
-                        sw.Flush();
-                        sw.Close();
-                    }
-                }
-                catch
-                {
-                }
-                try
-                {
-                    if (htmlFile != null)
-                    {
-                        htmlFile.Flush();
-                        htmlFile.Close();
-                    }
-                }
-                catch
-                {
-                }
-                htmlFilePath = null;
-                foreach (List<PatchPartContext> parts in typedParts.Values)
-                {
-                    parts.Clear();
-                }
                 if (patcher != null)
                 {
                     patcher.Close();
@@ -474,7 +529,6 @@ namespace WzComparerR2
                     break;
                 case PatchingState.VerifyOldChecksumBegin:
                     logFunc("  Checking pre-patch checksum...");
-                    progressBarX1.Maximum = (int)e.Part.OldFileLength;
                     break;
                 case PatchingState.VerifyOldChecksumEnd:
                     logFunc("  Completed\r\n");
@@ -488,6 +542,7 @@ namespace WzComparerR2
                 case PatchingState.TempFileCreated:
                     logFunc("  Creating temporary files...\r\n");
                     progressBarX1.Maximum = e.Part.NewFileLength;
+                    session.TemporaryFileMapping.Add(e.Part.FileName, e.Part.TempFilePath);
                     break;
                 case PatchingState.TempFileBuildProcessChanged:
                     progressBarX1.Value = (int)e.CurrentFileLength;
@@ -499,13 +554,10 @@ namespace WzComparerR2
                     progressBarX1.Maximum = 0;
                     progressBarX1.Text = string.Empty;
 
-                    typedParts[e.Part.WzType].Add(e.Part);
-
                     if (!string.IsNullOrEmpty(session.CompareFolder)
-                        //&& e.Part.Type == 1
+                        && e.Part.Type == 1
                         && Path.GetExtension(e.Part.FileName).Equals(".wz", StringComparison.OrdinalIgnoreCase)
-                        && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase)
-                        && typedParts[e.Part.WzType].Count == ((WzPatcher)sender).PatchParts.Where(part => part.Type != 2 && part.WzType == e.Part.WzType).Count())
+                        && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase))
                     {
                         Wz_Structure wznew = new Wz_Structure();
                         Wz_Structure wzold = new Wz_Structure();
@@ -519,86 +571,13 @@ namespace WzComparerR2
                             comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
                             comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
-                            comparer.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, logFunc);
-                            //wznew.Load(e.Part.TempFilePath, false);
-                            //wzold.Load(e.Part.OldFilePath, false);
-                            //comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder);
-                            string tempDir = e.Part.TempFilePath;
-                            while (Path.GetDirectoryName(tempDir) != session.MSFolder)
-                            {
-                                tempDir = Path.GetDirectoryName(tempDir);
-                            }
-                            string newWzFilePath = Path.Combine(tempDir, "Data", e.Part.WzType.ToString(), e.Part.WzType + ".wz");
-                            string oldWzFilePath = Path.Combine(session.MSFolder, "Data", e.Part.WzType.ToString(), e.Part.WzType + ".wz");
-                            bool isNewKMST1125WzFormat = wznew.IsKMST1125WzFormat(newWzFilePath, oldWzFilePath); // TODO: check if deleted
-                            bool isOldKMST1125WzFormat = wzold.IsKMST1125WzFormat(oldWzFilePath);
-                            if (isNewKMST1125WzFormat)
-                            {
-                                wznew.LoadKMST1125DataWz(newWzFilePath, oldWzFilePath);
-                            }
-                            else
-                            {
-                                foreach (PatchPartContext part in typedParts[e.Part.WzType])
-                                {
-                                    if (part.Type != 2)
-                                    {
-                                        wznew.Load(part.TempFilePath, false);
-                                    }
-                                }
-                            }
-                            if (isOldKMST1125WzFormat)
-                            {
-                                wzold.LoadKMST1125DataWz(oldWzFilePath);
-                            }
-                            else
-                            {
-                                foreach (PatchPartContext part in ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType))
-                                {
-                                    if (part.Type != 0 && File.Exists(Path.Combine(session.MSFolder, part.FileName)))
-                                    {
-                                        wzold.Load(Path.Combine(session.MSFolder, part.FileName), false);
-                                    }
-                                }
-                            }
-                            if (sw == null)
-                            {
-                                htmlFilePath = Path.Combine(session.CompareFolder, "index.html");
-
-                                htmlFile = new FileStream(htmlFilePath, FileMode.Create, FileAccess.Write);
-                                sw = new StreamWriter(htmlFile, Encoding.UTF8);
-                                sw.WriteLine("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
-                                sw.WriteLine("<html>");
-                                sw.WriteLine("<head>");
-                                sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
-                                sw.WriteLine("<title>Index {0}←{1}</title>", wznew.wz_files.Where(wz_file => wz_file != null).First().Header.WzVersion, wzold.wz_files.Where(wz_file => wz_file != null).First().Header.WzVersion);
-                                sw.WriteLine("<link type=\"text/css\" rel=\"stylesheet\" href=\"style.css\" />");
-                                sw.WriteLine("</head>");
-                                sw.WriteLine("<body>");
-                                //输出概况
-                                sw.WriteLine("<p class=\"wzf\">");
-                                sw.WriteLine("<table>");
-                                sw.WriteLine("<tr><th>Filename</th><th>Size New Version</th><th>Size Old Version</th><th>Modified</th><th>Added</th><th>Removed</th></tr>");
-                            }
-                            if (isNewKMST1125WzFormat && isOldKMST1125WzFormat)
-                            {
-                                comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder, sw);
-                            }
-                            else if (!isNewKMST1125WzFormat && !isOldKMST1125WzFormat)
-                            {
-                                comparer.EasyCompareWzStructures(wznew, wzold, session.CompareFolder, sw);
-                            }
-                            else if (isNewKMST1125WzFormat && !isOldKMST1125WzFormat)
-                            {
-                                comparer.EasyCompareWzStructuresToWzFiles(wznew.wz_files[0], wzold, session.CompareFolder, sw);
-                            }
-                            else
-                            {
-                                // TODO
-                            }
+                            wznew.Load(e.Part.TempFilePath, false);
+                            wzold.Load(e.Part.OldFilePath, false);
+                            comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder);
                         }
                         catch (Exception ex)
                         {
-                            logFunc(ex.ToString());
+                            txtPatchState.AppendText(ex.ToString());
                         }
                         finally
                         {
@@ -606,51 +585,55 @@ namespace WzComparerR2
                             wzold.Clear();
                             GC.Collect();
                         }
-
-                        if (session.DeadPatch && typedParts[e.Part.WzType].Count == ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType).Count())
-                        {
-                            foreach (PatchPartContext part in typedParts[e.Part.WzType].Where(part => part.Type == 1))
-                            {
-                                ((WzPatcher)sender).SafeMove(part.TempFilePath, part.OldFilePath);
-                            }
-                            logFunc("  Applying files...\r\n");
-                        }
                     }
 
-                    if (string.IsNullOrEmpty(session.CompareFolder) && session.DeadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
+                    if (session.DeadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
                     {
                         if (patcher.IsKMST1125Format.Value)
                         {
-                            // TODO: we should build the file dependency tree to make sure all old files could be overridden safely.
-                            logFunc("  (Immediate Patch) Delayed applying files...\r\n");
+                            if (session.deadPatchExecutionPlan?.Check(e.Part.FileName, out var filesCanInstantUpdate) ?? false)
+                            {
+                                long currentUsedDiskSpace = availableDiskSpace - RemainingDiskSpace(session.MSFolder);
+                                logFunc(string.Format("  (Immediate Patch) Used disk space: {0}\r\n", GetBothByteAndGBValue(currentUsedDiskSpace)));
+                                foreach (string fileName in filesCanInstantUpdate)
+                                {
+                                    if (session.TemporaryFileMapping.TryGetValue(fileName, out var temporaryFileName))
+                                    {
+                                        logFunc($"  (Immediate Patch) Applying file [{fileName}]...\r\n");
+                                        patcher.SafeMove(temporaryFileName, Path.Combine(session.MSFolder, fileName));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                logFunc("  (Immediate Patch) Delayed applying files...\r\n");
+                            }
                         }
                         else
                         {
-                            patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
                             logFunc("  (Immediate Patch) Applying files...\r\n");
+                            patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
                         }
                     }
-                    break;
-                case PatchingState.CompareStarted:
-                    progressBarX1.Maximum = e.Part.NewFileLength;
-                    break;
-                case PatchingState.CompareProcessChanged:
-                    progressBarX1.Value = (int)e.CurrentFileLength;
-                    progressBarX1.Text = string.Format("{0:N0}/{1:N0}", e.CurrentFileLength, e.Part.NewFileLength);
-                    break;
-                case PatchingState.CompareFinished:
-                    progressBarX1.Value = 0;
-                    progressBarX1.Maximum = 0;
-                    progressBarX1.Text = string.Empty;
                     break;
                 case PatchingState.PrepareVerifyOldChecksumBegin:
                     logFunc($"Checking the pre-patch checksum: {e.Part.FileName}");
                     break;
                 case PatchingState.PrepareVerifyOldChecksumEnd:
-                    logFunc(" Completed\r\n");
+                    if (e.Part.OldChecksum != e.Part.OldChecksumActual)
+                    {
+                        logFunc(" Mismatch\r\n");
+                    }
+                    else
+                    {
+                        logFunc(" Completed\r\n");
+                    }
                     break;
                 case PatchingState.ApplyFile:
                     logFunc($"Applying files: {e.Part.FileName}\r\n");
+                    break;
+                case PatchingState.FileSkipped:
+                    logFunc("  Skipped File: " + e.Part.FileName + "\r\n");
                     break;
             }
         }
@@ -667,6 +650,7 @@ namespace WzComparerR2
                 case 2: node.Cells.Add(new Cell("Removed", style)); break;
                 default: node.Cells.Add(new Cell(part.Type.ToString(), style)); break;
             }
+            node.Cells.Add(new Cell(part.Type.ToString(), style));
             node.Cells.Add(new Cell(part.NewFileLength.ToString("n0"), style));
             node.Cells.Add(new Cell(part.NewChecksum.ToString("x8"), style));
             node.Cells.Add(new Cell(part.OldChecksum?.ToString("x8"), style));
@@ -731,6 +715,58 @@ namespace WzComparerR2
             }
         }
 
+        private void FrmPatcher_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this.patcherSession != null && this.patcherSession.State != PatcherTaskState.NotStarted && this.patcherSession.State != PatcherTaskState.Complete)
+            {
+                DialogResult result = MessageBoxEx.Show(this, "Game is currently being patched, terminating it may corrupt game files.\r\nWould you like to terminate it anyway?", "Patcher", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    e.Cancel = false;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private long RemainingDiskSpace(string path)
+        {
+            string diskDrive = path.Substring(0, 2);
+            try
+            {
+                DriveInfo dinfo = new DriveInfo(diskDrive);
+                return dinfo.AvailableFreeSpace;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private string GetBothByteAndGBValue(long size)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB" };
+            double targetbytes = size;
+            int order = 0;
+
+            while (targetbytes >= 1024 && order < sizes.Length)
+            {
+                order++;
+                targetbytes /= 1024;
+            }
+
+            if (size <= 1024)
+            {
+                return $"{size:N0} bytes";
+            }
+            else
+            {
+                return $"{size:N0} bytes ({targetbytes:0.##} {sizes[order]})";
+            }
+        }
+
         class PatcherSession
         {
             public PatcherSession()
@@ -747,6 +783,9 @@ namespace WzComparerR2
             public Task PatchExecTask;
             public string LoggingFileName;
             public PatcherTaskState State;
+
+            public DeadPatchExecutionPlan deadPatchExecutionPlan;
+            public Dictionary<string, string> TemporaryFileMapping = new();
 
             public CancellationToken CancellationToken => this.cancellationTokenSource.Token;
             private CancellationTokenSource cancellationTokenSource;
@@ -783,6 +822,80 @@ namespace WzComparerR2
             WaitForContinue = 2,
             Patching = 3,
             Complete = 4,
+        }
+
+        class DeadPatchExecutionPlan
+        {
+            public DeadPatchExecutionPlan()
+            {
+                this.FileUpdateDependencies = new Dictionary<string, List<string>>();
+            }
+
+            public Dictionary<string, List<string>> FileUpdateDependencies { get; private set; }
+
+            public void Build(IEnumerable<PatchPartContext> orderedParts)
+            {
+                /*
+                 *  for examle:
+                 *    fileName   | type | dependencies               
+                 *    -----------|------|---------------     
+                 *    Mob_000.wz | 1    | Mob_000.wz   (self update)
+                 *    Mob_001.wz | 1    | Mob_001.wz, Mob_002.wz  (merge data)
+                 *    Mob_002.wz | 1    | Mob_001.wz, Mob_002.wz  (merge data)
+                 *    Mob_003.wz | 1    | Mob_001.wz, Mob_002.wz  (balance size from other file)
+                 *                                                 
+                 *  fileLastDependecy:                             
+                 *    key        | value                           
+                 *    -----------|----------------                 
+                 *    Mob_000.wz | Mob_000.wz
+                 *    Mob_001.wz | Mob_003.wz
+                 *    Mob_002.wz | Mob_003.wz
+                 *    Mob_003.wz | Mob_003.wz
+                 *    
+                 *  FileUpdateDependencies:
+                 *    key        | value
+                 *    -----------|----------------
+                 *    Mob_000.wz | Mob000.wz
+                 *    Mob_003.wz | Mob001.wz, Mob002.wz, Mob003.wz
+                 */
+
+                // find the last dependency
+                Dictionary<string, string> fileLastDependecy = new();
+                foreach (var part in orderedParts)
+                {
+                    if (part.Type == 0)
+                    {
+                        fileLastDependecy[part.FileName] = part.FileName;
+                    }
+                    else if (part.Type == 1)
+                    {
+                        fileLastDependecy[part.FileName] = part.FileName;
+                        foreach (var dep in part.DependencyFiles)
+                        {
+                            fileLastDependecy[dep] = part.FileName;
+                        }
+                    }
+                }
+
+                // reverse key and value
+                this.FileUpdateDependencies.Clear();
+                foreach (var grp in fileLastDependecy.GroupBy(kv => kv.Value, kv => kv.Key))
+                {
+                    this.FileUpdateDependencies.Add(grp.Key, grp.ToList());
+                }
+            }
+
+            public bool Check(string fileName, out IReadOnlyList<string> filesCanInstantUpdate)
+            {
+                if (this.FileUpdateDependencies.TryGetValue(fileName, out var value) && value != null && value.Count > 0)
+                {
+                    filesCanInstantUpdate = value;
+                    return true;
+                }
+
+                filesCanInstantUpdate = null;
+                return false;
+            }
         }
     }
 }
