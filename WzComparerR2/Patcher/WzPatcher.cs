@@ -653,7 +653,7 @@ namespace WzComparerR2.Patcher
                 {
                     this.inflateStream.Seek(part.Offset, SeekOrigin.Begin);
                     BinaryReader r = new BinaryReader(this.inflateStream);
-                    // Here is a trick that to leverage CalcNewFileLength method to skip this file.
+                    // Here is a trick to leverage CalcNewFileLength method to skip this file.
                     part.NewFileLength = CalcNewFileLength(part, r);
                 }
                 else

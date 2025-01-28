@@ -408,13 +408,13 @@ namespace WzComparerR2
                     }
                 }
                 patchedFileIndex.Sort();
-                diskSpaceMessage.AppendLine(string.Format("Total requires space: {0}", GetBothByteAndGBValue(patchedAllFileSize)));
+                diskSpaceMessage.AppendLine(string.Format("Total required disk space: {0}", GetBothByteAndGBValue(patchedAllFileSize)));
                 diskSpaceMessage.AppendLine(string.Format("Available disk space: {0}", GetBothByteAndGBValue(availableDiskSpace)));
                 AppendStateText(diskSpaceMessage.ToString());
                 AppendStateText("Completed\r\n");
                 if (patchedAllFileSize > availableDiskSpace)
                 {
-                    DialogResult PatcherPromptResult = MessageBoxEx.Show(this, diskSpaceMessage.ToString() + "\r\nAvailable disk space may insufficient for finishing patching.\r\nProceed anyway?", "Warning", MessageBoxButtons.YesNo);
+                    DialogResult PatcherPromptResult = MessageBoxEx.Show(this, diskSpaceMessage.ToString() + "\r\nAvailable disk space may be insufficient for finishing patching.\r\nProceed anyway?", "Warning", MessageBoxButtons.YesNo);
                     if (PatcherPromptResult == DialogResult.No)
                     {
                         throw new OperationCanceledException("The patch has been canceled.");
@@ -633,7 +633,7 @@ namespace WzComparerR2
                     logFunc($"Applying files: {e.Part.FileName}\r\n");
                     break;
                 case PatchingState.FileSkipped:
-                    logFunc("  Skipped File: " + e.Part.FileName + "\r\n");
+                    logFunc("  Skipped file: " + e.Part.FileName + "\r\n");
                     break;
             }
         }
@@ -719,7 +719,7 @@ namespace WzComparerR2
         {
             if (this.patcherSession != null && this.patcherSession.State != PatcherTaskState.NotStarted && this.patcherSession.State != PatcherTaskState.Complete)
             {
-                DialogResult result = MessageBoxEx.Show(this, "Game is currently being patched, terminating it may corrupt game files.\r\nWould you like to terminate it anyway?", "Patcher", MessageBoxButtons.YesNo);
+                DialogResult result = MessageBoxEx.Show(this, "The game is currently being patched, and terminating it may corrupt the game files.\r\nWould you like to terminate it anyway?", "Patcher", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
                     e.Cancel = false;
@@ -836,7 +836,7 @@ namespace WzComparerR2
             public void Build(IEnumerable<PatchPartContext> orderedParts)
             {
                 /*
-                 *  for examle:
+                 *  for example:
                  *    fileName   | type | dependencies               
                  *    -----------|------|---------------     
                  *    Mob_000.wz | 1    | Mob_000.wz   (self update)
