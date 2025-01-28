@@ -36,6 +36,7 @@ namespace WzComparerR2
         public MainForm()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
@@ -3609,6 +3610,26 @@ namespace WzComparerR2
                 UpdateWzLoadingSettings();
                 UpdateTranslateSettings();
             }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form is FrmPatcher && !form.IsDisposed)
+                {
+                    form.Show();
+                    form.BringToFront();
+                    MessageBoxEx.Show(this, "Please close the patcher before closing WzComparerR2.", "Notice", MessageBoxButtons.OK);
+                    e.Cancel = true;
+                    return;
+                }
+            }
+        }
+
+        private void buttomItem13_FormClosing(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         private static string RemoveInvalidFileNameChars(string fileName)

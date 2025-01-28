@@ -1725,10 +1725,10 @@
             // 
             this.buttonItem13.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
             this.buttonItem13.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.buttonItem13.Enabled = false;
             this.buttonItem13.Name = "buttonItem13";
             this.buttonItem13.SubItemsExpandWidth = 24;
             this.buttonItem13.Text = "Exit";
+            this.buttonItem13.Click += new System.EventHandler(this.buttomItem13_FormClosing);
             // 
             // styleManager1
             // 
