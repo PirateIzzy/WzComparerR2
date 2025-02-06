@@ -181,15 +181,15 @@ namespace WzComparerR2
                     switch (MessageBoxEx.Show(string.Format("용량 : {0:N0}B, 업로드 시각 : {1:yyyy-MM-dd HH:mm:ss}\r\n패치 파일을 바로 다운로드하시겠습니까？", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
                     {
                         case DialogResult.Yes:
-                        #if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER
                             Process.Start(new ProcessStartInfo
                             {
                                 UseShellExecute = true,
                                 FileName = txtUrl.Text,
                             });
-                        #else
+#else
                             Process.Start(txtUrl.Text);
-                        #endif
+#endif
                             return;
 
                         case DialogResult.No:
@@ -350,9 +350,14 @@ namespace WzComparerR2
                         {
                             this.advTreePatchFiles.Nodes.Add(CreateFileNode(part));
                             advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Enabled = session.PrePatch;
-                            if (session.PrePatch && part.Type == 1)
+                            if (session.PrePatch && part.Type == 1 && part.OldChecksum != null)
                             {
-                                advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Checked = File.Exists(Path.Combine(session.MSFolder, part.FileName));
+                                //advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Checked = File.Exists(Path.Combine(session.MSFolder, part.FileName));
+                                if (!File.Exists(Path.Combine(session.MSFolder, part.FileName)))
+                                {
+                                    AppendStateText($"(경고) {part.FileName} 파일이 존재하지 않습니다.\r\n");
+                                    advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Checked = false;
+                                }
                             }
                         }
                         //this.advTreePatchFiles.Enabled = true;
@@ -380,6 +385,29 @@ namespace WzComparerR2
                         node.Enabled = false;
                     }
                     patcher.PatchParts.Sort((part1, part2) => part1.Offset.CompareTo(part2.Offset));
+                    if (patcher.IsKMST1125Format.Value && session.DeadPatch)
+                    {
+                        AppendStateText(" (즉시 패치) 실행 계획 생성 중 : \r\n");
+                        session.deadPatchExecutionPlan = new();
+                        session.deadPatchExecutionPlan.Build(patcher.PatchParts);
+                        foreach (var part in patcher.PatchParts)
+                        {
+                            if (session.deadPatchExecutionPlan.Check(part.FileName, out var filesCanInstantUpdate))
+                            {
+                                AppendStateText($"+ {part.FileName} 파일 실행\r\n");
+                                foreach (var fileName in filesCanInstantUpdate)
+                                {
+                                    AppendStateText($"  - {fileName} 파일 적용\r\n");
+                                }
+                            }
+                            else
+                            {
+                                AppendStateText($"- {part.FileName} 파일 실행, 적용 연기\r\n");
+                            }
+                        }
+                        // disable force validation
+                        patcher.ThrowOnValidationFailed = false;
+                    }
                 }
                 AppendStateText("패치중...\r\n");
                 var sw = Stopwatch.StartNew();
@@ -488,6 +516,7 @@ namespace WzComparerR2
                 case PatchingState.TempFileCreated:
                     logFunc("  임시 파일 작성 시작...\r\n");
                     progressBarX1.Maximum = e.Part.NewFileLength;
+                    session.TemporaryFileMapping.Add(e.Part.FileName, e.Part.TempFilePath);
                     break;
                 case PatchingState.TempFileBuildProcessChanged:
                     progressBarX1.Value = (int)e.CurrentFileLength;
@@ -621,13 +650,26 @@ namespace WzComparerR2
                     {
                         if (patcher.IsKMST1125Format.Value)
                         {
-                            // TODO: we should build the file dependency tree to make sure all old files could be overridden safely.
-                            logFunc("  (즉시 패치) 파일 적용 연기...\r\n");
+                            if (session.deadPatchExecutionPlan?.Check(e.Part.FileName, out var filesCanInstantUpdate) ?? false)
+                            {
+                                foreach (string fileName in filesCanInstantUpdate)
+                                {
+                                    if (session.TemporaryFileMapping.TryGetValue(fileName, out var temporaryFileName))
+                                    {
+                                        logFunc($"  (즉시 패치) {fileName} 파일 적용 중...\r\n");
+                                        patcher.SafeMove(temporaryFileName, Path.Combine(session.MSFolder, fileName));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                logFunc("  (즉시 패치) 파일 적용 연기...\r\n");
+                            }
                         }
                         else
                         {
-                            patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
                             logFunc("  (즉시 패치) 파일 적용...\r\n");
+                            patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
                         }
                     }
                     break;
@@ -647,10 +689,20 @@ namespace WzComparerR2
                     logFunc($"패치 전 체크섬 확인: {e.Part.FileName}");
                     break;
                 case PatchingState.PrepareVerifyOldChecksumEnd:
-                    logFunc(" 완료\r\n");
+                    if (e.Part.OldChecksum != e.Part.OldChecksumActual)
+                    {
+                        logFunc(" 불일치\r\n");
+                    }
+                    else
+                    {
+                        logFunc(" 완료\r\n");
+                    }
                     break;
                 case PatchingState.ApplyFile:
                     logFunc($"파일 적용: {e.Part.FileName}\r\n");
+                    break;
+                case PatchingState.FileSkipped:
+                    logFunc("  파일 건너뜀: " + e.Part.FileName + "\r\n");
                     break;
             }
         }
@@ -726,7 +778,7 @@ namespace WzComparerR2
                     builder.outputFileName = dlg.FileName;
                     builder.Build();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                 }
             }
@@ -748,6 +800,9 @@ namespace WzComparerR2
             public Task PatchExecTask;
             public string LoggingFileName;
             public PatcherTaskState State;
+
+            public DeadPatchExecutionPlan deadPatchExecutionPlan;
+            public Dictionary<string, string> TemporaryFileMapping = new ();
 
             public CancellationToken CancellationToken => this.cancellationTokenSource.Token;
             private CancellationTokenSource cancellationTokenSource;
@@ -784,6 +839,80 @@ namespace WzComparerR2
             WaitForContinue = 2,
             Patching = 3,
             Complete = 4,
+        }
+
+        class DeadPatchExecutionPlan
+        {
+            public DeadPatchExecutionPlan()
+            {
+                this.FileUpdateDependencies = new Dictionary<string, List<string>>();
+            }
+
+            public Dictionary<string, List<string>> FileUpdateDependencies { get; private set; }
+
+            public void Build(IEnumerable<PatchPartContext> orderedParts)
+            {
+                /*
+                 *  for examle:
+                 *    fileName   | type | dependencies               
+                 *    -----------|------|---------------     
+                 *    Mob_000.wz | 1    | Mob_000.wz   (self update)
+                 *    Mob_001.wz | 1    | Mob_001.wz, Mob_002.wz  (merge data)
+                 *    Mob_002.wz | 1    | Mob_001.wz, Mob_002.wz  (merge data)
+                 *    Mob_003.wz | 1    | Mob_001.wz, Mob_002.wz  (balance size from other file)
+                 *                                                 
+                 *  fileLastDependecy:                             
+                 *    key        | value                           
+                 *    -----------|----------------                 
+                 *    Mob_000.wz | Mob_000.wz
+                 *    Mob_001.wz | Mob_003.wz
+                 *    Mob_002.wz | Mob_003.wz
+                 *    Mob_003.wz | Mob_003.wz
+                 *    
+                 *  FileUpdateDependencies:
+                 *    key        | value
+                 *    -----------|----------------
+                 *    Mob_000.wz | Mob000.wz
+                 *    Mob_003.wz | Mob001.wz, Mob002.wz, Mob003.wz
+                 */
+
+                // find the last dependency
+                Dictionary<string, string> fileLastDependecy = new();
+                foreach (var part in orderedParts)
+                {
+                    if (part.Type == 0)
+                    {
+                        fileLastDependecy[part.FileName] = part.FileName;
+                    }
+                    else if (part.Type == 1)
+                    {
+                        fileLastDependecy[part.FileName] = part.FileName;
+                        foreach (var dep in part.DependencyFiles)
+                        {
+                            fileLastDependecy[dep] = part.FileName;
+                        }
+                    }
+                }
+
+                // reverse key and value
+                this.FileUpdateDependencies.Clear();
+                foreach (var grp in fileLastDependecy.GroupBy(kv => kv.Value, kv => kv.Key))
+                {
+                    this.FileUpdateDependencies.Add(grp.Key, grp.ToList());
+                }
+            }
+
+            public bool Check(string fileName, out IReadOnlyList<string> filesCanInstantUpdate)
+            {
+                if (this.FileUpdateDependencies.TryGetValue(fileName, out var value) && value != null && value.Count > 0)
+                {
+                    filesCanInstantUpdate = value;
+                    return true;
+                }
+
+                filesCanInstantUpdate = null;
+                return false;
+            }
         }
     }
 }
