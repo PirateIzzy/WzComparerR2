@@ -1468,8 +1468,23 @@ namespace WzComparerR2.AvatarCommon
                         partNode.Add(Tuple.Create(hairNode, (Wz_Node)null, 100));
                     }
                 }
+                //cap
+                if (headNode != null && this.Cap != null && this.Cap.Visible)
+                {
+                    var capNode = FindActionFrameNode(this.Cap.Node, bodyAction);
+                    if (capNode == null)
+                    {
+                        string actName = this.GetHairActionName(bodyAction.Action, face);
+                        if (actName != null)
+                        {
+                            ActionFrame capAction = new ActionFrame() { Action = actName, Frame = 0 };
+                            capNode = FindActionFrameNode(this.Cap.Node, capAction);
+                        }
+                    }
+                    partNode.Add(Tuple.Create(capNode, (Wz_Node)null, 100));
+                }
                 //其他部件
-                for (int i = 4; i < 16; i++)
+                for (int i = 5; i < 16; i++)
                 {
                     var part = this.Parts[i];
                     if (part != null && part.Visible)
