@@ -433,7 +433,7 @@ namespace WzComparerR2.Avatar.UI
                 return;
             }
 
-            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10},{11}:{12}",
+            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10},{11}:{12}:{13}",
                 this.avatar.ActionName,
                 bodyFrame,
                 this.avatar.EmotionName,
@@ -446,7 +446,8 @@ namespace WzComparerR2.Avatar.UI
                 this.avatar.WeaponType,
                 this.avatar.WeaponIndex,
                 this.avatar.ActionName,
-                string.Join("_", effectFrames));
+                string.Join("_", effectFrames),
+                string.Join("_", this.avatar.EffectVisibles));
 
             if (!avatarContainer1.HasCache(actionTag))
             {
@@ -695,6 +696,7 @@ namespace WzComparerR2.Avatar.UI
                     btn.Checked = part.Visible;
                     btn.btnItemShow.Click += BtnItemShow_Click;
                     btn.btnItemDel.Click += BtnItemDel_Click;
+                    btn.chkShowEffect.Click += ChkShowEffect_Click;
                     btn.CheckedChanged += Btn_CheckedChanged;
                     btn.rdoMixColor0.CheckedChanged += RadioMixColor0_CheckedChanged;
                     btn.rdoMixColor1.CheckedChanged += RadioMixColor1_CheckedChanged;
@@ -733,6 +735,25 @@ namespace WzComparerR2.Avatar.UI
                     {
                         this.avatar.Parts[index] = null;
                         this.FillAvatarParts();
+                        this.UpdateDisplay();
+                    }
+                }
+            }
+        }
+
+        private void ChkShowEffect_Click(object sender, EventArgs e)
+        {
+            var btn = (sender as BaseItem).Parent as AvatarPartButtonItem;
+            if (btn != null)
+            {
+                var part = btn.Tag as AvatarPart;
+                part.EffectVisible = btn.chkShowEffect.Checked;
+                if (part != null)
+                {
+                    int index = Array.IndexOf(this.avatar.Parts, part);
+                    if (index > -1)
+                    {
+                        this.avatar.EffectVisibles[index] = btn.chkShowEffect.Checked;
                         this.UpdateDisplay();
                     }
                 }

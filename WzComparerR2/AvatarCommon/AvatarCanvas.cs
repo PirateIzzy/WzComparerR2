@@ -20,6 +20,7 @@ namespace WzComparerR2.AvatarCommon
             this.Emotions = new List<string>();
             this.TamingActions = new List<string>();
             this.EffectActions = new List<string>[18];
+            this.EffectVisibles = Enumerable.Repeat(true, 18).ToList();
             for (int i = 0; i < this.EffectActions.Length; i++)
             {
                 this.EffectActions[i] = new List<string>();
@@ -35,6 +36,7 @@ namespace WzComparerR2.AvatarCommon
         public List<string> Emotions { get; private set; }
         public List<string> TamingActions { get; private set; }
         public List<string>[] EffectActions { get; private set; }
+        public List<bool> EffectVisibles { get; private set; }
 
         public AvatarPart[] Parts { get; private set; }
         public string ActionName { get; set; }
@@ -1539,7 +1541,7 @@ namespace WzComparerR2.AvatarCommon
             List<Wz_Node> partNode = new List<Wz_Node>();
 
             //链接马
-            if (parent != null && parent.Visible && aFrame != null)
+            if (parent != null && parent.Visible && parent.EffectVisible && aFrame != null)
             {
                 partNode.Add(FindActionFrameNode(parent.effectNode, aFrame, true));
             }
