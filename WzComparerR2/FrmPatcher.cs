@@ -58,6 +58,15 @@ namespace WzComparerR2
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
             typedParts = Enum.GetValues(typeof(Wz_Type)).Cast<Wz_Type>().ToDictionary(type => type, type => new List<PatchPartContext>());
+
+            // Disable until the bug is fixed
+            this.chkCompare.Enabled = false;
+            this.cmbComparePng.Enabled = false;
+            this.chkOutputPng.Enabled = false;
+            this.chkResolvePngLink.Enabled = false;
+            this.chkOutputAddedImg.Enabled = false;
+            this.chkOutputRemovedImg.Enabled = false;
+            this.chkEnableDarkMode.Enabled = false;
         }
 
         public Encoding PatcherNoticeEncoding { get; set; }
@@ -284,6 +293,7 @@ namespace WzComparerR2
                 MSFolder = txtMSFolder.Text,
                 PrePatch = chkPrePatch.Checked,
                 DeadPatch = chkDeadPatch.Checked,
+                CompareFolder = compareFolder,
             };
             session.LoggingFileName = Path.Combine(session.MSFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
             session.PatchExecTask = Task.Run(() => this.ExecutePatchAsync(session, session.CancellationToken));
