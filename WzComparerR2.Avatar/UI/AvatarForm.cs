@@ -2145,7 +2145,6 @@ namespace WzComparerR2.Avatar.UI
                         if (item != null && item.Text == actionName)
                         {
                             cmbActionBody.SelectedIndex = (beforeIdx + i) % cmbActionBody.Items.Count;
-                            return;
                         }
                     }
                     //SelectBodyAction(actionName);
