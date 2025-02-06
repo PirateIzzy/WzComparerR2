@@ -7,6 +7,8 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
+using WzComparerR2.WzLib;
+using WzComparerR2.AvatarCommon;
 using static WzComparerR2.CharaSimControl.RenderHelper;
 
 namespace WzComparerR2.CharaSimControl
@@ -25,6 +27,7 @@ namespace WzComparerR2.CharaSimControl
         }
 
         public Mob MobInfo { get; set; }
+        private AvatarCanvasManager avatar { get; set; }
 
         public override Bitmap Render()
         {
@@ -151,6 +154,43 @@ namespace WzComparerR2.CharaSimControl
             Rectangle imgRect = Rectangle.Empty;
             Rectangle textRect = Measure(propBlocks);
             Bitmap mobImg = MobInfo.Default.Bitmap;
+            if (MobInfo.IsAvatarLook)
+            {
+                if (this.avatar == null)
+                {
+                    this.avatar = new AvatarCanvasManager();
+                }
+
+                foreach (var node in MobInfo.AvatarLook.Nodes)
+                {
+                    switch (node.Text)
+                    {
+                        case "skin":
+                            var skin = node.GetValueEx<int>(0);
+                            this.avatar.AddBodyFromSkin3(skin);
+                            break;
+
+                        case "ear":
+                            var type = node.GetValueEx<int>(0);
+                            this.avatar.SetEarType(type);
+                            break;
+
+                        default:
+                            var gearID = node.GetValueEx<int>(0);
+                            this.avatar.AddGear(gearID);
+                            break;
+                    }
+                }
+
+                var img = this.avatar.GetBitmapOrigin();
+                if (img.Bitmap != null)
+                {
+                    MobInfo.Default = img;
+                    mobImg = img.Bitmap;
+                }
+
+                this.avatar.ClearCanvas();
+            }
             if (mobImg != null)
             {
                 if (mobImg.Width > 250 || mobImg.Height > 300) //进行缩放

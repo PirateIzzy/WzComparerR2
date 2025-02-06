@@ -967,37 +967,52 @@ namespace WzComparerR2.MapRender
         private StateMachineAnimator CreateSMAnimator(Wz_Node node, ResourceLoader resLoader)
         {
             var aniData = new Dictionary<string, RepeatableFrameAnimationData>();
-            foreach (var actionNode in node.Nodes)
+            if ((node.Nodes["info"]?.Nodes["component"]?.Nodes?.Count ?? 0) > 0)
             {
-                var actName = actionNode.Text;
-                if (actName != "info" && !actName.StartsWith("condition"))
+                var componentNode = node.Nodes["info"]?.Nodes["component"];
+                foreach (var actName in new[] { "stand", "walk" })
                 {
-                    var ani = resLoader.LoadAnimationData(actionNode) as RepeatableFrameAnimationData;
+                    var ani = resLoader.LoadAvatarAnimationData(componentNode, actName) as RepeatableFrameAnimationData;
                     if (ani != null)
                     {
                         aniData.Add(actName, ani);
                     }
                 }
             }
-            long date = Int64.Parse(Date.ToString("yyyyMMddHHmm"));
-            foreach (var conditionNode in node.Nodes.Where(n => n.Text.StartsWith("condition")))
+            else
             {
-                if ((conditionNode.Nodes.Any(n => n.Text.All(char.IsDigit)) && conditionNode.Nodes.Where(n => n.Text.All(char.IsDigit)).All(n => resLoader.PatchVisibility.IsQuestVisibleExact(int.Parse(n.Text), Convert.ToInt32(n.Value)))) || (conditionNode.Nodes["dateStart"].GetValueEx<long>(0) <= date && date <= conditionNode.Nodes["dateEnd"].GetValueEx<long>(0)))
+                foreach (var actionNode in node.Nodes)
                 {
-                    aniData.Clear();
-                    foreach (var conditionedActionNode in conditionNode.Nodes)
+                    var actName = actionNode.Text;
+                    if (actName != "info" && !actName.StartsWith("condition"))
                     {
-                        var conditionedActName = conditionedActionNode.Text;
-                        if (conditionedActName != "dateStart" && conditionedActName != "dateEnd")
+                        var ani = resLoader.LoadAnimationData(actionNode) as RepeatableFrameAnimationData;
+                        if (ani != null)
                         {
-                            var ani = resLoader.LoadAnimationData(conditionedActionNode) as RepeatableFrameAnimationData;
-                            if (ani != null)
-                            {
-                                aniData.Add(conditionNode.Text + "/" + conditionedActName, ani);
-                            }
+                            aniData.Add(actName, ani);
                         }
                     }
-                    break;
+                }
+                long date = Int64.Parse(Date.ToString("yyyyMMddHHmm"));
+                foreach (var conditionNode in node.Nodes.Where(n => n.Text.StartsWith("condition")))
+                {
+                    if ((conditionNode.Nodes.Any(n => n.Text.All(char.IsDigit)) && conditionNode.Nodes.Where(n => n.Text.All(char.IsDigit)).All(n => resLoader.PatchVisibility.IsQuestVisibleExact(int.Parse(n.Text), Convert.ToInt32(n.Value)))) || (conditionNode.Nodes["dateStart"].GetValueEx<long>(0) <= date && date <= conditionNode.Nodes["dateEnd"].GetValueEx<long>(0)))
+                    {
+                        aniData.Clear();
+                        foreach (var conditionedActionNode in conditionNode.Nodes)
+                        {
+                            var conditionedActName = conditionedActionNode.Text;
+                            if (conditionedActName != "dateStart" && conditionedActName != "dateEnd")
+                            {
+                                var ani = resLoader.LoadAnimationData(conditionedActionNode) as RepeatableFrameAnimationData;
+                                if (ani != null)
+                                {
+                                    aniData.Add(conditionNode.Text + "/" + conditionedActName, ani);
+                                }
+                            }
+                        }
+                        break;
+                    }
                 }
             }
             if (aniData.Count > 0)
@@ -1084,7 +1099,7 @@ namespace WzComparerR2.MapRender
 
         private void AddNpcAI(StateMachineAnimator ani)
         {
-            var actions = new[] { "stand", "say", "mouse", "move", "hand", "laugh", "eye" };
+            var actions = new[] { "stand", "say", "mouse", "move", "hand", "laugh", "eye", "walk" };
             var availActions = ani.Data.States.Where(act => !act.EndsWith("_old") && Array.Exists(actions, acts => act.Contains(acts))).ToArray();
             if (availActions.Length > 0)
             {

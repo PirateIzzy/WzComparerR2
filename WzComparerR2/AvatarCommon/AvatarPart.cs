@@ -6,7 +6,7 @@ using WzComparerR2.CharaSim;
 using WzComparerR2.WzLib;
 using System.Text.RegularExpressions;
 
-namespace WzComparerR2.Avatar
+namespace WzComparerR2.AvatarCommon
 {
     public class AvatarPart
     {

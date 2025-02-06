@@ -8,6 +8,7 @@ using WzComparerR2.Common;
 using WzComparerR2.PluginBase;
 using WzComparerR2.Rendering;
 using WzComparerR2.WzLib;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.MapRender
 {
@@ -83,6 +84,22 @@ namespace WzComparerR2.MapRender
             if (!loadedAnimationData.TryGetValue(assetName, out aniData))
             {
                 aniData = InnerLoadAnimationData(node);
+                if (aniData == null)
+                {
+                    return null;
+                }
+                loadedAnimationData[assetName] = aniData;
+            }
+            return aniData;
+        }
+
+        public object LoadAvatarAnimationData(Wz_Node node, string action)
+        {
+            object aniData;
+            string assetName = string.Join("\\", new[] { node.FullPathToFile, action });
+            if (!loadedAnimationData.TryGetValue(assetName, out aniData))
+            {
+                aniData = InnerLoadAvatarAnimationData(node, action);
                 if (aniData == null)
                 {
                     return null;
@@ -348,6 +365,48 @@ namespace WzComparerR2.MapRender
                         return new RepeatableFrameAnimationData(frames) { Repeat = repeat };
                     }
                 }
+            }
+            return null;
+        }
+
+        private object InnerLoadAvatarAnimationData(Wz_Node node, string action)
+        {
+            if (node != null && (node = node.ResolveUol()) != null)
+            {
+                var frames = new List<Frame>();
+
+                var avatar = new AvatarCanvasManager();
+
+                foreach (var component in node.Nodes)
+                {
+                    switch (component.Text)
+                    {
+                        case "skin":
+                            var skin = component.GetValueEx<int>(0);
+                            avatar.AddBodyFromSkin3(skin);
+                            break;
+
+                        case "ear":
+                            var type = component.GetValueEx<int>(0);
+                            avatar.SetEarType(type);
+                            break;
+
+                        default:
+                            var gearID = component.GetValueEx<int>(0);
+                            avatar.AddGear(gearID);
+                            break;
+                    }
+                }
+
+                for (int i = 0; i < avatar.GetActionFrameCount(action + "1"); i++)
+                {
+                    var frame = avatar.GetTexture2DFrame(action + "1", "default", i, 0, 0, this.GraphicsDevice);
+                    frames.Add(frame);
+                }
+
+                avatar.ClearCanvas();
+
+                return new RepeatableFrameAnimationData(frames) { Repeat = true };
             }
             return null;
         }

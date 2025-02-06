@@ -10,6 +10,7 @@ using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.WzLib;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -34,6 +35,7 @@ namespace WzComparerR2.CharaSimControl
         private CharacterStatus charStat;
 
         public Gear Gear { get; set; }
+        private AvatarCanvasManager avatar;
 
         public override object TargetItem
         {
@@ -434,18 +436,57 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.type == GearType.android && Gear.Props.TryGetValue(GearPropType.android, out value) && value > 0)
             {
                 TextRenderer.DrawText(g, "외형 :", GearGraphics.EquipDetailFont, new Point(13, picH), Color.White, TextFormatFlags.NoPadding);
-                picH += 15;
+                //picH += 15;
 
                 Wz_Node android = PluginBase.PluginManager.FindWz(string.Format("Etc/Android/{0:D4}.img", value));
-
-                int morphID = android?.Nodes["info"]?.Nodes["morphID"]?.GetValueEx<int>(0) ?? 0;
-                BitmapOrigin appearance = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(morphID != 0 ? string.Format("Morph/{0:D4}.img/stand/0", morphID) : "Npc/0010300.img/stand/0"), PluginBase.PluginManager.FindWz);
-                appearance.Bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
-
-                g.DrawImage(appearance.Bitmap, 63, picH + 9);
-                picH += 9 + appearance.Bitmap.Height + 13;
-
                 Wz_Node costume = android?.Nodes["costume"];
+                Wz_Node basic = android?.Nodes["basic"];
+
+                BitmapOrigin appearance;
+                int morphID = android?.Nodes["info"]?.Nodes["morphID"]?.GetValueEx<int>(0) ?? 0;
+                if (morphID != 0)
+                {
+                    appearance = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(string.Format("Morph/{0:D4}.img/stand/0", morphID)), PluginBase.PluginManager.FindWz);
+                }
+                else
+                {
+                    if (this.avatar == null)
+                    {
+                        this.avatar = new AvatarCanvasManager();
+                    }
+
+                    var skin = costume?.Nodes["skin"]?.Nodes["0"].GetValueEx<int>(2015);
+                    var hair = costume?.Nodes["hair"]?.Nodes["0"].GetValueEx<int>(30000);
+                    var face = costume?.Nodes["face"]?.Nodes["0"].GetValueEx<int>(20000);
+
+                    this.avatar.AddBodyFromSkin4((int)skin);
+                    this.avatar.AddGears([(int)hair, (int)face]);
+
+                    if (basic != null)
+                    {
+                        foreach (var node in basic.Nodes)
+                        {
+                            var gearID = node.GetValueEx<int>(0);
+                            this.avatar.AddGear(gearID);
+                        }
+                    }
+
+                    appearance = this.avatar.GetBitmapOrigin();
+
+                    this.avatar.ClearCanvas();
+                }
+                //BitmapOrigin appearance = BitmapOrigin.CreateFromNode(PluginBase.PluginManager.FindWz(morphID != 0 ? string.Format("Morph/{0:D4}.img/stand/0", morphID) : "Npc/0010300.img/stand/0"), PluginBase.PluginManager.FindWz);
+
+                //appearance.Bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
+
+                var imgrect = new Rectangle(Math.Max(appearance.Origin.X - 50, 0),
+                    Math.Max(appearance.Origin.Y - 100, 0),
+                    Math.Min(appearance.Bitmap.Width, appearance.Origin.X + 50) - Math.Max(appearance.Origin.X - 50, 0),
+                    Math.Min(appearance.Origin.Y, 100));
+
+                g.DrawImage(appearance.Bitmap, 88 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
+                picH += 100;
+
                 List<string> randomParts = new List<string>();
                 if (costume?.Nodes["face"]?.Nodes["1"] != null)
                 {

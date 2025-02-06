@@ -42,6 +42,11 @@ namespace WzComparerR2.CharaSim
             get { return GetBooleanValue(ItemPropType.timeLimited); }
         }
 
+        public bool ShowCosmetic
+        {
+            get { return this.Specs.TryGetValue(ItemSpecType.cosmetic, out long value) && value > 0; }
+        }
+
         public bool GetBooleanValue(ItemPropType type)
         {
             return this.Props.TryGetValue(type, out long value) && value != 0;

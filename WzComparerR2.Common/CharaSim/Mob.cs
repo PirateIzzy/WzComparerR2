@@ -61,6 +61,14 @@ namespace WzComparerR2.CharaSim
         public BitmapOrigin Default { get; set; }
         //public LifeAnimateCollection Animates { get; private set; }
 
+        public Wz_Node AvatarLook { get; set; }
+        public bool IsAvatarLook
+        {
+            get
+            {
+                return this.AvatarLook != null;
+            }
+        }
 
         public static Mob CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
         {
@@ -117,6 +125,8 @@ namespace WzComparerR2.CharaSim
                         case "link": mobInfo.Link = propNode.GetValueEx<int>(0); break;
                         case "skeleton": mobInfo.Skeleton = propNode.GetValueEx<int>(0) != 0; break;
                         case "jsonLoad": mobInfo.JsonLoad = propNode.GetValueEx<int>(0) != 0; break;
+
+                        case "avatarLook": mobInfo.AvatarLook = propNode; break;
 
                         //case "skill": LoadSkill(mobInfo, propNode); break;
                         //case "attack": LoadAttack(mobInfo, propNode); break;

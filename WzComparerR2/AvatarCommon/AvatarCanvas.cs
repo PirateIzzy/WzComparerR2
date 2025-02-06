@@ -9,7 +9,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.CharaSim;
 using System.Text.RegularExpressions;
 
-namespace WzComparerR2.Avatar
+namespace WzComparerR2.AvatarCommon
 {
     public class AvatarCanvas
     {
@@ -320,7 +320,10 @@ namespace WzComparerR2.Avatar
                 case GearType.hair:
                 case GearType.hair2:
                 case GearType.hair3: this.Hair = part; break;
-                case GearType.cap: this.Cap = part; break;
+                case GearType.cap:
+                    this.Cap = part;
+                    this.CapType = part.VSlot;// sets CapType
+                    break;
                 case GearType.coat: this.Coat = part; break;
                 case GearType.longcoat: this.Longcoat = part; break;
                 case GearType.pants: this.Pants = part; break;
