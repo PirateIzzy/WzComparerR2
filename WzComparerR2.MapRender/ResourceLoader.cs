@@ -358,6 +358,11 @@ namespace WzComparerR2.MapRender
                         Wz_Node frameNode;
                         for (int i = 0; (frameNode = node.Nodes[i.ToString()]) != null; i++)
                         {
+                            if (i == 0 && frameNode?.Value == null)
+                            {
+                                return InnerLoadAnimationData(frameNode);
+                            }
+
                             var frame = LoadFrame(frameNode);
                             frames.Add(frame);
                         }
