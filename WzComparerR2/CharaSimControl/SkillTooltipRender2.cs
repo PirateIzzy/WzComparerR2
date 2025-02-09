@@ -27,6 +27,7 @@ namespace WzComparerR2.CharaSimControl
 
         public bool ShowProperties { get; set; } = true;
         public bool ShowDelay { get; set; }
+        public bool ShowArea { get; set; }
         public bool ShowReqSkill { get; set; } = true;
         public bool DisplayCooltimeMSAsSec { get; set; } = true;
         public bool DisplayPermyriadAsPercent { get; set; } = true;
@@ -201,25 +202,21 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Skill.IsSequenceOn)
             {
+                string colortag = "#c";
                 if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("isSequenceOn"))
                 {
-                    GearGraphics.DrawString(g, "#$g스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                    colortag = "#$g";
                 }
-                else
-                {
-                    GearGraphics.DrawString(g, "#c스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                }
+                GearGraphics.DrawString(g, colortag + "스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             if (Skill.IsPetAutoBuff)
             {
+                string colortag = "#c";
                 if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("isPetAutoBuff"))
                 {
-                    GearGraphics.DrawString(g, "#$g펫 버프 자동스킬 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                    colortag = "#$g";
                 }
-                else
-                {
-                    GearGraphics.DrawString(g, "#c펫 버프 자동스킬 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                }
+                GearGraphics.DrawString(g, colortag + "펫 버프 자동스킬 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             /*if (Skill.ReqLevel > 0)
             {
@@ -388,6 +385,24 @@ namespace WzComparerR2.CharaSimControl
                 foreach (string action in Skill.Action)
                 {
                     skillDescEx.Add("#c[딜레이] " + action + ": " + CharaSimLoader.GetActionDelay(action, this.wzNode) + " ms#");
+                }
+            }
+
+            if (ShowArea && Skill.Lt.Count > 0)
+            {
+                foreach (var kv in Skill.Lt)
+                {
+                    if (!Skill.Rb.ContainsKey(kv.Key))
+                    {
+                        continue;
+                    }
+                    string colortag = "";
+                    if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && (DiffSkillTags[skillIDstr].Contains("lt" + kv.Key) || DiffSkillTags[skillIDstr].Contains("rb" + kv.Key)))
+                    {
+                        colortag = "#$g";
+                    }
+                    skillDescEx.Add("#c[범위" + kv.Key + "(px)] " + colortag + "좌: " + kv.Value.X + ", 우: " + Skill.Rb[kv.Key].X + ", 상: " + kv.Value.Y + ", 하: " + Skill.Rb[kv.Key].Y + "" +
+                        ", 영역: " + Math.Abs(Skill.Rb[kv.Key].X - kv.Value.X) + " x " + Math.Abs(kv.Value.Y - Skill.Rb[kv.Key].Y) + "#");
                 }
             }
 

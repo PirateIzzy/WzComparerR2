@@ -226,6 +226,7 @@ namespace WzComparerR2
             tooltipQuickView.SkillRender.ShowProperties = Setting.Skill.ShowProperties;
             tooltipQuickView.SkillRender.ShowObjectID = Setting.Skill.ShowID;
             tooltipQuickView.SkillRender.ShowDelay = Setting.Skill.ShowDelay;
+            tooltipQuickView.SkillRender.ShowArea = Setting.Skill.ShowArea;
             tooltipQuickView.SkillRender.DisplayCooltimeMSAsSec = Setting.Skill.DisplayCooltimeMSAsSec;
             tooltipQuickView.SkillRender.DisplayPermyriadAsPercent = Setting.Skill.DisplayPermyriadAsPercent;
             tooltipQuickView.SkillRender.IgnoreEvalError = Setting.Skill.IgnoreEvalError;
