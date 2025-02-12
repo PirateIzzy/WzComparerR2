@@ -1454,6 +1454,11 @@ namespace WzComparerR2
                 case Wz_Video video:
                     textBoxX1.Text = "dataLength: " + video.Length + " bytes\r\n" +
                         "offset: " + video.Offset;
+                    if (this.pictureBoxEx1.ShowOverlayAni) break; // 애니메이션 중첩 중일때는 자동 video 미리보기 없음
+                    var videoFrameData = this.pictureBoxEx1.LoadVideo(video);
+                    pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                    this.pictureBoxEx1.ShowAnimation(videoFrameData);
+                    this.cmbItemAniNames.Items.Clear();
                     break;
 
                 default:
