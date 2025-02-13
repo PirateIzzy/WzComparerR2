@@ -42,6 +42,7 @@ namespace WzComparerR2.CharaSim
         public int PlatinumHammer { get; set; }
         public bool CanPotential { get; internal set; }
         public string EpicHs { get; internal set; }
+        public BitmapOrigin ToolTIpPreview { get; set; }
 
         public bool FixLevel { get; internal set; }
         public List<GearLevelInfo> Levels { get; internal set; }
@@ -654,6 +655,13 @@ namespace WzComparerR2.CharaSim
                             if (subNode.Value is Wz_Uol || subNode.Value is Wz_Png)
                             {
                                 gear.Sample = BitmapOrigin.CreateFromNode(subNode, findNode);
+                            }
+                            break;
+
+                        case "toolTipPreview":
+                            if (subNode.Value is Wz_Uol || subNode.Value is Wz_Png)
+                            {
+                                gear.ToolTIpPreview = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
                             break;
 

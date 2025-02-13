@@ -109,7 +109,7 @@ namespace WzComparerR2.CharaSim
 
                 case GearPropType.only: return value == 0 ? null : "고유 아이템";
                 case GearPropType.tradeBlock: return value == 0 ? null : "교환 불가";
-                case GearPropType.equipTradeBlock: return value == 0 ? null : "장착시 교환 불가";
+                case GearPropType.equipTradeBlock: return value == 0 ? null : "장착 시 교환 불가";
                 case GearPropType.accountSharable: return value == 0 ? null : "월드 내 나의 캐릭터 간 이동만 가능";
                 case GearPropType.sharableOnce: return value == 0 ? null : "월드 내 나의 캐릭터 간 1회 이동 가능\n(이동 후 교환불가)";
                 case GearPropType.onlyEquip: return value == 0 ? null : "고유장착 아이템";
