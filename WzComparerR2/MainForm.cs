@@ -30,7 +30,6 @@ using WzComparerR2.Controls;
 using WzComparerR2.Encoders;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
-using Microsoft.Xna.Framework.Media;
 
 namespace WzComparerR2
 {
