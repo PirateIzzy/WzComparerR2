@@ -30,6 +30,7 @@ using WzComparerR2.Controls;
 using WzComparerR2.Encoders;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
+using Microsoft.Xna.Framework.Media;
 
 namespace WzComparerR2
 {
@@ -605,6 +606,20 @@ namespace WzComparerR2
                 if (pngFrameData != null)
                 {
                     this.pictureBoxEx1.ShowOverlayAnimation(pngFrameData, true);
+                    this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemSkins.Visible = false;
+                    this.pictureBoxEx1.PictureName = aniName;
+                }
+
+                return;
+            }
+            else if (node.Value is Wz_Video)
+            {
+                var videoFrameData = this.pictureBoxEx1.LoadVideo(node.Value as Wz_Video);
+
+                if (videoFrameData != null)
+                {
+                    this.pictureBoxEx1.ShowOverlayAnimation(videoFrameData, true);
                     this.cmbItemAniNames.Items.Clear();
                     this.cmbItemSkins.Visible = false;
                     this.pictureBoxEx1.PictureName = aniName;
