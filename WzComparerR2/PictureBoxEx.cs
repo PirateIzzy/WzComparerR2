@@ -137,9 +137,9 @@ namespace WzComparerR2
         }
 
         // 애니메이션 중첩
-        public void ShowOverlayAnimation(FrameAnimationData data, bool isPngFrameAni = false)
+        public void ShowOverlayAnimation(FrameAnimationData data, string multiFrameInfo = null, bool isPngFrameAni = false)
         {
-            this.ShowOverlayAnimation(new FrameAnimator(data), isPngFrameAni);
+            this.ShowOverlayAnimation(new FrameAnimator(data), multiFrameInfo, isPngFrameAni);
         }
 
         public void ShowAnimation(AnimationItem animator)
@@ -165,7 +165,7 @@ namespace WzComparerR2
         }
 
         // 애니메이션 중첩
-        public void ShowOverlayAnimation(AnimationItem animator, bool isPngFrameAni)
+        public void ShowOverlayAnimation(AnimationItem animator, string multiFrameInfo, bool isPngFrameAni)
         {
             if (!ShowOverlayAni)
             {
@@ -185,7 +185,7 @@ namespace WzComparerR2
 
             FrameAnimator aniItem = (FrameAnimator)animator;
 
-            var frmOverlayAniOptions = new FrmOverlayAniOptions(0, aniItem.Data.Frames.Count - 1, isPngFrameAni);
+            var frmOverlayAniOptions = new FrmOverlayAniOptions(0, aniItem.Data.Frames.Count - 1, multiFrameInfo, isPngFrameAni);
             int delayOffset = 0;
             int moveX = 0;
             int moveY = 0;
