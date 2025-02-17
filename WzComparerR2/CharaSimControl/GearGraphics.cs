@@ -768,6 +768,7 @@ namespace WzComparerR2.CharaSimControl
                     switch (colorID)
                     {
                         case "c": color = GearGraphics.OrangeBrushColor; break;
+                        case "$g": color = GearGraphics.gearCyanColor; break;
                         default: color = this.defaultColor; break;
                     }
                 }

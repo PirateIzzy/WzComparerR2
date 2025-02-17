@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -199,7 +200,7 @@ namespace WzComparerR2
         /// </summary>
         internal void PluginOnLoad()
         {
-            ConfigManager.RegisterAllSection();
+            ConfigManager.RegisterAllSection(this.GetType().Assembly);
             var conf = ImageHandlerConfig.Default;
             //刷新最近打开文件列表
             refreshRecentDocItems();
@@ -231,6 +232,7 @@ namespace WzComparerR2
             tooltipQuickView.SkillRender.ShowProperties = Setting.Skill.ShowProperties;
             tooltipQuickView.SkillRender.ShowObjectID = Setting.Skill.ShowID;
             tooltipQuickView.SkillRender.ShowDelay = Setting.Skill.ShowDelay;
+            tooltipQuickView.SkillRender.ShowArea = Setting.Skill.ShowArea;
             tooltipQuickView.SkillRender.DisplayCooltimeMSAsSec = Setting.Skill.DisplayCooltimeMSAsSec;
             tooltipQuickView.SkillRender.DisplayPermyriadAsPercent = Setting.Skill.DisplayPermyriadAsPercent;
             tooltipQuickView.SkillRender.IgnoreEvalError = Setting.Skill.IgnoreEvalError;
@@ -623,6 +625,20 @@ namespace WzComparerR2
                 if (pngFrameData != null)
                 {
                     this.pictureBoxEx1.ShowOverlayAnimation(pngFrameData, true);
+                    this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemSkins.Visible = false;
+                    this.pictureBoxEx1.PictureName = aniName;
+                }
+
+                return;
+            }
+            else if (node.Value is Wz_Video)
+            {
+                var videoFrameData = this.pictureBoxEx1.LoadVideo(node.Value as Wz_Video);
+
+                if (videoFrameData != null)
+                {
+                    this.pictureBoxEx1.ShowOverlayAnimation(videoFrameData, true);
                     this.cmbItemAniNames.Items.Clear();
                     this.cmbItemSkins.Visible = false;
                     this.pictureBoxEx1.PictureName = aniName;
@@ -1472,6 +1488,11 @@ namespace WzComparerR2
                 case Wz_Video video:
                     textBoxX1.Text = "dataLength: " + video.Length + " bytes\r\n" +
                         "offset: " + video.Offset;
+                    if (this.pictureBoxEx1.ShowOverlayAni) break; // 애니메이션 중첩 중일때는 자동 video 미리보기 없음
+                    var videoFrameData = this.pictureBoxEx1.LoadVideo(video);
+                    pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                    this.pictureBoxEx1.ShowAnimation(videoFrameData);
+                    this.cmbItemAniNames.Items.Clear();
                     break;
 
                 default:
@@ -3172,19 +3193,19 @@ namespace WzComparerR2
             {
                 case Keys.Escape:
                     frm.Hide();
-                    break;
+                    return;
                 case Keys.Up:
                     frm.Top -= 1;
-                    break;
+                    return;
                 case Keys.Down:
                     frm.Top += 1;
-                    break;
+                    return;
                 case Keys.Left:
                     frm.Left -= 1;
-                    break;
+                    return;
                 case Keys.Right:
                     frm.Left += 1;
-                    break;
+                    return;
             }
 
             Skill skill = frm.TargetItem as Skill;
@@ -3208,6 +3229,8 @@ namespace WzComparerR2
                     case Keys.OemCloseBrackets:
                         skill.Level += this.skillInterval;
                         break;
+                    default:
+                        return;
                 }
                 frm.Refresh();
             }

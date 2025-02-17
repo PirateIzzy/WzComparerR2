@@ -6,7 +6,7 @@ using WzComparerR2.CharaSim;
 using WzComparerR2.WzLib;
 using System.Text.RegularExpressions;
 
-namespace WzComparerR2.Avatar
+namespace WzComparerR2.AvatarCommon
 {
     public class AvatarPart
     {
@@ -14,6 +14,7 @@ namespace WzComparerR2.Avatar
         {
             this.Node = node;
             this.Visible = true;
+            this.EffectVisible = true;
             this.LoadInfo();
             this.LoadMixNodes();
             this.MixColor = this.BaseColor;
@@ -32,6 +33,7 @@ namespace WzComparerR2.Avatar
         public string VSlot { get; private set; }
         public BitmapOrigin Icon { get; private set; }
         public bool Visible { get; set; }
+        public bool EffectVisible { get; set; }
         public int? ID { get; private set; }
         public bool IsSkill { get; private set; }
         public Wz_Vector bodyRelMove { get; set; }

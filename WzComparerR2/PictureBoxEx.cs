@@ -8,7 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
+using SpineV2 = Spine.V2;
 using WzComparerR2.Animation;
 using WzComparerR2.Common;
 using WzComparerR2.Config;
@@ -77,6 +78,11 @@ namespace WzComparerR2
             this.ShowAnimation(frameData);
         }
 
+        public FrameAnimationData LoadVideo(Wz_Video wzVideo)
+        {
+            return new MaplestoryCanvasVideoLoader().Load(wzVideo, this.GraphicsDevice);
+        }
+
         public FrameAnimationData LoadFrameAnimation(Wz_Node node, FrameAnimationCreatingOptions options = default)
         {
             return FrameAnimationData.CreateFromNode(node, this.GraphicsDevice, options, PluginBase.PluginManager.FindWz);
@@ -140,7 +146,12 @@ namespace WzComparerR2
         {
             if (this.Items.Count > 0)
             {
+                var itemsCopy = new List<AnimationItem>(this.Items);
                 this.Items.Clear();
+                foreach (var aniItem in itemsCopy)
+                {
+                    this.DisposeAnimationItem(aniItem);
+                }
             }
 
             this.Items.Add(animator);
@@ -722,6 +733,62 @@ namespace WzComparerR2
                     base.GlobalScale,
                     aniItem.Length <= 0 ? 0 : (time % aniItem.Length),
                     aniItem.Length);
+            }
+        }
+
+        private void DisposeAnimationItem(AnimationItem animationItem)
+        {
+            switch (animationItem)
+            {
+                case FrameAnimator frameAni:
+                    if (frameAni.Data?.Frames != null)
+                    {
+                        foreach (var frame in frameAni.Data.Frames)
+                        {
+                            if (frame.Texture != null && !frame.Texture.IsDisposed)
+                            {
+                                frame.Texture.Dispose();
+                            }
+                        }
+                    }
+                    break;
+                case SpineAnimatorV2 spineV2:
+                    if (spineV2.Skeleton != null)
+                    {
+                        foreach(var slot in spineV2.Skeleton.Slots.Items)
+                        {
+                            var atlasRegion = (slot.Attachment switch
+                            {
+                                SpineV2.MeshAttachment mesh => mesh.RendererObject,
+                                SpineV2.RegionAttachment region => region.RendererObject,
+                                SpineV2.SkinnedMeshAttachment skinnedMesh => skinnedMesh.RendererObject,
+                                _ => null
+                            }) as SpineV2.AtlasRegion;
+                            if (atlasRegion?.page?.rendererObject is Texture2D texture && !texture.IsDisposed)
+                            {
+                                texture.Dispose();
+                            }
+                        }
+                    }
+                    break;
+                case SpineAnimatorV4 spineV4:
+                    if (spineV4.Skeleton != null)
+                    {
+                        foreach (var slot in spineV4.Skeleton.Slots.Items)
+                        {
+                            var atlasRegion = (slot.Attachment switch
+                            {
+                                Spine.MeshAttachment mesh => mesh.Region,
+                                Spine.RegionAttachment region => region.Region,
+                                _ => null
+                            }) as Spine.AtlasRegion;
+                            if (atlasRegion?.page?.rendererObject is Texture2D texture && !texture.IsDisposed)
+                            {
+                                texture.Dispose();
+                            }
+                        }
+                    }
+                    break;
             }
         }
     }

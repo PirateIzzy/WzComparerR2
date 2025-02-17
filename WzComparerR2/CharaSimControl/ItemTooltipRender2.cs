@@ -11,6 +11,7 @@ using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -51,6 +52,7 @@ namespace WzComparerR2.CharaSimControl
         public TooltipRender LinkRecipeItemRender { get; set; }
         public TooltipRender SetItemRender { get; set; }
         public TooltipRender CashPackageRender { get; set; }
+        private AvatarCanvasManager avatar { get; set; }
 
         public override Bitmap Render()
         {
@@ -583,7 +585,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 3;
             }
 
-            int right = tooltip.Width - 18;
+            int right = tooltip.Width - 30;
 
             string desc = null;
             if (item.Level > 0)
@@ -780,6 +782,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 GearGraphics.DrawString(g, "Tip: You can control what your\n\r pet says once it reaches Lv. 15.", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
                 GearGraphics.DrawString(g, "#cEx) /Pet [what to say]#", GearGraphics.ItemDetailFont, new Dictionary<string, Color>() { { "c", ((SolidBrush)GearGraphics.OrangeBrush4).Color } }, 100, right, ref picH, 16);
+
             }
 
             string incline = null;
@@ -817,7 +820,7 @@ namespace WzComparerR2.CharaSimControl
             long minLev = 0, maxLev = 0;
             bool willDrawExp = item.Props.TryGetValue(ItemPropType.exp_minLev, out minLev) && item.Props.TryGetValue(ItemPropType.exp_maxLev, out maxLev);
 
-            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || willDrawNickTag || willDrawExp)
+            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || item.ShowCosmetic || willDrawNickTag || willDrawExp)
             {
                 if (picH < iconY + 84)
                 {
@@ -893,26 +896,76 @@ namespace WzComparerR2.CharaSimControl
                         picH += 2;
                     }
                 }
+                if (this.item.Specs.TryGetValue(ItemSpecType.cosmetic, out value) && value > 0)
+                {
+                    if (this.avatar == null)
+                    {
+                        this.avatar = new AvatarCanvasManager();
+                    }
+
+                    if (value < 1000)
+                    {
+                        this.avatar.AddBodyFromSkin3((int)value);
+                    }
+                    else
+                    {
+                        this.avatar.AddBodyFromSkin4(2015);
+                        this.avatar.AddHairOrFace((int)value, true);
+                    }
+
+                    this.avatar.AddGears([1042194, 1062153]);
+
+                    var frame = this.avatar.GetBitmapOrigin();
+                    if (frame.Bitmap != null)
+                    {
+                        picH += 9;
+                        g.DrawImage(frame.Bitmap, tooltip.Width / 2 - frame.Origin.X, picH);
+                        picH += frame.Bitmap.Height;
+                        picH += 2;
+                    }
+
+                    this.avatar.ClearCanvas();
+                }
                 if (item.SamplePath != null)
                 {
                     Wz_Node sampleNode = PluginManager.FindWz(item.SamplePath);
-                    int sampleW = 15;
-                    for (int i = 1; ; i++)
+                    // Workaround for KMST 1.2.1184
+                    if (sampleNode == null && item.SamplePath.Contains("ChatEmoticon.img"))
                     {
-                        Wz_Node effectNode = sampleNode.FindNodeByPath(string.Format("{0}{1:D4}\\effect\\0", sampleNode.Text, i));
-                        if (effectNode == null)
-                        {
-                            break;
-                        }
+                        sampleNode = PluginManager.FindWz(item.SamplePath.Replace("ChatEmoticon.img/", "ChatEmoticon.img/Emoticon/"));
+                    }
 
-                        BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz);
-                        if (sampleW + 87 >= tooltip.Width)
+                    if (sampleNode != null)
+                    {
+                        if (sampleNode?.Text == "effect")
                         {
-                            picH += 62;
-                            sampleW = 15;
+                            Wz_Node effectNode = sampleNode.Nodes["0"];
+                            BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz);
+                            g.DrawImage(effect.Bitmap, 38 + (85 - effect.Bitmap.Width - 1) / 2, picH - 8 + (62 - effect.Bitmap.Height - 1) / 2);
+                            picH += 73;
                         }
-                        g.DrawImage(effect.Bitmap, sampleW + (85 - effect.Bitmap.Width - 1) / 2, picH + (62 - effect.Bitmap.Height - 1) / 2);
-                        sampleW += 87;
+                        else
+                        {
+                            int sampleW = 15;
+                            for (int i = 1; ; i++)
+                            {
+                                Wz_Node effectNode = sampleNode.FindNodeByPath(string.Format("{0}{1:D4}\\effect\\0", sampleNode.Text, i));
+                                if (effectNode == null)
+                                {
+                                    break;
+                                }
+
+                                BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz);
+                                if (sampleW + 87 >= tooltip.Width)
+                                {
+                                    picH += 62;
+                                    sampleW = 15;
+                                }
+                                g.DrawImage(effect.Bitmap, sampleW + (85 - effect.Bitmap.Width - 1) / 2, picH + (62 - effect.Bitmap.Height - 1) / 2);
+                                sampleW += 87;
+                            }
+                            picH += 62;
+                        }
                     }
                     picH += 62;
                 }
@@ -1006,7 +1059,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 6;
             }
 
-            picH = Math.Max(iconY + 94, picH + 6);
+            picH = Math.Max(iconY + 103, picH + 15);
             return tooltip;
         }
 

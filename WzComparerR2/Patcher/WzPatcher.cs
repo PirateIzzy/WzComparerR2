@@ -633,6 +633,7 @@ namespace WzComparerR2.Patcher
             {
                 skipUpdate = false;
                 var oldWzFile = openFile(part.FileName);
+                part.OldFileLength = (int)oldWzFile.Length;
                 this.OnVerifyOldChecksumBegin(part);
                 uint oldCheckSumActual = CheckSum.ComputeHash(oldWzFile, oldWzFile.Length);
                 this.OnVerifyOldChecksumEnd(part);

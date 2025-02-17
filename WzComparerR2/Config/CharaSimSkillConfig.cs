@@ -29,6 +29,13 @@ namespace WzComparerR2.Config
             set { this["showDelay"] = value; }
         }
 
+        [ConfigurationProperty("showArea", DefaultValue = true)]
+        public bool ShowArea
+        {
+            get { return (bool)this["showArea"]; }
+            set { this["showArea"] = value; }
+        }
+
         [ConfigurationProperty("showReqSkill", DefaultValue = true)]
         public bool ShowReqSkill
         {

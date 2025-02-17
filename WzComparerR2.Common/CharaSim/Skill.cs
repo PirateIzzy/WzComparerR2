@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2.CharaSim
@@ -17,6 +18,8 @@ namespace WzComparerR2.CharaSim
             this.RelationSkill = null;
             this.ReqSkill = new Dictionary<int, int>();
             this.Action = new List<string>();
+            this.Lt = new Dictionary<string, Wz_Vector>();
+            this.Rb = new Dictionary<string, Wz_Vector>();
         }
 
         private int level;
@@ -78,6 +81,8 @@ namespace WzComparerR2.CharaSim
         public int AddAttackToolTipDescSkill { get; set; }
         public int AssistSkillLink { get; set; }
         public int VehicleID { get; set; }
+        public Dictionary<string, Wz_Vector> Lt {  get; set; }
+        public Dictionary<string, Wz_Vector> Rb { get; set; }
 
         public Point LT { get; set; }
         public Point RB { get; set; }
@@ -125,14 +130,17 @@ namespace WzComparerR2.CharaSim
                             }
                             else if (commonNode.Value != null && commonNode.Value is Wz_Vector)
                             {
-                                Wz_Vector cNode = commonNode.Value as Wz_Vector;
-                                if (commonNode.Text == "lt")
+                                var match = Regex.Match(commonNode.Text, "^(lt|rb)([0-9]*)$");
+                                if (match.Success)
                                 {
-                                    skill.LT = new Point(cNode.X, cNode.Y);
-                                }
-                                else if (commonNode.Text == "rb")
-                                {
-                                    skill.RB = new Point(cNode.X, cNode.Y);
+                                    if (match.Groups[1].Value == "lt")
+                                    {
+                                        skill.Lt[match.Groups[2].Value] = commonNode.Value as Wz_Vector;
+                                    }
+                                    else
+                                    {
+                                        skill.Rb[match.Groups[2].Value] = commonNode.Value as Wz_Vector;
+                                    }
                                 }
                             }
                         }

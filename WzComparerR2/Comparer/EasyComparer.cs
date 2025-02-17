@@ -570,6 +570,7 @@ namespace WzComparerR2.Comparer
                 skillRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i]);
                 skillRenderNewOld[i].ShowObjectID = true;
                 skillRenderNewOld[i].ShowDelay = true;
+                skillRenderNewOld[i].ShowArea = true;
                 skillRenderNewOld[i].wzNode = WzNewOld[i];
                 skillRenderNewOld[i].DiffSkillTags = this.DiffSkillTags;
                 skillRenderNewOld[i].IgnoreEvalError = true;

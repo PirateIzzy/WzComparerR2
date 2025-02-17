@@ -58,6 +58,20 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
+            SortedDictionary<string, long> patchedFileSizes = new SortedDictionary<string, long>();
+            List<string> patchedFileIndex = new List<string>();
+            Dictionary<string, string> finishedFileIndex = new Dictionary<string, string>();
+
+            typedParts = Enum.GetValues(typeof(Wz_Type)).Cast<Wz_Type>().ToDictionary(type => type, type => new List<PatchPartContext>());
+
+            // Disable until the bug is fixed
+            this.chkCompare.Enabled = false;
+            this.cmbComparePng.Enabled = false;
+            this.chkOutputPng.Enabled = false;
+            this.chkResolvePngLink.Enabled = false;
+            this.chkOutputAddedImg.Enabled = false;
+            this.chkOutputRemovedImg.Enabled = false;
+            this.chkEnableDarkMode.Enabled = false;
         }
 
         SortedDictionary<string, long> patchedFileSizes = new SortedDictionary<string, long>();
@@ -300,11 +314,17 @@ namespace WzComparerR2
                 MSFolder = txtMSFolder.Text,
                 PrePatch = chkPrePatch.Checked,
                 DeadPatch = chkDeadPatch.Checked,
+                CompareFolder = compareFolder,
             };
             session.LoggingFileName = Path.Combine(session.MSFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
             session.PatchExecTask = Task.Run(() => this.ExecutePatchAsync(session, session.CancellationToken));
             this.patcherSession = session;
         }
+
+        string htmlFilePath;
+        FileStream htmlFile;
+        StreamWriter sw;
+        Dictionary<Wz_Type, List<PatchPartContext>> typedParts;
 
         private async Task ExecutePatchAsync(PatcherSession session, CancellationToken cancellationToken)
         {
@@ -650,7 +670,6 @@ namespace WzComparerR2
                 case 2: node.Cells.Add(new Cell("Removed", style)); break;
                 default: node.Cells.Add(new Cell(part.Type.ToString(), style)); break;
             }
-            node.Cells.Add(new Cell(part.Type.ToString(), style));
             node.Cells.Add(new Cell(part.NewFileLength.ToString("n0"), style));
             node.Cells.Add(new Cell(part.NewChecksum.ToString("x8"), style));
             node.Cells.Add(new Cell(part.OldChecksum?.ToString("x8"), style));
@@ -836,7 +855,7 @@ namespace WzComparerR2
             public void Build(IEnumerable<PatchPartContext> orderedParts)
             {
                 /*
-                 *  for example:
+                 *  for examle:
                  *    fileName   | type | dependencies               
                  *    -----------|------|---------------     
                  *    Mob_000.wz | 1    | Mob_000.wz   (self update)

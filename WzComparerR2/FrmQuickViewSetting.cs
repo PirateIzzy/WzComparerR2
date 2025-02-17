@@ -55,6 +55,13 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Skill_ShowArea
+        {
+            get { return checkBoxX16.Checked; }
+            set { checkBoxX16.Checked = value; }
+        }
+
+        [Link]
         public DefaultLevel Skill_DefaultLevel
         {
             get { return (DefaultLevel)comboBoxEx1.SelectedIndex; }

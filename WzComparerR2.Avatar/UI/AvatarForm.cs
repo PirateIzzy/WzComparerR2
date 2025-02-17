@@ -17,6 +17,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.PluginBase;
 using WzComparerR2.Config;
 using WzComparerR2.Controls;
+using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.Avatar.UI
 {
@@ -350,10 +351,6 @@ namespace WzComparerR2.Avatar.UI
                     avatar.Longcoat.Visible = false;
                 }
             }
-            else if (part == avatar.Cap) // sets CapType
-            {
-                avatar.CapType = part.VSlot;
-            }
 
             if (part.effectNode != null) // load Effects
             {
@@ -436,7 +433,7 @@ namespace WzComparerR2.Avatar.UI
                 return;
             }
 
-            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10},{11}:{12}",
+            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10},{11}:{12}:{13}",
                 this.avatar.ActionName,
                 bodyFrame,
                 this.avatar.EmotionName,
@@ -449,7 +446,8 @@ namespace WzComparerR2.Avatar.UI
                 this.avatar.WeaponType,
                 this.avatar.WeaponIndex,
                 this.avatar.ActionName,
-                string.Join("_", effectFrames));
+                string.Join("_", effectFrames),
+                string.Join("_", this.avatar.EffectVisibles));
 
             if (!avatarContainer1.HasCache(actionTag))
             {
@@ -698,6 +696,7 @@ namespace WzComparerR2.Avatar.UI
                     btn.Checked = part.Visible;
                     btn.btnItemShow.Click += BtnItemShow_Click;
                     btn.btnItemDel.Click += BtnItemDel_Click;
+                    btn.chkShowEffect.Click += ChkShowEffect_Click;
                     btn.CheckedChanged += Btn_CheckedChanged;
                     btn.rdoMixColor0.CheckedChanged += RadioMixColor0_CheckedChanged;
                     btn.rdoMixColor1.CheckedChanged += RadioMixColor1_CheckedChanged;
@@ -736,6 +735,25 @@ namespace WzComparerR2.Avatar.UI
                     {
                         this.avatar.Parts[index] = null;
                         this.FillAvatarParts();
+                        this.UpdateDisplay();
+                    }
+                }
+            }
+        }
+
+        private void ChkShowEffect_Click(object sender, EventArgs e)
+        {
+            var btn = (sender as BaseItem).Parent as AvatarPartButtonItem;
+            if (btn != null)
+            {
+                var part = btn.Tag as AvatarPart;
+                part.EffectVisible = btn.chkShowEffect.Checked;
+                if (part != null)
+                {
+                    int index = Array.IndexOf(this.avatar.Parts, part);
+                    if (index > -1)
+                    {
+                        this.avatar.EffectVisibles[index] = btn.chkShowEffect.Checked;
                         this.UpdateDisplay();
                     }
                 }
@@ -1429,9 +1447,20 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnSaveAsGif_Click(object sender, EventArgs e)
         {
-            bool bodyPlaying = chkBodyPlay.Checked && cmbBodyFrame.Items.Count > 1;
-            bool emoPlaying = chkEmotionPlay.Checked && cmbEmotionFrame.Items.Count > 1;
-            bool tamingPlaying = chkTamingPlay.Checked && cmbTamingFrame.Items.Count > 1;
+            if (this.avatar.Body == null || this.avatar.Head == null)
+            {
+                MessageBoxEx.Show("캐릭터가 없습니다.");
+                return;
+            }
+
+            SaveGif(sender, e, chkBodyPlay.Checked, chkEmotionPlay.Checked, chkTamingPlay.Checked);
+        }
+
+        private void SaveGif(object sender, EventArgs e, bool isBodyPlayingChecked = true, bool isEmotionPlayingChecked = true, bool isTamingPlayingChecked = true, string outputFileName = null)
+        { 
+            bool bodyPlaying = isBodyPlayingChecked && cmbBodyFrame.Items.Count > 1;
+            bool emoPlaying = isEmotionPlayingChecked && cmbEmotionFrame.Items.Count > 1;
+            bool tamingPlaying = isTamingPlayingChecked && cmbTamingFrame.Items.Count > 1;
 
             int aniCount = new[] { bodyPlaying, emoPlaying, tamingPlaying }.Count(b => b);
             int effectCount = bodyPlaying ? (GetSelectedEffectFrames(out int[] frameIndex, out ActionFrame[] actionFrame) ? 1 : 0) : 0;
@@ -1444,25 +1473,34 @@ namespace WzComparerR2.Avatar.UI
                 this.GetSelectedTamingFrame(out int tamingFrame, out _);
                 this.GetSelectedEffectFrames(out int[] effectFrames, out _);
 
-                // no animation is playing, save as png
-                var dlg = new SaveFileDialog()
+                if (string.IsNullOrEmpty(outputFileName))
                 {
-                    Title = "Save Avatar Frame",
-                    Filter = "PNG (*.png)|*.png|*.*|*.*",
-                    FileName = string.Format("avatar{0}{1}{2}.png",
-                        string.IsNullOrEmpty(avatar.ActionName) ? "" : ("_" + avatar.ActionName + "(" + bodyFrame + ")"),
-                        string.IsNullOrEmpty(avatar.EmotionName) ? "" : ("_" + avatar.EmotionName + "(" + emoFrame + ")"),
-                        string.IsNullOrEmpty(avatar.TamingActionName) ? "" : ("_" + avatar.TamingActionName + "(" + tamingFrame + ")"))
-                };
+                    // If no animation is playing, save as PNG
+                    var dlg = new SaveFileDialog()
+                    {
+                        Title = "Save Avatar Frame",
+                        Filter = "PNG (*.png)|*.png|*.*|*.*",
+                        FileName = string.Format("avatar{0}{1}{2}.png",
+                            string.IsNullOrEmpty(avatar.ActionName) ? "" : ("_" + avatar.ActionName + "(" + bodyFrame + ")"),
+                            string.IsNullOrEmpty(avatar.EmotionName) ? "" : ("_" + avatar.EmotionName + "(" + emoFrame + ")"),
+                            string.IsNullOrEmpty(avatar.TamingActionName) ? "" : ("_" + avatar.TamingActionName + "(" + tamingFrame + ")"))
+                    };
 
-                if (dlg.ShowDialog() != DialogResult.OK)
+                    if (dlg.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    outputFileName = dlg.FileName;
+                }
+                else
                 {
-                    return;
+                    outputFileName += ".png";
                 }
 
                 var bone = this.avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame, effectFrames);
                 var frame = this.avatar.DrawFrame(bone);
-                frame.Bitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                frame.Bitmap.Save(outputFileName, System.Drawing.Imaging.ImageFormat.Png);
             }
             else
             {
@@ -1473,23 +1511,32 @@ namespace WzComparerR2.Avatar.UI
 
                 string extensionFilter = string.Join(";", cap.SupportedExtensions.Select(ext => $"*{ext}"));
 
-                var dlg = new SaveFileDialog()
+                if (string.IsNullOrEmpty(outputFileName))
                 {
-                    Title = "Save Avatar",
-                    Filter = string.Format("{0} (*{1})|*{1}|All Files(*.*)|*.*", encoder.Name, extensionFilter),
-                    FileName = string.Format("avatar{0}{1}{2}{3}",
+                    var dlg = new SaveFileDialog()
+                    {
+                        Title = "Save Avatar",
+                        Filter = string.Format("{0} (*{1})|*{1}|All Files(*.*)|*.*", encoder.Name, extensionFilter),
+                        FileName = string.Format("avatar{0}{1}{2}{3}",
                         string.IsNullOrEmpty(avatar.ActionName) ? "" : ("_" + avatar.ActionName),
                         string.IsNullOrEmpty(avatar.EmotionName) ? "" : ("_" + avatar.EmotionName),
                         string.IsNullOrEmpty(avatar.TamingActionName) ? "" : ("_" + avatar.TamingActionName),
                         cap.DefaultExtension)
-                };
+                    };
 
-                if (dlg.ShowDialog() != DialogResult.OK)
+                    if (dlg.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    outputFileName = dlg.FileName;
+                }
+                else
                 {
-                    return;
+                    outputFileName += cap.DefaultExtension;
                 }
 
-                string outputFileName = dlg.FileName;
+                //string outputFileName = dlg.FileName;
                 var actPlaying = new[] { bodyPlaying, emoPlaying, tamingPlaying };
                 var actFrames = new[] { cmbBodyFrame, cmbEmotionFrame, cmbTamingFrame }
                     .Select((cmb, i) =>
@@ -2083,7 +2130,94 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            ExportAvatar(sender, e);
+            ExportAvatar2(sender, e);
+        }
+
+        private void ExportAvatar2(object sender, EventArgs e)
+        {
+            if (this.avatar.Body == null || this.avatar.Head == null)
+            {
+                MessageBoxEx.Show("캐릭터가 없습니다.");
+                return;
+            }
+
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.Description = "내보내고자 하는 폴더를 선택하세요.";
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                var actionIdx = cmbActionBody.SelectedIndex;
+                var playingState1 = chkBodyPlay.Checked;
+                var playingState2 = chkEmotionPlay.Checked;
+                var playingState3 = chkTamingPlay.Checked;
+
+                chkBodyPlay.Checked = false;
+                chkEmotionPlay.Checked = false;
+                chkTamingPlay.Checked = false;
+
+                var basePath = dlg.SelectedPath;
+
+                async Task ExportGif(string actionName)
+                {
+                    var beforeIdx = cmbActionBody.SelectedIndex;
+                    for (int i = 0; i < cmbActionBody.Items.Count; i++)
+                    {
+                        ComboItem item = cmbActionBody.Items[(beforeIdx + i) % cmbActionBody.Items.Count] as ComboItem;
+                        if (item != null && item.Text == actionName)
+                        {
+                            cmbActionBody.SelectedIndex = (beforeIdx + i) % cmbActionBody.Items.Count;
+                        }
+                    }
+                    //SelectBodyAction(actionName);
+
+                    string fileName = System.IO.Path.Combine(basePath, actionName.Replace('\\', '.'));
+
+                    var tasks = new List<Task>();
+
+                    tasks.Add(Task.Run(() =>
+                    {
+                        SaveGif(sender, e, true, true, true, fileName);
+                    }));
+
+                    await Task.WhenAll(tasks);
+                }
+
+                async Task ExportJob(IProgressDialogContext context, CancellationToken cancellationToken)
+                {
+                    IEnumerable<AvatarCommon.Action> actionEnumerator = avatar.Actions;
+                    var step1 = actionEnumerator.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
+
+                    var step2 = step1.Select(item => ExportGif(item.Name));
+
+                    // run pipeline
+                    try
+                    {
+                        this.Enabled = false;
+                        context.ProgressMin = 0;
+                        context.ProgressMax = avatar.Actions.Count;
+                        foreach (var task in step2)
+                        {
+                            await task;
+                            context.Progress++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        context.Message = $"오류: {ex.Message}";
+                        throw;
+                    }
+                    finally
+                    {
+                        this.Enabled = true;
+                        cmbActionBody.SelectedIndex = actionIdx;
+                        chkBodyPlay.Checked = playingState1;
+                        chkEmotionPlay.Checked = playingState2;
+                        chkTamingPlay.Checked = playingState3;
+                    }
+                }
+
+                ProgressDialog.Show(this.FindForm(), "내보내는 중...", avatar.Actions.Count + "개 동작 내보내는 중...", true, false, ExportJob);
+            }
         }
 
         private void ExportAvatar(object sender, EventArgs e)
@@ -2128,6 +2262,7 @@ namespace WzComparerR2.Avatar.UI
                 var actionFrames = avatar.GetActionFrames(actionName);
                 var faceFrames = avatar.GetFaceFrames(avatar.EmotionName);
                 var tamingFrames = avatar.GetTamingFrames(avatar.TamingActionName);
+                var effectActions = new ActionFrame[avatar.Parts.Length];
                 if (emoFrame <= -1 || emoFrame >= faceFrames.Length)
                 {
                     return;
@@ -2139,7 +2274,7 @@ namespace WzComparerR2.Avatar.UI
                 {
                     if (frame.Delay != 0)
                     {
-                        var bone = string.IsNullOrEmpty(avatar.TamingActionName) ? avatar.CreateFrame(frame, faceFrames[emoFrame], null, null) : avatar.CreateFrame(actionFrames[0], faceFrames[emoFrame], frame, null);
+                        var bone = string.IsNullOrEmpty(avatar.TamingActionName) ? avatar.CreateFrame(frame, faceFrames[emoFrame], null, effectActions) : avatar.CreateFrame(actionFrames[0], faceFrames[emoFrame], frame, effectActions);
                         var bmp = avatar.DrawFrame(bone);
 
                         Point pos = bmp.OpOrigin;
@@ -2165,7 +2300,7 @@ namespace WzComparerR2.Avatar.UI
 
             async Task ExportJob(IProgressDialogContext context, CancellationToken cancellationToken)
             {
-                IEnumerable<Action> actionEnumerator = avatar.Actions;
+                IEnumerable<AvatarCommon.Action> actionEnumerator = avatar.Actions;
                 var step1 = actionEnumerator.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
 
                 var step2 = step1.Select(item => ExportGif(item.Name));

@@ -64,14 +64,22 @@ namespace WzComparerR2.Patcher.Builder
             }
         }
 
-        public static uint ComputeHash(Stream stream, long length, CancellationToken cancellationToken = default)
+        public static uint ComputeHash(Stream stream, long length, CancellationToken cancellationToken = default, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
         {
-            return ComputeHash(stream, length, 0, cancellationToken);
+            return ComputeHash(stream, length, 0, cancellationToken, PatchingStateChanged);
         }
 
-        public static uint ComputeHash(Stream stream, long length, uint crc, CancellationToken cancellationToken = default)
+        public static uint ComputeHash(Stream stream, long length, uint crc, CancellationToken cancellationToken = default, EventHandler<PatchingEventArgs> PatchingStateChanged = null)
         {
             var buffer = ArrayPool<byte>.Shared.Rent(0x4000);
+            PatchPartContext part = new PatchPartContext("", 0, 0);
+            part.NewFileLength = (int)length;
+
+            double patchProc = 0;
+            const double patchProcReportInverval = 0.005;
+            long patchLength = 0;
+            const long patchLengthReportInterval = 1 * 1024 * 1024;
+
             try
             {
                 while (length > 0)
@@ -81,6 +89,19 @@ namespace WzComparerR2.Patcher.Builder
                     if (count == 0)
                     {
                         break;
+                    }
+                    crc = ComputeHash(buffer, 0, count, crc);
+                    length -= count;
+                    if (PatchingStateChanged != null && part.NewFileLength > 0)
+                    {
+                        long curLength = part.NewFileLength - length;
+                        double curProc = 1.0 * curLength / part.NewFileLength;
+                        if (curProc - patchProc >= patchProcReportInverval && curLength - patchLength >= patchLengthReportInterval)// || curProc >= 1 - patchProcReportInverval)
+                        {
+                            PatchingStateChanged(null, new PatchingEventArgs(part, PatchingState.TempFileBuildProcessChanged, curLength));//更新进度改变
+                            patchProc = curProc;
+                            patchLength = curLength;
+                        }
                     }
                     crc = ComputeHash(buffer, 0, count, crc);
                     length -= count;

@@ -28,6 +28,7 @@ namespace WzComparerR2.CharaSimControl
 
         public bool ShowProperties { get; set; } = true;
         public bool ShowDelay { get; set; }
+        public bool ShowArea { get; set; }
         public bool ShowReqSkill { get; set; } = true;
         public bool DisplayCooltimeMSAsSec { get; set; } = true;
         public bool DisplayPermyriadAsPercent { get; set; } = true;
@@ -289,29 +290,25 @@ namespace WzComparerR2.CharaSimControl
                 //GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? 10 : 86, 485, ref picH, 16);
                 GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
-            /* Commenting until GMS receives the Skill Sequence system
+            /* Commenting until GMS receives the foreach (var kv in Skill.Lt)m
             if (Skill.IsSequenceOn)
             {
+                string colortag = "#c";
                 if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("isSequenceOn"))
                 {
-                    GearGraphics.DrawString(g, "#$g스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                    colortag = "#$g";
                 }
-                else
-                {
-                    GearGraphics.DrawString(g, "#c스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                }
+                GearGraphics.DrawString(g, colortag + "스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             */
             if (Skill.IsPetAutoBuff)
             {
+                string colortag = "#c";
                 if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && DiffSkillTags[skillIDstr].Contains("isPetAutoBuff"))
                 {
-                    GearGraphics.DrawString(g, "#gCan add Auto Buff Skill#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                    colortag = "#$g";
                 }
-                else
-                {
-                    GearGraphics.DrawString(g, "#cCan add Auto Buff Skill#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                }
+                GearGraphics.DrawString(g, colortag + "Can add Auto Buff Skill#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             if ((Skill.SkillID / 10000 / 1000 == 10 || Skill.SkillID / 10000 / 1000 == 11) && Skill.ReqLevel > 0)
             {
@@ -550,6 +547,24 @@ namespace WzComparerR2.CharaSimControl
                 foreach (string action in Skill.Action)
                 {
                     skillDescEx.Add("#c[Delay] " + action + ": " + CharaSimLoader.GetActionDelay(action, this.wzNode) + " ms#");
+                }
+            }
+
+            if (ShowArea && Skill.Lt.Count > 0)
+            {
+                foreach (var kv in Skill.Lt)
+                {
+                    if (!Skill.Rb.ContainsKey(kv.Key))
+                    {
+                        continue;
+                    }
+                    string colortag = "";
+                    if (doHighlight && DiffSkillTags.ContainsKey(skillIDstr) && (DiffSkillTags[skillIDstr].Contains("lt" + kv.Key) || DiffSkillTags[skillIDstr].Contains("rb" + kv.Key)))
+                    {
+                        colortag = "#$g";
+                    }
+                    skillDescEx.Add("#c[Range" + kv.Key + "(px)] " + colortag + "Left: " + kv.Value.X + ", Right: " + Skill.Rb[kv.Key].X + ", Top: " + kv.Value.Y + ", Bottom: " + Skill.Rb[kv.Key].Y + "" +
+                        ", Area: " + Math.Abs(Skill.Rb[kv.Key].X - kv.Value.X) + " x " + Math.Abs(kv.Value.Y - Skill.Rb[kv.Key].Y) + "#");
                 }
             }
 

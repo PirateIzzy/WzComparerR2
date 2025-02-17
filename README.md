@@ -18,7 +18,7 @@
 - **1.x**: WinXp+/.net2.0+/dx9.0
 
 # Compile
-- vs2022 or higher/.net 6 SDK
+- vs2022 or higher/.net 8 SDK
 
 # Credits
 - **Fiel** ([Southperry](http://www.southperry.net))  wz文件读取代码改造自WzExtract 以及WzPatcher
@@ -27,6 +27,5 @@
 - **[IMEHelper](https://github.com/JLChnToZ/IMEHelper)**
 - **[Spine-Runtime](https://github.com/EsotericSoftware/spine-runtimes)**
 - **[EmptyKeysUI](https://github.com/EmptyKeys)**
-- **[@KENNYSOFT](https://github.com/KENNYSOFT)** and his WcR2-KMS version.
-- **[@Kagamia](https://github.com/Kagamia)** and his WcR2-CMS version.
-- **[@Spadow](https://github.com/Sunaries)** for providing his WcR2-GMS version.
+- [libvpx](https://www.webmproject.org/code/) & [libyuv](https://chromium.googlesource.com/libyuv/libyuv/) for video decoding
+- [VC-LTL5](https://github.com/Chuyu-Team/VC-LTL5) for native library build

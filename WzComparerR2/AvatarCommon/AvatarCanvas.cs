@@ -9,7 +9,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.CharaSim;
 using System.Text.RegularExpressions;
 
-namespace WzComparerR2.Avatar
+namespace WzComparerR2.AvatarCommon
 {
     public class AvatarCanvas
     {
@@ -20,6 +20,7 @@ namespace WzComparerR2.Avatar
             this.Emotions = new List<string>();
             this.TamingActions = new List<string>();
             this.EffectActions = new List<string>[18];
+            this.EffectVisibles = Enumerable.Repeat(true, 18).ToList();
             for (int i = 0; i < this.EffectActions.Length; i++)
             {
                 this.EffectActions[i] = new List<string>();
@@ -35,6 +36,7 @@ namespace WzComparerR2.Avatar
         public List<string> Emotions { get; private set; }
         public List<string> TamingActions { get; private set; }
         public List<string>[] EffectActions { get; private set; }
+        public List<bool> EffectVisibles { get; private set; }
 
         public AvatarPart[] Parts { get; private set; }
         public string ActionName { get; set; }
@@ -320,7 +322,10 @@ namespace WzComparerR2.Avatar
                 case GearType.hair:
                 case GearType.hair2:
                 case GearType.hair3: this.Hair = part; break;
-                case GearType.cap: this.Cap = part; break;
+                case GearType.cap:
+                    this.Cap = part;
+                    this.CapType = part.VSlot;// sets CapType
+                    break;
                 case GearType.coat: this.Coat = part; break;
                 case GearType.longcoat: this.Longcoat = part; break;
                 case GearType.pants: this.Pants = part; break;
@@ -1465,8 +1470,23 @@ namespace WzComparerR2.Avatar
                         partNode.Add(Tuple.Create(hairNode, (Wz_Node)null, 100));
                     }
                 }
+                //cap
+                if (headNode != null && this.Cap != null && this.Cap.Visible)
+                {
+                    var capNode = FindActionFrameNode(this.Cap.Node, bodyAction);
+                    if (capNode == null)
+                    {
+                        string actName = this.GetHairActionName(bodyAction.Action, face);
+                        if (actName != null)
+                        {
+                            ActionFrame capAction = new ActionFrame() { Action = actName, Frame = 0 };
+                            capNode = FindActionFrameNode(this.Cap.Node, capAction);
+                        }
+                    }
+                    partNode.Add(Tuple.Create(capNode, (Wz_Node)null, 100));
+                }
                 //其他部件
-                for (int i = 4; i < 16; i++)
+                for (int i = 5; i < 16; i++)
                 {
                     var part = this.Parts[i];
                     if (part != null && part.Visible)
@@ -1521,7 +1541,7 @@ namespace WzComparerR2.Avatar
             List<Wz_Node> partNode = new List<Wz_Node>();
 
             //链接马
-            if (parent != null && parent.Visible && aFrame != null)
+            if (parent != null && parent.Visible && parent.EffectVisible && aFrame != null)
             {
                 partNode.Add(FindActionFrameNode(parent.effectNode, aFrame, true));
             }

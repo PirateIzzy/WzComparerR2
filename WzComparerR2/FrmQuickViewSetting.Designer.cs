@@ -30,6 +30,10 @@
         {
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.checkBoxX16 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX15 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX14 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX13 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX10 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX3 = new DevComponents.DotNetBar.LabelX();
             this.comboBoxEx2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -52,24 +56,21 @@
             this.superTabControlPanel4 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.checkBoxX7 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem4 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.checkBoxX11 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX6 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX4 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX3 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.checkBoxX9 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX8 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX5 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
-            this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
-            this.checkBoxX6 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.checkBoxX4 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.checkBoxX3 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
-            this.checkBoxX11 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX12 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.checkBoxX13 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.checkBoxX14 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.checkBoxX15 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
             this.cmbPreferredStringCopyMethod = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.chkCopyParsedSkillString = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -114,7 +115,7 @@
             this.superTabControl1.ReorderTabsEnabled = true;
             this.superTabControl1.SelectedTabFont = new System.Drawing.Font("Arial", 9f, System.Drawing.FontStyle.Bold);
             this.superTabControl1.SelectedTabIndex = 0;
-            this.superTabControl1.Size = new System.Drawing.Size(304, 251);
+            this.superTabControl1.Size = new System.Drawing.Size(355, 300);
             this.superTabControl1.TabAlignment = DevComponents.DotNetBar.eTabStripAlignment.Left;
             this.superTabControl1.TabFont = new System.Drawing.Font("Arial", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.superTabControl1.TabIndex = 0;
@@ -128,6 +129,7 @@
             // 
             // superTabControlPanel1
             // 
+            this.superTabControlPanel1.Controls.Add(this.checkBoxX16);
             this.superTabControlPanel1.Controls.Add(this.checkBoxX15);
             this.superTabControlPanel1.Controls.Add(this.checkBoxX14);
             this.superTabControlPanel1.Controls.Add(this.checkBoxX13);
@@ -141,8 +143,9 @@
             this.superTabControlPanel1.Controls.Add(this.checkBoxX1);
             this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel1.Location = new System.Drawing.Point(62, 0);
+            this.superTabControlPanel1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.superTabControlPanel1.Name = "superTabControlPanel1";
-            this.superTabControlPanel1.Size = new System.Drawing.Size(242, 251);
+            this.superTabControlPanel1.Size = new System.Drawing.Size(293, 278);
             this.superTabControlPanel1.TabIndex = 1;
             this.superTabControlPanel1.TabItem = this.superTabItem1;
             // 
@@ -170,7 +173,7 @@
             // 
             this.labelX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.labelX3.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.labelX3.Location = new System.Drawing.Point(13, 211);
+            this.labelX3.Location = new System.Drawing.Point(13, 235);
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(142, 30);
             this.labelX3.TabIndex = 6;
@@ -190,7 +193,7 @@
             this.comboItem8,
             this.comboItem9,
             this.comboItem10});
-            this.comboBoxEx2.Location = new System.Drawing.Point(94, 179);
+            this.comboBoxEx2.Location = new System.Drawing.Point(94, 202);
             this.comboBoxEx2.Name = "comboBoxEx2";
             this.comboBoxEx2.Size = new System.Drawing.Size(90, 21);
             this.comboBoxEx2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -228,7 +231,7 @@
             // 
             // 
             this.labelX2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX2.Location = new System.Drawing.Point(13, 182);
+            this.labelX2.Location = new System.Drawing.Point(13, 206);
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(81, 18);
             this.labelX2.TabIndex = 4;
@@ -242,7 +245,7 @@
             // 
             // 
             this.labelX1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX1.Location = new System.Drawing.Point(13, 157);
+            this.labelX1.Location = new System.Drawing.Point(13, 181);
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(81, 18);
             this.labelX1.TabIndex = 3;
@@ -260,7 +263,7 @@
             this.comboItem2,
             this.comboItem3,
             this.comboItem4});
-            this.comboBoxEx1.Location = new System.Drawing.Point(94, 154);
+            this.comboBoxEx1.Location = new System.Drawing.Point(94, 178);
             this.comboBoxEx1.Name = "comboBoxEx1";
             this.comboBoxEx1.Size = new System.Drawing.Size(90, 21);
             this.comboBoxEx1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -504,9 +507,9 @@
             this.panelEx1.Controls.Add(this.buttonX1);
             this.panelEx1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelEx1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelEx1.Location = new System.Drawing.Point(0, 251);
+            this.panelEx1.Location = new System.Drawing.Point(0, 278);
             this.panelEx1.Name = "panelEx1";
-            this.panelEx1.Size = new System.Drawing.Size(304, 30);
+            this.panelEx1.Size = new System.Drawing.Size(355, 30);
             this.panelEx1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelEx1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
             this.panelEx1.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
@@ -625,7 +628,7 @@
             // 
             // 
             this.checkBoxX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX13.Location = new System.Drawing.Point(13, 81);
+            this.checkBoxX13.Location = new System.Drawing.Point(13, 105);
             this.checkBoxX13.Name = "checkBoxX13";
             this.checkBoxX13.Size = new System.Drawing.Size(138, 18);
             this.checkBoxX13.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -640,12 +643,28 @@
             // 
             // 
             this.checkBoxX14.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX14.Location = new System.Drawing.Point(13, 105);
+            this.checkBoxX14.Location = new System.Drawing.Point(13, 129);
             this.checkBoxX14.Name = "checkBoxX14";
             this.checkBoxX14.Size = new System.Drawing.Size(150, 18);
             this.checkBoxX14.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX14.TabIndex = 9;
             this.checkBoxX14.Text = "Convert PerM to percent";
+            // 
+            // checkBoxX16
+            // 
+            this.checkBoxX16.AutoSize = true;
+            this.checkBoxX16.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX16.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX16.Location = new System.Drawing.Point(13, 81);
+            this.checkBoxX16.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX16.Name = "checkBoxX16";
+            this.checkBoxX16.Size = new System.Drawing.Size(109, 18);
+            this.checkBoxX16.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX16.TabIndex = 10;
+            this.checkBoxX16.Text = "Show Skill Range";
             // 
             // checkBoxX15
             // 
@@ -655,18 +674,18 @@
             // 
             // 
             this.checkBoxX15.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX15.Location = new System.Drawing.Point(13, 129);
+            this.checkBoxX15.Location = new System.Drawing.Point(13, 153);
             this.checkBoxX15.Name = "checkBoxX15";
             this.checkBoxX15.Size = new System.Drawing.Size(125, 18);
             this.checkBoxX15.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX15.TabIndex = 10;
-            this.checkBoxX15.Text = "Ignore calculation errors";
+            this.checkBoxX15.Text = "Ignore Calculation Errors";
             // 
             // FrmQuickViewSetting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(304, 281);
+            this.ClientSize = new System.Drawing.Size(304, 308);
             this.Controls.Add(this.superTabControl1);
             this.Controls.Add(this.panelEx1);
             this.DoubleBuffered = true;
@@ -738,6 +757,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX13;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX14;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX21;
         private DevComponents.DotNetBar.LabelX labelX4;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredStringCopyMethod;
