@@ -18,14 +18,18 @@ namespace WzComparerR2
 
         }
 
-        public FrmOverlayAniOptions(int startIdx, int endIdx) : this(startIdx, endIdx, false)
+        public FrmOverlayAniOptions(int startIdx, int endIdx) : this(startIdx, endIdx, null, false)
         {
 
         }
 
-        public FrmOverlayAniOptions(int startIdx, int endIdx, bool isPngFrameAni)
+        public FrmOverlayAniOptions(int startIdx, int endIdx, string multiFrameInfo, bool isPngFrameAni)
         {
             InitializeComponent();
+            if (multiFrameInfo != null)
+            {
+                this.Text += " (Multiframe: " + multiFrameInfo + ")";
+            }
             this.txtDelayOffset.Value = 0;
             this.txtMoveX.Value = 0;
             this.txtMoveY.Value = 0;

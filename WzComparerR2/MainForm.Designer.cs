@@ -178,6 +178,7 @@
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
             this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
             this.buttonOverlayRect = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonLoadMultiFrameAniList = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -2100,7 +2101,8 @@
             this.itemContainer44.Name = "itemContainer44";
             this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonDisableOverlayAni,
-            this.buttonOverlayRect});
+            this.buttonOverlayRect,
+            this.buttonLoadMultiFrameAniList});
             // 
             // 
             // 
@@ -2117,6 +2119,12 @@
             this.buttonOverlayRect.Name = "buttonOverlayRect";
             this.buttonOverlayRect.Text = "Add Boundary Rectangle";
             this.buttonOverlayRect.Click += new System.EventHandler(this.buttonOverlayRect_Click);
+            // 
+            // buttonOverlayRect
+            // 
+            this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
+            this.buttonLoadMultiFrameAniList.Text = "Load Multiframe Animation";
+            this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // textBoxX1
             // 
@@ -3261,7 +3269,8 @@
         private DevComponents.DotNetBar.ItemContainer itemContainer44;
         private DevComponents.DotNetBar.ButtonItem buttonItemGifSetting;
         private DevComponents.DotNetBar.ButtonItem buttonDisableOverlayAni;
-        private DevComponents.DotNetBar.ButtonItem buttonOverlayRect;
+        private DevComponents.DotNetBar.ButtonItem buttonOverlayRect; 
+        private DevComponents.DotNetBar.ButtonItem buttonLoadMultiFrameAniList;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
         private System.Windows.Forms.ToolStripMenuItem tsmi2ExpandAll;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CollapseAll;

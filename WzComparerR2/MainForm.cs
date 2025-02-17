@@ -5,7 +5,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -624,7 +623,7 @@ namespace WzComparerR2
 
                 if (pngFrameData != null)
                 {
-                    this.pictureBoxEx1.ShowOverlayAnimation(pngFrameData, true);
+                    this.pictureBoxEx1.ShowOverlayAnimation(pngFrameData, isPngFrameAni: true);
                     this.cmbItemAniNames.Items.Clear();
                     this.cmbItemSkins.Visible = false;
                     this.pictureBoxEx1.PictureName = aniName;
@@ -638,7 +637,7 @@ namespace WzComparerR2
 
                 if (videoFrameData != null)
                 {
-                    this.pictureBoxEx1.ShowOverlayAnimation(videoFrameData, true);
+                    this.pictureBoxEx1.ShowOverlayAnimation(videoFrameData);
                     this.cmbItemAniNames.Items.Clear();
                     this.cmbItemSkins.Visible = false;
                     this.pictureBoxEx1.PictureName = aniName;
@@ -686,19 +685,50 @@ namespace WzComparerR2
 
                     if (multiData != null)
                     {
-                        /*
-                        this.pictureBoxEx1.ShowAnimation(multiData);
-                        var aniItem = this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator;
+                        foreach (var kv_frames in multiData.Frames)
+                        {
+                            var selectedFrameData = new FrameAnimationData(kv_frames.Value);
+
+                            this.pictureBoxEx1.ShowOverlayAnimation(selectedFrameData, multiFrameInfo: kv_frames.Key);
+                        }
                         this.cmbItemAniNames.Items.Clear();
-                        this.cmbItemAniNames.Items.AddRange(aniItem.Animations.ToArray());
-                        this.cmbItemAniNames.SelectedIndex = 0;
-                        */
-                        MessageBoxEx.Show("Multi-frame animations cannot be nested.", "Not Supported");
-                        return;
+                        this.cmbItemSkins.Visible = false;
+                        this.pictureBoxEx1.PictureName = aniName;
                     }
+
+                    return;
                 }
             }
             //this.pictureBoxEx1.PictureName = aniName;
+        }
+
+        private void OverlayMultiFrameWithKey(object sender, EventArgs e)
+        {
+            if (advTree3.SelectedNode == null)
+                return;
+
+            Wz_Node node = advTree3.SelectedNode.AsWzNode();
+            string aniName = "Nested_" + GetSelectedNodeImageName();
+
+            if ((sender as ButtonItem).Name != aniName)
+            {
+                MessageBoxEx.Show("The loaded Multiframe list does not match the currently selected node.", "Error");
+                return;
+            }
+
+            var multiData = this.pictureBoxEx1.LoadMultiFrameAnimation(node);
+            var key = (sender as ButtonItem).Text;
+
+            if (multiData != null && multiData.Frames.ContainsKey(key))
+            {
+                var selectedFrameData = new FrameAnimationData(multiData.Frames[key]);
+                this.pictureBoxEx1.ShowOverlayAnimation(selectedFrameData, multiFrameInfo: key);
+                this.cmbItemAniNames.Items.Clear();
+                this.cmbItemSkins.Visible = false;
+                this.pictureBoxEx1.PictureName = aniName;
+            }
+
+            return;
         }
 
         private string GetSelectedNodeImageName()
@@ -755,6 +785,36 @@ namespace WzComparerR2
             if (this.pictureBoxEx1.ShowOverlayAni)
             {
                 this.pictureBoxEx1.AddOverlayRect();
+            }
+        }
+        
+        private void buttonLoadMultiFrameAniList_Click(object sender, EventArgs e)
+        {
+            if (advTree3.SelectedNode == null)
+                return;
+
+            Wz_Node node = advTree3.SelectedNode.AsWzNode();
+            string aniNameKey = "중첩_" + GetSelectedNodeImageName();
+
+            if ((sender as ButtonItem).Name == aniNameKey)
+            {
+                return;
+            }
+
+            this.buttonLoadMultiFrameAniList.SubItems.Clear();
+            (sender as ButtonItem).Name = aniNameKey;
+
+            var list = MultiFrameAnimationData.CreateListFromNode(node, PluginBase.PluginManager.FindWz);
+            if (list.Count > 0)
+            {
+                this.buttonLoadMultiFrameAniList.SubItems.AddRange(list.Select(item =>
+                {
+                    var buttonItem = new DevComponents.DotNetBar.ButtonItem();
+                    buttonItem.Name = aniNameKey;
+                    buttonItem.Text = item;
+                    buttonItem.Click += new System.EventHandler(this.OverlayMultiFrameWithKey);
+                    return buttonItem as BaseItem;
+                }).ToArray());
             }
         }
 
