@@ -1449,7 +1449,7 @@ namespace WzComparerR2.Avatar.UI
         {
             if (this.avatar.Body == null || this.avatar.Head == null)
             {
-                MessageBoxEx.Show("캐릭터가 없습니다.");
+                MessageBoxEx.Show("Please add a character.");
                 return;
             }
 
@@ -2137,12 +2137,12 @@ namespace WzComparerR2.Avatar.UI
         {
             if (this.avatar.Body == null || this.avatar.Head == null)
             {
-                MessageBoxEx.Show("캐릭터가 없습니다.");
+                MessageBoxEx.Show("Please add a character.");
                 return;
             }
 
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = "내보내고자 하는 폴더를 선택하세요.";
+            dlg.Description = "Select a destination folder to export.";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -2203,7 +2203,7 @@ namespace WzComparerR2.Avatar.UI
                     }
                     catch (Exception ex)
                     {
-                        context.Message = $"오류: {ex.Message}";
+                        context.Message = $"Error: {ex.Message}";
                         throw;
                     }
                     finally
@@ -2216,7 +2216,7 @@ namespace WzComparerR2.Avatar.UI
                     }
                 }
 
-                ProgressDialog.Show(this.FindForm(), "내보내는 중...", avatar.Actions.Count + "개 동작 내보내는 중...", true, false, ExportJob);
+                ProgressDialog.Show(this.FindForm(), "Exporting...", avatar.Actions.Count + " Exporting action...", true, false, ExportJob);
             }
         }
 
