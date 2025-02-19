@@ -552,9 +552,9 @@ namespace WzComparerR2.AvatarCommon
                 }
             }
 
-            var actionNode = this.Taming?.Node.Nodes[action]?.ResolveUol();
+            var actionNode = this.Taming?.Node?.Nodes[action]?.ResolveUol();
 
-            var frameNode = actionNode.Nodes[frameIndex.ToString()];
+            var frameNode = actionNode?.Nodes[frameIndex.ToString()];
             if (frameNode != null)
             {
                 var frame = LoadStandardFrame(frameNode);
