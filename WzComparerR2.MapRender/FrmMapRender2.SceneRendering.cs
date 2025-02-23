@@ -880,7 +880,14 @@ namespace WzComparerR2.MapRender
             Point renderSize;
             if (back.View.Animator is FrameAnimator frameAni)
             {
-                renderSize = frameAni.CurrentFrame.Rectangle.Size;
+                if (back.TileMode != TileMode.None && back.Ani == 1)
+                {
+                    renderSize = frameAni.Data.GetBound().Size;
+                }
+                else
+                {
+                    renderSize = frameAni.CurrentFrame.Rectangle.Size;
+                }
             }
             else if (back.View.Animator is AnimationItem aniItem)
             {
