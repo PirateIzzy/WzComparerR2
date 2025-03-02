@@ -621,11 +621,11 @@ namespace WzComparerR2.Patcher
                 switch (fileHash.VerifyState)
                 {
                     case FileHashVerifyState.NotVerified:
-                        throw new Exception($"OldFile has not verified. FileName: {depFileName}");
+                        throw new Exception($"OldFileHash is not verified. FileName: {depFileName}");
                     case FileHashVerifyState.FileNotFound:
-                        throw new Exception($"OldFile not found. FileName: {depFileName}");
+                        throw new Exception($"OldFileHash is not found. FileName: {depFileName}");
                     case FileHashVerifyState.HashNotMatch:
-                        throw new Exception($"OldFile hash not match. FileName: {depFileName}");
+                        throw new Exception($"OldFileHash does not match. FileName: {depFileName}");
                 }
             }
 
