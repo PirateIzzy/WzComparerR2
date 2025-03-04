@@ -370,6 +370,7 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.boxingCannon: return "拳封";//Mo Xuan weapon
                 case GearType.boxingSky: return "拳天";//Mo Xuan weapon
+                case GearType.jewel: return "宝玉";
                 default: return null;
             }
         }
