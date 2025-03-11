@@ -1349,7 +1349,8 @@ namespace WzComparerR2.CharaSimControl
         {
             Bitmap genesisBitmap = null;
             picHeight = 0;
-            if (Gear.IsGenesisWeapon)
+            if (Gear.IsGenesisWeapon &&
+                (this.StringLinker?.StringEqp.TryGetValue(Gear.ItemID, out var sr_gearname) ?? false) && Regex.Match(sr_gearname.Name, @"(제네시스|Genesis|ジェネシス|创世|創世)").Success)
             {
                 genesisBitmap = new Bitmap(261, DefaultPicHeight);
                 Graphics g = Graphics.FromImage(genesisBitmap);
