@@ -179,6 +179,7 @@
             this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
             this.buttonOverlayRect = new DevComponents.DotNetBar.ButtonItem();
             this.buttonLoadMultiFrameAniList = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonOverlayExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -2078,8 +2079,8 @@
             // buttonItemExtractGifEx
             //
             this.buttonItemExtractGifEx.Name = "buttonItemExtractGifEx";
-            this.buttonItemExtractGifEx.Text = "ExtractGifEx";
-            this.buttonItemExtractGifEx.Tooltip = "对所选节点的全部子节点提取帧动画，而不使用序数节点名称。";
+            this.buttonItemExtractGifEx.Text = "활성화+";
+            this.buttonItemExtractGifEx.Tooltip = "0부터 순서대로가 아닌, 모든 하위 노드에서 애니메이션을 불러옵니다.";
             this.buttonItemExtractGifEx.Click += new System.EventHandler(this.buttonItemGif_Click);
             // 
             // buttonItemGifSetting
@@ -2099,6 +2100,7 @@
             this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonDisableOverlayAni,
             this.buttonOverlayRect,
+            this.buttonOverlayExtractGifEx,
             this.buttonLoadMultiFrameAniList});
             // 
             // 
@@ -2115,12 +2117,21 @@
             // 
             this.buttonOverlayRect.Name = "buttonOverlayRect";
             this.buttonOverlayRect.Text = "범위 사각형 추가";
+            this.buttonOverlayRect.Tooltip = "입력한 범위에 대한 반투명 사각형을 그립니다.";
             this.buttonOverlayRect.Click += new System.EventHandler(this.buttonOverlayRect_Click);
+            // 
+            // buttonItemExtractGifEx
+            //
+            this.buttonOverlayExtractGifEx.Name = "buttonOverlayExtractGifEx";
+            this.buttonOverlayExtractGifEx.Text = "중첩+";
+            this.buttonOverlayExtractGifEx.Tooltip = "0부터 순서대로가 아닌, 모든 하위 노드에서 애니메이션을 불러와서 중첩합니다.";
+            this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
             // 
             // buttonOverlayRect
             // 
             this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
             this.buttonLoadMultiFrameAniList.Text = "멀티프레임 로드";
+            this.buttonLoadMultiFrameAniList.Tooltip = "찾아지는 프레임들의 목록을 불러옵니다. 불러온 목록 중 하나를 선택하여 중첩시킬 수 있습니다.";
             this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // textBoxX1
@@ -3268,6 +3279,7 @@
         private DevComponents.DotNetBar.ButtonItem buttonDisableOverlayAni;
         private DevComponents.DotNetBar.ButtonItem buttonOverlayRect; 
         private DevComponents.DotNetBar.ButtonItem buttonLoadMultiFrameAniList;
+        private DevComponents.DotNetBar.ButtonItem buttonOverlayExtractGifEx;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
         private System.Windows.Forms.ToolStripMenuItem tsmi2ExpandAll;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CollapseAll;

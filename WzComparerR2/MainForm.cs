@@ -651,7 +651,8 @@ namespace WzComparerR2
             }
             else
             {
-                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node);
+                var options = (sender == this.buttonOverlayExtractGifEx) ? FrameAnimationCreatingOptions.ScanAllChildrenFrames : default;
+                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node, options);
 
                 if (frameData != null)
                 {
