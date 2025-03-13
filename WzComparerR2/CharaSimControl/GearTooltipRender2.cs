@@ -1349,22 +1349,25 @@ namespace WzComparerR2.CharaSimControl
         {
             Bitmap genesisBitmap = null;
             picHeight = 0;
-            if (Gear.IsGenesisWeapon &&
-                (this.StringLinker?.StringEqp.TryGetValue(Gear.ItemID, out var sr_gearname) ?? false) && Regex.Match(sr_gearname.Name, @"(제네시스|Genesis|ジェネシス|创世|創世)").Success)
+            if (Gear.IsGenesisWeapon)
             {
                 genesisBitmap = new Bitmap(261, DefaultPicHeight);
                 Graphics g = Graphics.FromImage(genesisBitmap);
                 picHeight = 13;
+
+                Gear.Props.TryGetValue(GearPropType.reqLevel, out var equipLevel);
+                int destinySkill = 1241 * (equipLevel == 250 ? 1 : 0);
+
                 foreach (var skillID in new[] { 80002632, 80002633 })
                 {
                     string skillName;
-                    if (this.StringLinker?.StringSkill.TryGetValue(skillID, out var sr) ?? false && sr.Name != null)
+                    if (this.StringLinker?.StringSkill.TryGetValue(skillID + destinySkill, out var sr) ?? false && sr.Name != null)
                     {
                         skillName = sr.Name;
                     }
                     else
                     {
-                        skillName = skillID.ToString();
+                        skillName = (skillID + destinySkill).ToString();
                     }
                     g.DrawString($"<{skillName}> 사용 가능", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
                     picHeight += 16;
