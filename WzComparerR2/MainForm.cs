@@ -242,6 +242,8 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
             tooltipQuickView.ItemRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.ItemRender.ShowNickTag = Setting.Item.ShowNickTag;
+            tooltipQuickView.ItemRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
+            tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
         }
 

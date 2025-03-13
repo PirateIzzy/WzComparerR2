@@ -46,6 +46,8 @@ namespace WzComparerR2.CharaSimControl
         public bool LinkRecipeItem { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowNickTag { get; set; }
+        public int CosmeticHairColor { get; set; }
+        public int CosmeticFaceColor { get; set; }
 
         public TooltipRender LinkRecipeInfoRender { get; set; }
         public TooltipRender LinkRecipeGearRender { get; set; }
@@ -857,6 +859,8 @@ namespace WzComparerR2.CharaSimControl
                     {
                         this.avatar = new AvatarCanvasManager();
                     }
+
+                    this.avatar.SetCosmeticColor(this.CosmeticHairColor, this.CosmeticFaceColor);
 
                     if (value < 1000)
                     {

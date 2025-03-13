@@ -72,6 +72,10 @@
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
+            this.labelX4 = new DevComponents.DotNetBar.LabelX();
+            this.labelX5 = new DevComponents.DotNetBar.LabelX();
+            this.comboBoxEx3 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.comboBoxEx4 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
@@ -499,6 +503,10 @@
             this.superTabControlPanel3.Controls.Add(this.checkBoxX9);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX8);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX5);
+            this.superTabControlPanel3.Controls.Add(this.labelX4);
+            this.superTabControlPanel3.Controls.Add(this.labelX5);
+            this.superTabControlPanel3.Controls.Add(this.comboBoxEx3);
+            this.superTabControlPanel3.Controls.Add(this.comboBoxEx4);
             this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel3.Location = new System.Drawing.Point(72, 0);
             this.superTabControlPanel3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -523,6 +531,66 @@
             this.checkBoxX12.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX12.TabIndex = 5;
             this.checkBoxX12.Text = "칭호 미리보기";
+            // 
+            // labelX4
+            // 
+            this.labelX4.AutoSize = true;
+            this.labelX4.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX4.Location = new System.Drawing.Point(15, 108);
+            this.labelX4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelX4.Name = "labelX4";
+            this.labelX4.Size = new System.Drawing.Size(89, 18);
+            this.labelX4.TabIndex = 6;
+            this.labelX4.Text = "미리보기 헤어 색상";
+            // 
+            // labelX5
+            // 
+            this.labelX5.AutoSize = true;
+            this.labelX5.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX5.Location = new System.Drawing.Point(15, 132);
+            this.labelX5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelX5.Name = "labelX5";
+            this.labelX5.Size = new System.Drawing.Size(89, 18);
+            this.labelX5.TabIndex = 8;
+            this.labelX5.Text = "미리보기 성형 색상";
+            // 
+            // comboBoxEx3
+            // 
+            this.comboBoxEx3.DisplayMember = "Text";
+            this.comboBoxEx3.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboBoxEx3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxEx3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxEx3.FormattingEnabled = true;
+            this.comboBoxEx3.ItemHeight = 15;
+            this.comboBoxEx3.Location = new System.Drawing.Point(140, 106);
+            this.comboBoxEx3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.comboBoxEx3.Name = "comboBoxEx3";
+            this.comboBoxEx3.Size = new System.Drawing.Size(104, 21);
+            this.comboBoxEx3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.comboBoxEx3.TabIndex = 7;
+            // 
+            // comboBoxEx4
+            // 
+            this.comboBoxEx4.DisplayMember = "Text";
+            this.comboBoxEx4.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboBoxEx4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxEx4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxEx4.FormattingEnabled = true;
+            this.comboBoxEx4.ItemHeight = 15;
+            this.comboBoxEx4.Location = new System.Drawing.Point(140, 130);
+            this.comboBoxEx4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.comboBoxEx4.Name = "comboBoxEx4";
+            this.comboBoxEx4.Size = new System.Drawing.Size(104, 21);
+            this.comboBoxEx4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.comboBoxEx4.TabIndex = 9;
             // 
             // checkBoxX9
             // 
@@ -736,5 +804,9 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX17;
+        private DevComponents.DotNetBar.LabelX labelX4;
+        private DevComponents.DotNetBar.LabelX labelX5;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx3;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx4;
     }
 }

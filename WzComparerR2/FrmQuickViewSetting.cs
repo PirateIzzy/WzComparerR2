@@ -24,6 +24,23 @@ namespace WzComparerR2
 #endif
             this.comboBoxEx1.SelectedIndex = 0;
             this.comboBoxEx2.SelectedIndex = 0;
+
+            this.comboBoxEx3.Items.AddRange((new[] { "검은색", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "갈색" }).Select(color =>
+            {
+                var comboBoxItem = new DevComponents.DotNetBar.ComboBoxItem();
+                comboBoxItem.Text = color;
+                return comboBoxItem;
+            }).ToArray());
+
+            this.comboBoxEx4.Items.AddRange((new[] { "검은색", "파란색", "빨간색", "초록색", "갈색", "에메랄드", "보라색", "자수정" }).Select(color =>
+            {
+                var comboBoxItem = new DevComponents.DotNetBar.ComboBoxItem();
+                comboBoxItem.Text = color;
+                return comboBoxItem;
+            }).ToArray());
+
+            this.comboBoxEx3.SelectedIndex = 0;
+            this.comboBoxEx4.SelectedIndex = 0;
         }
 
         [Link]
@@ -169,6 +186,20 @@ namespace WzComparerR2
         {
             get { return checkBoxX12.Checked; }
             set { checkBoxX12.Checked = value; }
+        }
+
+        [Link]
+        public int Item_CosmeticHairColor
+        {
+            get { return comboBoxEx3.SelectedIndex; }
+            set { comboBoxEx3.SelectedIndex = value; }
+        }
+
+        [Link]
+        public int Item_CosmeticFaceColor
+        {
+            get { return comboBoxEx4.SelectedIndex; }
+            set { comboBoxEx4.SelectedIndex = value; }
         }
 
         public void Load(CharaSimConfig config)
