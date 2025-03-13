@@ -52,6 +52,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowSpeed { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowMedalTag { get; set; } = true;
+        public bool MaxStar25 { get; set; } = false;
         public bool IsCombineProperties { get; set; } = true;
 
         public TooltipRender SetItemRender { get; set; }
@@ -1704,6 +1705,11 @@ namespace WzComparerR2.CharaSimControl
             int maxStar = Math.Max(Gear.GetMaxStar(), Gear.Star);
             if (maxStar > 0)
             {
+                if (maxStar == 30 && this.MaxStar25)
+                {
+                    maxStar -= 5;
+                }
+
                 for (int i = 0; i < maxStar; i += 15)
                 {
                     int starLine = Math.Min(maxStar - i, 15);

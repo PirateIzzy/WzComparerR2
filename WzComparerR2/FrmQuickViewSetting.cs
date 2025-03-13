@@ -135,6 +135,13 @@ namespace WzComparerR2
             set { checkBoxX11.Checked = value; }
         }
 
+        [Link]
+        public bool Gear_MaxStar25
+        {
+            get { return checkBoxX17.Checked; }
+            set { checkBoxX17.Checked = value; }
+        }
+
 
         [Link]
         public bool Recipe_ShowID

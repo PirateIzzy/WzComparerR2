@@ -55,6 +55,7 @@
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.checkBoxX11 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX17 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX6 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX4 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX3 = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -392,6 +393,7 @@
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.checkBoxX11);
+            this.superTabControlPanel2.Controls.Add(this.checkBoxX17);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX6);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX4);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX3);
@@ -419,6 +421,22 @@
             this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX11.TabIndex = 4;
             this.checkBoxX11.Text = "훈장 미리보기";
+            // 
+            // checkBoxX17
+            // 
+            this.checkBoxX17.AutoSize = true;
+            this.checkBoxX17.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX17.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX17.Location = new System.Drawing.Point(15, 108);
+            this.checkBoxX17.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX17.Name = "checkBoxX17";
+            this.checkBoxX17.Size = new System.Drawing.Size(120, 18);
+            this.checkBoxX17.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX17.TabIndex = 4;
+            this.checkBoxX17.Text = "최대 스타포스 25성";
             // 
             // checkBoxX6
             // 
@@ -717,5 +735,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX14;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX17;
     }
 }

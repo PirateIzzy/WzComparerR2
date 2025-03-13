@@ -137,7 +137,7 @@ namespace WzComparerR2.CharaSim
             new[]{ 110, 10, 8 }, 
             new[]{ 120, 15, 10 }, 
             new[]{ 130, 20, 12 }, 
-            new[]{ 140, 25, 15 }, 
+            new[]{ 140, 30, 15 }, 
         };
 
         public override object Clone()
