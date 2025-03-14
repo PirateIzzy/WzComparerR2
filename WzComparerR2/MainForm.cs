@@ -41,7 +41,7 @@ namespace WzComparerR2
             this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
-            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
+            this.Font = new Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
 #endif
             Form.CheckForIllegalCrossThreadCalls = false;
             this.MinimumSize = new Size(600, 450);
@@ -241,11 +241,14 @@ namespace WzComparerR2
             tooltipQuickView.GearRender.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.GearRender.ShowMedalTag = Setting.Gear.ShowMedalTag;
+            tooltipQuickView.GearRender.MaxStar25 = Setting.Gear.MaxStar25;
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
             tooltipQuickView.ItemRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.ItemRender.ShowNickTag = Setting.Item.ShowNickTag;
+            tooltipQuickView.ItemRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
+            tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
         }
 
@@ -670,7 +673,8 @@ namespace WzComparerR2
             }
             else
             {
-                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node);
+                var options = (sender == this.buttonOverlayExtractGifEx) ? FrameAnimationCreatingOptions.ScanAllChildrenFrames : default;
+                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node, options);
 
                 if (frameData != null)
                 {

@@ -20,7 +20,7 @@ namespace WzComparerR2
             InitializeComponent();
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
-            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
+            this.Font = new Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
 #endif
             this.comboBoxEx1.SelectedIndex = 0;
             this.comboBoxEx2.SelectedIndex = 0;
@@ -31,6 +31,22 @@ namespace WzComparerR2
                 new ComboItem("Plain String") { Value = 1 },
                 new ComboItem("MapleWiki Optimized") { Value = 2 },
             });
+            this.comboBoxEx3.Items.AddRange((new[] { "Black", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown" }).Select(color =>
+            {
+                var comboBoxItem = new DevComponents.DotNetBar.ComboBoxItem();
+                comboBoxItem.Text = color;
+                return comboBoxItem;
+            }).ToArray());
+
+            this.comboBoxEx4.Items.AddRange((new[] { "Black", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown" }).Select(color =>
+            {
+                var comboBoxItem = new DevComponents.DotNetBar.ComboBoxItem();
+                comboBoxItem.Text = color;
+                return comboBoxItem;
+            }).ToArray());
+
+            this.comboBoxEx3.SelectedIndex = 0;
+            this.comboBoxEx4.SelectedIndex = 0;
         }
 
         [Link]
@@ -142,6 +158,13 @@ namespace WzComparerR2
             set { checkBoxX11.Checked = value; }
         }
 
+        [Link]
+        public bool Gear_MaxStar25
+        {
+            get { return checkBoxX17.Checked; }
+            set { checkBoxX17.Checked = value; }
+        }
+
 
         [Link]
         public bool Recipe_ShowID
@@ -191,6 +214,20 @@ namespace WzComparerR2
         {
             get { return chkCopyParsedSkillString.Checked; }
             set { chkCopyParsedSkillString.Checked = value; }
+        }
+
+        [Link]
+        public int Item_CosmeticHairColor
+        {
+            get { return comboBoxEx3.SelectedIndex; }
+            set { comboBoxEx3.SelectedIndex = value; }
+        }
+
+        [Link]
+        public int Item_CosmeticFaceColor
+        {
+            get { return comboBoxEx4.SelectedIndex; }
+            set { comboBoxEx4.SelectedIndex = value; }
         }
 
         public void Load(CharaSimConfig config)

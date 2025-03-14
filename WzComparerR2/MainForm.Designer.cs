@@ -179,6 +179,7 @@
             this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
             this.buttonOverlayRect = new DevComponents.DotNetBar.ButtonItem();
             this.buttonLoadMultiFrameAniList = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonOverlayExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -2081,8 +2082,8 @@
             // buttonItemExtractGifEx
             //
             this.buttonItemExtractGifEx.Name = "buttonItemExtractGifEx";
-            this.buttonItemExtractGifEx.Text = "ExtractGifEx";
-            this.buttonItemExtractGifEx.Tooltip = "Extract frame animations for all child nodes of the selected node, without using ordinal node names.";
+            this.buttonItemExtractGifEx.Text = "Activate+";
+            this.buttonItemExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node, without using ordinal node names.";
             this.buttonItemExtractGifEx.Click += new System.EventHandler(this.buttonItemGif_Click);
             // 
             // buttonItemGifSetting
@@ -2102,6 +2103,7 @@
             this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonDisableOverlayAni,
             this.buttonOverlayRect,
+            this.buttonOverlayExtractGifEx,
             this.buttonLoadMultiFrameAniList});
             // 
             // 
@@ -2118,12 +2120,21 @@
             // 
             this.buttonOverlayRect.Name = "buttonOverlayRect";
             this.buttonOverlayRect.Text = "Add Boundary Rectangle";
+            this.buttonOverlayRect.Tooltip = "Draws a semi-transparent rectangle for the input range.";
             this.buttonOverlayRect.Click += new System.EventHandler(this.buttonOverlayRect_Click);
+            // 
+            // buttonItemExtractGifEx
+            //
+            this.buttonOverlayExtractGifEx.Name = "buttonOverlayExtractGifEx";
+            this.buttonOverlayExtractGifEx.Text = "Nesting+";
+            this.buttonOverlayExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node and nest them, without using ordinal node names.";
+            this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
             // 
             // buttonOverlayRect
             // 
             this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
             this.buttonLoadMultiFrameAniList.Text = "Load Multiframe Animation";
+            this.buttonLoadMultiFrameAniList.Tooltip = "Load a list of frames to find. You can select one of the loaded lists and nest it..";
             this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // textBoxX1
@@ -3271,6 +3282,7 @@
         private DevComponents.DotNetBar.ButtonItem buttonDisableOverlayAni;
         private DevComponents.DotNetBar.ButtonItem buttonOverlayRect; 
         private DevComponents.DotNetBar.ButtonItem buttonLoadMultiFrameAniList;
+        private DevComponents.DotNetBar.ButtonItem buttonOverlayExtractGifEx;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
         private System.Windows.Forms.ToolStripMenuItem tsmi2ExpandAll;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CollapseAll;

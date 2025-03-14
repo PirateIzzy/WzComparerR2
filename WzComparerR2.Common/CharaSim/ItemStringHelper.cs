@@ -132,7 +132,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.fixedPotential: return value == 0 ? null : "Potential Reset Not Allowed";
                 case GearPropType.superiorEqp: return value == 0 ? null : "Allows you to gain even higher stats with successful item enhancement.";
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#cYou can mount a Nebulite on this item.#";
-                case GearPropType.jokerToSetItem: return value == 0 ? null : "\n#cThis lucky item counts towards any set,\n\rso long as you have at least 3 set pieces equipped!#";//\n\r#cThis lucky...
+                case GearPropType.jokerToSetItem: return value == 0 ? null : "\n#cThis lucky item counts towards any set, so long\n\ras you have at least 3 set pieces equipped!\n\r(However, the effect will apply to only one set if\n\ryou have 2 or more lucky items equipped.)#";//\n\r#cThis lucky...
                 case GearPropType.plusToSetItem: return value == 0 ? null : "#cWhen equipped, the item set will count as having equipped two.#";
                 case GearPropType.abilityTimeLimited: return value == 0 ? null : "Limited Time Stats";
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "Golden Hammer cannot be used.";

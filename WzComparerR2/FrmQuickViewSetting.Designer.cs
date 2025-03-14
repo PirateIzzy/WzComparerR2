@@ -58,6 +58,7 @@
             this.superTabItem4 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.checkBoxX11 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX17 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX6 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX4 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX3 = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -71,11 +72,14 @@
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
             this.checkBoxX12 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.labelX4 = new DevComponents.DotNetBar.LabelX();
             this.cmbPreferredStringCopyMethod = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.chkCopyParsedSkillString = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabControlPanel5 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.superTabItem5 = new DevComponents.DotNetBar.SuperTabItem();
+            this.labelX4 = new DevComponents.DotNetBar.LabelX();
+            this.labelX5 = new DevComponents.DotNetBar.LabelX();
+            this.comboBoxEx3 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.comboBoxEx4 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
@@ -322,6 +326,258 @@
             this.superTabItem1.Name = "superTabItem1";
             this.superTabItem1.Text = "Skill";
             // 
+            // superTabControlPanel2
+            // 
+            this.superTabControlPanel2.Controls.Add(this.checkBoxX11);
+            this.superTabControlPanel2.Controls.Add(this.checkBoxX17);
+            this.superTabControlPanel2.Controls.Add(this.checkBoxX6);
+            this.superTabControlPanel2.Controls.Add(this.checkBoxX4);
+            this.superTabControlPanel2.Controls.Add(this.checkBoxX3);
+            this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel2.Location = new System.Drawing.Point(72, 0);
+            this.superTabControlPanel2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.superTabControlPanel2.Name = "superTabControlPanel2";
+            this.superTabControlPanel2.Size = new System.Drawing.Size(282, 231);
+            this.superTabControlPanel2.TabIndex = 0;
+            this.superTabControlPanel2.TabItem = this.superTabItem2;
+            this.superTabControlPanel2.Visible = false;
+            // 
+            // checkBoxX11
+            // 
+            this.checkBoxX11.AutoSize = true;
+            this.checkBoxX11.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX11.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX11.Location = new System.Drawing.Point(13, 84);
+            this.checkBoxX11.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX11.Name = "checkBoxX11";
+            this.checkBoxX11.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX11.TabIndex = 4;
+            this.checkBoxX11.Text = "Show Medal Preview";
+            // 
+            // checkBoxX17
+            // 
+            this.checkBoxX17.AutoSize = true;
+            this.checkBoxX17.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX17.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX17.Location = new System.Drawing.Point(13, 108);
+            this.checkBoxX17.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX17.Name = "checkBoxX17";
+            this.checkBoxX17.Size = new System.Drawing.Size(120, 18);
+            this.checkBoxX17.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX17.TabIndex = 4;
+            this.checkBoxX17.Text = "Set 25 Star Force Maximum";
+            // 
+            // checkBoxX6
+            // 
+            this.checkBoxX6.AutoSize = true;
+            this.checkBoxX6.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX6.Location = new System.Drawing.Point(13, 60);
+            this.checkBoxX6.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX6.Name = "checkBoxX6";
+            this.checkBoxX6.Size = new System.Drawing.Size(125, 18);
+            this.checkBoxX6.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX6.TabIndex = 3;
+            this.checkBoxX6.Text = "Show Item Growth Info";
+            // 
+            // checkBoxX4
+            // 
+            this.checkBoxX4.AutoSize = true;
+            this.checkBoxX4.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX4.Location = new System.Drawing.Point(13, 36);
+            this.checkBoxX4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX4.Name = "checkBoxX4";
+            this.checkBoxX4.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX4.TabIndex = 2;
+            this.checkBoxX4.Text = "Show Weapon Attack Speed";
+            // 
+            // checkBoxX3
+            // 
+            this.checkBoxX3.AutoSize = true;
+            this.checkBoxX3.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX3.Location = new System.Drawing.Point(13, 12);
+            this.checkBoxX3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX3.Name = "checkBoxX3";
+            this.checkBoxX3.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX3.TabIndex = 1;
+            this.checkBoxX3.Text = "Show Equip Code";
+            // 
+            // superTabItem2
+            // 
+            this.superTabItem2.AttachedControl = this.superTabControlPanel2;
+            this.superTabItem2.GlobalItem = false;
+            this.superTabItem2.Name = "superTabItem2";
+            this.superTabItem2.Text = "Equip";
+            // 
+            // superTabControlPanel3
+            // 
+            this.superTabControlPanel3.Controls.Add(this.checkBoxX12);
+            this.superTabControlPanel3.Controls.Add(this.checkBoxX9);
+            this.superTabControlPanel3.Controls.Add(this.checkBoxX8);
+            this.superTabControlPanel3.Controls.Add(this.checkBoxX5);
+            this.superTabControlPanel3.Controls.Add(this.labelX4);
+            this.superTabControlPanel3.Controls.Add(this.labelX5);
+            this.superTabControlPanel3.Controls.Add(this.comboBoxEx3);
+            this.superTabControlPanel3.Controls.Add(this.comboBoxEx4);
+            this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel3.Location = new System.Drawing.Point(72, 0);
+            this.superTabControlPanel3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.superTabControlPanel3.Name = "superTabControlPanel3";
+            this.superTabControlPanel3.Size = new System.Drawing.Size(282, 231);
+            this.superTabControlPanel3.TabIndex = 0;
+            this.superTabControlPanel3.TabItem = this.superTabItem3;
+            this.superTabControlPanel3.Visible = false;
+            // 
+            // checkBoxX12
+            // 
+            this.checkBoxX12.AutoSize = true;
+            this.checkBoxX12.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX12.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX12.Location = new System.Drawing.Point(13, 84);
+            this.checkBoxX12.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX12.Name = "checkBoxX12";
+            this.checkBoxX12.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX12.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX12.TabIndex = 5;
+            this.checkBoxX12.Text = "Show Title Preview";
+            // 
+            // labelX4
+            // 
+            this.labelX4.AutoSize = true;
+            this.labelX4.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX4.Location = new System.Drawing.Point(13, 36);
+            this.labelX4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelX4.Name = "labelX4";
+            this.labelX4.Size = new System.Drawing.Size(87, 16);
+            this.labelX4.TabIndex = 3;
+            this.labelX4.Text = "Copy Method";
+            // 
+            // labelX5
+            // 
+            this.labelX5.AutoSize = true;
+            this.labelX5.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX5.Location = new System.Drawing.Point(13, 132);
+            this.labelX5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelX5.Name = "labelX5";
+            this.labelX5.Size = new System.Drawing.Size(89, 18);
+            this.labelX5.TabIndex = 8;
+            this.labelX5.Text = "Preview Color";
+            // 
+            // comboBoxEx3
+            // 
+            this.comboBoxEx3.DisplayMember = "Text";
+            this.comboBoxEx3.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboBoxEx3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxEx3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxEx3.FormattingEnabled = true;
+            this.comboBoxEx3.ItemHeight = 15;
+            this.comboBoxEx3.Location = new System.Drawing.Point(140, 106);
+            this.comboBoxEx3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.comboBoxEx3.Name = "comboBoxEx3";
+            this.comboBoxEx3.Size = new System.Drawing.Size(104, 21);
+            this.comboBoxEx3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.comboBoxEx3.TabIndex = 7;
+            // 
+            // comboBoxEx4
+            // 
+            this.comboBoxEx4.DisplayMember = "Text";
+            this.comboBoxEx4.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboBoxEx4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxEx4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxEx4.FormattingEnabled = true;
+            this.comboBoxEx4.ItemHeight = 15;
+            this.comboBoxEx4.Location = new System.Drawing.Point(140, 130);
+            this.comboBoxEx4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.comboBoxEx4.Name = "comboBoxEx4";
+            this.comboBoxEx4.Size = new System.Drawing.Size(104, 21);
+            this.comboBoxEx4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.comboBoxEx4.TabIndex = 9;
+            // 
+            // checkBoxX9
+            // 
+            this.checkBoxX9.AutoSize = true;
+            this.checkBoxX9.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX9.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX9.Location = new System.Drawing.Point(13, 60);
+            this.checkBoxX9.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX9.Name = "checkBoxX9";
+            this.checkBoxX9.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX9.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX9.TabIndex = 4;
+            this.checkBoxX9.Text = "Show Recipe Result";
+            // 
+            // checkBoxX8
+            // 
+            this.checkBoxX8.AutoSize = true;
+            this.checkBoxX8.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX8.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX8.Location = new System.Drawing.Point(13, 36);
+            this.checkBoxX8.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX8.Name = "checkBoxX8";
+            this.checkBoxX8.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX8.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX8.TabIndex = 3;
+            this.checkBoxX8.Text = "Show Recipe Materials";
+            // 
+            // checkBoxX5
+            // 
+            this.checkBoxX5.AutoSize = true;
+            this.checkBoxX5.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX5.Location = new System.Drawing.Point(13, 12);
+            this.checkBoxX5.Name = "checkBoxX5";
+            this.checkBoxX5.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX5.TabIndex = 2;
+            this.checkBoxX5.Text = "Show Item Code";
+            // 
+            // superTabItem3
+            // 
+            this.superTabItem3.AttachedControl = this.superTabControlPanel3;
+            this.superTabItem3.GlobalItem = false;
+            this.superTabItem3.Name = "superTabItem3";
+            this.superTabItem3.Text = "Item";
+            // 
             // superTabControlPanel4
             // 
             this.superTabControlPanel4.Controls.Add(this.checkBoxX7);
@@ -367,66 +623,6 @@
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
             // 
-            // checkBoxX12
-            // 
-            this.checkBoxX12.AutoSize = true;
-            this.checkBoxX12.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX12.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX12.Location = new System.Drawing.Point(13, 84);
-            this.checkBoxX12.Name = "checkBoxX12";
-            this.checkBoxX12.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX12.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX12.TabIndex = 5;
-            this.checkBoxX12.Text = "Show Title Preview";
-            // 
-            // checkBoxX9
-            // 
-            this.checkBoxX9.AutoSize = true;
-            this.checkBoxX9.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX9.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX9.Location = new System.Drawing.Point(13, 60);
-            this.checkBoxX9.Name = "checkBoxX9";
-            this.checkBoxX9.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX9.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX9.TabIndex = 4;
-            this.checkBoxX9.Text = "Show Recipe Result";
-            // 
-            // checkBoxX8
-            // 
-            this.checkBoxX8.AutoSize = true;
-            this.checkBoxX8.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX8.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX8.Location = new System.Drawing.Point(13, 36);
-            this.checkBoxX8.Name = "checkBoxX8";
-            this.checkBoxX8.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX8.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX8.TabIndex = 3;
-            this.checkBoxX8.Text = "Show Recipe Material";
-            // 
-            // checkBoxX5
-            // 
-            this.checkBoxX5.AutoSize = true;
-            this.checkBoxX5.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX5.Location = new System.Drawing.Point(13, 12);
-            this.checkBoxX5.Name = "checkBoxX5";
-            this.checkBoxX5.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX5.TabIndex = 2;
-            this.checkBoxX5.Text = "Show Item Code";
-            // 
             // superTabItem3
             // 
             this.superTabItem3.AttachedControl = this.superTabControlPanel3;
@@ -446,51 +642,6 @@
             this.superTabControlPanel2.Size = new System.Drawing.Size(242, 231);
             this.superTabControlPanel2.TabIndex = 0;
             this.superTabControlPanel2.TabItem = this.superTabItem2;
-            // 
-            // checkBoxX6
-            // 
-            this.checkBoxX6.AutoSize = true;
-            this.checkBoxX6.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX6.Location = new System.Drawing.Point(13, 60);
-            this.checkBoxX6.Name = "checkBoxX6";
-            this.checkBoxX6.Size = new System.Drawing.Size(125, 18);
-            this.checkBoxX6.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX6.TabIndex = 3;
-            this.checkBoxX6.Text = "Show Item Growth Info";
-            // 
-            // checkBoxX4
-            // 
-            this.checkBoxX4.AutoSize = true;
-            this.checkBoxX4.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX4.Location = new System.Drawing.Point(13, 36);
-            this.checkBoxX4.Name = "checkBoxX4";
-            this.checkBoxX4.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX4.TabIndex = 2;
-            this.checkBoxX4.Text = "Show Weapon Attack Speed";
-            // 
-            // checkBoxX3
-            // 
-            this.checkBoxX3.AutoSize = true;
-            this.checkBoxX3.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX3.Location = new System.Drawing.Point(13, 12);
-            this.checkBoxX3.Name = "checkBoxX3";
-            this.checkBoxX3.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX3.TabIndex = 1;
-            this.checkBoxX3.Text = "Show Equip Code";
             // 
             // superTabItem2
             // 
@@ -554,20 +705,6 @@
             this.chkCopyParsedSkillString.TabIndex = 3;
             this.chkCopyParsedSkillString.Text = "Parse Skill String before copying";
             // 
-            // labelX4
-            // 
-            this.labelX4.AutoSize = true;
-            this.labelX4.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.labelX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX4.Location = new System.Drawing.Point(13, 36);
-            this.labelX4.Name = "labelX4";
-            this.labelX4.Size = new System.Drawing.Size(87, 16);
-            this.labelX4.TabIndex = 3;
-            this.labelX4.Text = "Copy Method";
-            // 
             // cmbPreferredStringCopyMethod
             // 
             this.cmbPreferredStringCopyMethod.DisplayMember = "Text";
@@ -605,21 +742,6 @@
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 0;
             this.buttonX1.Text = "Confirm";
-            // 
-            // checkBoxX11
-            // 
-            this.checkBoxX11.AutoSize = true;
-            this.checkBoxX11.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX11.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX11.Location = new System.Drawing.Point(13, 84);
-            this.checkBoxX11.Name = "checkBoxX11";
-            this.checkBoxX11.Size = new System.Drawing.Size(101, 18);
-            this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX11.TabIndex = 4;
-            this.checkBoxX11.Text = "Show Medal Preview";
             // checkBoxX13
             // 
             this.checkBoxX13.AutoSize = true;
@@ -759,8 +881,12 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX21;
-        private DevComponents.DotNetBar.LabelX labelX4;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredStringCopyMethod;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkCopyParsedSkillString;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX17;
+        private DevComponents.DotNetBar.LabelX labelX4;
+        private DevComponents.DotNetBar.LabelX labelX5;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx3;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx4;
     }
 }

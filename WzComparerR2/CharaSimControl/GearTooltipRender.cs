@@ -463,7 +463,7 @@ namespace WzComparerR2.CharaSimControl
                 if (!string.IsNullOrEmpty(incline))
                 {
                     picHeight -= 5;
-                    GearGraphics.DrawString(g, "#cGrants " + incline.Substring(1) + " EXP when first equipped (up to the daily maximum).#",
+                    GearGraphics.DrawString(g, "#cGrants " + incline.Substring(1) + " EXP when first equipped (up to the daily maximum, excluded if max reached).#",
                         GearGraphics.EquipDetailFont, 8, 236, ref picHeight, 16);
                     picHeight += 8;
                 }
