@@ -20,7 +20,7 @@ namespace WzComparerR2
             InitializeComponent();
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
-            this.Font = new Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
 #endif
             this.comboBoxEx1.SelectedIndex = 0;
             this.comboBoxEx2.SelectedIndex = 0;
@@ -157,14 +157,6 @@ namespace WzComparerR2
             get { return checkBoxX11.Checked; }
             set { checkBoxX11.Checked = value; }
         }
-
-        [Link]
-        public bool Gear_MaxStar25
-        {
-            get { return checkBoxX17.Checked; }
-            set { checkBoxX17.Checked = value; }
-        }
-
 
         [Link]
         public bool Recipe_ShowID

@@ -52,7 +52,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowSpeed { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowMedalTag { get; set; } = true;
-        public bool MaxStar25 { get; set; } = false;
+        private bool isPostNEXTClient;
         public bool IsCombineProperties { get; set; } = true;
 
         public TooltipRender SetItemRender { get; set; }
@@ -67,7 +67,9 @@ namespace WzComparerR2.CharaSimControl
             int[] picH = new int[4];
             Bitmap left = RenderBase(out picH[0]);
             Bitmap add = RenderAddition(out picH[1]);
-            Bitmap genesis = RenderGenesisSkills(out int genesisHeight);
+            int equipLevel = 0;
+            this.Gear.Props.TryGetValue(GearPropType.reqLevel, out equipLevel);
+            Bitmap genesis = RenderGenesisSkills(out int genesisHeight, equipLevel == 250);
             Bitmap set = RenderSetItem(out int setHeight);
             picH[2] = genesisHeight + setHeight;
             Bitmap levelOrSealed = null;
@@ -179,6 +181,9 @@ namespace WzComparerR2.CharaSimControl
 
         private Bitmap RenderBase(out int picH)
         {
+            StringResult destinyWeapon;
+            // 1212142 = Destiny Shining Rod
+            isPostNEXTClient = StringLinker.StringEqp.TryGetValue(1212142, out destinyWeapon);
             Bitmap bitmap = new Bitmap(261, DefaultPicHeight);
             Graphics g = Graphics.FromImage(bitmap);
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
@@ -503,6 +508,7 @@ namespace WzComparerR2.CharaSimControl
                         Math.Min(appearance.Origin.Y, 100));
 
                     g.DrawImage(appearance.Bitmap, 88 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
+                    Gear.AndroidBitmap = appearance.Bitmap;
 
                     picH += 100;
                 }
@@ -728,7 +734,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //星星锤子
-            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar() > 0 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar(isPostNEXTClient) > 0 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 if (Gear.Hammer == 2)
                 {
@@ -1398,7 +1404,7 @@ namespace WzComparerR2.CharaSimControl
             return levelOrSealed;
         }
 
-        private Bitmap RenderGenesisSkills(out int picHeight)
+        private Bitmap RenderGenesisSkills(out int picHeight, bool isDestinyWeapon=false)
         {
             Bitmap genesisBitmap = null;
             picHeight = 0;
@@ -1408,19 +1414,18 @@ namespace WzComparerR2.CharaSimControl
                 Graphics g = Graphics.FromImage(genesisBitmap);
                 picHeight = 13;
 
-                Gear.Props.TryGetValue(GearPropType.reqLevel, out var equipLevel);
-                int destinySkill = 1241 * (equipLevel == 250 ? 1 : 0);
-
-                foreach (var skillID in new[] { 80002632, 80002633 })
+                int[] skillList = new[] { 80002632, 80002633 };
+                if (isDestinyWeapon) skillList = new[] { 80003873, 80003874 };
+                foreach (var skillID in skillList)
                 {
                     string skillName;
-                    if (this.StringLinker?.StringSkill.TryGetValue(skillID + destinySkill, out var sr) ?? false && sr.Name != null)
+                    if (this.StringLinker?.StringSkill.TryGetValue(skillID, out var sr) ?? false && sr.Name != null)
                     {
                         skillName = sr.Name;
                     }
                     else
                     {
-                        skillName = (skillID + destinySkill).ToString();
+                        skillName = skillID.ToString();
                     }
                     g.DrawString($"{skillName} available", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
                     picHeight += 16;
@@ -1684,7 +1689,7 @@ namespace WzComparerR2.CharaSimControl
 
             int reqJob;
             Gear.Props.TryGetValue(GearPropType.reqJob, out reqJob);
-            int[] origin = new int[] { 14, 7, 56, 7, 95, 7, 135, 7, 166, 10, 198, 10 };//翻译改动
+            int[] origin = new int[] { 16, 7, 58, 7, 97, 7, 137, 7, 168, 10, 200, 10 };//翻译改动
             int[] origin2 = new int[] { 10, 6, 44, 6, 79, 6, 126, 6, 166, 6, 201, 6 };
             for (int i = 0; i <= 5; i++)
             {
@@ -1754,14 +1759,9 @@ namespace WzComparerR2.CharaSimControl
         private void DrawStar2(Graphics g, ref int picH)
         {
             //int maxStar = Gear.GetMaxStar();
-            int maxStar = Math.Max(Gear.GetMaxStar(), Gear.Star);
+            int maxStar = Math.Max(Gear.GetMaxStar(isPostNEXTClient), Gear.Star);
             if (maxStar > 0)
             {
-                if (maxStar == 30 && this.MaxStar25)
-                {
-                    maxStar -= 5;
-                }
-
                 for (int i = 0; i < maxStar; i += 15)
                 {
                     int starLine = Math.Min(maxStar - i, 15);
