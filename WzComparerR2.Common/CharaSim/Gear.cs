@@ -90,7 +90,7 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public int GetMaxStar()
+        public int GetMaxStar(bool isPostNEXTClient = false)
         {
             if (!this.HasTuc)
             {
@@ -112,17 +112,35 @@ namespace WzComparerR2.CharaSim
             int reqLevel;
             this.Props.TryGetValue(GearPropType.reqLevel, out reqLevel);
             int[] data = null;
-            foreach (int[] item in starData)
+            if (isPostNEXTClient)
             {
-                if (reqLevel >= item[0])
+                foreach (int[] item in starDataPostNEXT)
                 {
-                    data = item;
-                }
-                else
-                {
-                    break;
+                    if (reqLevel >= item[0])
+                    {
+                        data = item;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
+            else
+            {
+                foreach (int[] item in starData)
+                {
+                    if (reqLevel >= item[0])
+                    {
+                        data = item;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
             if (data == null)
             {
                 return 0;
@@ -132,12 +150,21 @@ namespace WzComparerR2.CharaSim
         }
 
         private static readonly int[][] starData = new int[][] {
-            new[]{ 0, 5, 3 }, 
-            new[]{ 95, 8, 5 }, 
-            new[]{ 108, 10, 8 }, 
-            new[]{ 118, 15, 10 }, 
-            new[]{ 128, 20, 12 }, 
-            new[]{ 138, 30, 15 }, 
+            new[]{ 0, 5, 3 },
+            new[]{ 95, 8, 5 },
+            new[]{ 108, 10, 8 },
+            new[]{ 118, 15, 10 },
+            new[]{ 128, 20, 12 },
+            new[]{ 138, 25, 15 },
+        };
+
+        private static readonly int[][] starDataPostNEXT = new int[][] {
+            new[]{ 0, 5, 3 },
+            new[]{ 95, 8, 5 },
+            new[]{ 108, 10, 8 },
+            new[]{ 118, 15, 10 },
+            new[]{ 128, 20, 12 },
+            new[]{ 138, 30, 15 },
         };
 
         public override object Clone()
