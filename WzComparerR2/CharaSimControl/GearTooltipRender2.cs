@@ -508,6 +508,7 @@ namespace WzComparerR2.CharaSimControl
                         Math.Min(appearance.Origin.Y, 100));
 
                     g.DrawImage(appearance.Bitmap, 88 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
+                    Gear.AndroidBitmap = appearance.Bitmap;
 
                     picH += 100;
                 }
@@ -1688,7 +1689,7 @@ namespace WzComparerR2.CharaSimControl
 
             int reqJob;
             Gear.Props.TryGetValue(GearPropType.reqJob, out reqJob);
-            int[] origin = new int[] { 14, 7, 56, 7, 95, 7, 135, 7, 166, 10, 198, 10 };//翻译改动
+            int[] origin = new int[] { 16, 7, 58, 7, 97, 7, 137, 7, 168, 10, 200, 10 };//翻译改动
             int[] origin2 = new int[] { 10, 6, 44, 6, 79, 6, 126, 6, 166, 6, 201, 6 };
             for (int i = 0; i <= 5; i++)
             {

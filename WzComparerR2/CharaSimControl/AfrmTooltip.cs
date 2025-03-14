@@ -17,7 +17,10 @@ namespace WzComparerR2.CharaSimControl
             this.menu = new ContextMenuStrip();
             this.menu.Items.Add(new ToolStripMenuItem("Copy Tooltip Image to Clipboard", null, tsmiCopy_Click));
             this.menu.Items.Add(new ToolStripMenuItem("Save Tooltip Image", null, tsmiSave_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Save Android Image", null, tsmiAndroidSave_Click));
+            this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Copy String to Clipboard", null, tsmiCopyText_Click));
+            this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Close (Esc)", null, tsmiClose_Click));
             this.ContextMenuStrip = this.menu;
 
@@ -41,6 +44,9 @@ namespace WzComparerR2.CharaSimControl
         private ContextMenuStrip menu;
         private bool showMenu;
         private bool showID;
+
+        private Bitmap AndroidBitmap;
+
 
         public Object TargetItem
         {
@@ -103,6 +109,7 @@ namespace WzComparerR2.CharaSimControl
 
         public void PreRender()
         {
+            AndroidBitmap = null;
             if (this.item == null)
                 return;
 
@@ -194,6 +201,7 @@ namespace WzComparerR2.CharaSimControl
             }
             renderer.StringLinker = StringLinker;
             this.Bitmap = renderer.Render();
+            if (item is Gear) AndroidBitmap = (this.TargetItem as Gear).AndroidBitmap;
         }
 
         void AfrmTooltip_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -392,6 +400,24 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
         }
+
+        void tsmiAndroidSave_Click(object sender, EventArgs e)
+        {
+            if (this.AndroidBitmap != null && this.item != null)
+            {
+                using (SaveFileDialog dlg = new SaveFileDialog())
+                {
+                    dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
+                    dlg.FileName = this.ImageFileName.Replace("eqp", "android");
+
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        this.AndroidBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                }
+            }
+        }
+
 
         void AfrmTooltip_SizeChanged(object sender, EventArgs e)
         {
