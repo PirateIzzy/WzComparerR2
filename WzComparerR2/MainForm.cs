@@ -38,6 +38,7 @@ namespace WzComparerR2
         public MainForm()
         {
             InitializeComponent();
+            this.Shown += new EventHandler(MainForm_Shown);
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -263,6 +264,21 @@ namespace WzComparerR2
             Wz_Structure.DefaultAutoDetectExtFiles = config.AutoDetectExtFiles;
             Wz_Structure.DefaultImgCheckDisabled = config.ImgCheckDisabled;
             Wz_Structure.DefaultWzVersionVerifyMode = config.WzVersionVerifyMode;
+        }
+
+        async Task<bool> AutomaticCheckUpdate()
+        {
+            return await FrmUpdater.QueryUpdate();
+            // Following code is from JMS implementation
+            /*var config = WcR2Config.Default;
+            if (config.EnableAutoUpdate)
+            {
+                return await FrmUpdater.QueryUpdate();
+            }
+            else
+            {
+                return false;
+            }*/
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
@@ -3648,15 +3664,7 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-#if NET6_0_OR_GREATER
-            Process.Start(new ProcessStartInfo
-            {
-                UseShellExecute = true,
-                FileName = "https://github.com/KENNYSOFT/WzComparerR2/releases",
-            });
-#else
-            Process.Start("https://github.com/KENNYSOFT/WzComparerR2/releases");
-#endif
+            new FrmUpdater().ShowDialog();
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)
@@ -3670,6 +3678,13 @@ namespace WzComparerR2
                 ConfigManager.Save();
                 UpdateWzLoadingSettings();
             }
+        }
+
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            //Automatic Update Check
+            bool isUpdateRequired = await AutomaticCheckUpdate();
+            if (isUpdateRequired) new FrmUpdater().ShowDialog();
         }
     }
 

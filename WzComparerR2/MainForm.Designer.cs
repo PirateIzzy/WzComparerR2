@@ -1502,7 +1502,7 @@
             // 
             this.buttonItemUpdate.Name = "buttonItemUpdate";
             this.buttonItemUpdate.SubItemsExpandWidth = 14;
-            this.buttonItemUpdate.Text = "업데이트";
+            this.buttonItemUpdate.Text = "업데이터";
             this.buttonItemUpdate.Click += new System.EventHandler(this.buttonItemUpdate_Click);
             // 
             // ribbonBar6
