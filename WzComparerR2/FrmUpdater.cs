@@ -27,7 +27,7 @@ namespace WzComparerR2
             InitializeComponent();
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
-            this.Font = new Font(new FontFamily("굴림"), 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Font = new Font(new FontFamily("Arial"), 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
 #endif
 
             // this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, Program.GetArchitecture());
@@ -40,13 +40,13 @@ namespace WzComparerR2
         }
 
         private UpdaterSession updateSession;
-        // private string net462url;
-        // private string net60url;
-        // private string net80url;
+        private string net462url;
+        private string net60url;
+        private string net80url;
         private string fileurl;
 
-        private string updaterURL = "https://github.com/HikariCalyx/WzComparerR2Updater/releases/download/v1.0.0.250318-1934/Updater_SKMS.exe";
-        private static string checkUpdateURL = "https://api.github.com/repos/seotbeo/WzComparerR2/releases/latest";
+        private string updaterURL = "https://github.com/HikariCalyx/WzComparerR2Updater/releases/download/v1.0.0.250318-1934/Updater.exe";
+        private static string checkUpdateURL = "https://api.github.com/repos/PirateIzzy/WzComparerR2/releases/latest";
 
         public static async Task<bool> QueryUpdate()
         {
@@ -62,7 +62,7 @@ namespace WzComparerR2
                     string responseString = reader.ReadToEnd();
                     JObject UpdateContent = JObject.Parse(responseString);
                     string BuildNumber = UpdateContent.SelectToken("tag_name").ToString();
-                    return Int64.Parse(BuildNumber.Substring(1, 8)) > Int64.Parse(BuildInfo.BuildTime.Substring(1, 8));
+                    return Int64.Parse(BuildNumber) > Int64.Parse(BuildInfo.BuildTime);
                 }
             }
             catch (Exception ex)
@@ -90,16 +90,15 @@ namespace WzComparerR2
                 {
                     downloadUrls[i] = assets[i]["browser_download_url"]?.ToString();
                 }
-                // This part is for builds that separated into 3 packages
-                /*foreach (string url in downloadUrls)
+                // This part is for builds that are separated into 3 packages
+                foreach (string url in downloadUrls)
                 {
                     if (url.Contains("net6.0")) net60url = url;
                     else if (url.Contains("net8.0")) net80url = url;
                     else net462url = url;
-                }*/
+                }
 
-                // This part is specificially for this fork
-                fileurl = downloadUrls[0];
+                // fileurl = downloadUrls[0];
 
                 this.lblLatestVer.Text = BuildNumber;
                 this.advTree1.Nodes.Add(new Node("<font color=\"#FF0000\">" + ChangeTitle + "</font>"));
@@ -108,19 +107,19 @@ namespace WzComparerR2
                     this.advTree1.Nodes.Add(new Node(line));
                 }
 
-                if (Int64.Parse(BuildNumber.Substring(1, 8)) > Int64.Parse(BuildInfo.BuildTime.Substring(1, 8)))
+                if (Int64.Parse(BuildNumber) > Int64.Parse(BuildInfo.BuildTime))
                 {
                     buttonX1.Enabled = true;
-                    this.lblUpdateContent.Text = "업데이트 가능";
+                    this.lblUpdateContent.Text = "Update available";
                 }
                 else
                 {
-                    this.lblUpdateContent.Text = "이미 최신 버전을 실행 중입니다";
+                    this.lblUpdateContent.Text = "Already using the latest version";
                 }
             }
             catch (Exception ex)
             {
-                this.lblUpdateContent.Text = "업데이트 확인 실패";
+                this.lblUpdateContent.Text = "Update check failed";
             }
         }
 
@@ -164,11 +163,11 @@ namespace WzComparerR2
                         }
                     }
                 }
-                RunProgram("Updater.exe", "\"" + savePath + "\"", Environment.Version.Major);
+                RunProgram("Updater.exe", "\"" + savePath + "\"");
             }
             catch (Exception ex)
             {
-                this.lblUpdateContent.Text = "업데이트 다운로드 실패";
+                this.lblUpdateContent.Text = "Failed to download update";
             }
             finally
             {
@@ -178,15 +177,15 @@ namespace WzComparerR2
 
         private void buttonX1_Click(object sender, EventArgs e)
         {
-            this.lblUpdateContent.Text = "업데이트를 다운로드하는 중...";
+            this.lblUpdateContent.Text = "Downloading update...";
             buttonX1.Enabled = false;
-            // string selectedURL = "";
+            string selectedURL = "";
             updateSession = new UpdaterSession();
-            /*switch (Environment.Version.Major)
+            switch (Environment.Version.Major)
             {
                 default:
                 case 4:
-                    selectedURL = net48url;
+                    selectedURL = net462url;
                     break;
                 case 6:
                     selectedURL = net60url;
@@ -194,21 +193,21 @@ namespace WzComparerR2
                 case 8:
                     selectedURL = net80url;
                     break;
-            }*/
-            Task.Run(() => this.DownloadUpdateAsync(fileurl, updateSession, updateSession.CancellationToken));
+            }
+            Task.Run(() => this.DownloadUpdateAsync(selectedURL, updateSession, updateSession.CancellationToken));
         }
 
-        private void RunProgram(string url, string path, int dotNetVersion)
+        private void RunProgram(string url, string argument)
         {
 #if NET6_0_OR_GREATER
             Process.Start(new ProcessStartInfo
             {
                 UseShellExecute = true,
                 FileName = url,
-                Arguments = String.Format("{0} {1}", path, dotNetVersion.ToString()),
+                Arguments = argument,
             });
 #else
-            Process.Start(url, String.Format("{0} {1}", path, dotNetVersion.ToString()));
+            Process.Start(url, argument);
 #endif
         }
 

@@ -52,7 +52,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(56, 16);
             this.labelX1.TabIndex = 0;
-            this.labelX1.Text = "현재 버전:";
+            this.labelX1.Text = "Current Version:";
             // 
             // labelX2
             // 
@@ -65,7 +65,7 @@
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(81, 16);
             this.labelX2.TabIndex = 1;
-            this.labelX2.Text = "최신 버전:";
+            this.labelX2.Text = "Latest Version:";
             // 
             // labelX3
             // 
@@ -78,7 +78,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(50, 16);
             this.labelX3.TabIndex = 2;
-            this.labelX3.Text = "버전 정보:";
+            this.labelX3.Text = "Version info:";
             // 
             // lblCurrentVer
             // 
@@ -117,7 +117,7 @@
             this.lblUpdateContent.Name = "lblUpdateContent";
             this.lblUpdateContent.Size = new System.Drawing.Size(13, 16);
             this.lblUpdateContent.TabIndex = 6;
-            this.lblUpdateContent.Text = "업데이트를 확인하는 중...";
+            this.lblUpdateContent.Text = "Checking for updates...";
             // 
             // buttonX1
             // 
@@ -132,7 +132,7 @@
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 8;
             this.buttonX1.Enabled = false;
-            this.buttonX1.Text = "업데이트";
+            this.buttonX1.Text = "Update";
             this.buttonX1.Click += new System.EventHandler(this.buttonX1_Click);
             // 
             // advTree1
@@ -181,14 +181,14 @@
             this.Controls.Add(this.labelX2);
             this.Controls.Add(this.labelX1);
             this.DoubleBuffered = true;
-            this.Font = new System.Drawing.Font("굴림", 9F);
+            this.Font = new System.Drawing.Font("Arial", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmUpdater";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "업데이터";
+            this.Text = "Updater";
             ((System.ComponentModel.ISupportInitialize)(this.advTree1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
