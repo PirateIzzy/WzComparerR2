@@ -517,7 +517,7 @@ namespace WzComparerR2.WzLib
                         // copy back to the original buffer
                         dataCopy.CopyTo(data);
                         return true;
-                    }
+                    } 
                 }
             }
             waveFormatEx = default;

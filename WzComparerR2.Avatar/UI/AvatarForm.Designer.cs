@@ -39,6 +39,7 @@
             this.dockContainerItem1 = new DevComponents.DotNetBar.DockContainerItem();
             this.bar2 = new DevComponents.DotNetBar.Bar();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
+            this.cmbEar = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbWeaponIdx = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbWeaponType = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
@@ -57,6 +58,9 @@
             this.chkHairShade = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkHairCover = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkApplyBRM = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.labelX5 = new DevComponents.DotNetBar.LabelX();
+            this.labelX6 = new DevComponents.DotNetBar.LabelX();
+            this.cmbGroupChair = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.dockSite8 = new DevComponents.DotNetBar.DockSite();
             this.dockSite5 = new DevComponents.DotNetBar.DockSite();
@@ -70,12 +74,10 @@
             this.btnReset = new DevComponents.DotNetBar.ButtonItem();
             this.btnLock = new DevComponents.DotNetBar.ButtonItem();
             this.btnSaveAsGif = new DevComponents.DotNetBar.ButtonItem();
+            this.btnExport = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
-            this.labelX5 = new DevComponents.DotNetBar.LabelX();
-            this.cmbEar = new DevComponents.DotNetBar.Controls.ComboBoxEx();
-            this.btnExport = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar1)).BeginInit();
             this.bar1.SuspendLayout();
@@ -116,9 +118,9 @@
             this.dockSite4.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite4.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.dockSite4.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite4.Location = new System.Drawing.Point(0, 411);
+            this.dockSite4.Location = new System.Drawing.Point(0, 539);
             this.dockSite4.Name = "dockSite4";
-            this.dockSite4.Size = new System.Drawing.Size(584, 0);
+            this.dockSite4.Size = new System.Drawing.Size(775, 0);
             this.dockSite4.TabIndex = 3;
             this.dockSite4.TabStop = false;
             // 
@@ -127,9 +129,9 @@
             this.dockSite1.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite1.Dock = System.Windows.Forms.DockStyle.Left;
             this.dockSite1.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite1.Location = new System.Drawing.Point(0, 25);
+            this.dockSite1.Location = new System.Drawing.Point(0, 27);
             this.dockSite1.Name = "dockSite1";
-            this.dockSite1.Size = new System.Drawing.Size(0, 386);
+            this.dockSite1.Size = new System.Drawing.Size(0, 512);
             this.dockSite1.TabIndex = 0;
             this.dockSite1.TabStop = false;
             // 
@@ -140,11 +142,11 @@
             this.dockSite2.Controls.Add(this.bar2);
             this.dockSite2.Dock = System.Windows.Forms.DockStyle.Right;
             this.dockSite2.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer(new DevComponents.DotNetBar.DocumentBaseContainer[] {
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 212))),
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 171)))}, DevComponents.DotNetBar.eOrientation.Vertical);
-            this.dockSite2.Location = new System.Drawing.Point(368, 25);
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 278))),
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 231)))}, DevComponents.DotNetBar.eOrientation.Vertical);
+            this.dockSite2.Location = new System.Drawing.Point(559, 27);
             this.dockSite2.Name = "dockSite2";
-            this.dockSite2.Size = new System.Drawing.Size(216, 386);
+            this.dockSite2.Size = new System.Drawing.Size(216, 512);
             this.dockSite2.TabIndex = 1;
             this.dockSite2.TabStop = false;
             // 
@@ -164,7 +166,7 @@
             this.bar1.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
             this.bar1.Location = new System.Drawing.Point(3, 0);
             this.bar1.Name = "bar1";
-            this.bar1.Size = new System.Drawing.Size(213, 212);
+            this.bar1.Size = new System.Drawing.Size(213, 278);
             this.bar1.Stretch = true;
             this.bar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar1.TabIndex = 0;
@@ -178,13 +180,14 @@
             this.panelDockContainer1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer1.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer1.Name = "panelDockContainer1";
-            this.panelDockContainer1.Size = new System.Drawing.Size(207, 186);
+            this.panelDockContainer1.Size = new System.Drawing.Size(207, 252);
             this.panelDockContainer1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer1.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
             this.panelDockContainer1.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.ItemText;
             this.panelDockContainer1.Style.GradientAngle = 90;
             this.panelDockContainer1.TabIndex = 0;
+            this.panelDockContainer1.Visible = true;
             // 
             // itemPanel1
             // 
@@ -200,7 +203,7 @@
             this.itemPanel1.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemPanel1.Location = new System.Drawing.Point(0, 0);
             this.itemPanel1.Name = "itemPanel1";
-            this.itemPanel1.Size = new System.Drawing.Size(207, 186);
+            this.itemPanel1.Size = new System.Drawing.Size(207, 252);
             this.itemPanel1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.itemPanel1.TabIndex = 8;
             this.itemPanel1.Text = "itemPanel1";
@@ -225,9 +228,9 @@
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem2});
             this.bar2.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
-            this.bar2.Location = new System.Drawing.Point(3, 215);
+            this.bar2.Location = new System.Drawing.Point(3, 281);
             this.bar2.Name = "bar2";
-            this.bar2.Size = new System.Drawing.Size(213, 171);
+            this.bar2.Size = new System.Drawing.Size(213, 231);
             this.bar2.Stretch = true;
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 1;
@@ -258,27 +261,46 @@
             this.panelDockContainer2.Controls.Add(this.chkHairCover);
             this.panelDockContainer2.Controls.Add(this.chkApplyBRM);
             this.panelDockContainer2.Controls.Add(this.labelX5);
+            this.panelDockContainer2.Controls.Add(this.labelX6);
+            this.panelDockContainer2.Controls.Add(this.cmbGroupChair);
             this.panelDockContainer2.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer2.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer2.Name = "panelDockContainer2";
-            this.panelDockContainer2.Size = new System.Drawing.Size(207, 145);
+            this.panelDockContainer2.Size = new System.Drawing.Size(207, 205);
             this.panelDockContainer2.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer2.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer2.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
             this.panelDockContainer2.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.ItemText;
             this.panelDockContainer2.Style.GradientAngle = 90;
             this.panelDockContainer2.TabIndex = 0;
+            this.panelDockContainer2.Visible = true;
+            // 
+            // cmbEar
+            // 
+            this.cmbEar.DisplayMember = "Text";
+            this.cmbEar.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbEar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbEar.FormattingEnabled = true;
+            this.cmbEar.ItemHeight = 15;
+            this.cmbEar.Location = new System.Drawing.Point(161, 84);
+            this.cmbEar.Name = "cmbEar";
+            this.cmbEar.Size = new System.Drawing.Size(39, 21);
+            this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbEar.TabIndex = 15;
+            this.cmbEar.SelectedIndexChanged += new System.EventHandler(this.cmbEar_SelectedIndexChanged);
             // 
             // cmbWeaponIdx
             // 
             this.cmbWeaponIdx.DisplayMember = "Text";
             this.cmbWeaponIdx.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbWeaponIdx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWeaponIdx.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbWeaponIdx.FormattingEnabled = true;
             this.cmbWeaponIdx.ItemHeight = 15;
-            this.cmbWeaponIdx.Location = new System.Drawing.Point(128, 84);
+            this.cmbWeaponIdx.Location = new System.Drawing.Point(90, 84);
             this.cmbWeaponIdx.Name = "cmbWeaponIdx";
-            this.cmbWeaponIdx.Size = new System.Drawing.Size(50, 21);
+            this.cmbWeaponIdx.Size = new System.Drawing.Size(40, 21);
             this.cmbWeaponIdx.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.cmbWeaponIdx.TabIndex = 13;
             this.cmbWeaponIdx.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponIdx_SelectedIndexChanged);
@@ -288,11 +310,12 @@
             this.cmbWeaponType.DisplayMember = "Text";
             this.cmbWeaponType.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbWeaponType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWeaponType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbWeaponType.FormattingEnabled = true;
             this.cmbWeaponType.ItemHeight = 15;
             this.cmbWeaponType.Location = new System.Drawing.Point(46, 84);
             this.cmbWeaponType.Name = "cmbWeaponType";
-            this.cmbWeaponType.Size = new System.Drawing.Size(78, 21);
+            this.cmbWeaponType.Size = new System.Drawing.Size(40, 21);
             this.cmbWeaponType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.cmbWeaponType.TabIndex = 12;
             this.cmbWeaponType.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponType_SelectedIndexChanged);
@@ -366,6 +389,7 @@
             this.cmbTamingFrame.DisplayMember = "Text";
             this.cmbTamingFrame.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbTamingFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTamingFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbTamingFrame.FormattingEnabled = true;
             this.cmbTamingFrame.ItemHeight = 15;
             this.cmbTamingFrame.Location = new System.Drawing.Point(128, 57);
@@ -381,6 +405,7 @@
             this.cmbEmotionFrame.DisplayMember = "Text";
             this.cmbEmotionFrame.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbEmotionFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEmotionFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbEmotionFrame.FormattingEnabled = true;
             this.cmbEmotionFrame.ItemHeight = 15;
             this.cmbEmotionFrame.Location = new System.Drawing.Point(128, 30);
@@ -396,6 +421,7 @@
             this.cmbBodyFrame.DisplayMember = "Text";
             this.cmbBodyFrame.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbBodyFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbBodyFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbBodyFrame.FormattingEnabled = true;
             this.cmbBodyFrame.ItemHeight = 15;
             this.cmbBodyFrame.Location = new System.Drawing.Point(128, 3);
@@ -412,6 +438,7 @@
             this.cmbActionTaming.DisplayMember = "Text";
             this.cmbActionTaming.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbActionTaming.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbActionTaming.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbActionTaming.FormattingEnabled = true;
             this.cmbActionTaming.ItemHeight = 15;
             this.cmbActionTaming.Location = new System.Drawing.Point(37, 57);
@@ -428,6 +455,7 @@
             this.cmbEmotion.DisplayMember = "Text";
             this.cmbEmotion.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbEmotion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEmotion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbEmotion.FormattingEnabled = true;
             this.cmbEmotion.ItemHeight = 15;
             this.cmbEmotion.Location = new System.Drawing.Point(37, 30);
@@ -489,6 +517,7 @@
             this.cmbActionBody.DisplayMember = "Text";
             this.cmbActionBody.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbActionBody.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbActionBody.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbActionBody.FormattingEnabled = true;
             this.cmbActionBody.ItemHeight = 15;
             this.cmbActionBody.Location = new System.Drawing.Point(37, 3);
@@ -506,9 +535,9 @@
             // 
             // 
             this.chkHairShade.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHairShade.Location = new System.Drawing.Point(82, 142);
+            this.chkHairShade.Location = new System.Drawing.Point(5, 175);
             this.chkHairShade.Name = "chkHairShade";
-            this.chkHairShade.Size = new System.Drawing.Size(85, 19);
+            this.chkHairShade.Size = new System.Drawing.Size(76, 20);
             this.chkHairShade.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkHairShade.TabIndex = 10;
             this.chkHairShade.Text = "Hair Shadow";
@@ -522,9 +551,9 @@
             // 
             // 
             this.chkHairCover.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHairCover.Location = new System.Drawing.Point(5, 155);
+            this.chkHairCover.Location = new System.Drawing.Point(5, 112);
             this.chkHairCover.Name = "chkHairCover";
-            this.chkHairCover.Size = new System.Drawing.Size(83, 19);
+            this.chkHairCover.Size = new System.Drawing.Size(88, 20);
             this.chkHairCover.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkHairCover.TabIndex = 9;
             this.chkHairCover.Text = "Flatten Hair";
@@ -538,13 +567,59 @@
             // 
             // 
             this.chkApplyBRM.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkApplyBRM.Location = new System.Drawing.Point(5, 135);
+            this.chkApplyBRM.Location = new System.Drawing.Point(5, 155);
             this.chkApplyBRM.Name = "chkApplyBRM";
-            this.chkApplyBRM.Size = new System.Drawing.Size(150, 19);
+            this.chkApplyBRM.Size = new System.Drawing.Size(172, 18);
             this.chkApplyBRM.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkApplyBRM.TabIndex = 16;
             this.chkApplyBRM.Text = "Adjust Player Position (Chair)";
             this.chkApplyBRM.CheckedChanged += new System.EventHandler(this.chkApplyBRM_CheckedChanged);
+            // 
+            // labelX5
+            // 
+            this.labelX5.AutoSize = true;
+            this.labelX5.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX5.Location = new System.Drawing.Point(139, 87);
+            this.labelX5.Name = "labelX5";
+            this.labelX5.Size = new System.Drawing.Size(25, 16);
+            this.labelX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.labelX5.TabIndex = 14;
+            this.labelX5.Text = "Ear";
+            // 
+            // labelX6
+            // 
+            this.labelX6.AutoSize = true;
+            this.labelX6.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX6.Location = new System.Drawing.Point(3, 135);
+            this.labelX6.Name = "labelX6";
+            this.labelX6.Size = new System.Drawing.Size(60, 18);
+            this.labelX6.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.labelX6.TabIndex = 17;
+            this.labelX6.Text = "Multiperson Chair";
+            // 
+            // cmbGroupChair
+            // 
+            this.cmbGroupChair.DisplayMember = "Text";
+            this.cmbGroupChair.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbGroupChair.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbGroupChair.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbGroupChair.FormattingEnabled = true;
+            this.cmbGroupChair.ItemHeight = 15;
+            this.cmbGroupChair.Location = new System.Drawing.Point(95, 132);
+            this.cmbGroupChair.Name = "cmbGroupChair";
+            this.cmbGroupChair.Size = new System.Drawing.Size(50, 21);
+            this.cmbGroupChair.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbGroupChair.TabIndex = 18;
+            this.cmbGroupChair.Enabled = false;
+            this.cmbGroupChair.SelectedIndexChanged += new System.EventHandler(this.cmbGroupChair_SelectedIndexChanged);
             // 
             // dockContainerItem2
             // 
@@ -556,9 +631,9 @@
             // 
             this.dockSite8.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite8.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dockSite8.Location = new System.Drawing.Point(0, 411);
+            this.dockSite8.Location = new System.Drawing.Point(0, 539);
             this.dockSite8.Name = "dockSite8";
-            this.dockSite8.Size = new System.Drawing.Size(584, 0);
+            this.dockSite8.Size = new System.Drawing.Size(775, 0);
             this.dockSite8.TabIndex = 7;
             this.dockSite8.TabStop = false;
             // 
@@ -566,9 +641,9 @@
             // 
             this.dockSite5.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.dockSite5.Location = new System.Drawing.Point(0, 25);
+            this.dockSite5.Location = new System.Drawing.Point(0, 27);
             this.dockSite5.Name = "dockSite5";
-            this.dockSite5.Size = new System.Drawing.Size(0, 386);
+            this.dockSite5.Size = new System.Drawing.Size(0, 512);
             this.dockSite5.TabIndex = 4;
             this.dockSite5.TabStop = false;
             // 
@@ -576,9 +651,9 @@
             // 
             this.dockSite6.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite6.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dockSite6.Location = new System.Drawing.Point(584, 25);
+            this.dockSite6.Location = new System.Drawing.Point(775, 27);
             this.dockSite6.Name = "dockSite6";
-            this.dockSite6.Size = new System.Drawing.Size(0, 386);
+            this.dockSite6.Size = new System.Drawing.Size(0, 512);
             this.dockSite6.TabIndex = 5;
             this.dockSite6.TabStop = false;
             // 
@@ -589,7 +664,7 @@
             this.dockSite7.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite7.Location = new System.Drawing.Point(0, 0);
             this.dockSite7.Name = "dockSite7";
-            this.dockSite7.Size = new System.Drawing.Size(584, 25);
+            this.dockSite7.Size = new System.Drawing.Size(775, 27);
             this.dockSite7.TabIndex = 6;
             this.dockSite7.TabStop = false;
             // 
@@ -598,7 +673,6 @@
             this.bar3.AccessibleDescription = "DotNetBar Bar (bar3)";
             this.bar3.AccessibleName = "DotNetBar Bar";
             this.bar3.AccessibleRole = System.Windows.Forms.AccessibleRole.ToolBar;
-            this.bar3.CanCustomize = false;
             this.bar3.DockSide = DevComponents.DotNetBar.eDockSide.Top;
             this.bar3.Font = new System.Drawing.Font("Arial", 9F);
             this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Office2003;
@@ -612,7 +686,7 @@
             this.btnExport});
             this.bar3.Location = new System.Drawing.Point(0, 0);
             this.bar3.Name = "bar3";
-            this.bar3.Size = new System.Drawing.Size(142, 25);
+            this.bar3.Size = new System.Drawing.Size(168, 27);
             this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar3.TabIndex = 0;
             this.bar3.TabStop = false;
@@ -667,15 +741,22 @@
             this.btnSaveAsGif.Name = "btnSaveAsGif";
             this.btnSaveAsGif.Tooltip = "Save";
             this.btnSaveAsGif.Click += new System.EventHandler(this.btnSaveAsGif_Click);
+            //
+            // btnExport
+            //
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Image = global::WzComparerR2.Avatar.Properties.Resources.export;
+            this.btnExport.Tooltip = "Export Action";
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // dockSite3
             // 
             this.dockSite3.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite3.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite3.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite3.Location = new System.Drawing.Point(0, 25);
+            this.dockSite3.Location = new System.Drawing.Point(0, 27);
             this.dockSite3.Name = "dockSite3";
-            this.dockSite3.Size = new System.Drawing.Size(584, 0);
+            this.dockSite3.Size = new System.Drawing.Size(775, 0);
             this.dockSite3.TabIndex = 2;
             this.dockSite3.TabStop = false;
             // 
@@ -687,52 +768,16 @@
             // 
             this.avatarContainer1.BackColor = System.Drawing.Color.White;
             this.avatarContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.avatarContainer1.Location = new System.Drawing.Point(0, 25);
+            this.avatarContainer1.Location = new System.Drawing.Point(0, 27);
             this.avatarContainer1.Name = "avatarContainer1";
             this.avatarContainer1.Origin = new System.Drawing.Point(0, 0);
-            this.avatarContainer1.Size = new System.Drawing.Size(368, 386);
+            this.avatarContainer1.Size = new System.Drawing.Size(559, 512);
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
             // 
-            // labelX5
-            // 
-            this.labelX5.AutoSize = true;
-            this.labelX5.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX5.Location = new System.Drawing.Point(3, 111);
-            this.labelX5.Name = "labelX5";
-            this.labelX5.Size = new System.Drawing.Size(25, 16);
-            this.labelX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.labelX5.TabIndex = 14;
-            this.labelX5.Text = "Ear";
-            // 
-            // cmbEar
-            // 
-            this.cmbEar.DisplayMember = "Text";
-            this.cmbEar.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.cmbEar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbEar.FormattingEnabled = true;
-            this.cmbEar.ItemHeight = 15;
-            this.cmbEar.Location = new System.Drawing.Point(45, 111);
-            this.cmbEar.Name = "cmbEar";
-            this.cmbEar.Size = new System.Drawing.Size(39, 21);
-            this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbEar.TabIndex = 15;
-            this.cmbEar.SelectedIndexChanged += new System.EventHandler(this.cmbEar_SelectedIndexChanged);
-            //
-            // btnExport
-            //
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Image = global::WzComparerR2.Avatar.Properties.Resources.export;
-            this.btnExport.Tooltip = "Export Action";
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            // 
             // AvatarForm
             // 
-            this.ClientSize = new System.Drawing.Size(584, 411);
+            this.ClientSize = new System.Drawing.Size(775, 539);
             this.Controls.Add(this.avatarContainer1);
             this.Controls.Add(this.dockSite2);
             this.Controls.Add(this.dockSite1);
@@ -808,5 +853,7 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEar;
         private DevComponents.DotNetBar.LabelX labelX5;
         private DevComponents.DotNetBar.ButtonItem btnExport;
+        private DevComponents.DotNetBar.LabelX labelX6;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbGroupChair;
     }
 }

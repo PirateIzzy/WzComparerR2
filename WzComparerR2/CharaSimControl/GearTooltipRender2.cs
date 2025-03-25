@@ -578,6 +578,18 @@ namespace WzComparerR2.CharaSimControl
                 TextRenderer.DrawText(g, "Item EXP : 1 / 29 ( 3% )", GearGraphics.EquipDetailFont, new Point(12, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.NoPadding);
                 picH += 15;
             }
+            else if (Gear.ItemID / 1000 == 1714)
+            {
+                TextRenderer.DrawText(g, "성장 레벨 : 1", GearGraphics.EquipDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.NoPadding);
+                picH += 15;
+                TextRenderer.DrawText(g, "성장치 : 1 / 29 ( 3% )", GearGraphics.EquipDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.NoPadding);
+                picH += 15;
+                foreach (var prop in new[] {"경험치 획득량 : +10%", "메소 획득량 : +5%", "아이템 드롭률 : +5%" })
+                {
+                    TextRenderer.DrawText(g, prop, GearGraphics.EquipDetailFont, new Point(13, picH), Color.White, TextFormatFlags.NoPadding);
+                    picH += 15;
+                }
+            }
 
             if (Gear.Props.TryGetValue(GearPropType.@sealed, out value))
             {

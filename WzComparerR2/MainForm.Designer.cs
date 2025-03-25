@@ -125,6 +125,7 @@
             this.comboItem10 = new DevComponents.Editors.ComboItem();
             this.comboItem11 = new DevComponents.Editors.ComboItem();
             this.comboItem12 = new DevComponents.Editors.ComboItem();
+            this.comboItem12_2 = new DevComponents.Editors.ComboItem();
             this.itemContainer17 = new DevComponents.DotNetBar.ItemContainer();
             this.checkBoxItemRegex1 = new DevComponents.DotNetBar.CheckBoxItem();
             this.buttonItemSearchWz = new DevComponents.DotNetBar.ButtonItem();
@@ -1355,7 +1356,8 @@
             this.comboBoxItem1.Items.AddRange(new object[] {
             this.comboItem10,
             this.comboItem11,
-            this.comboItem12});
+            this.comboItem12,
+            this.comboItem12_2});
             this.comboBoxItem1.Name = "comboBoxItem1";
             this.comboBoxItem1.SelectedIndex = 0;
             // 
@@ -1370,6 +1372,10 @@
             // comboItem12
             // 
             this.comboItem12.Text = "Image Value";
+            // 
+            // comboItem12_2
+            // 
+            this.comboItem12_2.Text = "Node,Value";
             // 
             // itemContainer17
             // 
@@ -3367,5 +3373,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputSkillTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
         private DevComponents.Editors.ComboItem comboItem19;
+        private DevComponents.Editors.ComboItem comboItem12_2;
     }
 }
