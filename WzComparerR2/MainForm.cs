@@ -39,6 +39,7 @@ namespace WzComparerR2
         {
             InitializeComponent();
             this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
+            this.Shown += new EventHandler(MainForm_Shown);
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
@@ -281,6 +282,20 @@ namespace WzComparerR2
             Translator.DefaultDetectCurrency = config.DetectCurrency;
             Translator.DefaultDesiredCurrency = config.DesiredCurrency;
             Translator.ExchangeTable = null;
+        }
+        async Task<bool> AutomaticCheckUpdate()
+        {
+            return await FrmUpdater.QueryUpdate();
+            // Following code is from JMS implementation
+            /*var config = WcR2Config.Default;
+            if (config.EnableAutoUpdate)
+            {
+                return await FrmUpdater.QueryUpdate();
+            }
+            else
+            {
+                return false;
+            }*/
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
@@ -583,7 +598,7 @@ namespace WzComparerR2
             }
             else
             {
-                var options = (sender == this.buttonItemExtractGifEx) ? FrameAnimationCreatingOptions.ScanAllChildrenFrames: default;
+                var options = (sender == this.buttonItemExtractGifEx) ? FrameAnimationCreatingOptions.ScanAllChildrenFrames : default;
                 var frameData = this.pictureBoxEx1.LoadFrameAnimation(node, options);
 
                 if (frameData != null)
@@ -790,7 +805,7 @@ namespace WzComparerR2
                 this.pictureBoxEx1.AddOverlayRect();
             }
         }
-        
+
         private void buttonLoadMultiFrameAniList_Click(object sender, EventArgs e)
         {
             if (advTree3.SelectedNode == null)
@@ -853,7 +868,7 @@ namespace WzComparerR2
 
             var aniItem = this.pictureBoxEx1.Items[0];
             var frameData = (aniItem as FrameAnimator)?.Data;
-            if (frameData != null && frameData.Frames.Count == 1 
+            if (frameData != null && frameData.Frames.Count == 1
                 && frameData.Frames[0].A0 == 255 && frameData.Frames[0].A1 == 255 && (frameData.Frames[0].Delay == 0 || pictureBoxEx1.ShowOverlayAni))
             {
                 // save still picture as png
@@ -1442,7 +1457,7 @@ namespace WzComparerR2
             return value switch
             {
                 string => "str",
-                short or int or long or float or double=> "num",
+                short or int or long or float or double => "num",
                 Wz_Png => "png",
                 Wz_Vector => "vector",
                 Wz_Uol => "uol",
@@ -2159,6 +2174,9 @@ namespace WzComparerR2
                 case 2:
                     searchAdvTree(advTree3, 1, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
+                case 3:
+                    searchAdvTreeEx(advTree3, 0, 1, textBoxItemSearchWz.Text);
+                    break;
             }
         }
 
@@ -2177,6 +2195,47 @@ namespace WzComparerR2
             catch (Exception ex)
             {
                 MessageBoxEx.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void searchAdvTreeEx(AdvTree advTree, int cellIndex1, int cellIndex2, string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText))
+                return;
+
+            try
+            {
+                if (advTree.Nodes.Count == 0)
+                    return;
+
+                Node searchNode = null;
+
+                // split input by ','
+                var searchText1 = "^" + searchText.Split(',')[0] + "$";
+                var searchText2 = "^" + searchText.Split(',')[1] + "$";
+
+                if (string.IsNullOrEmpty(searchText2))
+                    return;
+
+                Regex r1 = new Regex(searchText1, RegexOptions.IgnoreCase);
+                Regex r2 = new Regex(searchText2, RegexOptions.IgnoreCase);
+
+                foreach (var node in findNextNode(advTree))
+                {
+                    if (node != null && node.Cells.Count > Math.Max(cellIndex1, cellIndex2) && r1.IsMatch(node.Cells[cellIndex1].Text) && r2.IsMatch(node.Cells[cellIndex2].Text))
+                    {
+                        searchNode = node;
+                        break;
+                    }
+                }
+
+                advTree.SelectedNode = searchNode;
+                if (searchNode == null)
+                    MessageBoxEx.Show("검색 결과가 없습니다.", "오류");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(this, ex.Message, "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -3679,15 +3738,7 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-#if NET6_0_OR_GREATER
-            Process.Start(new ProcessStartInfo
-            {
-                UseShellExecute = true,
-                FileName = "https://github.com/PirateIzzy/WzComparerR2/releases",
-            });
-#else
-            Process.Start("https://github.com/PirateIzzy/WzComparerR2/releases");
-#endif
+            new FrmUpdater().ShowDialog();
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)
@@ -3703,7 +3754,6 @@ namespace WzComparerR2
                 UpdateTranslateSettings();
             }
         }
-
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             foreach (Form form in Application.OpenForms)
@@ -3730,6 +3780,12 @@ namespace WzComparerR2
             string invalidChars = new string(System.IO.Path.GetInvalidFileNameChars());
             string regexPattern = $"[{Regex.Escape(invalidChars)}]";
             return Regex.Replace(fileName, regexPattern, "_");
+        }
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            //Automatic Update Check
+            bool isUpdateRequired = await AutomaticCheckUpdate();
+            if (isUpdateRequired) new FrmUpdater().ShowDialog();
         }
     }
 
