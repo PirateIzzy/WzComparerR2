@@ -48,6 +48,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowNickTag { get; set; }
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
+        public bool Enable22AniStyle { get; set; }
 
         public TooltipRender LinkRecipeInfoRender { get; set; }
         public TooltipRender LinkRecipeGearRender { get; set; }
@@ -270,7 +271,7 @@ namespace WzComparerR2.CharaSimControl
                 //复制图像
                 g.DrawImage(itemBmp, 0, 0, new Rectangle(0, 0, itemBmp.Width, picHeight), GraphicsUnit.Pixel);
                 //左上角
-                g.DrawImage(Resource.UIToolTip_img_Item_Frame2_cover, 3, 3);
+                if (!Enable22AniStyle) g.DrawImage(Resource.UIToolTip_img_Item_Frame2_cover, 3, 3);
 
                 if (this.ShowObjectID)
                 {

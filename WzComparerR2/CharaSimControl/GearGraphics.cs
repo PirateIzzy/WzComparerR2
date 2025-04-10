@@ -24,6 +24,7 @@ namespace WzComparerR2.CharaSimControl
         static GearGraphics()
         {
             TBrushes = new Dictionary<string, TextureBrush>();
+            TBrushes22ani = new Dictionary<string, TextureBrush>();
             TBrushes["n"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_n, WrapMode.Tile);
             TBrushes["ne"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_ne, WrapMode.Clamp);
             TBrushes["e"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_e, WrapMode.Tile);
@@ -33,10 +34,23 @@ namespace WzComparerR2.CharaSimControl
             TBrushes["w"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_w, WrapMode.Tile);
             TBrushes["nw"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_nw, WrapMode.Clamp);
             TBrushes["c"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_c, WrapMode.Tile);
+
+            TBrushes22ani["n"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_n, WrapMode.Tile);
+            TBrushes22ani["ne"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_ne, WrapMode.Clamp);
+            TBrushes22ani["e"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_e, WrapMode.Tile);
+            TBrushes22ani["se"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_se, WrapMode.Clamp);
+            TBrushes22ani["s"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_s, WrapMode.Tile);
+            TBrushes22ani["sw"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_sw, WrapMode.Clamp);
+            TBrushes22ani["w"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_w, WrapMode.Tile);
+            TBrushes22ani["nw"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_nw, WrapMode.Clamp);
+            TBrushes22ani["c"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_c, WrapMode.Tile);
+
             SetFontFamily("돋움");
         }
 
+        public static bool is22aniStyle { get; set; }
         public static readonly Dictionary<string, TextureBrush> TBrushes;
+        public static readonly Dictionary<string, TextureBrush> TBrushes22ani;
         public static readonly Font ItemNameFont = new Font("돋움", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
         public static readonly Font ItemDetailFont = new Font("돋움", 12f, GraphicsUnit.Pixel);
         public static readonly Font EquipDetailFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
@@ -421,7 +435,7 @@ namespace WzComparerR2.CharaSimControl
 
         public static void DrawNewTooltipBack(Graphics g, int x, int y, int width, int height)
         {
-            Dictionary<string, TextureBrush> res = TBrushes;
+            Dictionary<string, TextureBrush> res = is22aniStyle ? TBrushes22ani : TBrushes;
             //测算准线
             int[] guideX = new int[4] { 0, res["w"].Image.Width, width - res["e"].Image.Width, width };
             int[] guideY = new int[4] { 0, res["n"].Image.Height, height - res["s"].Image.Height, height };

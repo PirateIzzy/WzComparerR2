@@ -30,6 +30,7 @@
         {
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX16 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX15 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX14 = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -67,13 +68,15 @@
             this.checkBoxX5 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel4 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.superTabControlPanel5 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.checkBoxX7 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem4 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabItem5 = new DevComponents.DotNetBar.SuperTabItem();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
-            this.labelX4 = new DevComponents.DotNetBar.LabelX();
-            this.labelX5 = new DevComponents.DotNetBar.LabelX();
+            this.labelCosmeticHairColor = new DevComponents.DotNetBar.LabelX();
+            this.labelCosmeticFaceColor = new DevComponents.DotNetBar.LabelX();
             this.comboBoxEx3 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.comboBoxEx4 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
@@ -82,6 +85,7 @@
             this.superTabControlPanel2.SuspendLayout();
             this.superTabControlPanel3.SuspendLayout();
             this.superTabControlPanel4.SuspendLayout();
+            this.superTabControlPanel5.SuspendLayout();
             this.panelEx1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -107,6 +111,7 @@
             this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
             this.superTabControl1.Controls.Add(this.superTabControlPanel4);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel5);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -122,7 +127,8 @@
             this.superTabItem1,
             this.superTabItem2,
             this.superTabItem3,
-            this.superTabItem4});
+            this.superTabItem4,
+            this.superTabItem5});
             this.superTabControl1.Text = "superTabControl1";
             // 
             // superTabControlPanel1
@@ -503,8 +509,8 @@
             this.superTabControlPanel3.Controls.Add(this.checkBoxX9);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX8);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX5);
-            this.superTabControlPanel3.Controls.Add(this.labelX4);
-            this.superTabControlPanel3.Controls.Add(this.labelX5);
+            this.superTabControlPanel3.Controls.Add(this.labelCosmeticHairColor);
+            this.superTabControlPanel3.Controls.Add(this.labelCosmeticFaceColor);
             this.superTabControlPanel3.Controls.Add(this.comboBoxEx3);
             this.superTabControlPanel3.Controls.Add(this.comboBoxEx4);
             this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -532,35 +538,35 @@
             this.checkBoxX12.TabIndex = 5;
             this.checkBoxX12.Text = "칭호 미리보기";
             // 
-            // labelX4
+            // labelCosmeticHairColor
             // 
-            this.labelX4.AutoSize = true;
-            this.labelX4.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.labelX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX4.Location = new System.Drawing.Point(15, 108);
-            this.labelX4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.labelX4.Name = "labelX4";
-            this.labelX4.Size = new System.Drawing.Size(89, 18);
-            this.labelX4.TabIndex = 6;
-            this.labelX4.Text = "미리보기 헤어 색상";
-            // 
-            // labelX5
-            // 
-            this.labelX5.AutoSize = true;
-            this.labelX5.BackColor = System.Drawing.Color.Transparent;
+            this.labelCosmeticHairColor.AutoSize = true;
+            this.labelCosmeticHairColor.BackColor = System.Drawing.Color.Transparent;
             // 
             // 
             // 
-            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX5.Location = new System.Drawing.Point(15, 132);
-            this.labelX5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.labelX5.Name = "labelX5";
-            this.labelX5.Size = new System.Drawing.Size(89, 18);
-            this.labelX5.TabIndex = 8;
-            this.labelX5.Text = "미리보기 성형 색상";
+            this.labelCosmeticHairColor.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelCosmeticHairColor.Location = new System.Drawing.Point(15, 108);
+            this.labelCosmeticHairColor.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelCosmeticHairColor.Name = "labelCosmeticHairColor";
+            this.labelCosmeticHairColor.Size = new System.Drawing.Size(89, 18);
+            this.labelCosmeticHairColor.TabIndex = 6;
+            this.labelCosmeticHairColor.Text = "미리보기 헤어 색상";
+            // 
+            // labelCosmeticFaceColor
+            // 
+            this.labelCosmeticFaceColor.AutoSize = true;
+            this.labelCosmeticFaceColor.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelCosmeticFaceColor.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelCosmeticFaceColor.Location = new System.Drawing.Point(15, 132);
+            this.labelCosmeticFaceColor.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.labelCosmeticFaceColor.Name = "labelCosmeticFaceColor";
+            this.labelCosmeticFaceColor.Size = new System.Drawing.Size(89, 18);
+            this.labelCosmeticFaceColor.TabIndex = 8;
+            this.labelCosmeticFaceColor.Text = "미리보기 성형 색상";
             // 
             // comboBoxEx3
             // 
@@ -703,6 +709,40 @@
             this.panelEx1.Style.GradientAngle = 90;
             this.panelEx1.TabIndex = 1;
             // 
+            // superTabControlPanel5
+            // 
+            this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
+            this.superTabControlPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel5.Location = new System.Drawing.Point(62, 0);
+            this.superTabControlPanel5.Name = "superTabControlPanel5";
+            this.superTabControlPanel5.Size = new System.Drawing.Size(242, 211);
+            this.superTabControlPanel5.TabIndex = 0;
+            this.superTabControlPanel5.TabItem = this.superTabItem5;
+            this.superTabControlPanel5.Visible = false;
+            // 
+            // superTabItem5
+            // 
+            this.superTabItem5.AttachedControl = this.superTabControlPanel5;
+            this.superTabItem5.GlobalItem = false;
+            this.superTabItem5.Name = "superTabItem5";
+            this.superTabItem5.Text = "기타";
+            // 
+            // chkEnable22AniStyle
+            // 
+            this.chkEnable22AniStyle.AutoSize = true;
+            this.chkEnable22AniStyle.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkEnable22AniStyle.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkEnable22AniStyle.Location = new System.Drawing.Point(15, 12);
+            this.chkEnable22AniStyle.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkEnable22AniStyle.Name = "chkEnable22AniStyle";
+            this.chkEnable22AniStyle.Size = new System.Drawing.Size(145, 16);
+            this.chkEnable22AniStyle.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkEnable22AniStyle.TabIndex = 4;
+            this.chkEnable22AniStyle.Text = "22주년 UI 적용";
+            // 
             // buttonX2
             // 
             this.buttonX2.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
@@ -753,6 +793,8 @@
             this.superTabControlPanel3.PerformLayout();
             this.superTabControlPanel4.ResumeLayout(false);
             this.superTabControlPanel4.PerformLayout();
+            this.superTabControlPanel5.ResumeLayout(false);
+            this.superTabControlPanel5.PerformLayout();
             this.panelEx1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -791,7 +833,9 @@
         private DevComponents.DotNetBar.LabelX labelX3;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX4;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel4;
+        private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel5;
         private DevComponents.DotNetBar.SuperTabItem superTabItem4;
+        private DevComponents.DotNetBar.SuperTabItem superTabItem5;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX6;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX7;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX9;
@@ -804,8 +848,9 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX17;
-        private DevComponents.DotNetBar.LabelX labelX4;
-        private DevComponents.DotNetBar.LabelX labelX5;
+        private DevComponents.DotNetBar.LabelX labelCosmeticHairColor;
+        private DevComponents.DotNetBar.LabelX labelCosmeticFaceColor;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx3;
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx4;
     }

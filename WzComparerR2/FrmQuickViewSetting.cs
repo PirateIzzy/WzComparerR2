@@ -202,6 +202,13 @@ namespace WzComparerR2
             set { comboBoxEx4.SelectedIndex = value; }
         }
 
+        [Link]
+        public bool Misc_Enable22AniStyle
+        {
+            get { return chkEnable22AniStyle.Checked; }
+            set { chkEnable22AniStyle.Checked = value; }
+        }
+
         public void Load(CharaSimConfig config)
         {
             var linkProp = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)

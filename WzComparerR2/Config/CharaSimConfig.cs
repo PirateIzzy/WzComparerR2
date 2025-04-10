@@ -58,5 +58,11 @@ namespace WzComparerR2.Config
         {
             get { return (CharaSimNpcConfig)this["npc"]; }
         }
+
+        [ConfigurationProperty("misc")]
+        public CharaSimMiscConfig Misc
+        {
+            get { return (CharaSimMiscConfig)this["misc"]; }
+        }
     }
 }
