@@ -214,7 +214,14 @@
             this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
+            this.chkOutputCashTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputEqpTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputItemTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputMobTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputNpcTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputSkillTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowChangeType = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
@@ -2436,7 +2443,14 @@
             // 
             this.superTabControlPanel2.Controls.Add(this.chkHashPngFileName);
             this.superTabControlPanel2.Controls.Add(this.chkEnableDarkMode);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputCashTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputEqpTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputItemTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputMobTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputNpcTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputSkillTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkShowObjectID);
+            this.superTabControlPanel2.Controls.Add(this.chkShowChangeType);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2481,19 +2495,112 @@
             this.chkEnableDarkMode.TabIndex = 9;
             this.chkEnableDarkMode.Text = "Enable Dark Mode";
             // 
-            // 
-            // chkSaveSkillTooltip
+            // chkOutputSkillTooltip
             // 
             // 
             // 
             // 
             this.chkOutputSkillTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputSkillTooltip.Location = new System.Drawing.Point(430, 34);
-            this.chkOutputSkillTooltip.Name = "chkSaveSkillTooltip";
+            this.chkOutputSkillTooltip.Location = new System.Drawing.Point(550, 34);
+            this.chkOutputSkillTooltip.Name = "chkOutputSkillTooltip";
             this.chkOutputSkillTooltip.Size = new System.Drawing.Size(135, 23);
             this.chkOutputSkillTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkOutputSkillTooltip.TabIndex = 11;
             this.chkOutputSkillTooltip.Text = "Save Skill Tooltip";
+            // 
+            // chkOutputCashTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputCashTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputCashTooltip.Location = new System.Drawing.Point(550, 61);
+            this.chkOutputCashTooltip.Name = "chkOutputCashTooltip";
+            this.chkOutputCashTooltip.Size = new System.Drawing.Size(200, 23);
+            this.chkOutputCashTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputCashTooltip.TabIndex = 12;
+            this.chkOutputCashTooltip.Text = "Save Cash Package Tooltip";
+            this.chkOutputCashTooltip.Enabled = false;
+            // 
+            // chkOutputEqpTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputEqpTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputEqpTooltip.Location = new System.Drawing.Point(550, 88);
+            this.chkOutputEqpTooltip.Name = "chkOutputEqpTooltip";
+            this.chkOutputEqpTooltip.Size = new System.Drawing.Size(135, 23);
+            this.chkOutputEqpTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputEqpTooltip.TabIndex = 13;
+            this.chkOutputEqpTooltip.Text = "Save Gear Tooltip";
+            // 
+            // chkOutputItemTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputItemTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputItemTooltip.Location = new System.Drawing.Point(550, 115);
+            this.chkOutputItemTooltip.Name = "chkOutputItemTooltip";
+            this.chkOutputItemTooltip.Size = new System.Drawing.Size(165, 23);
+            this.chkOutputItemTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputItemTooltip.TabIndex = 14;
+            this.chkOutputItemTooltip.Text = "Save Item Tooltip";
+            // 
+            // chkOutputMobTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputMobTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputMobTooltip.Location = new System.Drawing.Point(550, 142);
+            this.chkOutputMobTooltip.Name = "chkOutputMobTooltip";
+            this.chkOutputMobTooltip.Size = new System.Drawing.Size(155, 23);
+            this.chkOutputMobTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputMobTooltip.TabIndex = 15;
+            this.chkOutputMobTooltip.Text = "Save Mob Tooltip";
+            // 
+            // chkOutputNpcTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputNpcTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputNpcTooltip.Location = new System.Drawing.Point(550, 169);
+            this.chkOutputNpcTooltip.Name = "chkOutputNpcTooltip";
+            this.chkOutputNpcTooltip.Size = new System.Drawing.Size(135, 23);
+            this.chkOutputNpcTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputNpcTooltip.TabIndex = 16;
+            this.chkOutputNpcTooltip.Text = "Save NPC Tooltip";
+            // 
+            // chkShowObjectID
+            // 
+            // 
+            // 
+            // 
+            this.chkShowObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowObjectID.Location = new System.Drawing.Point(550, 196);
+            this.chkShowObjectID.Name = "chkShowObjectID";
+            this.chkShowObjectID.Size = new System.Drawing.Size(185, 23);
+            this.chkShowObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowObjectID.TabIndex = 17;
+            this.chkShowObjectID.Text = "Show ID in Saved Tooltip";
+            this.chkShowObjectID.Checked = true;
+            // 
+            // chkShowChangeType
+            // 
+            // 
+            // 
+            // 
+            this.chkShowChangeType.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowChangeType.Location = new System.Drawing.Point(550, 223);
+            this.chkShowChangeType.Name = "chkShowChangeType";
+            this.chkShowChangeType.Size = new System.Drawing.Size(135, 23);
+            this.chkShowChangeType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowChangeType.TabIndex = 18;
+            this.chkShowChangeType.Text = "Show Change Type";
+            this.chkShowChangeType.Checked = true;
             // 
             // chkOutputRemovedImg
             // 
@@ -3370,8 +3477,15 @@
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputCashTooltip;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputEqpTooltip;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputItemTooltip;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputMobTooltip;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputNpcTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputSkillTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowObjectID;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowChangeType;
         private DevComponents.Editors.ComboItem comboItem19;
         private DevComponents.Editors.ComboItem comboItem12_2;
     }
