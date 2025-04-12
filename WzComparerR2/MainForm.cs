@@ -3580,7 +3580,14 @@ namespace WzComparerR2
                     comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
                     comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                     comparer.OutputSkillTooltip = chkOutputSkillTooltip.Checked;
+                    comparer.OutputItemTooltip = chkOutputItemTooltip.Checked;
+                    comparer.OutputGearTooltip = chkOutputEqpTooltip.Checked;
+                    comparer.OutputMobTooltip = chkOutputMobTooltip.Checked;
+                    comparer.OutputNpcTooltip = chkOutputNpcTooltip.Checked;
+                    comparer.OutputCashTooltip = chkOutputCashTooltip.Checked;
                     comparer.HashPngFileName = chkHashPngFileName.Checked;
+                    comparer.ShowObjectID = chkShowObjectID.Checked;
+                    comparer.ShowChangeType = chkShowChangeType.Checked;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try
@@ -3599,6 +3606,22 @@ namespace WzComparerR2
                             switch (MessageBoxEx.Show(txt, "WZ Compare", MessageBoxButtons.YesNoCancel))
                             {
                                 case DialogResult.Yes:
+                                    btnEasyCompare.Enabled = false;
+                                    cmbComparePng.Enabled = false;
+                                    chkOutputPng.Enabled = false;
+                                    chkResolvePngLink.Enabled = false;
+                                    chkOutputAddedImg.Enabled = false;
+                                    chkOutputRemovedImg.Enabled = false;
+                                    chkEnableDarkMode.Enabled = false;
+                                    chkOutputSkillTooltip.Enabled = false;
+                                    chkOutputItemTooltip.Enabled = false;
+                                    chkOutputEqpTooltip.Enabled = false;
+                                    chkOutputMobTooltip.Enabled = false;
+                                    chkOutputNpcTooltip.Enabled = false;
+                                    // chkOutputCashTooltip.Enabled = false;
+                                    chkShowObjectID.Enabled = false;
+                                    chkShowChangeType.Enabled = false;
+                                    chkHashPngFileName.Enabled = false;
                                     comparer.EasyCompareWzFiles(fileNew, fileOld, dlg.SelectedPath);
                                     return;
 
@@ -3629,6 +3652,22 @@ namespace WzComparerR2
                         compareThread = null;
                         labelXComp1.Text = "Comparison completed. Time elapsed: " + sw.Elapsed.ToString();
                         labelXComp2.Text = "";
+                        btnEasyCompare.Enabled = true;
+                        cmbComparePng.Enabled = true;
+                        chkOutputPng.Enabled = true;
+                        chkResolvePngLink.Enabled = true;
+                        chkOutputAddedImg.Enabled = true;
+                        chkOutputRemovedImg.Enabled = true;
+                        chkEnableDarkMode.Enabled = true;
+                        chkOutputSkillTooltip.Enabled = true;
+                        chkOutputItemTooltip.Enabled = true;
+                        chkOutputEqpTooltip.Enabled = true;
+                        chkOutputMobTooltip.Enabled = true;
+                        chkOutputNpcTooltip.Enabled = true;
+                        // chkOutputCashTooltip.Enabled = true;
+                        chkShowObjectID.Enabled = true;
+                        chkShowChangeType.Enabled = true;
+                        chkHashPngFileName.Enabled = true;
                     }
                 });
                 compareThread.Priority = ThreadPriority.Highest;
