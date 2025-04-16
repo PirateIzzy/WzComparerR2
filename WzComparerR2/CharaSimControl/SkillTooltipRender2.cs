@@ -232,7 +232,7 @@ namespace WzComparerR2.CharaSimControl
             //delay rendering v6 splitter
             picH = Math.Max(picH, 114);
             splitterH.Add(picH);
-            picH += 15;
+            picH += this.Enable22AniStyle ? 16 : 15;
 
             var skillSummaryOptions = new SkillSummaryOptions
             {

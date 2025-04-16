@@ -12,6 +12,7 @@ using WzComparerR2.PluginBase;
 using WzComparerR2.CharaSimControl;
 using WzComparerR2.CharaSim;
 using System.Text.RegularExpressions;
+using WzComparerR2.Config;
 
 namespace WzComparerR2.Comparer
 {
@@ -574,6 +575,7 @@ namespace WzComparerR2.Comparer
                 skillRenderNewOld[i].wzNode = WzNewOld[i];
                 skillRenderNewOld[i].DiffSkillTags = this.DiffSkillTags;
                 skillRenderNewOld[i].IgnoreEvalError = true;
+                skillRenderNewOld[i].Enable22AniStyle = CharaSimConfig.Default.Misc.Enable22AniStyle;
             }
 
             foreach (var skillID in OutputSkillTooltipIDs)
