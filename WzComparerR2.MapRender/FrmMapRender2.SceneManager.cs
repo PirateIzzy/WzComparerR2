@@ -300,7 +300,8 @@ namespace WzComparerR2.MapRender
 
             this.ui.Minimap.Mirror = mapData.ID / 10000000 == 32;
 
-            bool isTranslateRequired = Translator.IsTranslateEnabled;
+            // Disable OpenAI Translate Engine in MapRender
+            bool isTranslateRequired = Translator.IsTranslateEnabled && Translator.DefaultPreferredTranslateEngine != 9;
 
             StringResult sr;
             if (mapData.ID != null && this.StringLinker != null

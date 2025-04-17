@@ -29,9 +29,14 @@
         private void InitializeComponent()
         {
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
+            this.buttonX3 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
+            this.txtOpenAIBackend = new DevComponents.DotNetBar.Controls.TextBoxX();
+            this.txtOpenAISystemMessage = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.txtSecretkey = new DevComponents.DotNetBar.Controls.TextBoxX();
+            this.txtLMTemperature = new DevComponents.Editors.DoubleInput();
+            this.txtMaximumToken = new DevComponents.Editors.IntegerInput();
             this.buttonXCheck2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonXCheck3 = new DevComponents.DotNetBar.ButtonX();
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
@@ -41,8 +46,10 @@
             this.chkImgCheckDisabled = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkWzSortByImgID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkAutoCheckExtFiles = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOpenAIExtraOption = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbDesiredLanguage = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbMozhiBackend = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.cmbLanguageModel = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbDetectCurrency = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbDesiredCurrency = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbPreferredLayout = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -51,8 +58,10 @@
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
             this.chkWzAutoSort = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
-            this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.labelX3 = new DevComponents.DotNetBar.LabelX();
             this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
             this.labelX5 = new DevComponents.DotNetBar.LabelX();
@@ -61,13 +70,20 @@
             this.labelX8 = new DevComponents.DotNetBar.LabelX();
             this.labelX9 = new DevComponents.DotNetBar.LabelX();
             this.labelX10 = new DevComponents.DotNetBar.LabelX();
-            this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
+            this.labelX11 = new DevComponents.DotNetBar.LabelX();
+            this.labelX12 = new DevComponents.DotNetBar.LabelX();
+            this.labelX13 = new DevComponents.DotNetBar.LabelX();
+            this.labelX14 = new DevComponents.DotNetBar.LabelX();
+            this.labelX15 = new DevComponents.DotNetBar.LabelX();
+            this.superTabItem4 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel4 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.panelEx1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanel2.SuspendLayout();
             this.superTabControlPanel3.SuspendLayout();
+            this.superTabControlPanel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelEx1
@@ -116,6 +132,83 @@
             this.buttonX1.TabIndex = 0;
             this.buttonX1.Text = "Confirm";
             // 
+            // txtOpenAIBackend
+            // 
+            // 
+            // 
+            // 
+            this.txtOpenAIBackend.Border.Class = "TextBoxBorder";
+            this.txtOpenAIBackend.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtOpenAIBackend.Location = new System.Drawing.Point(140, 13);
+            this.txtOpenAIBackend.Name = "txtOpenAIBackend";
+            this.txtOpenAIBackend.Size = new System.Drawing.Size(178, 23);
+            this.txtOpenAIBackend.TabIndex = 10;
+            this.txtOpenAIBackend.WatermarkText = "https://api.openai.com/v1";
+            // 
+            // txtOpenAISystemMessage
+            // 
+            // 
+            // 
+            // 
+            this.txtOpenAISystemMessage.Border.Class = "TextBoxBorder";
+            this.txtOpenAISystemMessage.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtOpenAISystemMessage.Location = new System.Drawing.Point(140, 40);
+            this.txtOpenAISystemMessage.Multiline = true;
+            this.txtOpenAISystemMessage.Name = "txtOpenAISystemMessage";
+            this.txtOpenAISystemMessage.Size = new System.Drawing.Size(178, 50);
+            this.txtOpenAISystemMessage.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtOpenAISystemMessage.TabIndex = 11;
+            this.txtOpenAISystemMessage.WatermarkText = "You are an automated translator for a community game engine, and I only need translated result in output.";
+            // 
+            // chkOpenAIExtraOption
+            // 
+            this.chkOpenAIExtraOption.AutoSize = true;
+            this.chkOpenAIExtraOption.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkOpenAIExtraOption.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOpenAIExtraOption.Location = new System.Drawing.Point(14, 94);
+            this.chkOpenAIExtraOption.Name = "chkOpenAIExtraOption";
+            this.chkOpenAIExtraOption.Size = new System.Drawing.Size(212, 16);
+            this.chkOpenAIExtraOption.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOpenAIExtraOption.TabIndex = 12;
+            this.chkOpenAIExtraOption.Text = "Use following parameters";
+            this.chkOpenAIExtraOption.CheckedChanged += new System.EventHandler(this.chkOpenAIExtraOption_CheckedChanged);
+            //
+            // txtLMTemperature
+            //
+            //
+            //
+            this.txtLMTemperature.BackgroundStyle.Class = "DateTimeInputBackground";
+            this.txtLMTemperature.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtLMTemperature.ButtonFreeText.Shortcut = DevComponents.DotNetBar.eShortcut.F2;
+            this.txtLMTemperature.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.txtLMTemperature.Location = new System.Drawing.Point(140, 121);
+            this.txtLMTemperature.MinValue = 0;
+            this.txtLMTemperature.MaxValue = 2;
+            this.txtLMTemperature.Increment = 0.1;
+            this.txtLMTemperature.DisplayFormat = "0.0";
+            this.txtLMTemperature.Name = "txtLMTemperature";
+            this.txtLMTemperature.ShowUpDown = true;
+            this.txtLMTemperature.Size = new System.Drawing.Size(70, 21);
+            this.txtLMTemperature.TabIndex = 13;
+            //
+            // txtMaximumToken
+            //
+            //
+            //
+            this.txtMaximumToken.BackgroundStyle.Class = "DateTimeInputBackground";
+            this.txtMaximumToken.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtMaximumToken.ButtonFreeText.Shortcut = DevComponents.DotNetBar.eShortcut.F2;
+            this.txtMaximumToken.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.txtMaximumToken.Location = new System.Drawing.Point(140, 148);
+            this.txtMaximumToken.MinValue = -1;
+            this.txtMaximumToken.Name = "txtMaximumToken";
+            this.txtMaximumToken.ShowUpDown = true;
+            this.txtMaximumToken.Size = new System.Drawing.Size(70, 21);
+            this.txtMaximumToken.TabIndex = 14;
+            // 
             // buttonXCheck2
             // 
             this.buttonXCheck2.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
@@ -142,6 +235,19 @@
             this.buttonXCheck3.Text = "Check";
             this.buttonXCheck3.Click += new System.EventHandler(this.buttonXCheck3_Click);
             // 
+            // buttonX3
+            // 
+            this.buttonX3.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.buttonX3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonX3.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.buttonX3.Location = new System.Drawing.Point(293, 67);
+            this.buttonX3.Name = "buttonX3";
+            this.buttonX3.Size = new System.Drawing.Size(55, 19);
+            this.buttonX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.buttonX3.TabIndex = 16;
+            this.buttonX3.Text = "Glossary";
+            this.buttonX3.Click += new System.EventHandler(this.buttonX3_Click);
+            // 
             // superTabControl1
             // 
             this.superTabControl1.AutoCloseTabs = false;
@@ -163,6 +269,7 @@
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel4);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
@@ -176,7 +283,8 @@
             this.superTabControl1.Tabs.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabItem1,
             this.superTabItem2,
-            this.superTabItem3});
+            this.superTabItem3,
+            this.superTabItem4});
             this.superTabControl1.Text = "superTabControl1";
             // 
             // superTabControlPanel1
@@ -320,8 +428,10 @@
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.labelX5);
+            this.superTabControlPanel2.Controls.Add(this.buttonX3);
             this.superTabControlPanel2.Controls.Add(this.buttonXCheck2);
             this.superTabControlPanel2.Controls.Add(this.cmbMozhiBackend);
+            this.superTabControlPanel2.Controls.Add(this.cmbLanguageModel);
             this.superTabControlPanel2.Controls.Add(this.labelX6);
             this.superTabControlPanel2.Controls.Add(this.cmbDesiredLanguage);
             this.superTabControlPanel2.Controls.Add(this.labelX7);
@@ -331,6 +441,7 @@
             this.superTabControlPanel2.Controls.Add(this.labelX9);
             this.superTabControlPanel2.Controls.Add(this.cmbDetectCurrency);
             this.superTabControlPanel2.Controls.Add(this.labelX10);
+            this.superTabControlPanel2.Controls.Add(this.labelX11);
             this.superTabControlPanel2.Controls.Add(this.cmbDesiredCurrency);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel2.Location = new System.Drawing.Point(49, 0);
@@ -419,6 +530,72 @@
             this.labelX10.TabIndex = 9;
             this.labelX10.Text = "Target Currency";
             // 
+            // labelX11
+            // 
+            this.labelX11.AutoSize = true;
+            this.labelX11.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX11.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX11.Location = new System.Drawing.Point(14, 15);
+            this.labelX11.Name = "labelX11";
+            this.labelX11.TabIndex = 9;
+            this.labelX11.Text = "Language Model";
+            this.labelX11.Visible = false;
+            // 
+            // labelX12
+            // 
+            this.labelX12.AutoSize = true;
+            this.labelX12.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX12.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX12.Location = new System.Drawing.Point(14, 15);
+            this.labelX12.Name = "labelX12";
+            this.labelX12.TabIndex = 9;
+            this.labelX12.Text = "Backend Address";
+            // 
+            // labelX13
+            // 
+            this.labelX13.AutoSize = true;
+            this.labelX13.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX13.Location = new System.Drawing.Point(14, 123);
+            this.labelX13.Name = "labelX13";
+            this.labelX13.TabIndex = 9;
+            this.labelX13.Text = "Temperature";
+            // 
+            // labelX14
+            // 
+            this.labelX14.AutoSize = true;
+            this.labelX14.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX14.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX14.Location = new System.Drawing.Point(14, 150);
+            this.labelX14.Name = "labelX14";
+            this.labelX14.TabIndex = 9;
+            this.labelX14.Text = "Maximum Token";
+            // 
+            // labelX15
+            // 
+            this.labelX15.AutoSize = true;
+            this.labelX15.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX15.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX15.Location = new System.Drawing.Point(14, 42);
+            this.labelX15.Name = "labelX15";
+            this.labelX15.TabIndex = 9;
+            this.labelX15.Text = "AI System Message";
+            // 
             // cmbDesiredLanguage
             // 
             this.cmbDesiredLanguage.DisplayMember = "Text";
@@ -447,6 +624,21 @@
             this.cmbMozhiBackend.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.cmbMozhiBackend.TabIndex = 12;
             // 
+            // cmbLanguageModel
+            // 
+            this.cmbLanguageModel.DisplayMember = "Text";
+            this.cmbLanguageModel.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbLanguageModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbLanguageModel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbLanguageModel.FormattingEnabled = true;
+            this.cmbLanguageModel.ItemHeight = 13;
+            this.cmbLanguageModel.Width = 148;
+            this.cmbLanguageModel.Location = new System.Drawing.Point(115, 13);
+            this.cmbLanguageModel.Name = "cmbLanguageModel";
+            this.cmbLanguageModel.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbLanguageModel.TabIndex = 12;
+            this.cmbLanguageModel.Visible = false;
+            // 
             // cmbPreferredTranslateEngine
             // 
             this.cmbPreferredTranslateEngine.DisplayMember = "Text";
@@ -460,6 +652,7 @@
             this.cmbPreferredTranslateEngine.Name = "cmbPreferredTranslateEngine";
             this.cmbPreferredTranslateEngine.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.cmbPreferredTranslateEngine.TabIndex = 13;
+            this.cmbPreferredTranslateEngine.SelectedIndexChanged += cmbPreferredTranslateEngine_SelectedIndexChanged;
             // 
             // cmbPreferredLayout
             // 
@@ -512,16 +705,36 @@
             // 
             // superTabControlPanel3
             // 
-            this.superTabControlPanel3.Controls.Add(this.labelX4);
-            this.superTabControlPanel3.Controls.Add(this.buttonXCheck3);
-            this.superTabControlPanel3.Controls.Add(this.txtSecretkey);
+            this.superTabControlPanel3.Controls.Add(this.labelX12);
+            this.superTabControlPanel3.Controls.Add(this.labelX13);
+            this.superTabControlPanel3.Controls.Add(this.labelX14);
+            this.superTabControlPanel3.Controls.Add(this.labelX15);
+            this.superTabControlPanel3.Controls.Add(this.txtOpenAIBackend);
+            this.superTabControlPanel3.Controls.Add(this.txtLMTemperature);
+            this.superTabControlPanel3.Controls.Add(this.txtMaximumToken);
+            this.superTabControlPanel3.Controls.Add(this.chkOpenAIExtraOption);
+            this.superTabControlPanel3.Controls.Add(this.txtOpenAISystemMessage);
             this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel3.Location = new System.Drawing.Point(49, 0);
+            this.superTabControlPanel3.Location = new System.Drawing.Point(39, 0);
             this.superTabControlPanel3.Name = "superTabControlPanel3";
             this.superTabControlPanel3.Size = new System.Drawing.Size(351, 171);
             this.superTabControlPanel3.TabIndex = 1;
             this.superTabControlPanel3.TabItem = this.superTabItem2;
             this.superTabControlPanel3.Visible = false;
+            // 
+            // superTabControlPanel4
+            // 
+            this.superTabControlPanel4.Controls.Add(this.labelX3);
+            this.superTabControlPanel4.Controls.Add(this.labelX4);
+            this.superTabControlPanel4.Controls.Add(this.buttonXCheck3);
+            this.superTabControlPanel4.Controls.Add(this.txtSecretkey);
+            this.superTabControlPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel4.Location = new System.Drawing.Point(49, 0);
+            this.superTabControlPanel4.Name = "superTabControlPanel4";
+            this.superTabControlPanel4.Size = new System.Drawing.Size(351, 171);
+            this.superTabControlPanel4.TabIndex = 1;
+            this.superTabControlPanel4.TabItem = this.superTabItem4;
+            this.superTabControlPanel4.Visible = false;
             // 
             // labelX4
             // 
@@ -553,7 +766,14 @@
             this.superTabItem3.AttachedControl = this.superTabControlPanel3;
             this.superTabItem3.GlobalItem = false;
             this.superTabItem3.Name = "superTabItem3";
-            this.superTabItem3.Text = "API Key";
+            this.superTabItem3.Text = "OpenAI";
+            // 
+            // superTabItem4
+            // 
+            this.superTabItem4.AttachedControl = this.superTabControlPanel4;
+            this.superTabItem4.GlobalItem = false;
+            this.superTabItem4.Name = "superTabItem4";
+            this.superTabItem4.Text = "API Key";
             // 
             // FrmOptions
             // 
@@ -576,20 +796,32 @@
             this.superTabControlPanel1.PerformLayout();
             this.superTabControlPanel2.ResumeLayout(false);
             this.superTabControlPanel2.PerformLayout();
+            this.superTabControlPanel3.ResumeLayout(false);
+            this.superTabControlPanel3.PerformLayout();
+            this.superTabControlPanel4.ResumeLayout(false);
+            this.superTabControlPanel4.PerformLayout();
             this.ResumeLayout(false);
         }
 
         #endregion
 
         private DevComponents.DotNetBar.PanelEx panelEx1;
+        private DevComponents.DotNetBar.Controls.TextBoxX txtNxAPIkey;
+        private DevComponents.DotNetBar.Controls.TextBoxX txtOpenAIBackend;
+        private DevComponents.DotNetBar.Controls.TextBoxX txtOpenAISystemMessage;
         private DevComponents.DotNetBar.Controls.TextBoxX txtSecretkey;
+        private DevComponents.Editors.DoubleInput txtLMTemperature;
+        private DevComponents.Editors.IntegerInput txtMaximumToken;
         private DevComponents.DotNetBar.SuperTabControl superTabControl1;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel1;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel2;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel3;
+        private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel4;
         private DevComponents.DotNetBar.SuperTabItem superTabItem1;
         private DevComponents.DotNetBar.SuperTabItem superTabItem2;
         private DevComponents.DotNetBar.SuperTabItem superTabItem3;
+        private DevComponents.DotNetBar.SuperTabItem superTabItem4;
+        private DevComponents.DotNetBar.ButtonX buttonX3;
         private DevComponents.DotNetBar.ButtonX buttonX2;
         private DevComponents.DotNetBar.ButtonX buttonX1;
         private DevComponents.DotNetBar.ButtonX buttonXCheck2;
@@ -600,14 +832,17 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoCheckExtFiles;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkImgCheckDisabled;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOpenAIExtraOption;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzVersionVerifyMode;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbDesiredLanguage;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbMozhiBackend;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbLanguageModel;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbDetectCurrency;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbDesiredCurrency;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredLayout;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredTranslateEngine;
         private DevComponents.DotNetBar.LabelX labelX2;
+        private DevComponents.DotNetBar.LabelX labelX3;
         private DevComponents.DotNetBar.LabelX labelX4;
         private DevComponents.DotNetBar.LabelX labelX5;
         private DevComponents.DotNetBar.LabelX labelX6;
@@ -615,5 +850,10 @@
         private DevComponents.DotNetBar.LabelX labelX8;
         private DevComponents.DotNetBar.LabelX labelX9;
         private DevComponents.DotNetBar.LabelX labelX10;
+        private DevComponents.DotNetBar.LabelX labelX11;
+        private DevComponents.DotNetBar.LabelX labelX12;
+        private DevComponents.DotNetBar.LabelX labelX13;
+        private DevComponents.DotNetBar.LabelX labelX14;
+        private DevComponents.DotNetBar.LabelX labelX15;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -31,6 +32,7 @@ namespace WzComparerR2.CharaSim
         public Dictionary<ItemCoreSpecType, Wz_Node> CoreSpecs { get; private set; }
         public List<int> AddTooltips { get; internal set; } // Additional Tooltips
         public List<int> Recipes { get; private set; }
+        public Bitmap AvatarBitmap { get; set; }
 
         public bool Cash
         {

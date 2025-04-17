@@ -116,6 +116,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     NpcInfo.Default = img;
                     npcImg = img.Bitmap;
+                    NpcInfo.AvatarBitmap = npcImg;
                 }
 
                 this.avatar.ClearCanvas();
