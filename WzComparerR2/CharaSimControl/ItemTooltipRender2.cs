@@ -518,9 +518,17 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //绘制图标
+            picH += 1;
             int iconY = picH;
             int iconX = 14;
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, iconX, picH);
+            if (this.Enable22AniStyle)
+            {
+                g.DrawImage(Resource.UIToolTipNew_img_Item_Common_ItemIcon_base, iconX, picH);
+            }
+            else
+            {
+                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, iconX, picH);
+            }
             if (item.Icon.Bitmap != null)
             {
                 g.DrawImage(GearGraphics.EnlargeBitmap(item.Icon.Bitmap),
@@ -556,8 +564,11 @@ namespace WzComparerR2.CharaSimControl
                     iconX + 6 + 68 - cashOrigin.X * 2 - 2,
                     picH + 6 + 68 - cashOrigin.Y * 2 - 2);
             }
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_new, iconX + 7, picH + 7);
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
+            if (!this.Enable22AniStyle)
+            {
+                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_new, iconX + 7, picH + 7);
+                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
+            }
 
             value = 0;
             if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) || item.ItemID / 10000 == 301 || item.ItemID / 1000 == 5204)
