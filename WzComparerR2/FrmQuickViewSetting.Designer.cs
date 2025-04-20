@@ -402,7 +402,7 @@
             // 
             // superTabControlPanel2
             // 
-            this.superTabControlPanel2.Controls.Add(this.checkBoxX11);
+            //this.superTabControlPanel2.Controls.Add(this.checkBoxX11);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX17);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX6);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX4);
@@ -440,7 +440,7 @@
             // 
             // 
             this.checkBoxX17.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX17.Location = new System.Drawing.Point(15, 108);
+            this.checkBoxX17.Location = new System.Drawing.Point(15, 84);
             this.checkBoxX17.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.checkBoxX17.Name = "checkBoxX17";
             this.checkBoxX17.Size = new System.Drawing.Size(120, 18);

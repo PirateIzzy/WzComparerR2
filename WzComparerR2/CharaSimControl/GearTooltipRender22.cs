@@ -57,7 +57,6 @@ namespace WzComparerR2.CharaSimControl
 
         public bool ShowSpeed { get; set; }
         public bool ShowLevelOrSealed { get; set; }
-        public bool ShowMedalTag { get; set; } = true;
         public bool MaxStar25 { get; set; } = false;
         public bool IsCombineProperties { get; set; } = true;
 
@@ -380,7 +379,7 @@ namespace WzComparerR2.CharaSimControl
             // 착용 성별
             if (gender < 2)
             {
-                TextRenderer.DrawText(g, "착용 성별", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 15 + 217: 15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "착용 성별", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 15 + 217: 15, picH, ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 TextRenderer.DrawText(g, gender == 0 ? "남" : "여", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 79 + 217: 79, picH), Color.White, TextFormatFlags.NoPadding);
                 if (!moveX) picH += 16;
             }
