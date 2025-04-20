@@ -137,7 +137,11 @@ namespace WzComparerR2.CharaSim
                         props.Sort();
                         foreach (GearPropType type in props)
                         {
-                            sb.AppendLine(ItemStringHelper.GetGearPropString(type, Convert.ToInt32(Props[Enum.GetName(typeof(GearPropType), type)])));
+                            var text = ItemStringHelper.GetGearPropString(type, Convert.ToInt32(Props[Enum.GetName(typeof(GearPropType), type)]));
+                            if (!string.IsNullOrEmpty(text))
+                            {
+                                sb.AppendLine(text);
+                            }
                         }
                     }
                     if (sb.Length > 0)
