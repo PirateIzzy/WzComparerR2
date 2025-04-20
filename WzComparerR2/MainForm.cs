@@ -232,13 +232,21 @@ namespace WzComparerR2
             tooltipQuickView.SkillRender.DisplayPermyriadAsPercent = Setting.Skill.DisplayPermyriadAsPercent;
             tooltipQuickView.SkillRender.IgnoreEvalError = Setting.Skill.IgnoreEvalError;
             tooltipQuickView.SkillRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+
             this.skillDefaultLevel = Setting.Skill.DefaultLevel;
             this.skillInterval = Setting.Skill.IntervalLevel;
+
             tooltipQuickView.GearRender.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.GearRender.ShowMedalTag = Setting.Gear.ShowMedalTag;
             tooltipQuickView.GearRender.MaxStar25 = Setting.Gear.MaxStar25;
+            tooltipQuickView.GearRender22.ShowObjectID = Setting.Gear.ShowID;
+            tooltipQuickView.GearRender22.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
+            tooltipQuickView.GearRender22.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
+            tooltipQuickView.GearRender22.ShowMedalTag = Setting.Gear.ShowMedalTag;
+            tooltipQuickView.GearRender22.MaxStar25 = Setting.Gear.MaxStar25;
+
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -247,7 +255,9 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
+            tooltipQuickView.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             GearGraphics.is22aniStyle = Setting.Misc.Enable22AniStyle;
         }
 

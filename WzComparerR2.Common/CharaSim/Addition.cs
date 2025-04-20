@@ -165,7 +165,8 @@ namespace WzComparerR2.CharaSim
                     return "레벨 " + this.ConValue[0] + " 이상일 때";
                 case GearPropType.reqCraft:
                     int lastExp;
-                    return "손재주 경험치가 " + this.ConValue[0] + "(" + getPersonalityLevel(this.ConValue[0], out lastExp) + "레벨 " + lastExp + "점) 이상일 때";
+                    //return "손재주 경험치가 " + this.ConValue[0] + "(" + getPersonalityLevel(this.ConValue[0], out lastExp) + "레벨 " + lastExp + "점) 이상일 때";
+                    return "";
                 case GearPropType.reqWeekDay:
                     string[] weekdays = new string[this.ConValue.Count];
                     for (int i = 0; i < this.ConValue.Count; i++)

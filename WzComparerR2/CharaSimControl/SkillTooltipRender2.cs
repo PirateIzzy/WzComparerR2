@@ -459,10 +459,20 @@ namespace WzComparerR2.CharaSimControl
             TooltipRender renderer = this.LinkRidingGearRender;
             if (renderer == null)
             {
-                GearTooltipRender2 defaultRenderer = new GearTooltipRender2();
-                defaultRenderer.StringLinker = this.StringLinker;
-                defaultRenderer.ShowObjectID = false;
-                renderer = defaultRenderer;
+                if (this.Enable22AniStyle)
+                {
+                    GearTooltipRender22 defaultRenderer = new GearTooltipRender22();
+                    defaultRenderer.StringLinker = this.StringLinker;
+                    defaultRenderer.ShowObjectID = false;
+                    renderer = defaultRenderer;
+                }
+                else
+                {
+                    GearTooltipRender2 defaultRenderer = new GearTooltipRender2();
+                    defaultRenderer.StringLinker = this.StringLinker;
+                    defaultRenderer.ShowObjectID = false;
+                    renderer = defaultRenderer;
+                }
             }
 
             renderer.TargetItem = gear;

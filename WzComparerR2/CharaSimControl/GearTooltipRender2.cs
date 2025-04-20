@@ -592,7 +592,7 @@ namespace WzComparerR2.CharaSimControl
             //装备类型
             bool isWeapon = Gear.IsWeapon(Gear.type);
             string typeStr = ItemStringHelper.GetGearTypeString(Gear.type);
-            if (!string.IsNullOrEmpty(typeStr))
+            if (!string.IsNullOrEmpty(typeStr) && (int)Gear.type / 10 != 171)
             {
                 if (isWeapon)
                 {
@@ -1368,8 +1368,7 @@ namespace WzComparerR2.CharaSimControl
                 Graphics g = Graphics.FromImage(genesisBitmap);
                 picHeight = 13;
 
-                Gear.Props.TryGetValue(GearPropType.reqLevel, out var equipLevel);
-                int destinySkill = 1241 * (equipLevel == 250 ? 1 : 0);
+                int destinySkill = 1241 * (Gear.IsDestinyWeapon ? 1 : 0);
 
                 foreach (var skillID in new[] { 80002632, 80002633 })
                 {

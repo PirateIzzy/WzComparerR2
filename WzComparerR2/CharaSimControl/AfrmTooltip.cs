@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Controls;
+using System.Linq;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -21,6 +22,7 @@ namespace WzComparerR2.CharaSimControl
             this.Size = new Size(1, 1);
             this.HideOnHover = true;
             this.GearRender = new GearTooltipRender2();
+            this.GearRender22 = new GearTooltipRender22();
             this.ItemRender = new ItemTooltipRender2();
             this.SkillRender = new SkillTooltipRender2();
             this.RecipeRender = new RecipeTooltipRender();
@@ -28,6 +30,7 @@ namespace WzComparerR2.CharaSimControl
             this.NpcRender = new NpcTooltipRenderer();
             this.HelpRender = new HelpTooltipRender();
             this.SetItemRender = new SetItemTooltipRender();
+            this.SetItemRender22 = new SetItemTooltipRender22();
             this.SizeChanged += AfrmTooltip_SizeChanged;
 
             this.MouseClick += AfrmTooltip_MouseClick;
@@ -49,6 +52,7 @@ namespace WzComparerR2.CharaSimControl
         public Character Character { get; set; }
 
         public GearTooltipRender2 GearRender { get; private set; }
+        public GearTooltipRender22 GearRender22 { get; private set; }
         public ItemTooltipRender2 ItemRender { get; private set; }
         public SkillTooltipRender2 SkillRender { get; private set; }
         public RecipeTooltipRender RecipeRender { get; private set; }
@@ -56,8 +60,10 @@ namespace WzComparerR2.CharaSimControl
         public NpcTooltipRenderer NpcRender { get; private set; }
         public HelpTooltipRender HelpRender { get; private set; }
         public SetItemTooltipRender SetItemRender { get; private set; }
+        public SetItemTooltipRender22 SetItemRender22 { get; private set; }
 
         public string ImageFileName { get; set; }
+        public bool Enable22AniStyle { get; set; }
 
         public bool ShowID
         {
@@ -66,6 +72,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 this.showID = value;
                 this.GearRender.ShowObjectID = value;
+                this.GearRender22.ShowObjectID = value;
                 this.ItemRender.ShowObjectID = value;
                 this.SkillRender.ShowObjectID = value;
                 this.RecipeRender.ShowObjectID = value;
@@ -102,8 +109,16 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (item is Gear)
             {
-                renderer = GearRender;
-                GearRender.Gear = this.TargetItem as Gear;
+                if (Enable22AniStyle)
+                {
+                    renderer = GearRender22;
+                    GearRender22.Gear = this.TargetItem as Gear;
+                }
+                else
+                {
+                    renderer = GearRender;
+                    GearRender.Gear = this.TargetItem as Gear;
+                }
 
                 if (false)
                 {
@@ -171,8 +186,25 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (item is SetItem)
             {
-                renderer = SetItemRender;
-                SetItemRender.SetItem = this.item as SetItem;
+                if (Enable22AniStyle)
+                {
+                    if ((item as SetItem).ItemIDs.Parts.Any(p => p.Value.ItemIDs.Any(i => i.Key / 1000000 == 5)))
+                    {
+                        renderer = SetItemRender;
+                        SetItemRender.Enable22AniStyle = true;
+                        SetItemRender.SetItem = this.item as SetItem;
+                    }
+                    else
+                    {
+                        renderer = SetItemRender22;
+                        SetItemRender22.SetItem = this.item as SetItem;
+                    }
+                }
+                else
+                {
+                    renderer = SetItemRender;
+                    SetItemRender.SetItem = this.item as SetItem;
+                }
             }
             else
             {
