@@ -178,7 +178,19 @@ namespace WzComparerR2
 
         private void buttonX1_Click(object sender, EventArgs e)
         {
-            this.lblUpdateContent.Text = "업데이트를 다운로드하는 중...";
+#if NET6_0_OR_GREATER
+             Process.Start(new ProcessStartInfo
+             {
+                 UseShellExecute = true,
+                 FileName = "https://github.com/seotbeo/WzComparerR2/releases",
+             });
+#else
+            Process.Start("https://github.com/seotbeo/WzComparerR2/releases");
+#endif
+            
+            this.lblUpdateContent.Text = "업데이트 릴리즈로 이동합니다.";
+
+            return;
             buttonX1.Enabled = false;
             // string selectedURL = "";
             updateSession = new UpdaterSession();
