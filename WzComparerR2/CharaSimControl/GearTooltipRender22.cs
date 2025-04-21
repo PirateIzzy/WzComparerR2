@@ -332,26 +332,51 @@ namespace WzComparerR2.CharaSimControl
             picH += 18;
 
             // 착용 직업
-            string extraReq = ItemStringHelper.GetExtraJobReqString(Gear.type);
-            if (extraReq == null && Gear.Props.TryGetValue(GearPropType.reqSpecJob, out value))
+            string reqJobString = ItemStringHelper.GetExtraJobReqString(Gear.type);
+            if (reqJobString == null && Gear.Props.TryGetValue(GearPropType.reqSpecJob, out value))
             {
-                extraReq = ItemStringHelper.GetExtraJobReqString(value);
+                reqJobString = ItemStringHelper.GetExtraJobReqString(value);
             }
-            if (extraReq == null && Gear.ReqSpecJobs.Count > 0)
+            if (reqJobString == null && Gear.ReqSpecJobs.Count > 0)
             {
                 // apply req order fix for CMS only
                 int[] specJobsList1 = new[] { 2, 22, 12, 32, 172 };
                 if (new HashSet<int>(specJobsList1).SetEquals(Gear.ReqSpecJobs))
                 {
-                    extraReq = ItemStringHelper.GetExtraJobReqString(specJobsList1);
+                    reqJobString = ItemStringHelper.GetExtraJobReqString(specJobsList1);
                 }
                 else
                 {
-                    extraReq = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs);
+                    reqJobString = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs);
+                }
+            }
+            if (reqJobString == null)
+            {
+                Gear.Props.TryGetValue(GearPropType.reqJob, out int reqJob);
+                switch (reqJob)
+                {
+                    case 1:
+                        reqJobString = "전사";
+                        break;
+                    case 2:
+                        reqJobString = "마법사";
+                        break;
+                    case 3:
+                        reqJobString = "궁수";
+                        break;
+                    case 4:
+                        reqJobString = "도적";
+                        break;
+                    case 5:
+                        reqJobString = "해적";
+                        break;
+                    default:
+                        reqJobString = "공용";
+                        break;
                 }
             }
             TextRenderer.DrawText(g, "착용 직업", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-            TextRenderer.DrawText(g, extraReq == null ? "공용" : extraReq.Replace(" 착용 가능", ""), GearGraphics.EquipMDMoris9Font, new Point(79, picH), Color.White, TextFormatFlags.NoPadding);
+            TextRenderer.DrawText(g, reqJobString.Replace(" 착용 가능", "").Replace(" 착용가능", ""), GearGraphics.EquipMDMoris9Font, new Point(79, picH), Color.White, TextFormatFlags.NoPadding);
             picH += 16;
 
             // 요구 레벨

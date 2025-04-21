@@ -59,7 +59,8 @@ namespace WzComparerR2.CharaSimControl
             int picHeight2 = 0;
             Bitmap effectBmp = null;
 
-            if (this.SetItem.ExpandToolTip)
+            //if (this.SetItem.ExpandToolTip)
+            if (false)
             {
                 effectBmp = RenderEffectPart(specialPetSetEffectName, out picHeight2);
                 width += 298;
@@ -338,7 +339,8 @@ namespace WzComparerR2.CharaSimControl
             picHeight += 5;
             AddLines(0, 6, ref picHeight);
 
-            if (!this.SetItem.ExpandToolTip)
+            //if (!this.SetItem.ExpandToolTip)
+            if (true)
             {
                 picHeight += 6;
                 RenderEffect(g, specialPetSetEffectName, ref picHeight);

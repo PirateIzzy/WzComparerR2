@@ -410,12 +410,20 @@ namespace WzComparerR2.CharaSimControl
                         foreach (SetItemActiveSkill p in ops)
                         {
                             StringResult sr;
+                            string summary;
                             if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(p.SkillID, out sr))
                             {
                                 sr = new StringResult();
                                 sr.Name = p.SkillID.ToString();
                             }
-                            string summary = $"<{sr.Name.Replace(Environment.NewLine, "")}> 스킬 사용 가능";
+                            if (Enable22AniStyle)
+                            {
+                                summary = $"[{sr.Name.Replace(Environment.NewLine, "")}] 스킬 사용 가능";
+                            }
+                            else
+                            {
+                                summary = $"<{sr.Name.Replace(Environment.NewLine, "")}> 스킬 사용 가능";
+                            }
                             GearGraphics.DrawPlainText(g, summary, GearGraphics.EquipDetailFont2, color, 10, 244, ref picHeight, 15);
                         }
                     }
