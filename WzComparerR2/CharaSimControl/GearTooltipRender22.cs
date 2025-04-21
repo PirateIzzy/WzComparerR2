@@ -862,6 +862,17 @@ namespace WzComparerR2.CharaSimControl
 
                 GearGraphics.DrawString(g, sr.Desc.Replace("#", " #").Trim(), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
             }
+            // 값이 있는 설명
+            if (!string.IsNullOrEmpty(Gear.EpicHs) && sr[Gear.EpicHs] != null)
+            {
+                hasThirdContents = true;
+
+                var text = sr[Gear.EpicHs].Replace("#", " #").Trim();
+                if (!string.IsNullOrEmpty(text))
+                {
+                    GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, new Dictionary<string, Color>() { { "c", Color.White } }, 15, 305, ref picH, 16, strictlyAlignLeft: 0);
+                }
+            }
 
             // 펫장비 능력치 이전 주문서
             if (Gear.Props.TryGetValue(GearPropType.noPetEquipStatMoveItem, out value) && value != 0)
@@ -871,7 +882,7 @@ namespace WzComparerR2.CharaSimControl
                 GearGraphics.DrawString(g, "펫 장비 능력치 이전 주문서를 사용할 수 없는 아이템입니다.", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
             }
             // 캐시 이펙트
-            if (Gear.type != GearType.pickaxe && Gear.type != GearType.shovel && PluginBase.PluginManager.FindWz(string.Format("Effect/ItemEff.img/{0}/effect", Gear.ItemID)) != null)
+            if (Gear.Cash && Gear.type != GearType.pickaxe && Gear.type != GearType.shovel && PluginBase.PluginManager.FindWz(string.Format("Effect/ItemEff.img/{0}/effect", Gear.ItemID)) != null)
             {
                 hasThirdContents = true;
 
@@ -1228,7 +1239,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             // 소울
-            if (Gear.IsWeapon(Gear.type))
+            if (!Gear.Cash && Gear.IsWeapon(Gear.type))
             {
                 AddLines(0, 6, ref picH, condition: thirdLineNeeded);
                 thirdLineNeeded = false;
@@ -1250,15 +1261,6 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 foreach (var text in attrList)
-                {
-                    GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(Gear.EpicHs) && sr[Gear.EpicHs] != null)
-            {
-                var text = sr[Gear.EpicHs].Replace("#", " #").Trim();
-                if (!string.IsNullOrEmpty(text))
                 {
                     GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
                 }
