@@ -1585,7 +1585,7 @@ namespace WzComparerR2.CharaSimControl
                             {
                                 itemGroup += "류 아이템";
                             }
-                            exclusiveEquip = $"#r아이템 그룹 내 중복 장착 불가# ({itemGroup})";
+                            exclusiveEquip = $"#$r아이템 그룹 내 중복 장착 불가# ({itemGroup})";
                         }
                         else
                         {
