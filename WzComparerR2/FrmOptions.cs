@@ -52,6 +52,12 @@ namespace WzComparerR2
             set { chkWzSortByImgID.Checked = value; }
         }
 
+        public bool AutoDetectUpdate
+        {
+            get { return chkAutoDetectUpdate.Checked; }
+            set { chkAutoDetectUpdate.Checked = value; }
+        }
+
         public int DefaultWzCodePage
         {
             get
@@ -100,6 +106,7 @@ namespace WzComparerR2
             this.AutoDetectExtFiles = config.AutoDetectExtFiles;
             this.ImgCheckDisabled = config.ImgCheckDisabled;
             this.WzVersionVerifyMode = config.WzVersionVerifyMode;
+            this.AutoDetectUpdate = config.AutoDetectUpdate;
         }
 
         public void Save(WcR2Config config)
@@ -110,6 +117,7 @@ namespace WzComparerR2
             config.AutoDetectExtFiles = this.AutoDetectExtFiles;
             config.ImgCheckDisabled = this.ImgCheckDisabled;
             config.WzVersionVerifyMode = this.WzVersionVerifyMode;
+            config.AutoDetectUpdate = this.AutoDetectUpdate;
         }
     }
 }

@@ -17,6 +17,7 @@ namespace WzComparerR2.Config
             this.MainStyleColor = Color.DimGray;
             this.SortWzOnOpened = true;
             this.AutoDetectExtFiles = true;
+            this.AutoDetectUpdate = true;
             this.WzVersionVerifyMode = WzLib.WzVersionVerifyMode.Fast;
         }
 
@@ -125,6 +126,13 @@ namespace WzComparerR2.Config
         public PatcherSettingCollection PatcherSettings
         {
             get { return (PatcherSettingCollection)this["patcherSettings"]; }
+        }
+
+        [ConfigurationProperty("autoDetectUpdate")]
+        public ConfigItem<bool> AutoDetectUpdate
+        {
+            get { return (ConfigItem<bool>)this["autoDetectUpdate"]; }
+            set { this["autoDetectUpdate"] = value; }
         }
     }
 }
