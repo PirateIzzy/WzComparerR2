@@ -1801,7 +1801,7 @@ namespace WzComparerR2.CharaSimControl
         {
             List<string> categories = new List<string>();
 
-            if (Gear.IsWeapon(Gear.type))
+            if (Gear.IsWeapon(Gear.type) || Gear.IsCashWeapon(Gear.type))
             {
                 categories.Add("무기");
                 if (!Gear.Cash && (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara))
@@ -1830,7 +1830,11 @@ namespace WzComparerR2.CharaSimControl
                 categories.Add("장신구");
             }
 
-            categories.Add(ItemStringHelper.GetGearTypeString(Gear.type));
+            var text = ItemStringHelper.GetGearTypeString(Gear.type);
+            if (!string.IsNullOrEmpty(text))
+            {
+                categories.Add(text);
+            }
 
             if (categories.Count <= 0) return;
 
