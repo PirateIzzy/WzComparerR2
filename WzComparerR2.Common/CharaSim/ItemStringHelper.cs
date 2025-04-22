@@ -864,6 +864,11 @@ namespace WzComparerR2.CharaSim
 
         public static string GetExtraJobReqString(IEnumerable<int> specJobs)
         {
+            return string.Join(", ", GetExtraJobReqStringList(specJobs)) + " 착용 가능";
+        }
+
+        public static List<string> GetExtraJobReqStringList(IEnumerable<int> specJobs)
+        {
             List<string> extraJobNames = new List<string>();
             foreach (int specJob in specJobs)
             {
@@ -884,7 +889,7 @@ namespace WzComparerR2.CharaSim
             {
                 return null;
             }
-            return string.Join(", ", extraJobNames) + " 착용 가능";
+            return extraJobNames;
         }
 
         public static string GetItemPropString(ItemPropType propType, long value)

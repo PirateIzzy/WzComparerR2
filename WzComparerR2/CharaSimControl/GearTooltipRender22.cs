@@ -343,11 +343,11 @@ namespace WzComparerR2.CharaSimControl
                 int[] specJobsList1 = new[] { 2, 22, 12, 32, 172 };
                 if (new HashSet<int>(specJobsList1).SetEquals(Gear.ReqSpecJobs))
                 {
-                    reqJobString = ItemStringHelper.GetExtraJobReqString(specJobsList1);
+                    reqJobString = JoinStringWithNewline(g, ", ", ItemStringHelper.GetExtraJobReqStringList(specJobsList1), 220);
                 }
                 else
                 {
-                    reqJobString = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs);
+                    reqJobString = JoinStringWithNewline(g, ", ", ItemStringHelper.GetExtraJobReqStringList(Gear.ReqSpecJobs), 220);
                 }
             }
             if (reqJobString == null)
@@ -396,8 +396,7 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
             TextRenderer.DrawText(g, "착용 직업", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-            TextRenderer.DrawText(g, (reqJobString ?? "공용").Replace(" 착용 가능", "").Replace(" 착용가능", ""), GearGraphics.EquipMDMoris9Font, new Point(79, picH), Color.White, TextFormatFlags.NoPadding);
-            picH += 16;
+            GearGraphics.DrawString(g, (string.IsNullOrEmpty(reqJobString) ? "공용" : reqJobString).Replace("착용", "").Replace("가능", "").Trim(), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 79, 308, ref picH, 16);
 
             // 요구 레벨
             this.Gear.Props.TryGetValue(GearPropType.reqLevel, out value2);
@@ -1901,6 +1900,37 @@ namespace WzComparerR2.CharaSimControl
                 return true;
             }
             return false;
+        }
+
+        public static string JoinStringWithNewline(Graphics g, string separator, List<string> texts, int width)
+        {
+            if (texts == null || texts.Count <= 0)
+            {
+                return "";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            int count = 1;
+            int width_total = TextRenderer.MeasureText(g, texts[0] + separator, GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width;
+            int width_add = 0;
+            sb.Append(texts[0]);
+
+            while (count < texts.Count)
+            {
+                sb.Append(separator);
+
+                width_add = TextRenderer.MeasureText(g, texts[count] + separator, GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width;
+                width_total += width_add;
+                if (width_total > width)
+                {
+                    width_total = width_add;
+                    sb.Append("\n");
+                }
+
+                sb.Append(texts[count++]);
+            }
+
+            return sb.ToString();
         }
 
         private bool TryGetMedalResource(int medalTag, out Wz_Node resNode)
