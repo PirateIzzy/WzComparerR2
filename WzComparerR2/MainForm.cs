@@ -3656,6 +3656,39 @@ namespace WzComparerR2
 
         private void buttonItem1_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            var characWz = PluginManager.FindWz(Wz_Type.Character);
+            Wz_Node wpNode = null;
+            foreach (var node1 in characWz.Nodes)
+            {
+                if (node1.Text.Contains("_Canvas"))
+                {
+                    continue;
+                }
+
+                if (node1.Text == "Weapon")
+                {
+                    wpNode = node1;
+                    foreach (var imgNode in wpNode.Nodes)
+                    {
+                        Wz_Image img = imgNode.GetValue<Wz_Image>();
+                        if (img != null && img.TryExtract())
+                        {
+                            var c = img.Node?.FindNodeByPath("info")?.FindNodeByPath("reqJob");
+                            if (c != null)
+                            {
+                                var d = c.GetValueEx<int>() ?? 0;
+                                if (!(d % 2 == 0 || d == 1 || d == 0))
+                                {
+                                    Debug.WriteLine($"{img.Node.Text}, {d}");
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+#endif
         }
 
         private void labelItemStatus_TextChanged(object sender, EventArgs e)

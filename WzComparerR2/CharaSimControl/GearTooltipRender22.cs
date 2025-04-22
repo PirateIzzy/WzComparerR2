@@ -352,31 +352,51 @@ namespace WzComparerR2.CharaSimControl
             }
             if (reqJobString == null)
             {
+                List<string> reqJobList = new List<string>();
                 Gear.Props.TryGetValue(GearPropType.reqJob, out int reqJob);
                 switch (reqJob)
                 {
-                    case 1:
-                        reqJobString = "전사";
+                    case -1:
+                        reqJobString = "초보자";
                         break;
-                    case 2:
-                        reqJobString = "마법사";
-                        break;
-                    case 3:
-                        reqJobString = "궁수";
-                        break;
-                    case 4:
-                        reqJobString = "도적";
-                        break;
-                    case 5:
-                        reqJobString = "해적";
-                        break;
-                    default:
+                    case 0:
                         reqJobString = "공용";
                         break;
+                    default:
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if ((reqJob & (1 << i)) != 0)
+                            {
+                                switch (i)
+                                {
+                                    case 0:
+                                        reqJobList.Add("전사");
+                                        break;
+                                    case 1:
+                                        reqJobList.Add("마법사");
+                                        break;
+                                    case 2:
+                                        reqJobList.Add("궁수");
+                                        break;
+                                    case 3:
+                                        reqJobList.Add("도적");
+                                        break;
+                                    case 4:
+                                        reqJobList.Add("해적");
+                                        break;
+                                }
+                            }
+                        }
+                        break;
+                }
+
+                if (reqJobList.Count > 0)
+                {
+                    reqJobString = string.Join(", ", reqJobList);
                 }
             }
             TextRenderer.DrawText(g, "착용 직업", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-            TextRenderer.DrawText(g, reqJobString.Replace(" 착용 가능", "").Replace(" 착용가능", ""), GearGraphics.EquipMDMoris9Font, new Point(79, picH), Color.White, TextFormatFlags.NoPadding);
+            TextRenderer.DrawText(g, (reqJobString ?? "공용").Replace(" 착용 가능", "").Replace(" 착용가능", ""), GearGraphics.EquipMDMoris9Font, new Point(79, picH), Color.White, TextFormatFlags.NoPadding);
             picH += 16;
 
             // 요구 레벨
