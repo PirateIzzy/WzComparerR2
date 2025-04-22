@@ -1785,25 +1785,29 @@ namespace WzComparerR2.Comparer
             {
                 int idx = -1;
                 string col0 = null;
+                string col0ToFile = null;
                 switch (diff.DifferenceType)
                 {
                     case DifferenceType.Changed:
                         idx = 0;
                         col0 = diff.NodeNew.FullPath;
+                        col0ToFile = diff.NodeNew.FullPathToFile;
                         break;
                     case DifferenceType.Append:
                         idx = 1;
                         col0 = diff.NodeNew.FullPath;
+                        col0ToFile = diff.NodeNew.FullPathToFile;
                         break;
                     case DifferenceType.Remove:
                         idx = 2;
                         col0 = diff.NodeOld.FullPath;
+                        col0ToFile = diff.NodeOld.FullPathToFile;
                         break;
                 }
                 sb.AppendFormat("<tr class=\"r{0}\">", idx);
                 sb.AppendFormat("<td>{0}</td>", col0 ?? " ");
-                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.NodeOld, 1, outputDir) ?? " ");
-                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.NodeNew, 0, outputDir) ?? " ");
+                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0ToFile, diff.NodeOld, 1, outputDir) ?? " ");
+                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0ToFile, diff.NodeNew, 0, outputDir) ?? " ");
                 sb.AppendLine("</tr>");
                 count[idx]++;
 
@@ -1882,9 +1886,10 @@ namespace WzComparerR2.Comparer
                 if (node != null)
                 {
                     string fullPath = node.FullPath;
+                    string fullPathToFile = node.FullPathToFile;
                     sw.Write("<tr class=\"r{0}\">", idx);
                     sw.Write("<td>{0}</td>", fullPath ?? " ");
-                    sw.Write("<td>{0}</td>", OutputNodeValue(fullPath, node, 0, outputDir) ?? " ");
+                    sw.Write("<td>{0}</td>", OutputNodeValue(fullPathToFile, node, 0, outputDir) ?? " ");
                     sw.WriteLine("</tr>");
 
                     // 변경된 스킬 툴팁 출력
