@@ -82,6 +82,7 @@ namespace WzComparerR2
                 new ComboItem("MyMemory"){ Value = 4 },
                 new ComboItem("Yandex"){ Value = 5 },
                 new ComboItem("Naver Papago (Non-Mozhi)"){ Value = 6 },
+                new ComboItem("OpenAI Compatible"){ Value = 9 },
             });
 
             cmbPreferredLayout.Items.AddRange(new[]
@@ -118,6 +119,11 @@ namespace WzComparerR2
                 new ComboItem("New Taiwan Dollar (NTD)"){ Value = "twd" },
                 new ComboItem("Singapore Dollar (SGD)"){ Value = "sgd" },
                 new ComboItem("US Dollar (USD)"){ Value = "usd" },
+            });
+
+            cmbLanguageModel.Items.AddRange(new[]
+            {
+                new ComboItem("Keep Current"){ Value = "none" },
             });
         }
 
@@ -167,6 +173,18 @@ namespace WzComparerR2
             set { chkImgCheckDisabled.Checked = value; }
         }
 
+        public string OpenAIBackend
+        {
+            get { return txtOpenAIBackend.Text; }
+            set { txtOpenAIBackend.Text = value; }
+        }
+
+        public string OpenAISystemMessage
+        {
+            get { return txtOpenAISystemMessage.Text; }
+            set { txtOpenAISystemMessage.Text = value; }
+        }
+
         public string NxSecretKey
         {
             get { return txtSecretkey.Text; }
@@ -202,6 +220,50 @@ namespace WzComparerR2
                     ?? items.Last();
                 item.Value = value;
                 cmbMozhiBackend.SelectedItem = item;
+            }
+        }
+
+        public string LanguageModel
+        {
+            get
+            {
+                return ((cmbLanguageModel.SelectedItem as ComboItem)?.Value as string) ?? "";
+            }
+            set
+            {
+                var items = cmbLanguageModel.Items.Cast<ComboItem>();
+                var item = items.FirstOrDefault(_item => _item.Value as string == value)
+                    ?? items.Last();
+                item.Value = value;
+                cmbLanguageModel.SelectedItem = item;
+            }
+        }
+        public bool OpenAIExtraOption
+        {
+            get { return chkOpenAIExtraOption.Checked; }
+            set { chkOpenAIExtraOption.Checked = value; }
+        }
+
+        public double LMTemperature
+        {
+            get
+            {
+                return Double.Parse(txtLMTemperature.Text);
+            }
+            set
+            {
+                txtLMTemperature.Text = value.ToString();
+            }
+        }
+        public int MaximumToken
+        {
+            get
+            {
+                return int.Parse(txtMaximumToken.Text);
+            }
+            set
+            {
+                txtMaximumToken.Text = value.ToString();
             }
         }
 
@@ -271,29 +333,73 @@ namespace WzComparerR2
 
         private void buttonXCheck2_Click(object sender, EventArgs e)
         {
+            ComboItem selectedItem = (ComboItem)cmbPreferredTranslateEngine.SelectedItem;
             string respText;
-            var req = WebRequest.Create((cmbMozhiBackend.SelectedItem as ComboItem)?.Value + "/api/engines") as HttpWebRequest;
-            req.Timeout = 15000;
-            try
+            HttpWebRequest req;
+            string backendAddress;
+            if (string.IsNullOrEmpty(OpenAIBackend))
             {
-                string respJson = new StreamReader(req.GetResponse().GetResponseStream(), Encoding.UTF8).ReadToEnd();
-                if (respJson.Contains("All Engines"))
-                {
-                    respText = "This Mozhi Server is valid.";
-                }
-                else
-                {
-                    respText = "This Mozhi Server is invalid.";
-                }
+                backendAddress = txtOpenAIBackend.WatermarkText;
             }
-            catch (WebException ex)
+            else
             {
-                string respJson = new StreamReader(ex.Response.GetResponseStream(), Encoding.UTF8).ReadToEnd();
-                respText = "This Mozhi Server is invalid.";
+                backendAddress = OpenAIBackend;
             }
-            catch (Exception ex)
+            switch ((int)selectedItem.Value)
             {
-                respText = "An unknown error has occurred: " + ex;
+                case 8:
+                case 9:
+                    req = WebRequest.Create(backendAddress + "/models") as HttpWebRequest;
+                    req.Timeout = 15000;
+                    if (!string.IsNullOrEmpty(NxSecretKey))
+                    {
+                        JObject reqHeaders = JObject.Parse(NxSecretKey);
+                        foreach (var property in reqHeaders.Properties()) req.Headers.Add(property.Name, property.Value.ToString());
+                    }
+                    try
+                    {
+                        string respJson = new StreamReader(req.GetResponse().GetResponseStream(), Encoding.UTF8).ReadToEnd();
+                        JObject jsonResp = JObject.Parse(respJson);
+                        JArray dataArray = (JArray)jsonResp["data"];
+                        StringBuilder sb = new StringBuilder();
+                        cmbLanguageModel.Items.Clear();
+                        foreach (JObject dataItem in dataArray)
+                        {
+                            sb.AppendLine(dataItem["id"].ToString());
+                            cmbLanguageModel.Items.Add(new ComboItem(dataItem["id"].ToString()) { Value = dataItem["id"].ToString() });
+                        }
+                        cmbLanguageModel.SelectedIndex = 0;
+                        respText = sb.ToString();
+                    }
+                    catch
+                    {
+                        respText = "This API is invalid.";
+                    }
+                    break;
+                default:
+                    req = WebRequest.Create((cmbMozhiBackend.SelectedItem as ComboItem)?.Value + "/api/engines") as HttpWebRequest;
+                    req.Timeout = 15000;
+                    try
+                    {
+                        string respJson = new StreamReader(req.GetResponse().GetResponseStream(), Encoding.UTF8).ReadToEnd();
+                        if (respJson.Contains("All Engines"))
+                        {
+                            respText = "This Mozhi Server is valid.";
+                        }
+                        else
+                        {
+                            respText = "This Mozhi Server is invalid.";
+                        }
+                    }
+                    catch (WebException ex)
+                    {
+                        respText = "This Mozhi Server is invalid.";
+                    }
+                    catch (Exception ex)
+                    {
+                        respText = "An unknown error has occurred: " + ex;
+                    }
+                    break;
             }
             MessageBoxEx.Show(respText);
         }
@@ -312,6 +418,99 @@ namespace WzComparerR2
                 respText = "The JSON is invalid. ";
             }
             MessageBoxEx.Show(respText);
+        }
+
+        private void cmbPreferredTranslateEngine_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboItem selectedItem = (ComboItem)cmbPreferredTranslateEngine.SelectedItem;
+            switch ((int)selectedItem.Value)
+            {
+                case 0:
+                case 6:
+                    labelX5.Visible = true;
+                    labelX5.Enabled = false;
+                    labelX11.Visible = false;
+                    labelX12.Enabled = false;
+                    labelX13.Enabled = false;
+                    labelX14.Enabled = false;
+                    labelX15.Enabled = false;
+                    txtOpenAIBackend.Enabled = false;
+                    txtOpenAISystemMessage.Enabled = false;
+                    txtLMTemperature.Enabled = false;
+                    txtMaximumToken.Enabled = false;
+                    cmbMozhiBackend.Visible = true;
+                    cmbMozhiBackend.Enabled = false;
+                    cmbLanguageModel.Visible = false;
+                    chkOpenAIExtraOption.Enabled = false;
+                    buttonXCheck2.Enabled = false;
+                    break;
+                case 8:
+                case 9:
+                    labelX5.Visible = false;
+                    labelX11.Visible = true;
+                    labelX12.Enabled = true;
+                    labelX13.Enabled = chkOpenAIExtraOption.Checked;
+                    labelX14.Enabled = chkOpenAIExtraOption.Checked;
+                    labelX15.Enabled = true;
+                    txtOpenAIBackend.Enabled = true;
+                    txtOpenAISystemMessage.Enabled = true;
+                    txtLMTemperature.Enabled = chkOpenAIExtraOption.Checked;
+                    txtMaximumToken.Enabled = chkOpenAIExtraOption.Checked;
+                    cmbMozhiBackend.Visible = false;
+                    cmbLanguageModel.Visible = true;
+                    chkOpenAIExtraOption.Enabled = true;
+                    buttonXCheck2.Enabled = true;
+                    break;
+                default:
+                    labelX5.Visible = true;
+                    labelX5.Enabled = true;
+                    labelX11.Visible = false;
+                    labelX12.Enabled = false;
+                    labelX13.Enabled = false;
+                    labelX14.Enabled = false;
+                    labelX15.Enabled = false;
+                    txtOpenAIBackend.Enabled = false;
+                    txtOpenAISystemMessage.Enabled = false;
+                    txtLMTemperature.Enabled = false;
+                    txtMaximumToken.Enabled = false;
+                    cmbMozhiBackend.Visible = true;
+                    cmbMozhiBackend.Enabled = true;
+                    cmbLanguageModel.Visible = false;
+                    chkOpenAIExtraOption.Enabled = false;
+                    buttonXCheck2.Enabled = true;
+                    break;
+            }
+        }
+        private void chkOpenAIExtraOption_CheckedChanged(object sender, EventArgs e)
+        {
+            txtLMTemperature.Enabled = chkOpenAIExtraOption.Checked && chkOpenAIExtraOption.Enabled;
+            txtMaximumToken.Enabled = chkOpenAIExtraOption.Checked && chkOpenAIExtraOption.Enabled;
+            labelX13.Enabled = chkOpenAIExtraOption.Checked && chkOpenAIExtraOption.Enabled;
+            labelX14.Enabled = chkOpenAIExtraOption.Checked && chkOpenAIExtraOption.Enabled;
+        }
+
+        private void buttonX3_Click(object sender, EventArgs e)
+        {
+            string GlossaryTablePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TranslationCache", "Glossary.csv");
+            if (!File.Exists(GlossaryTablePath))
+            {
+                using (StreamWriter writer = new StreamWriter(GlossaryTablePath, false, new UTF8Encoding(true)))
+                {
+                    writer.Write(
+                        "identifier,ko,ja,zh-CN,zh-TW,en\r\n" +
+                        "<glos_0000000001>,메소,メル,金币,楓幣,mesos\r\n" +
+                        "<glos_0000000002>,메소,メル,金币,楓幣,meso\r\n");
+                }
+            }
+#if NET6_0_OR_GREATER
+            Process.Start(new ProcessStartInfo
+            {
+                UseShellExecute = true,
+                FileName = GlossaryTablePath
+            });
+#else
+            Process.Start(GlossaryTablePath);
+#endif
         }
 
         public WzLib.WzVersionVerifyMode WzVersionVerifyMode
@@ -336,6 +535,12 @@ namespace WzComparerR2
             this.WzVersionVerifyMode = config.WzVersionVerifyMode;
             this.NxSecretKey = config.NxSecretKey;
             this.MozhiBackend = config.MozhiBackend;
+            this.LanguageModel = config.LanguageModel;
+            this.OpenAIBackend = config.OpenAIBackend;
+            this.OpenAIExtraOption = config.OpenAIExtraOption;
+            this.OpenAISystemMessage = config.OpenAISystemMessage;
+            this.LMTemperature = config.LMTemperature;
+            this.MaximumToken = config.MaximumToken;
             this.PreferredTranslateEngine = config.PreferredTranslateEngine;
             this.DesiredLanguage = config.DesiredLanguage;
             this.PreferredLayout = config.PreferredLayout;
@@ -354,6 +559,12 @@ namespace WzComparerR2
             config.WzVersionVerifyMode = this.WzVersionVerifyMode;
             config.NxSecretKey = this.NxSecretKey;
             config.MozhiBackend = this.MozhiBackend;
+            if (this.LanguageModel != "none") config.LanguageModel = this.LanguageModel;
+            config.OpenAIBackend = this.OpenAIBackend;
+            config.OpenAIExtraOption = this.OpenAIExtraOption;
+            config.OpenAISystemMessage = this.OpenAISystemMessage;
+            config.LMTemperature = this.LMTemperature;
+            config.MaximumToken = this.MaximumToken;
             config.PreferredTranslateEngine = this.PreferredTranslateEngine;
             config.DesiredLanguage = this.DesiredLanguage;
             config.PreferredLayout = this.PreferredLayout;

@@ -936,6 +936,7 @@ namespace WzComparerR2.CharaSimControl
                     {
                         picH += 9;
                         g.DrawImage(frame.Bitmap, tooltip.Width / 2 - frame.Origin.X, picH);
+                        item.AvatarBitmap = frame.Bitmap;
                         picH += frame.Bitmap.Height;
                         picH += 2;
                     }

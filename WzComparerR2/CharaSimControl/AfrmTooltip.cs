@@ -8,6 +8,8 @@ using WzComparerR2.CharaSim;
 using WzComparerR2.Controls;
 using SharpDX.XAudio2;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -18,9 +20,10 @@ namespace WzComparerR2.CharaSimControl
             this.menu = new ContextMenuStrip();
             this.menu.Items.Add(new ToolStripMenuItem("Copy Tooltip Image to Clipboard", null, tsmiCopy_Click));
             this.menu.Items.Add(new ToolStripMenuItem("Save Tooltip Image", null, tsmiSave_Click));
-            this.menu.Items.Add(new ToolStripMenuItem("Save Android Image", null, tsmiAndroidSave_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Save Avatar Image", null, tsmiAvatarSave_Click));
             this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Copy String to Clipboard", null, tsmiCopyText_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Copy Translated String to Clipboard", null, tsmiCopyTranslate_Click));
             this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Close (Esc)", null, tsmiClose_Click));
             this.ContextMenuStrip = this.menu;
@@ -48,7 +51,9 @@ namespace WzComparerR2.CharaSimControl
         private bool showMenu;
         private bool showID;
 
-        private Bitmap AndroidBitmap;
+        private Bitmap AvatarBitmap;
+        private FrmWaiting WaitingForm = new FrmWaiting();
+        private Mutex TranslateMutex = new Mutex(false, "TranslateMutex");
 
 
         public Object TargetItem
@@ -102,9 +107,15 @@ namespace WzComparerR2.CharaSimControl
             set { showMenu = value; }
         }
 
-        public override void Refresh()
+        public async override void Refresh()
         {
             this.PreRender();
+            if (Translator.IsTranslateEnabled)
+            {
+                Thread.Sleep(10);
+                TranslateMutex.WaitOne();
+                TranslateMutex.ReleaseMutex();
+            }
             if (this.Bitmap != null)
             {
                 this.SetBitmap(Bitmap);
@@ -113,9 +124,9 @@ namespace WzComparerR2.CharaSimControl
             }
         }
 
-        public void PreRender()
+        public async void PreRender()
         {
-            AndroidBitmap = null;
+            AvatarBitmap = null;
             if (this.item == null)
                 return;
 
@@ -231,8 +242,26 @@ namespace WzComparerR2.CharaSimControl
                 return;
             }
             renderer.StringLinker = StringLinker;
-            this.Bitmap = renderer.Render();
-            if (item is Gear) AndroidBitmap = (this.TargetItem as Gear).AndroidBitmap;
+            if (Translator.IsTranslateEnabled)
+            {
+                Translator.WaitingForGlossaryTableRelease();
+                WaitingForm.UpdateMessage("Translating...");
+                WaitingForm.Show();
+                await Task.Run(() =>
+                {
+                    TranslateMutex.WaitOne();
+                    this.Bitmap = renderer.Render();
+                    TranslateMutex.ReleaseMutex();
+                });
+                WaitingForm.Hide();
+            }
+            else
+            {
+                this.Bitmap = renderer.Render();
+            }
+            if (item is Item) AvatarBitmap = (this.TargetItem as Item).AvatarBitmap;
+            if (item is Gear) AvatarBitmap = (this.TargetItem as Gear).AndroidBitmap;
+            if (item is Npc) AvatarBitmap = (this.TargetItem as Npc).AvatarBitmap;
         }
 
         void AfrmTooltip_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -339,6 +368,47 @@ namespace WzComparerR2.CharaSimControl
             sb.Clear();
         }
 
+        async void tsmiCopyTranslate_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (this.PreferredStringCopyMethod == 2) sb.AppendLine(this.NodeID.ToString());
+            if (!String.IsNullOrEmpty(this.NodeName)) sb.AppendLine(this.NodeName);
+            if (String.IsNullOrEmpty(this.Desc)) this.Desc = "";
+            if (String.IsNullOrEmpty(this.Pdesc)) this.Pdesc = "";
+            if (String.IsNullOrEmpty(this.AutoDesc)) this.AutoDesc = "";
+            if (String.IsNullOrEmpty(this.Hdesc)) this.Hdesc = "";
+            if (String.IsNullOrEmpty(this.DescLeftAlign)) this.DescLeftAlign = "";
+            if (this.CopyParsedSkillString && item is Skill) this.Hdesc = this.SkillRender.ParsedHdesc;
+            if (!String.IsNullOrEmpty(this.NodeName)) sb.AppendLine("<name>" + this.NodeName + "</name>");
+            if (!String.IsNullOrEmpty(this.Desc)) sb.AppendLine("<desc>" + this.Desc + "</desc>");
+            if (!String.IsNullOrEmpty(this.Pdesc)) sb.AppendLine("<pdesc>" + this.Pdesc + "</pdesc>");
+            if (!String.IsNullOrEmpty(this.AutoDesc)) sb.AppendLine("<autodesc>" + this.AutoDesc + "</autodesc>");
+            if (!String.IsNullOrEmpty(this.Hdesc)) sb.AppendLine("<hdesc>" + this.Hdesc + "</hdesc>");
+            if (!String.IsNullOrEmpty(this.DescLeftAlign)) sb.AppendLine("<descleftalign>" + this.DescLeftAlign + "</descleftalign>");
+            string translatedResult = "";
+            Translator.WaitingForGlossaryTableRelease();
+            WaitingForm.UpdateMessage("Translating...");
+            try
+            {
+                WaitingForm.Show();
+                await Task.Run(() => { translatedResult = Translator.AfrmTooltipTranslateBeforeCopy(sb.ToString()); });
+                Clipboard.SetText(translatedResult);
+                WaitingForm.Hide();
+                sb.Clear();
+            }
+            finally
+            {
+                if (WaitingForm.InvokeRequired)
+                {
+                    WaitingForm.Invoke(new Action(() => WaitingForm.Hide()));
+                }
+                else
+                {
+                    WaitingForm.Hide();
+                }
+            }
+        }
+
         void tsmiClose_Click(object sender, EventArgs e)
         {
             if (this.Bitmap != null)
@@ -432,9 +502,9 @@ namespace WzComparerR2.CharaSimControl
             }
         }
 
-        void tsmiAndroidSave_Click(object sender, EventArgs e)
+        void tsmiAvatarSave_Click(object sender, EventArgs e)
         {
-            if (this.AndroidBitmap != null && this.item != null)
+            if (this.AvatarBitmap != null && this.item != null)
             {
                 using (SaveFileDialog dlg = new SaveFileDialog())
                 {
@@ -443,7 +513,7 @@ namespace WzComparerR2.CharaSimControl
 
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
-                        this.AndroidBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        this.AvatarBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
                     }
                 }
             }
