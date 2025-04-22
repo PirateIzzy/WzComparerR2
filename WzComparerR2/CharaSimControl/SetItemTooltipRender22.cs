@@ -352,7 +352,7 @@ namespace WzComparerR2.CharaSimControl
             return setBitmap;
         }
 
-        private static string Compact(Graphics g, string text, int width) // https://www.codeproject.com/Articles/37503/Auto-Ellipsis
+        public static string Compact(Graphics g, string text, int width) // https://www.codeproject.com/Articles/37503/Auto-Ellipsis
         {
             Size s = TextRenderer.MeasureText(g, text, GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
 

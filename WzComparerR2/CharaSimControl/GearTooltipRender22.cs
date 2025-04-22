@@ -542,7 +542,7 @@ namespace WzComparerR2.CharaSimControl
                     hasThirdContents = true;
 
                     g.DrawImage(Resource.UIToolTipNew_img_Item_Equip_textIcon_set_guide, 15, picH - 2);
-                    GearGraphics.DrawString(g, $"#$g{text}#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 308, ref picH, 16, alignment: Text.TextAlignment.Right);
+                    GearGraphics.DrawString(g, SetItemTooltipRender22.Compact(g, $"#$g{text}#", 210), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 308, ref picH, 16, alignment: Text.TextAlignment.Right);
                 }
             }
 
@@ -589,7 +589,7 @@ namespace WzComparerR2.CharaSimControl
                     hasThirdContents = true;
 
                     TextRenderer.DrawText(g, "사용 가능 스킬", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                    GearGraphics.DrawString(g, $"#$g{text}#".Replace("#c", ""), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 308, ref picH, 16, alignment: Text.TextAlignment.Right);
+                    GearGraphics.DrawString(g, SetItemTooltipRender22.Compact(g, $"#$g{text}#".Replace("#c", ""), 210), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 308, ref picH, 16, alignment: Text.TextAlignment.Right);
                 }
             }
 
