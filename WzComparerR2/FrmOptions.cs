@@ -133,6 +133,12 @@ namespace WzComparerR2
             set { chkWzSortByImgID.Checked = value; }
         }
 
+        public bool AutoDetectUpdate
+        {
+            get { return chkAutoDetectUpdate.Checked; }
+            set { chkAutoDetectUpdate.Checked = value; }
+        }
+
         public int DefaultWzCodePage
         {
             get
@@ -335,6 +341,7 @@ namespace WzComparerR2
             this.PreferredLayout = config.PreferredLayout;
             this.DetectCurrency = config.DetectCurrency;
             this.DesiredCurrency = config.DesiredCurrency;
+            this.AutoDetectUpdate = config.AutoDetectUpdate;
         }
 
         public void Save(WcR2Config config)
@@ -352,6 +359,7 @@ namespace WzComparerR2
             config.PreferredLayout = this.PreferredLayout;
             config.DetectCurrency = this.DetectCurrency;
             config.DesiredCurrency = this.DesiredCurrency;
+            config.AutoDetectUpdate = this.AutoDetectUpdate;
         }
     }
 }

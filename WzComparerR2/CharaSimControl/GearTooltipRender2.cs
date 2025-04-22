@@ -611,7 +611,7 @@ namespace WzComparerR2.CharaSimControl
             //装备类型 - blank typeStr are for One-handed Weapon and Two-handed Weapon respectively
             bool isWeapon = Gear.IsWeapon(Gear.type);
             string typeStr = ItemStringHelper.GetGearTypeString(Gear.type);
-            if (!string.IsNullOrEmpty(typeStr))
+            if (!string.IsNullOrEmpty(typeStr) && (int)Gear.type / 10 != 171)
             {
                 if (isWeapon)
                 {
@@ -1427,9 +1427,9 @@ namespace WzComparerR2.CharaSimControl
                 Graphics g = Graphics.FromImage(genesisBitmap);
                 picHeight = 13;
 
-                int[] skillList = new[] { 80002632, 80002633 };
-                if (isDestinyWeapon) skillList = new[] { 80003873, 80003874 };
-                foreach (var skillID in skillList)
+                int destinySkill = 1241 * (Gear.IsDestinyWeapon ? 1 : 0);
+
+                foreach (var skillID in new[] { 80002632, 80002633 })
                 {
                     string skillName;
                     if (this.StringLinker?.StringSkill.TryGetValue(skillID, out var sr) ?? false && sr.Name != null)

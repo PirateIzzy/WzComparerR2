@@ -34,6 +34,11 @@ namespace WzComparerR2.CharaSim
             return GetGearPropString(propType, value, 0);
         }
 
+        public static string[] GetGearPropString22(GearPropType propType, long value)
+        {
+            return GetGearPropString22(propType, value, 0);
+        }
+
         /// <summary>
         /// 获取GearPropType所对应的文字说明。
         /// </summary>
@@ -158,6 +163,252 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public static string[] GetGearPropString22(GearPropType propType, long value, int signFlag)
+        {
+            string[] res = new string[2];
+            string sign;
+            switch (signFlag)
+            {
+                default:
+                case 0: //默认处理符号
+                    sign = value > 0 ? "+" : null;
+                    break;
+
+                case 1: //固定加号
+                    sign = "+";
+                    break;
+
+                case 2: //无特别符号
+                    sign = "";
+                    break;
+            }
+            switch (propType)
+            {
+                case GearPropType.incSTR:
+                    res[0] = "STR";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incSTRr:
+                    res[0] = "STR";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incDEX:
+                    res[0] = "DEX";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incDEXr:
+                    res[0] = "DEX";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incINT:
+                    res[0] = "INT";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incINTr:
+                    res[0] = "INT";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incLUK:
+                    res[0] = "LUK";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incLUKr:
+                    res[0] = "LUK";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incAllStat:
+                    res[0] = "올스탯";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.statR:
+                    res[0] = "올스탯";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incMHP:
+                    res[0] = "최대 HP";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incMHPr:
+                    res[0] = "최대 HP";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incMMP:
+                    res[0] = "최대 MP";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incMMPr:
+                    res[0] = "최대 MP";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incMDF:
+                    res[0] = "최대 DF";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incPAD:
+                    res[0] = "공격력";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incPADr:
+                    res[0] = "공격력";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incMAD:
+                    res[0] = "마력";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incMADr:
+                    res[0] = "마력";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incPDD:
+                    res[0] = "방어력";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incPDDr:
+                    res[0] = "방어력";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incSpeed:
+                    res[0] = "이동속도";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incJump:
+                    res[0] = "점프력";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.damR:
+                case GearPropType.incDAMr:
+                    res[0] = "데미지";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incCr:
+                    res[0] = "크리티컬 확률 : " + sign + value + "%";
+                    return res;
+                case GearPropType.incCDr:
+                    res[0] = "크리티컬 데미지 : " + sign + value + "%";
+                    return res;
+                case GearPropType.knockback:
+                    res[0] = "직접 타격시 " + value + "%의 확률로 넉백";
+                    return res;
+                case GearPropType.incPQEXPr:
+                    res[0] = "파티퀘스트 경험치 " + value + "% 추가";
+                    return res;
+                case GearPropType.incBDR:
+                case GearPropType.bdR:
+                    res[0] = "보스 몬스터 데미지";
+                    res[1] = "+" + value + "%";
+                    return res;
+                case GearPropType.incIMDR:
+                case GearPropType.imdR:
+                    res[0] = "몬스터 방어율 무시";
+                    res[1] = "+" + value + "%";
+                    return res;
+                case GearPropType.nbdR:
+                    res[0] = "일반 몬스터 공격 시 데미지 : +" + value + "%";
+                    return res;
+
+                case GearPropType.tradeBlock:
+                    res[0] = value == 0 ? null : "#$r교환 불가#";
+                    return res;
+                case GearPropType.accountSharable:
+                    res[0] = value == 0 ? null : "#$r월드 내 나의 캐릭터 간 이동만 가능#";
+                    return res;
+                case GearPropType.sharableOnce:
+                    res[0] = value == 0 ? null : "#$r월드 내 나의 캐릭터 간 1회 이동 가능 (이동 후 교환불가)#";
+                    return res;
+                case GearPropType.only:
+                    res[0] = value == 0 ? null : "#$r중복 소지 불가#";
+                    return res;
+                case GearPropType.onlyEquip:
+                    res[0] = value == 0 ? null : "#$r중복 장착 불가#";
+                    return res;
+                case GearPropType.equipTradeBlock:
+                    res[0] = value == 0 ? null : "#$r장착 시 교환 불가#";
+                    return res;
+                case GearPropType.notExtend:
+                    res[0] = value == 0 ? null : ", 연장 불가";
+                    return res;
+                case GearPropType.accountSharableAfterExchange:
+                    res[0] = value == 0 ? null : "1회 교환 가능 (거래 후 월드 내 나의 캐릭터 간 이동만 가능)";
+                    return res;
+                case GearPropType.timeLimited:
+                    res[0] = value == 0 ? null : "#$r기간제 아이템#";
+                    return res;
+                case GearPropType.abilityTimeLimited:
+                    res[0] = value == 0 ? null : "#$r기간 한정 능력치#";
+                    return res;
+                case GearPropType.noLookChange:
+                    res[0] = value == 0 ? null : "#$r훈장 신비의 모루 사용 불가#";
+                    return res;
+                case GearPropType.mintable:
+                    res[0] = value == 0 ? null : "#$r민팅 가능#";
+                    return res;
+                case GearPropType.tradeAvailable:
+                    switch (value)
+                    {
+                        case 1:
+                            res[0] = "#$g카르마의 가위 또는 실버 카르마의 가위 사용 시 1회 교환 가능#";
+                            return res;
+                        case 2:
+                            res[0] = "#$g플래티넘 카르마의 가위 사용 시 1회 교환 가능#";
+                            return res;
+                        default: return res;
+                    }
+                case GearPropType.accountShareTag:
+                    switch (value)
+                    {
+                        case 1:
+                            res[0] = "#c쉐어 네임 텍을 사용하면 월드 내 나의 캐릭터 간 1회 이동할 수 있습니다.#";
+                            return res;
+                        default: return res;
+                    }
+                //case GearPropType.noPotential: return value == 0 ? null : "잠재능력 설정 불가";
+                //case GearPropType.fixedPotential: return value == 0 ? null : "잠재능력 재설정 불가";
+                //case GearPropType.superiorEqp: return value == 0 ? null : "아이템 강화 성공시 더욱 높은 효과를 받을 수 있습니다.";
+                //case GearPropType.jokerToSetItem: return value == 0 ? null : "#c3개 이상 착용하고 있는 모든 세트 아이템에 포함되는 럭키 아이템! (단, 2개 이상의 럭키 아이템 착용 시 1개만 효과 적용.)#";
+                //case GearPropType.cantRepair: return value == 0 ? null : "수리 불가";
+
+                case GearPropType.incAllStat_incMHP25:
+                    res[0] = "올스탯  " + sign + value + ", 최대 HP  " + sign + (value * 25);
+                    return res;
+                case GearPropType.incAllStat_incMHP50_incMMP50:
+                    res[0] = "올스탯  " + sign + value + ", 최대 HP / 최대 MP  " + sign + (value * 50);
+                    return res;
+                case GearPropType.incMHP_incMMP:
+                    res[0] = "최대 HP / 최대 MP  " + sign + value;
+                    return res;
+                case GearPropType.incMHPr_incMMPr:
+                    res[0] = "최대 HP / 최대 MP  " + sign + value + "%";
+                    return res;
+                case GearPropType.incPAD_incMAD:
+                case GearPropType.incAD:
+                    res[0] = "공격력 / 마력  " + sign + " " + value;
+                    return res;
+                case GearPropType.incPDD_incMDD:
+                    res[0] = "방어력  " + sign + value;
+                    return res;
+
+                case GearPropType.incARC:
+                    res[0] = "ARC";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incAUT:
+                    res[0] = "AUT";
+                    res[1] = sign + value;
+                    return res;
+
+                case GearPropType.Etuc:
+                    res[0] = $"#$d익셉셔널 : 없음# (최대 {value}회)";
+                    return res;
+                case GearPropType.CuttableCount:
+                    res[0] = $" #$r(가위 사용 잔여 횟수：{value} / {value})#";
+                    return res;
+
+                case GearPropType.incCraft:
+                case GearPropType.incEXPr:
+                default: return res;
+            }
+        }
 
         public static string GetGearPropDiffString(GearPropType propType, int value, int standardValue)
         {
@@ -195,6 +446,49 @@ namespace WzComparerR2.CharaSim
                 propStr = "#$y" + propStr + "# " + suffix;
             }
             return propStr;
+        }
+
+        public static string[] GetGearPropDiffString22(GearPropType propType, int value, int standardValue)
+        {
+            string[] res = new string[3];
+
+            var propStr = GetGearPropString22(propType, value, 0);
+            res[0] = propStr[0];
+            res[1] = propStr[1];
+
+            if (value > standardValue)
+            {
+                string suffix = null;
+                switch (propType)
+                {
+                    case GearPropType.incSTR:
+                    case GearPropType.incDEX:
+                    case GearPropType.incINT:
+                    case GearPropType.incLUK:
+                    case GearPropType.incMHP:
+                    case GearPropType.incMMP:
+                    case GearPropType.incMDF:
+                    case GearPropType.incARC:
+                    case GearPropType.incAUT:
+                    case GearPropType.incPAD:
+                    case GearPropType.incMAD:
+                    case GearPropType.incPDD:
+                    case GearPropType.incMDD:
+                    case GearPropType.incSpeed:
+                    case GearPropType.incJump:
+                        suffix = $"({standardValue} #$e+{value - standardValue}#)"; break;
+                    case GearPropType.bdR:
+                    case GearPropType.incBDR:
+                    case GearPropType.imdR:
+                    case GearPropType.incIMDR:
+                    case GearPropType.damR:
+                    case GearPropType.incDAMr:
+                    case GearPropType.statR:
+                        suffix = $"({standardValue}% #$e+{value - standardValue}%#)"; break;
+                }
+                res[2] = suffix;
+            }
+            return res;
         }
 
         /// <summary>
@@ -299,7 +593,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.petEquip: return "Pet Equipment";
                 case GearType.taming:
                 case GearType.taming2:
-                case GearType.taming3: 
+                case GearType.taming3:
                 case GearType.tamingChair: return "Tamed Monster";
                 case GearType.saddle: return "Saddle";
                 case GearType.katana: return "Katana";
@@ -368,9 +662,13 @@ namespace WzComparerR2.CharaSim
                 case GearType.chakram: return "Chakram";
                 case GearType.hexSeeker: return "Hex Seeker";
 
+                case GearType.arcaneSymbol: return "Arcane Symbol";
+                case GearType.authenticSymbol: return "Sacred Symbol";
+                case GearType.grandAuthenticSymbol: return "Grand Sacred Symbol";
                 case GearType.boxingCannon: return "拳封";//Mo Xuan weapon
                 case GearType.boxingSky: return "拳天";//Mo Xuan weapon
                 case GearType.jewel: return "宝玉";
+
                 default: return null;
             }
         }

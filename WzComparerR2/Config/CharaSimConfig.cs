@@ -72,5 +72,11 @@ namespace WzComparerR2.Config
             get { return (ConfigItem<bool>)this["CopyParsedSkillString"]; }
             set { this["CopyParsedSkillString"] = value; }
         }
+
+        [ConfigurationProperty("misc")]
+        public CharaSimMiscConfig Misc
+        {
+            get { return (CharaSimMiscConfig)this["misc"]; }
+        }
     }
 }

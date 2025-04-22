@@ -48,6 +48,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowNickTag { get; set; }
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
+        public bool Enable22AniStyle { get; set; }
 
         public TooltipRender LinkRecipeInfoRender { get; set; }
         public TooltipRender LinkRecipeGearRender { get; set; }
@@ -270,7 +271,7 @@ namespace WzComparerR2.CharaSimControl
                 //复制图像
                 g.DrawImage(itemBmp, 0, 0, new Rectangle(0, 0, itemBmp.Width, picHeight), GraphicsUnit.Pixel);
                 //左上角
-                g.DrawImage(Resource.UIToolTip_img_Item_Frame2_cover, 3, 3);
+                if (!Enable22AniStyle) g.DrawImage(Resource.UIToolTip_img_Item_Frame2_cover, 3, 3);
 
                 if (this.ShowObjectID)
                 {
@@ -532,9 +533,17 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //绘制图标
+            picH += 1;
             int iconY = picH;
-            int iconX = 10;
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, iconX, picH);
+            int iconX = 14;
+            if (this.Enable22AniStyle)
+            {
+                g.DrawImage(Resource.UIToolTipNew_img_Item_Common_ItemIcon_base, iconX, picH);
+            }
+            else
+            {
+                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, iconX, picH);
+            }
             if (item.Icon.Bitmap != null)
             {
                 g.DrawImage(GearGraphics.EnlargeBitmap(item.Icon.Bitmap),
@@ -571,8 +580,11 @@ namespace WzComparerR2.CharaSimControl
                     iconX + 6 + 68 - cashOrigin.X * 2 - 2,
                     picH + 6 + 68 - cashOrigin.Y * 2 - 2);
             }
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_new, iconX + 7, picH + 7);
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
+            if (!this.Enable22AniStyle)
+            {
+                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_new, iconX + 7, picH + 7);
+                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
+            }
 
             value = 0;
             if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) || item.ItemID / 10000 == 301 || item.ItemID / 1000 == 5204)
@@ -1155,10 +1167,20 @@ namespace WzComparerR2.CharaSimControl
             TooltipRender renderer = this.LinkRecipeGearRender;
             if (renderer == null)
             {
-                GearTooltipRender2 defaultRenderer = new GearTooltipRender2();
-                defaultRenderer.StringLinker = this.StringLinker;
-                defaultRenderer.ShowObjectID = false;
-                renderer = defaultRenderer;
+                if (this.Enable22AniStyle)
+                {
+                    GearTooltipRender22 defaultRenderer = new GearTooltipRender22();
+                    defaultRenderer.StringLinker = this.StringLinker;
+                    defaultRenderer.ShowObjectID = false;
+                    renderer = defaultRenderer;
+                }
+                else
+                {
+                    GearTooltipRender2 defaultRenderer = new GearTooltipRender2();
+                    defaultRenderer.StringLinker = this.StringLinker;
+                    defaultRenderer.ShowObjectID = false;
+                    renderer = defaultRenderer;
+                }
             }
 
             renderer.TargetItem = gear;
@@ -1188,6 +1210,10 @@ namespace WzComparerR2.CharaSimControl
                 var defaultRenderer = new SetItemTooltipRender();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
+                if (this.Enable22AniStyle)
+                {
+                    defaultRenderer.Enable22AniStyle = true;
+                }
                 renderer = defaultRenderer;
             }
 

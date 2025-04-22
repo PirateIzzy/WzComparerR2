@@ -40,6 +40,7 @@
             this.labelX2 = new DevComponents.DotNetBar.LabelX();
             this.chkImgCheckDisabled = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkWzSortByImgID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.superTabControlPanelMisc = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkAutoCheckExtFiles = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbDesiredLanguage = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbMozhiBackend = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -62,12 +63,19 @@
             this.labelX9 = new DevComponents.DotNetBar.LabelX();
             this.labelX10 = new DevComponents.DotNetBar.LabelX();
             this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabItemMisc = new DevComponents.DotNetBar.SuperTabItem();
+            this.chkWzSortByImgID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkAutoDetectUpdate = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkImgCheckDisabled = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.cmbWzVersionVerifyMode = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.labelX2 = new DevComponents.DotNetBar.LabelX();
             this.panelEx1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanel2.SuspendLayout();
             this.superTabControlPanel3.SuspendLayout();
+            this.superTabControlPanelMisc.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelEx1
@@ -163,6 +171,7 @@
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
+            this.superTabControl1.Controls.Add(this.superTabControlPanelMisc);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
@@ -176,7 +185,8 @@
             this.superTabControl1.Tabs.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabItem1,
             this.superTabItem2,
-            this.superTabItem3});
+            this.superTabItem3,
+            this.superTabItemMisc});
             this.superTabControl1.Text = "superTabControl1";
             // 
             // superTabControlPanel1
@@ -195,6 +205,38 @@
             this.superTabControlPanel1.Size = new System.Drawing.Size(314, 171);
             this.superTabControlPanel1.TabIndex = 1;
             this.superTabControlPanel1.TabItem = this.superTabItem1;
+            // 
+            // superTabControlPanelMisc
+            // 
+            this.superTabControlPanelMisc.Controls.Add(this.chkAutoDetectUpdate);
+            this.superTabControlPanelMisc.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanelMisc.Location = new System.Drawing.Point(82, 0);
+            this.superTabControlPanelMisc.Name = "superTabControlPanel1";
+            this.superTabControlPanelMisc.Size = new System.Drawing.Size(222, 171);
+            this.superTabControlPanelMisc.TabIndex = 1;
+            this.superTabControlPanelMisc.TabItem = this.superTabItemMisc;
+            // 
+            // superTabItemMisc
+            // 
+            this.superTabItemMisc.AttachedControl = this.superTabControlPanelMisc;
+            this.superTabItemMisc.GlobalItem = false;
+            this.superTabItemMisc.Name = "superTabItemMisc";
+            this.superTabItemMisc.Text = "Misc.";
+            // 
+            // chkAutoDetectUpdate
+            // 
+            this.chkAutoDetectUpdate.AutoSize = true;
+            this.chkAutoDetectUpdate.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkAutoDetectUpdate.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkAutoDetectUpdate.Location = new System.Drawing.Point(14, 13);
+            this.chkAutoDetectUpdate.Name = "chkAutoDetectUpdate";
+            this.chkAutoDetectUpdate.Size = new System.Drawing.Size(107, 18);
+            this.chkAutoDetectUpdate.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkAutoDetectUpdate.TabIndex = 5;
+            this.chkAutoDetectUpdate.Text = "Automatically check for updates";
             // 
             // cmbWzVersionVerifyMode
             // 
@@ -590,6 +632,8 @@
         private DevComponents.DotNetBar.SuperTabItem superTabItem1;
         private DevComponents.DotNetBar.SuperTabItem superTabItem2;
         private DevComponents.DotNetBar.SuperTabItem superTabItem3;
+        private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanelMisc;
+        private DevComponents.DotNetBar.SuperTabItem superTabItemMisc;
         private DevComponents.DotNetBar.ButtonX buttonX2;
         private DevComponents.DotNetBar.ButtonX buttonX1;
         private DevComponents.DotNetBar.ButtonX buttonXCheck2;
@@ -598,7 +642,8 @@
         private DevComponents.DotNetBar.LabelX labelX1;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzEncoding;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoCheckExtFiles;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID; 
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoDetectUpdate;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkImgCheckDisabled;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzVersionVerifyMode;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbDesiredLanguage;

@@ -24,6 +24,7 @@ namespace WzComparerR2.CharaSimControl
         static GearGraphics()
         {
             TBrushes = new Dictionary<string, TextureBrush>();
+            TBrushes22ani = new Dictionary<string, TextureBrush>();
             TBrushes["n"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_n, WrapMode.Tile);
             TBrushes["ne"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_ne, WrapMode.Clamp);
             TBrushes["e"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_e, WrapMode.Tile);
@@ -34,16 +35,32 @@ namespace WzComparerR2.CharaSimControl
             TBrushes["nw"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_nw, WrapMode.Clamp);
             TBrushes["c"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_c, WrapMode.Tile);
             SetFontFamily("Arial");
+
+            TBrushes22ani["n"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_n, WrapMode.Tile);
+            TBrushes22ani["ne"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_ne, WrapMode.Clamp);
+            TBrushes22ani["e"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_e, WrapMode.Tile);
+            TBrushes22ani["se"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_se, WrapMode.Clamp);
+            TBrushes22ani["s"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_s, WrapMode.Tile);
+            TBrushes22ani["sw"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_sw, WrapMode.Clamp);
+            TBrushes22ani["w"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_w, WrapMode.Tile);
+            TBrushes22ani["nw"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_nw, WrapMode.Clamp);
+            TBrushes22ani["c"] = new TextureBrush(Resource.UIToolTipNew_img_Item_Common_frame_flexible_c, WrapMode.Tile);
+
+            SetFontFamily("Arial");
         }
 
+        public static bool is22aniStyle { get; set; }
         public static readonly Dictionary<string, TextureBrush> TBrushes;
-        public static readonly Font ItemNameFont = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
-        public static readonly Font ItemDetailFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
-        public static readonly Font EquipDetailFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
-        public static readonly Font EpicGearDetailFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
+        public static readonly Dictionary<string, TextureBrush> TBrushes22ani;
+        public static readonly Font ItemNameFont = new Font("돋움", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemDetailFont = new Font("돋움", 12f, GraphicsUnit.Pixel);
+        public static readonly Font EquipDetailFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
+        public static readonly Font EpicGearDetailFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
-        public static readonly Font SetItemPropFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
-        public static readonly Font ItemReqLevelFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
+        public static readonly Font SetItemPropFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
+        public static readonly Font ItemReqLevelFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
+        public static readonly Font EquipMDMoris9Font = new Font("Arial", 11f, GraphicsUnit.Pixel);
+        public static readonly Font EquipMDMoris9FontBold = new Font("Arial", 11f, FontStyle.Bold, GraphicsUnit.Pixel);
 
         public static Font ItemNameFont2 { get; private set; }
         public static Font ItemDetailFont2 { get; private set; }
@@ -183,6 +200,18 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Color SkillSummaryOrangeTextColor = Color.FromArgb(255, 204, 0);
         public static readonly Brush SkillSummaryOrangeTextBrush = new SolidBrush(SkillSummaryOrangeTextColor);
 
+        public static readonly Brush Equip22BrushGray = new SolidBrush(Color.FromArgb(183, 191, 197));
+        public static readonly Brush Equip22BrushDarkGray = new SolidBrush(Color.FromArgb(133, 145, 159));
+        public static readonly Brush Equip22BrushRed = new SolidBrush(Color.FromArgb(255, 102, 51));
+        public static readonly Brush Equip22BrushEmphasis = new SolidBrush(Color.FromArgb(255, 204, 0));
+        public static readonly Brush Equip22BrushScroll = new SolidBrush(Color.FromArgb(175, 173, 255));
+        public static readonly Brush Equip22BrushBonusStat = new SolidBrush(Color.FromArgb(10, 227, 173));
+        public static readonly Brush Equip22BrushRare = new SolidBrush(Color.FromArgb(102, 255, 255));
+        public static readonly Brush Equip22BrushEpic = new SolidBrush(Color.FromArgb(187, 129, 255));
+        public static readonly Brush Equip22BrushLegendary = new SolidBrush(Color.FromArgb(204, 255, 0));
+        public static readonly Brush Equip22BrushExceptional = new SolidBrush(Color.FromArgb(255, 51, 51));
+        public static readonly Brush Equip22BrushEmphasisBright = new SolidBrush(Color.FromArgb(255, 245, 77));
+
         public static Brush GetGearNameBrush(int diff, bool up, bool cash = false, bool petEquip = false)
         {
             if (cash && !petEquip)
@@ -255,7 +284,7 @@ namespace WzComparerR2.CharaSimControl
             DrawString(g, s, font, null, x, x1, ref y, height, alignment);
         }
 
-        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
+        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left, int strictlyAlignLeft = 0)
         {
             if (s == null)
                 return;
@@ -272,6 +301,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 r.UseGDIRenderer = true;
                 r.FontColorTable = fontColorTable;
+                r.StrictlyAlignLeft = strictlyAlignLeft;
                 r.DrawString(g, s, font, x, x1, ref y, height, alignment);
             }
         }
@@ -436,7 +466,7 @@ namespace WzComparerR2.CharaSimControl
 
         public static void DrawNewTooltipBack(Graphics g, int x, int y, int width, int height)
         {
-            Dictionary<string, TextureBrush> res = TBrushes;
+            Dictionary<string, TextureBrush> res = is22aniStyle ? TBrushes22ani : TBrushes;
             //测算准线
             int[] guideX = new int[4] { 0, res["w"].Image.Width, width - res["e"].Image.Width, width };
             int[] guideY = new int[4] { 0, res["n"].Image.Height, height - res["s"].Image.Height, height };

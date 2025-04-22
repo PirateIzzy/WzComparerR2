@@ -516,6 +516,18 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         totem = 120,
         /// <summary>
+        /// Arcane Symbol 1712
+        /// </summary>
+        arcaneSymbol = 1712,
+        /// <summary>
+        /// Sacred Symbol 1713
+        /// </summary>
+        authenticSymbol = 1713,
+        /// <summary>
+        /// Grand Sacred Symbol 1714
+        /// </summary>
+        grandAuthenticSymbol = 1714,
+        /// <summary>
         /// Jade 178
         /// </summary>
         jewel = 178,
