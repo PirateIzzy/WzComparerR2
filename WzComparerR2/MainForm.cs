@@ -255,6 +255,8 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
 
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
+            tooltipQuickView.RecipeRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+
             tooltipQuickView.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             GearGraphics.is22aniStyle = Setting.Misc.Enable22AniStyle;
         }
