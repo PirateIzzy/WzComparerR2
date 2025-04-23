@@ -359,14 +359,13 @@ namespace WzComparerR2.CharaSimControl
             {
                 tooltipWidth = fixWidth;
             }
-            else
             {
                 using (Bitmap dummyImg = new Bitmap(1, 1))
                 using (Graphics tempG = Graphics.FromImage(dummyImg))
                 {
                     SizeF titleSize = TextRenderer.MeasureText(tempG, itemName, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
                     titleSize.Width += 12.5F;
-                    if (titleSize.Width > DefualtWidth)
+                    if (titleSize.Width > tooltipWidth)
                     {
                         tooltipWidth = (int)Math.Ceiling(titleSize.Width);
                     }
