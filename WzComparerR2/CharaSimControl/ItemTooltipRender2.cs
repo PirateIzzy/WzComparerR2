@@ -1113,6 +1113,7 @@ namespace WzComparerR2.CharaSimControl
                 RecipeTooltipRender defaultRenderer = new RecipeTooltipRender();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
+                defaultRenderer.Enable22AniStyle = this.Enable22AniStyle;
                 renderer = defaultRenderer;
             }
 
@@ -1153,6 +1154,7 @@ namespace WzComparerR2.CharaSimControl
                 ItemTooltipRender2 defaultRenderer = new ItemTooltipRender2();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
+                defaultRenderer.Enable22AniStyle = this.Enable22AniStyle;
                 renderer = defaultRenderer;
             }
 
