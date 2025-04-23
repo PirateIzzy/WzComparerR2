@@ -1848,6 +1848,14 @@ namespace WzComparerR2.CharaSimControl
             {
                 categories.Add("장신구");
             }
+            else if (Gear.IsMechanicGear(Gear.type))
+            {
+                categories.Add("메카닉 장비");
+            }
+            else if (Gear.IsDragonGear(Gear.type))
+            {
+                categories.Add("드래곤 장비");
+            }
 
             var text = ItemStringHelper.GetGearTypeString(Gear.type);
             if (!string.IsNullOrEmpty(text))
