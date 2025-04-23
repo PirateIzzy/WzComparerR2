@@ -145,7 +145,7 @@ namespace WzComparerR2.CharaSimControl
             picHeight = 21;
             g.DrawImage(Resource.UIToolTipNew_img_Item_Equip_textIcon_set_normal, 14, picHeight - 1);
             TextRenderer.DrawText(g, this.SetItem.SetItemName, GearGraphics.EquipMDMoris9Font, new Point(46, picHeight), Color.White, TextFormatFlags.NoPadding);
-            DrawCategory(g, $"0 #$g/ {this.SetItem.ItemIDs.Parts.Count}", picHeight - 2);
+            DrawCategory(g, $"0 #$g/ {(this.SetItem.Parts ? this.SetItem.ItemIDs.Parts.Count : this.SetItem.Effects.Keys.Max())}", picHeight - 2);
             picHeight += 29;
 
             format.Alignment = StringAlignment.Far;
@@ -254,18 +254,20 @@ namespace WzComparerR2.CharaSimControl
                     itemName = itemName ?? string.Empty;
                     typeName = typeName ?? "장비";
 
-                    var match = Regex.Match(typeName, @"^(\(.*\)|（.*）|\[.*\])$");
+                    /*
+                    var match = Regex.Match(typeName, @"^(\((.*)\)|（(.*)）|\[(.*)\])$");
                     if (match.Success)
                     {
-                        typeName = match.Groups[1].Success ? match.Groups[1].Value :
-                               match.Groups[2].Success ? match.Groups[2].Value :
-                               match.Groups[3].Value;
+                        typeName = match.Groups[2].Success ? match.Groups[2].Value :
+                               match.Groups[3].Success ? match.Groups[3].Value :
+                               match.Groups[4].Value;
                     }
 
                     if (this.SetItem.Effects.Count > 1 && this.SetItem.ItemIDs.Parts.Count == 1)
                     {
                         typeName += "  [0/3]";
                     }
+                    */
 
                     if (!partNames.Contains(itemName + typeName))
                     {
