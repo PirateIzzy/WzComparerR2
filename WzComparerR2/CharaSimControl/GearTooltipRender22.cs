@@ -884,12 +884,26 @@ namespace WzComparerR2.CharaSimControl
             // 값이 있는 설명
             if (!string.IsNullOrEmpty(Gear.EpicHs) && sr[Gear.EpicHs] != null)
             {
-                hasThirdContents = true;
-
                 var text = sr[Gear.EpicHs].Replace("#", " #").Trim();
                 if (!string.IsNullOrEmpty(text))
                 {
+                    hasThirdContents = true;
+
                     GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, new Dictionary<string, Color>() { { "c", Color.White } }, 15, 305, ref picH, 16, strictlyAlignLeft: 0);
+                }
+            }
+            // 슈페리얼 장비 강화 설명
+            if (Gear.HasTuc && maxStar > 0 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                if (Gear.Props.TryGetValue(GearPropType.superiorEqp, out value) && value > 0) //极真
+                {
+                    var text = ItemStringHelper.GetGearPropString22(GearPropType.superiorEqp, value)[0];
+                    if (!string.IsNullOrEmpty (text))
+                    {
+                        hasThirdContents = true;
+
+                        GearGraphics.DrawPlainText(g, text, GearGraphics.EquipMDMoris9Font, Color.White, 15, 305, ref picH, 16);
+                    }
                 }
             }
 
