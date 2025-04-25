@@ -276,6 +276,10 @@ namespace WzComparerR2.CharaSim
                     res[0] = "점프력";
                     res[1] = sign + value;
                     return res;
+                case GearPropType.incCraft:
+                    res[0] = "손재주";
+                    res[1] = sign + value;
+                    return res;
                 case GearPropType.damR:
                 case GearPropType.incDAMr:
                     res[0] = "데미지";
@@ -414,7 +418,6 @@ namespace WzComparerR2.CharaSim
                     res[0] = $" #$r(가위 사용 잔여 횟수：{value} / {value})#";
                     return res;
 
-                case GearPropType.incCraft:
                 case GearPropType.incEXPr:
                 default: return res;
             }

@@ -679,7 +679,6 @@ namespace WzComparerR2.CharaSimControl
 
             // 장비 옵션
             List<GearPropType> props = new List<GearPropType>();
-            List<GearPropType> props2 = new List<GearPropType>();
             foreach (KeyValuePair<GearPropType, int> p in Gear.PropsV5) //5转过滤
             {
                 if ((int)p.Key < 100 && p.Value != 0)
