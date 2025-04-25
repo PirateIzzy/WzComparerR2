@@ -304,6 +304,13 @@ namespace WzComparerR2.CharaSim
                     res[0] = "몬스터 방어율 무시";
                     res[1] = "+" + value + "%";
                     return res;
+                case GearPropType.attackSpeed:
+                    if (2 <= value && value <= 9)
+                    {
+                        res[0] = "공격 속도";
+                        res[1] = $"{10 - value}단계";
+                    }
+                    return res;
                 case GearPropType.nbdR:
                     res[0] = "일반 몬스터 공격 시 데미지 : +" + value + "%";
                     return res;

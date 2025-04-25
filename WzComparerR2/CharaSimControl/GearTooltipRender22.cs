@@ -696,53 +696,6 @@ namespace WzComparerR2.CharaSimControl
                 Gear.StandardProps.TryGetValue(type, out value); //standard value
                 if (value > 0 || Gear.Props[type] > 0)
                 {
-                    switch (type)
-                    {
-                        // 올스탯, 데미지, 보공, 방무 옵션 분리
-                        case GearPropType.incAllStat:
-                        case GearPropType.incIMDR:
-                        case GearPropType.imdR:
-                        case GearPropType.incDAMr:
-                        case GearPropType.damR:
-                        case GearPropType.incBDR:
-                        case GearPropType.bdR:
-                            props2.Add(type);
-                            break;
-                        default:
-                            var propStr = ItemStringHelper.GetGearPropDiffString22(type, Gear.Props[type], value);
-
-                            if (DrawProps(g, propStr, 0, picH, equip22ColorTable))
-                            {
-                                hasThirdContents = true;
-                                picH += 16;
-                            }
-
-                            break;
-                    }
-                }
-            }
-            // 공격 속도
-            if (!Gear.Props.TryGetValue(GearPropType.attackSpeed, out value)
-                && (Gear.IsWeapon(Gear.type) || Gear.type == GearType.katara)) //找不到攻速的武器
-            {
-                value = 6; //给予默认速度
-            }
-            if (!Gear.Cash && value > 0)
-            {
-                if (2 <= value && value <= 9) // check valid speed
-                {
-                    hasThirdContents = true;
-
-                    TextRenderer.DrawText(g, "공격 속도", GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
-                    GearGraphics.DrawString(g, $"{10 - value}단계", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 110, ref picH, 16, alignment: Text.TextAlignment.Right);
-                }
-            }
-            // 장비 옵션2
-            foreach (GearPropType type in props2)
-            {
-                Gear.StandardProps.TryGetValue(type, out value); //standard value
-                if (value > 0 || Gear.Props[type] > 0)
-                {
                     var propStr = ItemStringHelper.GetGearPropDiffString22(type, Gear.Props[type], value);
 
                     if (DrawProps(g, propStr, 0, picH, equip22ColorTable))
