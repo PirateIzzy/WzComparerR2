@@ -291,7 +291,8 @@ namespace WzComparerR2.CharaSim
                     res[0] = "직접 타격시 " + value + "%의 확률로 넉백";
                     return res;
                 case GearPropType.incPQEXPr:
-                    res[0] = "파티퀘스트 경험치 " + value + "% 추가";
+                    res[0] = "파티퀘스트 경험치";
+                    res[1] = "+" + value + "%";
                     return res;
                 case GearPropType.incBDR:
                 case GearPropType.bdR:

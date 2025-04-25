@@ -50,6 +50,7 @@ namespace WzComparerR2.CharaSim
         nbdR,
         statR,
         incCHUC,
+        incPQEXPr,
 
         //潜能属性
         incPADr = 100,
@@ -168,7 +169,7 @@ namespace WzComparerR2.CharaSim
         fixedGrade,
         unchangeable,
         superiorEqp,
-        incPQEXPr,
+        //incPQEXPr,
         limitBreak,
         nActivatedSocket,
         jokerToSetItem,
