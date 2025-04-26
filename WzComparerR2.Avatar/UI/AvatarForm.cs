@@ -1795,7 +1795,7 @@ namespace WzComparerR2.Avatar.UI
                 var effectActFrames = cmbEffectFrames // get ActionFrame array from effect combobox
                     .Select((cmb, i) =>
                     {
-                        if (effectPlaying) // effect playing is bounded to body playing or taming playing with Chair part
+                        if (effectPlaying && avatar.IsPartEffectVisible(i)) // effect playing is bounded to body playing or taming playing with Chair part
                         {
                             return cmb.Items.OfType<ComboItem>().Select(cmbItem => new
                             {
