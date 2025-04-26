@@ -25,8 +25,6 @@ namespace WzComparerR2.CharaSim
         incMMP,
         incMMPr,
         incMDF,
-        incARC,
-        incAUT,
         incPAD_incMAD,
         incPAD,
         incMAD,
@@ -50,6 +48,8 @@ namespace WzComparerR2.CharaSim
         imdR,
         incIMDR,
         nbdR,
+        incARC,
+        incAUT,
         incCHUC,
         incPQEXPr,
 

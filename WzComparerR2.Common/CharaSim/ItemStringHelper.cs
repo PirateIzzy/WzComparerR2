@@ -286,10 +286,12 @@ namespace WzComparerR2.CharaSim
                     res[1] = sign + value + "%";
                     return res;
                 case GearPropType.incCr:
-                    res[0] = "크리티컬 확률 : " + sign + value + "%";
+                    res[0] = "크리티컬 확률";
+                    res[1] = sign + value + "%";
                     return res;
                 case GearPropType.incCDr:
-                    res[0] = "크리티컬 데미지 : " + sign + value + "%";
+                    res[0] = "크리티컬 데미지";
+                    res[1] = sign + value + "%";
                     return res;
                 case GearPropType.knockback:
                     res[0] = "직접 타격시 " + value + "%의 확률로 넉백";
@@ -316,7 +318,20 @@ namespace WzComparerR2.CharaSim
                     }
                     return res;
                 case GearPropType.nbdR:
-                    res[0] = "일반 몬스터 공격 시 데미지 : +" + value + "%";
+                    res[0] = "일반 몬스터 데미지";
+                    res[1] = "+" + value + "%";
+                    return res;
+                case GearPropType.incARC:
+                    res[0] = "ARC";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incAUT:
+                    res[0] = "AUT";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incCHUC:
+                    res[0] = "스타포스";
+                    res[1] = sign + value;
                     return res;
 
                 case GearPropType.tradeBlock:
@@ -400,15 +415,6 @@ namespace WzComparerR2.CharaSim
                     return res;
                 case GearPropType.incPDD_incMDD:
                     res[0] = "방어력  " + sign + value;
-                    return res;
-
-                case GearPropType.incARC:
-                    res[0] = "ARC";
-                    res[1] = sign + value;
-                    return res;
-                case GearPropType.incAUT:
-                    res[0] = "AUT";
-                    res[1] = sign + value;
                     return res;
 
                 case GearPropType.Etuc:
