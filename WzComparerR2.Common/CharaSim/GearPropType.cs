@@ -175,6 +175,8 @@ namespace WzComparerR2.CharaSim
         nActivatedSocket,
         jokerToSetItem,
         medalTag,
+        chatBalloon,
+        nameTag,
         ringOptionSkill,
         ringOptionSkillLv,
         abilityTimeLimited,

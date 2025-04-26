@@ -1044,9 +1044,15 @@ namespace WzComparerR2.CharaSimControl
 
             //判断是否绘制徽章
             Wz_Node medalResNode = null;
-            bool willDrawMedalTag = this.ShowMedalTag && this.Gear.Sample.Bitmap == null
+            Wz_Node chatBalloonResNode = null;
+            Wz_Node nameTagResNode = null;
+            bool willDrawMedalTag = this.Gear.Sample.Bitmap == null
                 && this.Gear.Props.TryGetValue(GearPropType.medalTag, out value)
-                && this.TryGetMedalResource(value, out medalResNode);
+                && this.TryGetMedalResource(value, 0, out medalResNode);
+            bool willDrawChatBalloon = this.Gear.Props.TryGetValue(GearPropType.chatBalloon, out value)
+                && this.TryGetMedalResource(value, 1, out chatBalloonResNode);
+            bool willDrawNameTag = this.Gear.Props.TryGetValue(GearPropType.nameTag, out value)
+                && this.TryGetMedalResource(value, 2, out nameTagResNode);
 
             //判断是否绘制技能desc
             string levelDesc = null;
@@ -1059,7 +1065,7 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            if (!string.IsNullOrEmpty(sr.Desc) || !string.IsNullOrEmpty(levelDesc) || desc.Count > 0 || Gear.Sample.Bitmap != null || willDrawMedalTag)
+            if (!string.IsNullOrEmpty(sr.Desc) || !string.IsNullOrEmpty(levelDesc) || desc.Count > 0 || Gear.Sample.Bitmap != null || willDrawMedalTag || willDrawChatBalloon || willDrawNameTag)
             {
                 //分割线4号
                 if (hasPart2)
@@ -1067,13 +1073,23 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawImage(res["dotline"].Image, 0, picH);
                     picH += 8;
                 }
-                if (Gear.Sample.Bitmap != null)
+                if (willDrawChatBalloon)
+                {
+                    GearGraphics.DrawChatBalloon(g, chatBalloonResNode, "MAPLESTORY", bitmap.Width - 10, ref picH);
+                    picH += 4;
+                }
+                else if (willDrawNameTag)
+                {
+                    GearGraphics.DrawNameTag(g, nameTagResNode, "MAPLESTORY", bitmap.Width - 10, ref picH);
+                    picH += 4;
+                }
+                else if (Gear.Sample.Bitmap != null)
                 {
                     g.DrawImage(Gear.Sample.Bitmap, (bitmap.Width - Gear.Sample.Bitmap.Width) / 2, picH);
                     picH += Gear.Sample.Bitmap.Height;
                     picH += 4;
                 }
-                if (medalResNode != null)
+                else if (medalResNode != null)
                 {
                     GearGraphics.DrawNameTag(g, medalResNode, sr.Name.Replace("의 훈장", ""), bitmap.Width, ref picH);
                     picH += 4;
@@ -1831,9 +1847,23 @@ namespace WzComparerR2.CharaSimControl
             }
         }
 
-        private bool TryGetMedalResource(int medalTag, out Wz_Node resNode)
+        private bool TryGetMedalResource(int medalTag, int type, out Wz_Node resNode)
         {
-            resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/medal/" + medalTag);
+            switch (type)
+            {
+                case 0:
+                    resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/medal/" + medalTag);
+                    break;
+                case 1:
+                    resNode = PluginBase.PluginManager.FindWz("UI/ChatBalloon.img/" + medalTag);
+                    break;
+                case 2:
+                    resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/" + medalTag);
+                    break;
+                default:
+                    resNode = null;
+                    break;
+            }
             return resNode != null;
         }
 
