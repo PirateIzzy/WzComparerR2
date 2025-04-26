@@ -210,6 +210,8 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Brush Equip22BrushExceptional = new SolidBrush(Color.FromArgb(255, 51, 51));
         public static readonly Brush Equip22BrushEmphasisBright = new SolidBrush(Color.FromArgb(255, 245, 77));
 
+        public static readonly Brush LocationBrush = new SolidBrush(Color.FromArgb(209, 255, 50));
+
         public static Brush GetGearNameBrush(int diff, bool up, bool cash = false, bool petEquip = false)
         {
             if (cash && !petEquip)

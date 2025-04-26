@@ -51,8 +51,32 @@ namespace WzComparerR2.CharaSimControl
                 titleBlocks.Add(block);
             }
 
-            List<TextBlock> propBlocks = new List<TextBlock>();
+            List<TextBlock> locBlocks = new List<TextBlock>();
             int picY = 0;
+
+            if (MobInfo?.ID != null)
+            {
+                var locNode = PluginBase.PluginManager.FindWz("Etc\\MobLocation.img\\" + MobInfo.ID.ToString());
+                if (locNode != null)
+                {
+                    foreach (var locMapNode in locNode.Nodes)
+                    {
+                        int mapID = locMapNode.GetValueEx<int>(-1);
+                        string mapName = null;
+                        if (mapID >= 0)
+                        {
+                            mapName = GetMapName(mapID);
+                        }
+                        string mobLoc = string.Format(" - {0}({1})", mapName ?? "null", mapID);
+
+                        locBlocks.Add(PrepareText(g, mobLoc, GearGraphics.ItemDetailFont, GearGraphics.LocationBrush, 0, picY));
+                        picY += 16;
+                    }
+                }
+            }
+
+            List<TextBlock> propBlocks = new List<TextBlock>();
+            picY = 0;
 
             StringBuilder sbExt = new StringBuilder();
             if (MobInfo.Boss)
@@ -153,6 +177,7 @@ namespace WzComparerR2.CharaSimControl
             Rectangle titleRect = Measure(titleBlocks);
             Rectangle imgRect = Rectangle.Empty;
             Rectangle textRect = Measure(propBlocks);
+            Rectangle locRect = Measure(locBlocks);
             Bitmap mobImg = MobInfo.Default.Bitmap;
             if (MobInfo.IsAvatarLook)
             {
@@ -212,11 +237,12 @@ namespace WzComparerR2.CharaSimControl
             {
                 textRect.X = imgRect.Width + 4;
             }
-            width = Math.Max(titleRect.Width, Math.Max(imgRect.Right, textRect.Right));
+            locRect.X = textRect.X + textRect.Width + 4;
+            width = Math.Max(titleRect.Width, Math.Max(imgRect.Right, Math.Max(textRect.Right, locRect.Right)));
             titleRect.X = (width - titleRect.Width) / 2;
 
             //垂直居中
-            int height = Math.Max(imgRect.Height, textRect.Height);
+            int height = Math.Max(imgRect.Height, Math.Max(textRect.Height, locRect.Height));
             imgRect.Y = (height - imgRect.Height) / 2;
             textRect.Y = (height - textRect.Height) / 2;
             if (!titleRect.IsEmpty)
@@ -225,12 +251,14 @@ namespace WzComparerR2.CharaSimControl
                 imgRect.Y += titleRect.Bottom + 4;
                 textRect.Y += titleRect.Bottom + 4;
             }
+            locRect.Y = textRect.Y;
 
             //绘制
             bmp = new Bitmap(width + 20, height + 20);
             titleRect.Offset(10, 10);
             imgRect.Offset(10, 10);
             textRect.Offset(10, 10);
+            locRect.Offset(10, 10);
             g = Graphics.FromImage(bmp);
             //绘制背景
             GearGraphics.DrawNewTooltipBack(g, 0, 0, bmp.Width, bmp.Height);
@@ -248,6 +276,10 @@ namespace WzComparerR2.CharaSimControl
             foreach (var item in propBlocks)
             {
                 DrawText(g, item, textRect.Location);
+            }
+            foreach (var item in locBlocks)
+            {
+                DrawText(g, item, locRect.Location);
             }
             g.Dispose();
             return bmp;
@@ -306,6 +338,16 @@ namespace WzComparerR2.CharaSimControl
                 }
                 return sb.ToString();
             });
+        }
+
+        private string GetMapName(int mapID)
+        {
+            StringResult sr;
+            if (this.StringLinker == null || !this.StringLinker.StringMap.TryGetValue(mapID, out sr))
+            {
+                return null;
+            }
+            return sr.Name;
         }
     }
 }
