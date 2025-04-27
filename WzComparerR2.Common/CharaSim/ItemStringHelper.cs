@@ -385,7 +385,7 @@ namespace WzComparerR2.CharaSim
                     switch (value)
                     {
                         case 1:
-                            res[0] = "#c쉐어 네임 텍을 사용하면 월드 내 나의 캐릭터 간 1회 이동할 수 있습니다.#";
+                            res[0] = "#$g쉐어 네임 텍을 사용하면 월드 내 나의 캐릭터 간 1회 이동할 수 있습니다.#";
                             return res;
                         default: return res;
                     }
@@ -1159,16 +1159,16 @@ namespace WzComparerR2.CharaSim
 
                 case 3000: return "시티즌";
                 case 3001: return "데몬";
-                case 3100: return "데몬슬레이어(1차)";
-                case 3110: return "데몬슬레이어(2차)";
-                case 3111: return "데몬슬레이어(3차)";
-                case 3112: return "데몬슬레이어(4차)";
-                case 3114: return "데몬슬레이어(6차)";
-                case 3101: return "데몬어벤져(1차)";
-                case 3120: return "데몬어벤져(2차)";
-                case 3121: return "데몬어벤져(3차)";
-                case 3122: return "데몬어벤져(4차)";
-                case 3124: return "데몬어벤져(6차)";
+                case 3100: return "데몬 슬레이어(1차)";
+                case 3110: return "데몬 슬레이어(2차)";
+                case 3111: return "데몬 슬레이어(3차)";
+                case 3112: return "데몬 슬레이어(4차)";
+                case 3114: return "데몬 슬레이어(6차)";
+                case 3101: return "데몬 어벤져(1차)";
+                case 3120: return "데몬 어벤져(2차)";
+                case 3121: return "데몬 어벤져(3차)";
+                case 3122: return "데몬 어벤져(4차)";
+                case 3124: return "데몬 어벤져(6차)";
                 case 3200: return "배틀메이지(1차)";
                 case 3210: return "배틀메이지(2차)";
                 case 3211: return "배틀메이지(3차)";
