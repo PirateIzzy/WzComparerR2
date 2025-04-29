@@ -332,7 +332,6 @@
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.checkBoxX11);
-            this.superTabControlPanel2.Controls.Add(this.checkBoxX17);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX6);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX4);
             this.superTabControlPanel2.Controls.Add(this.checkBoxX3);
@@ -360,22 +359,6 @@
             this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX11.TabIndex = 4;
             this.checkBoxX11.Text = "Show Medal Preview";
-            // 
-            // checkBoxX17
-            // 
-            this.checkBoxX17.AutoSize = true;
-            this.checkBoxX17.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX17.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX17.Location = new System.Drawing.Point(15, 84);
-            this.checkBoxX17.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.checkBoxX17.Name = "checkBoxX17";
-            this.checkBoxX17.Size = new System.Drawing.Size(120, 18);
-            this.checkBoxX17.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX17.TabIndex = 4;
-            this.checkBoxX17.Text = "Max 25 Star Force";
             // 
             // checkBoxX6
             // 
@@ -487,7 +470,7 @@
             this.labelCosmeticHairColor.AutoSize = true;
             this.labelCosmeticHairColor.BackColor = System.Drawing.Color.Transparent;
             this.labelCosmeticHairColor.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelCosmeticHairColor.Location = new System.Drawing.Point(15, 132);
+            this.labelCosmeticHairColor.Location = new System.Drawing.Point(15, 108);
             this.labelCosmeticHairColor.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.labelCosmeticHairColor.Name = "labelCosmeticHairColor";
             this.labelCosmeticHairColor.Size = new System.Drawing.Size(89, 18);
@@ -514,7 +497,7 @@
             this.comboBoxEx3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxEx3.FormattingEnabled = true;
             this.comboBoxEx3.ItemHeight = 15;
-            this.comboBoxEx3.Location = new System.Drawing.Point(140, 106);
+            this.comboBoxEx3.Location = new System.Drawing.Point(130, 106);
             this.comboBoxEx3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.comboBoxEx3.Name = "comboBoxEx3";
             this.comboBoxEx3.Size = new System.Drawing.Size(104, 21);
@@ -529,7 +512,7 @@
             this.comboBoxEx4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxEx4.FormattingEnabled = true;
             this.comboBoxEx4.ItemHeight = 15;
-            this.comboBoxEx4.Location = new System.Drawing.Point(140, 130);
+            this.comboBoxEx4.Location = new System.Drawing.Point(130, 130);
             this.comboBoxEx4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.comboBoxEx4.Name = "comboBoxEx4";
             this.comboBoxEx4.Size = new System.Drawing.Size(104, 21);
@@ -740,7 +723,7 @@
             // 
             // 
             this.chkEnable22AniStyle.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkEnable22AniStyle.Location = new System.Drawing.Point(15, 12);
+            this.chkEnable22AniStyle.Location = new System.Drawing.Point(13, 60);
             this.chkEnable22AniStyle.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.chkEnable22AniStyle.Name = "chkEnable22AniStyle";
             this.chkEnable22AniStyle.Size = new System.Drawing.Size(145, 16);
@@ -909,7 +892,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX14;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
-        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX17;
         private DevComponents.DotNetBar.LabelX labelCosmeticHairColor;
         private DevComponents.DotNetBar.LabelX labelCosmeticFaceColor;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;

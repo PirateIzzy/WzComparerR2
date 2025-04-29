@@ -52,13 +52,13 @@ namespace WzComparerR2.CharaSimControl
         public static bool is22aniStyle { get; set; }
         public static readonly Dictionary<string, TextureBrush> TBrushes;
         public static readonly Dictionary<string, TextureBrush> TBrushes22ani;
-        public static readonly Font ItemNameFont = new Font("돋움", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
-        public static readonly Font ItemDetailFont = new Font("돋움", 12f, GraphicsUnit.Pixel);
-        public static readonly Font EquipDetailFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
-        public static readonly Font EpicGearDetailFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
+        public static readonly Font ItemNameFont = new Font("Arial", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemDetailFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
+        public static readonly Font EquipDetailFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
+        public static readonly Font EpicGearDetailFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
-        public static readonly Font SetItemPropFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
-        public static readonly Font ItemReqLevelFont = new Font("돋움", 11f, GraphicsUnit.Pixel);
+        public static readonly Font SetItemPropFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
+        public static readonly Font ItemReqLevelFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
         public static readonly Font EquipMDMoris9Font = new Font("Arial", 11f, GraphicsUnit.Pixel);
         public static readonly Font EquipMDMoris9FontBold = new Font("Arial", 11f, FontStyle.Bold, GraphicsUnit.Pixel);
 
