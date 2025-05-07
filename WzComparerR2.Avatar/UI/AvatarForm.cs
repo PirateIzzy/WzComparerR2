@@ -2408,7 +2408,7 @@ namespace WzComparerR2.Avatar.UI
             }
 
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = "내보내고자 하는 폴더를 선택하세요.";
+            dlg.Description = $"내보내고자 하는 폴더를 선택하세요.\r\n - 주의 : 이 작업은 {avatar.Actions.Count}개의 이미지를 생성합니다.";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
