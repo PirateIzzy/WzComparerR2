@@ -112,12 +112,12 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.reduceReq: return "착용 레벨 감소 : - " + value;
                 case GearPropType.nbdR: return "일반 몬스터 공격 시 데미지 : +" + value + "%";
 
-                case GearPropType.only: return value == 0 ? null : "고유 아이템";
+                case GearPropType.only: return value == 0 ? null : "중복 소지 불가";
                 case GearPropType.tradeBlock: return value == 0 ? null : "교환 불가";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "장착 시 교환 불가";
                 case GearPropType.accountSharable: return value == 0 ? null : "월드 내 나의 캐릭터 간 이동만 가능";
                 case GearPropType.sharableOnce: return value == 0 ? null : "월드 내 나의 캐릭터 간 1회 이동 가능\n(이동 후 교환불가)";
-                case GearPropType.onlyEquip: return value == 0 ? null : "고유장착 아이템";
+                case GearPropType.onlyEquip: return value == 0 ? null : "중복 장착 불가";
                 case GearPropType.notExtend: return value == 0 ? null : "유효기간 연장 불가";
                 case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "1회 교환 가능\n(거래 후 월드 내 나의 캐릭터 간 이동만 가능)";
                 case GearPropType.mintable: return value == 0 ? null : "민팅 가능";

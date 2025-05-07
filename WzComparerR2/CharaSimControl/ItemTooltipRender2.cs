@@ -1042,6 +1042,10 @@ namespace WzComparerR2.CharaSimControl
             long value, value2;
             List<string> tags = new List<string>();
 
+            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.only, value));
+            }
             if (item.Props.TryGetValue(ItemPropType.quest, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.quest, value));
@@ -1049,10 +1053,6 @@ namespace WzComparerR2.CharaSimControl
             if (item.Props.TryGetValue(ItemPropType.pquest, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.pquest, value));
-            }
-            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.only, value));
             }
             if (item.Props.TryGetValue(ItemPropType.tradeBlock, out value) && value != 0)
             {
