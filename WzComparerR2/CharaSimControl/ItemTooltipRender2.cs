@@ -570,7 +570,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             value = 0;
-            if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) || item.ItemID / 10000 == 301 || item.ItemID / 1000 == 5204)
+            if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) && value > 0)
             {
                 //picH += 4;
                 g.DrawImage(Resource.ToolTip_Equip_Can_reqLEV, 100, picH);
