@@ -665,8 +665,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.arcaneSymbol: return "Arcane Symbol";
                 case GearType.authenticSymbol: return "Sacred Symbol";
                 case GearType.grandAuthenticSymbol: return "Grand Sacred Symbol";
-                case GearType.boxingCannon: return "拳封";//Mo Xuan weapon
-                case GearType.boxingSky: return "拳天";//Mo Xuan weapon
+                case GearType.boxingCannon: return "Martial Brace";
+                case GearType.boxingSky: return "Brace Band";
                 case GearType.jewel: return "宝玉";
 
                 default: return null;
