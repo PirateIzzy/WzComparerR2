@@ -134,5 +134,12 @@ namespace WzComparerR2.Config
             get { return (ConfigItem<bool>)this["autoDetectUpdate"]; }
             set { this["autoDetectUpdate"] = value; }
         }
+
+        [ConfigurationProperty("nexonOpenAPIKey")]
+        public ConfigItem<string> NexonOpenAPIKey
+        {
+            get { return (ConfigItem<string>)this["nexonOpenAPIKey"]; }
+            set { this["nexonOpenAPIKey"] = value; }
+        }
     }
 }

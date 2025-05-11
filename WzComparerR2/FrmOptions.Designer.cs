@@ -34,22 +34,28 @@
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.superTabControlPanelMisc = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.superTabControlPanelAPIKey = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkAutoCheckExtFiles = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbWzEncoding = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
             this.chkWzAutoSort = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabItemMisc = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabItemAPIKey = new DevComponents.DotNetBar.SuperTabItem();
             this.chkWzSortByImgID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkAutoDetectUpdate = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkImgCheckDisabled = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbWzVersionVerifyMode = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX2 = new DevComponents.DotNetBar.LabelX();
+            this.labelXOpenAPIKey = new DevComponents.DotNetBar.LabelX();
+            this.txtOpenAPIKey = new DevComponents.DotNetBar.Controls.TextBoxX();
+            this.chkHideAPIKey = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.panelEx1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanelMisc.SuspendLayout();
+            this.superTabControlPanelAPIKey.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelEx1
@@ -118,6 +124,7 @@
             this.superTabControl1.ControlBox.CloseBox});
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanelMisc);
+            this.superTabControl1.Controls.Add(this.superTabControlPanelAPIKey);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
@@ -130,7 +137,8 @@
             this.superTabControl1.TabIndex = 4;
             this.superTabControl1.Tabs.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabItem1,
-            this.superTabItemMisc});
+            this.superTabItemMisc,
+            this.superTabItemAPIKey});
             this.superTabControl1.Text = "superTabControl1";
             // 
             // superTabControlPanel1
@@ -159,6 +167,19 @@
             this.superTabControlPanelMisc.Size = new System.Drawing.Size(222, 171);
             this.superTabControlPanelMisc.TabIndex = 1;
             this.superTabControlPanelMisc.TabItem = this.superTabItemMisc;
+            // 
+            // superTabControlPanelAPIKey
+            // 
+            this.superTabControlPanelAPIKey.Controls.Add(this.labelXOpenAPIKey);
+            this.superTabControlPanelAPIKey.Controls.Add(this.chkHideAPIKey);
+            this.superTabControlPanelAPIKey.Controls.Add(this.txtOpenAPIKey);
+            this.superTabControlPanelAPIKey.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanelAPIKey.Location = new System.Drawing.Point(49, 0);
+            this.superTabControlPanelAPIKey.Name = "superTabControlPanelAPIKey";
+            this.superTabControlPanelAPIKey.Size = new System.Drawing.Size(351, 171);
+            this.superTabControlPanelAPIKey.TabIndex = 1;
+            this.superTabControlPanelAPIKey.TabItem = this.superTabItemAPIKey;
+            this.superTabControlPanelAPIKey.Visible = false;
             // 
             // chkAutoCheckExtFiles
             // 
@@ -230,6 +251,13 @@
             this.superTabItemMisc.GlobalItem = false;
             this.superTabItemMisc.Name = "superTabItemMisc";
             this.superTabItemMisc.Text = "기타";
+            // 
+            // superTabItemAPIKey
+            // 
+            this.superTabItemAPIKey.AttachedControl = this.superTabControlPanelAPIKey;
+            this.superTabItemAPIKey.GlobalItem = false;
+            this.superTabItemAPIKey.Name = "superTabItemAPIKey";
+            this.superTabItemAPIKey.Text = "API 키";
             // 
             // chkWzSortByImgID
             // 
@@ -303,6 +331,50 @@
             this.labelX2.TabIndex = 7;
             this.labelX2.Text = "Wz 버전 확인";
             // 
+            // labelXOpenAPIKey
+            // 
+            this.labelXOpenAPIKey.AutoSize = true;
+            this.labelXOpenAPIKey.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelXOpenAPIKey.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelXOpenAPIKey.Location = new System.Drawing.Point(14, 13);
+            this.labelXOpenAPIKey.Name = "labelXOpenAPIKey";
+            this.labelXOpenAPIKey.TabIndex = 9;
+            this.labelXOpenAPIKey.Text = "NEXON Open API 키";
+            // 
+            // txtOpenAPIKey
+            // 
+            this.txtOpenAPIKey.Border.Class = "TextBoxBorder";
+            this.txtOpenAPIKey.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtOpenAPIKey.Font = new System.Drawing.Font("돋움", 9F);
+            this.txtOpenAPIKey.Location = new System.Drawing.Point(14, 38);
+            this.txtOpenAPIKey.Multiline = true;
+            this.txtOpenAPIKey.WordWrap = true;
+            this.txtOpenAPIKey.Name = "txtOpenAPIKey";
+            this.txtOpenAPIKey.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtOpenAPIKey.Size = new System.Drawing.Size(220, 50);
+            this.txtOpenAPIKey.PasswordChar = '*';
+            this.txtOpenAPIKey.TabIndex = 11;
+            // 
+            // chkHideAPIKey
+            // 
+            this.chkHideAPIKey.AutoSize = true;
+            this.chkHideAPIKey.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkHideAPIKey.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkHideAPIKey.Location = new System.Drawing.Point(140, 13);
+            this.chkHideAPIKey.Name = "chkHideAPIKey";
+            this.chkHideAPIKey.Size = new System.Drawing.Size(132, 18);
+            this.chkHideAPIKey.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkHideAPIKey.TabIndex = 10;
+            this.chkHideAPIKey.Text = "키 숨김";
+            this.chkHideAPIKey.Checked = true;
+            this.chkHideAPIKey.CheckedChanged += ChkHideAPIKey_Click;
+            // 
             // FrmOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -331,8 +403,10 @@
         private DevComponents.DotNetBar.SuperTabControl superTabControl1;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel1;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanelMisc;
+        private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanelAPIKey;
         private DevComponents.DotNetBar.SuperTabItem superTabItem1;
         private DevComponents.DotNetBar.SuperTabItem superTabItemMisc;
+        private DevComponents.DotNetBar.SuperTabItem superTabItemAPIKey;
         private DevComponents.DotNetBar.ButtonX buttonX2;
         private DevComponents.DotNetBar.ButtonX buttonX1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkWzAutoSort;
@@ -344,5 +418,8 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkImgCheckDisabled;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzVersionVerifyMode;
         private DevComponents.DotNetBar.LabelX labelX2;
+        private DevComponents.DotNetBar.LabelX labelXOpenAPIKey;
+        private DevComponents.DotNetBar.Controls.TextBoxX txtOpenAPIKey;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkHideAPIKey;
     }
 }

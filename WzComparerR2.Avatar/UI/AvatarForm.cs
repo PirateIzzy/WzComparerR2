@@ -19,6 +19,10 @@ using WzComparerR2.Config;
 using WzComparerR2.Controls;
 using WzComparerR2.AvatarCommon;
 
+#if NET6_0_OR_GREATER
+using WzComparerR2.OpenAPI;
+#endif
+
 namespace WzComparerR2.Avatar.UI
 {
     internal partial class AvatarForm : DevComponents.DotNetBar.OfficeForm
@@ -45,6 +49,10 @@ namespace WzComparerR2.Avatar.UI
             btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
             FillEarSelection();
+
+#if NET6_0_OR_GREATER
+            this.btnCharac.SubItems.Add(this.btnAPI);
+#endif
         }
 
         public SuperTabControlPanel GetTabPanel()
@@ -72,6 +80,9 @@ namespace WzComparerR2.Avatar.UI
         private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbActionEffects;
         private DevComponents.DotNetBar.Controls.ComboBoxEx[] cmbEffectFrames;
         private bool updatingActionEffect = false;
+#if NET6_0_OR_GREATER
+        private NexonOpenAPI API;
+#endif
 
         /// <summary>
         /// wz1节点选中事件。
@@ -1672,6 +1683,90 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
+        private async void btnAPI_Click(object sender, EventArgs e)
+        {
+#if NET6_0_OR_GREATER
+            if (PluginManager.FindWz(Wz_Type.Base) == null)
+            {
+                MessageBoxEx.Show("Base.wz 파일을 열 수 없습니다.", "오류");
+                return;
+            }
+
+            var dlg = new AvatarAPIForm();
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                var key = ((string)WcR2Config.Default.NexonOpenAPIKey).Trim();
+                if (string.IsNullOrEmpty(key))
+                {
+                    MessageBoxEx.Show("설정에서 API Key를 입력해주세요.");
+                    return;
+                }
+
+                try
+                {
+                    if (this.API == null || !this.API.CheckSameAPIKey(key))
+                    {
+                        this.API = new NexonOpenAPI(key);
+                    }
+
+                    var name = dlg.CharaName;
+                    var ocid = await this.API.GetCharacterOCID(name);
+
+                    if (dlg.Type1)
+                    {
+                        try { await Type1(ocid); }
+                        catch { await Type2(ocid); }
+                    }
+                    else
+                    {
+                        try { await Type2(ocid); }
+                        catch { await Type1(ocid); }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxEx.Show($"{ex.Message}", "오류");
+                }
+            }
+
+            async Task Type1(string ocid) // 외형 기준
+            {
+                UnpackedAvatarData res = await this.API.GetAvatarResult(ocid);
+
+                var mixFace = int.Parse(res.MixFaceRatio) != 0 ? $"+{res.MixFaceColor}*{res.MixFaceRatio}" : "";
+                var mixHair = int.Parse(res.MixHairRatio) != 0 ? $"+{res.MixHairColor}*{res.MixHairRatio}" : "";
+                this.avatar.EarType = int.Parse(res.EarType);
+
+                var code = $"20{res.Skin}, {res.Face + mixFace}, {res.Hair + mixHair}, {res.Cap}, {res.FaceAcc}, {res.EyeAcc}, {res.EarAcc}, {res.Coat}, {res.Pants}, {res.Shoes}, {res.Gloves}, {res.Cape}, {res.Shield}, {res.Weapon}, {res.CashWeapon}";
+                LoadCode(code, 0);
+            }
+
+            async Task Type2(string ocid) // 장비창 기준
+            {
+                LoadedAvatarData res = await this.API.GetAvatarResult2(ocid);
+
+                var skinID = FindIDFromString(res.SkinInfo["SkinName"], gender: 2);
+                var faceID = FindIDFromString(res.FaceInfo["FaceName"], gender: res.Gender);
+                var hairID = FindIDFromString(res.HairInfo["HairName"], gender: res.Gender);
+
+                faceID = faceID.Remove(2, 1).Insert(2, Array.IndexOf(AvatarCanvas.FaceColor, res.FaceInfo["BaseColor"]).ToString());
+                hairID = hairID.Remove(4, 1).Insert(4, Array.IndexOf(AvatarCanvas.HairColor, res.HairInfo["BaseColor"]).ToString());
+
+                var mixFace = !string.IsNullOrEmpty(res.FaceInfo["MixColor"]) ? $"+{Array.IndexOf(AvatarCanvas.FaceColor, res.FaceInfo["MixColor"])}*{res.FaceInfo["MixRate"]}" : "";
+                var mixHair = !string.IsNullOrEmpty(res.HairInfo["MixColor"]) ? $"+{Array.IndexOf(AvatarCanvas.HairColor, res.HairInfo["MixColor"])}*{res.HairInfo["MixRate"]}" : "";
+
+                LoadCode($"{skinID},{faceID + mixFace},{hairID + mixHair}", 0);
+                LoadCode(string.Join(",", res.ItemList), 1);
+                LoadCode(string.Join(",", res.CashBaseItemList), 1);
+                LoadCode(string.Join(",", res.CashPresetItemList), 1);
+            }
+#else
+            MessageBoxEx.Show(".NET 6.0 이상에서만 실행 가능합니다.");
+            return;
+#endif
+        }
+
         private void btnReset_Click(object sender, EventArgs e)
         {
             this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2 + 40);
@@ -2149,6 +2244,19 @@ namespace WzComparerR2.Avatar.UI
                 }
             }
 
+            if (this.avatar.Longcoat != null)
+            {
+                if (this.avatar.Pants != null)
+                {
+                    this.avatar.Pants.Visible = false;
+                }
+                if (this.avatar.Coat != null)
+                {
+                    this.avatar.Coat.Visible = false;
+                }
+                this.avatar.Longcoat.Visible = true;
+            }
+
             //刷新
             this.FillAvatarParts();
             this.UpdateDisplay();
@@ -2285,6 +2393,32 @@ namespace WzComparerR2.Avatar.UI
             }
 
             return null;
+        }
+
+        private string FindIDFromString(string name, int gender = 2)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return "0";
+            }
+
+            var sl = this.PluginEntry.Context.DefaultStringLinker;
+            if (!sl.HasValues) //生成默认stringLinker
+            {
+                sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null), PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null), PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null));
+            }
+
+            foreach (var kv in sl.StringEqp)
+            {
+                if (kv.Value.Name == name)
+                {
+                    if (gender == 2 || ((gender + 1) & Gear.GetCosmeticGender(kv.Key)) > 0)
+                    {
+                        return kv.Key.ToString();
+                    }
+                }
+            }
+            return "0";
         }
 
         private class Animator

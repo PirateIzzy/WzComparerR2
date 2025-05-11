@@ -71,6 +71,7 @@
             this.btnCharac = new DevComponents.DotNetBar.ButtonItem();
             this.btnMale = new DevComponents.DotNetBar.ButtonItem();
             this.btnFemale = new DevComponents.DotNetBar.ButtonItem();
+            this.btnAPI = new DevComponents.DotNetBar.ButtonItem();
             this.btnReset = new DevComponents.DotNetBar.ButtonItem();
             this.btnLock = new DevComponents.DotNetBar.ButtonItem();
             this.btnSaveAsGif = new DevComponents.DotNetBar.ButtonItem();
@@ -721,6 +722,12 @@
             this.btnFemale.Text = "여자 기본";
             this.btnFemale.Click += new System.EventHandler(this.btnFemale_Click);
             // 
+            // btnAPI
+            // 
+            this.btnAPI.Name = "btnAPI";
+            this.btnAPI.Text = "캐릭터 검색";
+            this.btnAPI.Click += new System.EventHandler(this.btnAPI_Click);
+            // 
             // btnReset
             // 
             this.btnReset.Image = global::WzComparerR2.Avatar.Properties.Resources.arrow_in;
@@ -849,6 +856,7 @@
         private DevComponents.DotNetBar.ButtonItem btnLock;
         private DevComponents.DotNetBar.ButtonItem btnMale;
         private DevComponents.DotNetBar.ButtonItem btnFemale;
+        private DevComponents.DotNetBar.ButtonItem btnAPI;
         private DevComponents.DotNetBar.ButtonItem btnSaveAsGif;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEar;
         private DevComponents.DotNetBar.LabelX labelX5;

@@ -86,6 +86,12 @@ namespace WzComparerR2
             set { chkImgCheckDisabled.Checked = value; }
         }
 
+        public string NexonOpenAPIKey
+        {
+            get { return txtOpenAPIKey.Text; }
+            set { txtOpenAPIKey.Text = value; }
+        }
+
         public WzLib.WzVersionVerifyMode WzVersionVerifyMode
         {
             get { return ((cmbWzVersionVerifyMode.SelectedItem as ComboItem)?.Value as WzLib.WzVersionVerifyMode?) ?? default; }
@@ -107,6 +113,7 @@ namespace WzComparerR2
             this.ImgCheckDisabled = config.ImgCheckDisabled;
             this.WzVersionVerifyMode = config.WzVersionVerifyMode;
             this.AutoDetectUpdate = config.AutoDetectUpdate;
+            this.NexonOpenAPIKey = config.NexonOpenAPIKey;
         }
 
         public void Save(WcR2Config config)
@@ -118,6 +125,19 @@ namespace WzComparerR2
             config.ImgCheckDisabled = this.ImgCheckDisabled;
             config.WzVersionVerifyMode = this.WzVersionVerifyMode;
             config.AutoDetectUpdate = this.AutoDetectUpdate;
+            config.NexonOpenAPIKey = this.NexonOpenAPIKey;
+        }
+
+        private void ChkHideAPIKey_Click(object sender, EventArgs e)
+        {
+            if ((sender as DevComponents.DotNetBar.Controls.CheckBoxX).Checked)
+            {
+                this.txtOpenAPIKey.PasswordChar = '*';
+            }
+            else
+            {
+                this.txtOpenAPIKey.PasswordChar = '\0';
+            }
         }
     }
 }

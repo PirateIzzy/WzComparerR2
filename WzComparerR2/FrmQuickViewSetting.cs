@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using DevComponents.Editors;
 using WzComparerR2.Config;
+using WzComparerR2.AvatarCommon;
 
 
 namespace WzComparerR2
@@ -25,14 +26,14 @@ namespace WzComparerR2
             this.comboBoxEx1.SelectedIndex = 0;
             this.comboBoxEx2.SelectedIndex = 0;
 
-            this.comboBoxEx3.Items.AddRange((new[] { "검은색", "빨간색", "주황색", "노란색", "초록색", "파란색", "보라색", "갈색" }).Select(color =>
+            this.comboBoxEx3.Items.AddRange(AvatarCanvas.HairColor.Select(color =>
             {
                 var comboBoxItem = new DevComponents.DotNetBar.ComboBoxItem();
                 comboBoxItem.Text = color;
                 return comboBoxItem;
             }).ToArray());
 
-            this.comboBoxEx4.Items.AddRange((new[] { "검은색", "파란색", "빨간색", "초록색", "갈색", "에메랄드", "보라색", "자수정" }).Select(color =>
+            this.comboBoxEx4.Items.AddRange(AvatarCanvas.FaceColor.Select(color =>
             {
                 var comboBoxItem = new DevComponents.DotNetBar.ComboBoxItem();
                 comboBoxItem.Text = color;
