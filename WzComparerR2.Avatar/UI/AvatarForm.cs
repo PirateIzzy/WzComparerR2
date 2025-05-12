@@ -51,6 +51,8 @@ namespace WzComparerR2.Avatar.UI
             FillEarSelection();
 
 #if NET6_0_OR_GREATER
+            // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
+            this.Font = new Font("굴림", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btnCharac.SubItems.Add(this.btnAPI);
 #endif
         }
