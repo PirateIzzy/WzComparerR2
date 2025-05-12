@@ -1750,8 +1750,10 @@ namespace WzComparerR2.Avatar.UI
                 var faceID = FindIDFromString(res.FaceInfo["FaceName"], gender: res.Gender);
                 var hairID = FindIDFromString(res.HairInfo["HairName"], gender: res.Gender);
 
-                faceID = faceID.Remove(2, 1).Insert(2, Array.IndexOf(AvatarCanvas.FaceColor, res.FaceInfo["BaseColor"]).ToString());
-                hairID = hairID.Remove(4, 1).Insert(4, Array.IndexOf(AvatarCanvas.HairColor, res.HairInfo["BaseColor"]).ToString());
+                if (!string.IsNullOrEmpty(faceID) && faceID.Length == 5)
+                    faceID = faceID.Remove(2, 1).Insert(2, Array.IndexOf(AvatarCanvas.FaceColor, res.FaceInfo["BaseColor"]).ToString());
+                if (!string.IsNullOrEmpty(hairID) && hairID.Length == 5)
+                    hairID = hairID.Remove(4, 1).Insert(4, Array.IndexOf(AvatarCanvas.HairColor, res.HairInfo["BaseColor"]).ToString());
 
                 var mixFace = !string.IsNullOrEmpty(res.FaceInfo["MixColor"]) ? $"+{Array.IndexOf(AvatarCanvas.FaceColor, res.FaceInfo["MixColor"])}*{res.FaceInfo["MixRate"]}" : "";
                 var mixHair = !string.IsNullOrEmpty(res.HairInfo["MixColor"]) ? $"+{Array.IndexOf(AvatarCanvas.HairColor, res.HairInfo["MixColor"])}*{res.HairInfo["MixRate"]}" : "";
@@ -2399,7 +2401,7 @@ namespace WzComparerR2.Avatar.UI
         {
             if (string.IsNullOrEmpty(name))
             {
-                return "0";
+                return "";
             }
 
             var sl = this.PluginEntry.Context.DefaultStringLinker;
@@ -2418,7 +2420,7 @@ namespace WzComparerR2.Avatar.UI
                     }
                 }
             }
-            return "0";
+            return "";
         }
 
         private class Animator

@@ -96,7 +96,7 @@ namespace WzComparerR2.OpenAPI
             result.CashPresetItemList = new List<string>();
 
             var item = await API.GetCharacterCashItemEquipment(ocid);
-            result.CashPreset = item.PresetNo;
+            result.CashPreset = item.PresetNo ?? 0;
 
             foreach (var it in item.CashItemEquipmentBase)
             {
@@ -124,27 +124,27 @@ namespace WzComparerR2.OpenAPI
 
             result.HairInfo = new Dictionary<string, string>
             {
-                { "HairName", item.CharacterHair.HairName },
-                { "BaseColor", item.CharacterHair.BaseColor },
-                { "MixColor", item.CharacterHair.MixColor },
-                { "MixRate", item.CharacterHair.MixRate },
+                { "HairName", item.CharacterHair?.HairName ?? "" },
+                { "BaseColor", item.CharacterHair?.BaseColor ?? "" },
+                { "MixColor", item.CharacterHair?.MixColor ?? "" },
+                { "MixRate", item.CharacterHair?.MixRate ?? "0" },
             };
 
             result.FaceInfo = new Dictionary<string, string>
             {
-                { "FaceName", item.CharacterFace.FaceName },
-                { "BaseColor", item.CharacterFace.BaseColor },
-                { "MixColor", item.CharacterFace.MixColor },
-                { "MixRate", item.CharacterFace.MixRate },
+                { "FaceName", item.CharacterFace?.FaceName ?? "" },
+                { "BaseColor", item.CharacterFace?.BaseColor ?? "" },
+                { "MixColor", item.CharacterFace?.MixColor ?? "" },
+                { "MixRate", item.CharacterFace?.MixRate ?? "0" },
             };
 
             result.SkinInfo = new Dictionary<string, string>
             {
-                { "SkinName", item.CharacterSkin.SkinName },
-                { "ColorStyle", item.CharacterSkin.ColorStyle },
-                { "Hue", item.CharacterSkin.Hue.ToString() },
-                { "Saturation", item.CharacterSkin.Saturation.ToString() },
-                { "Brightness", item.CharacterSkin.Brightness.ToString() },
+                { "SkinName", item.CharacterSkin?.SkinName ?? "" },
+                { "ColorStyle", item.CharacterSkin?.ColorStyle ?? "" },
+                { "Hue", item.CharacterSkin?.Hue.ToString() ?? "" },
+                { "Saturation", item.CharacterSkin?.Saturation.ToString() ?? "" },
+                { "Brightness", item.CharacterSkin?.Brightness.ToString() ?? "" },
             };
         }
 
