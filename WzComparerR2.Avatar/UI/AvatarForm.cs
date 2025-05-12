@@ -1005,7 +1005,7 @@ namespace WzComparerR2.Avatar.UI
                 text = string.Format("{0}\r\n{1}{2}", sr.Name, part.IsSkill ? "s" : "", part.ID);
                 if (part.IsMixing)
                 {
-                    text = string.Format("{0} ( {1} {2} : {3} {4} )\r\n{5}+{6}*{7}",
+                    text = string.Format("{0}\r\n{1} {2} : {3} {4}\r\n{5}+{6}*{7}",
                         Regex.Replace(sr.Name, "^([^ ]+색 )?", "믹스 "),
                         GetColorName(part.ID.Value),
                         100 - part.MixOpacity,
