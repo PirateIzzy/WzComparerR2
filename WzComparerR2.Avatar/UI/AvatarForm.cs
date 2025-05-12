@@ -1688,7 +1688,7 @@ namespace WzComparerR2.Avatar.UI
 #if NET6_0_OR_GREATER
             if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                MessageBoxEx.Show("Base.wz 파일을 열 수 없습니다.", "오류");
+                ToastNotification.Show(this, $"오류: Base.wz 파일을 열 수 없습니다.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
 
@@ -1699,7 +1699,7 @@ namespace WzComparerR2.Avatar.UI
                 var key = ((string)WcR2Config.Default.NexonOpenAPIKey).Trim();
                 if (string.IsNullOrEmpty(key))
                 {
-                    MessageBoxEx.Show("설정에서 API Key를 입력해주세요.");
+                    ToastNotification.Show(this, $"설정에서 API Key를 입력해주세요.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
                     return;
                 }
 
@@ -1715,18 +1715,16 @@ namespace WzComparerR2.Avatar.UI
 
                     if (dlg.Type1)
                     {
-                        try { await Type1(ocid); }
-                        catch { await Type2(ocid); }
+                        await Type1(ocid);
                     }
                     else
                     {
-                        try { await Type2(ocid); }
-                        catch { await Type1(ocid); }
+                        await Type2(ocid);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxEx.Show($"{ex.Message}", "오류");
+                    ToastNotification.Show(this, $"오류: {ex.Message}", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 }
             }
 
@@ -1740,6 +1738,11 @@ namespace WzComparerR2.Avatar.UI
 
                 var code = $"20{res.Skin}, {res.Face + mixFace}, {res.Hair + mixHair}, {res.Cap}, {res.FaceAcc}, {res.EyeAcc}, {res.EarAcc}, {res.Coat}, {res.Pants}, {res.Shoes}, {res.Gloves}, {res.Cape}, {res.Shield}, {res.Weapon}, {res.CashWeapon}";
                 LoadCode(code, 0);
+
+                if (res.UnknownVer)
+                {
+                    throw new Exception($"알려지지 않은 코드 버전입니다. (버전: {res.Version})");
+                }
             }
 
             async Task Type2(string ocid) // 장비창 기준
@@ -1750,6 +1753,11 @@ namespace WzComparerR2.Avatar.UI
                 var faceID = FindIDFromString(res.FaceInfo["FaceName"], gender: res.Gender);
                 var hairID = FindIDFromString(res.HairInfo["HairName"], gender: res.Gender);
 
+                if (string.IsNullOrEmpty(skinID))
+                {
+                    throw new Exception($"캐릭터를 접속해서 갱신해주세요.");
+                }
+
                 if (!string.IsNullOrEmpty(faceID) && faceID.Length == 5)
                     faceID = faceID.Remove(2, 1).Insert(2, Array.IndexOf(AvatarCanvas.FaceColor, res.FaceInfo["BaseColor"]).ToString());
                 if (!string.IsNullOrEmpty(hairID) && hairID.Length == 5)
@@ -1759,12 +1767,14 @@ namespace WzComparerR2.Avatar.UI
                 var mixHair = !string.IsNullOrEmpty(res.HairInfo["MixColor"]) ? $"+{Array.IndexOf(AvatarCanvas.HairColor, res.HairInfo["MixColor"])}*{res.HairInfo["MixRate"]}" : "";
 
                 LoadCode($"{skinID},{faceID + mixFace},{hairID + mixHair}", 0);
-                LoadCode(string.Join(",", res.ItemList), 1);
-                LoadCode(string.Join(",", res.CashBaseItemList), 1);
-                LoadCode(string.Join(",", res.CashPresetItemList), 1);
+                foreach (var list in new[] { res.ItemList, res.CashBaseItemList, res.CashPresetItemList })
+                {
+                    if (list.Count > 0)
+                        LoadCode(string.Join(",", list), 1);
+                }
             }
 #else
-            MessageBoxEx.Show(".NET 6.0 이상에서만 실행 가능합니다.");
+            ToastNotification.Show(this, $".NET 6.0 이상에서만 실행 가능합니다.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
             return;
 #endif
         }
@@ -2120,13 +2130,13 @@ namespace WzComparerR2.Avatar.UI
             var matches = Regex.Matches(code, @"s?(\d+)(\+([0-7])\*(\d{1,2}))?([,\s]|$)");
             if (matches.Count <= 0)
             {
-                MessageBoxEx.Show("아이템 코드에 해당되는 아이템이 없습니다.", "오류");
+                ToastNotification.Show(this, $"아이템 코드에 해당되는 아이템이 없습니다.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
 
             if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                MessageBoxEx.Show("Base.wz 파일을 열 수 없습니다.", "오류");
+                ToastNotification.Show(this, $"Base.wz 파일을 열 수 없습니다.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
 
@@ -2137,7 +2147,7 @@ namespace WzComparerR2.Avatar.UI
             //试图初始化
             if (!this.inited && !this.AvatarInit())
             {
-                MessageBoxEx.Show("아바타 플러그인을 초기화할 수 없습니다.", "오류");
+                ToastNotification.Show(this, $"아바타 플러그인을 초기화할 수 없습니다.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
             var sl = this.PluginEntry.Context.DefaultStringLinker;
@@ -2267,12 +2277,12 @@ namespace WzComparerR2.Avatar.UI
             if (failList.Count > 0)
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("해당 아이템 코드를 찾을 수 없습니다 : ");
+                sb.AppendLine("해당 아이템 코드를 찾을 수 없습니다");
                 foreach (var gearID in failList)
                 {
                     sb.Append("  ").AppendLine(gearID.ToString("D8"));
                 }
-                MessageBoxEx.Show(sb.ToString(), "오류");
+                ToastNotification.Show(this, sb.ToString(), null, 4000, eToastGlowColor.Red, eToastPosition.TopCenter);
             }
 
         }

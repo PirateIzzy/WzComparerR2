@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using AES = System.Security.Cryptography.Aes;
 using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 
 #if NET6_0_OR_GREATER
 using MapleStory.OpenAPI;
@@ -38,30 +39,62 @@ namespace WzComparerR2.OpenAPI
 
         public async Task<string> GetCharacterOCID(string characterName)
         {
-            var character = await API.GetCharacter(characterName);
-            return character.OCID;
+            try
+            {
+                var character = await API.GetCharacter(characterName);
+                return character.OCID;
+            }
+            catch (MapleStoryAPIException e)
+            {
+                switch (e.ErrorCode)
+                {
+                    case MapleStoryAPIErrorCode.OPENAPI00004:
+                        throw new Exception(Utils.GetExceptionMsg(e, forceMsg: $"캐릭터 이름이 올바르지 않습니다."));
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+                
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<UnpackedAvatarData> GetAvatarResult(string ocid)
         {
-            var basic = await API.GetCharacterBasic(ocid);
-            var m = Regex.Match(basic.CharacterImage, @"look/([A-Z]+)$");
-            if (m.Success)
+            try
             {
-                var data = m.Groups[1].Value;
+                var basic = await API.GetCharacterBasic(ocid);
+                var m = Regex.Match(basic.CharacterImage, @"look/([A-Z]+)$");
+                if (m.Success)
+                {
+                    var data = m.Groups[1].Value;
 
-                var decrypted = Utils.Decrypt(data);
-                var version = Utils.CheckVer(decrypted);
+                    var decrypted = Utils.Decrypt(data);
+                    var version = Utils.CheckVer(decrypted);
 
-                var unpackedData = new UnpackedAvatarData(version);
-                if (unpackedData.Unsupported) return null;
+                    var unpackedData = new UnpackedAvatarData(version);
 
-                Utils.Unpack(unpackedData, decrypted);
-                unpackedData.SetProperties();
+                    Utils.Unpack(unpackedData, decrypted);
+                    unpackedData.SetProperties();
 
-                return unpackedData;
+                    return unpackedData;
+                }
+                return null;
             }
-            return null;
+            catch (MapleStoryAPIException e)
+            {
+                switch (e.ErrorCode)
+                {
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<LoadedAvatarData> GetAvatarResult2(string ocid)
@@ -77,75 +110,120 @@ namespace WzComparerR2.OpenAPI
 
         private async Task GetAvatarItems(string ocid, LoadedAvatarData result)
         {
-            result.ItemList = new List<string>();
+            try
+            { 
+                result.ItemList = new List<string>();
 
-            var item = await API.GetCharacterItemEquipment(ocid);
-            result.Preset = item.PresetNo ?? 0;
+                var item = await API.GetCharacterItemEquipment(ocid);
+                result.Preset = item.PresetNo ?? 0;
 
-            foreach (var it in item.ItemEquipment)
+                foreach (var it in item.ItemEquipment)
+                {
+                    var m = Regex.Match(it.ItemIcon, @"icon/([A-Z]+)$");
+                    if (m.Success)
+                        result.ItemList.Add(Utils.GetItemID(m.Groups[1].Value));
+                }
+            }
+            catch (MapleStoryAPIException e)
             {
-                var m = Regex.Match(it.ItemIcon, @"icon/([A-Z]+)$");
-                if (m.Success)
-                    result.ItemList.Add(Utils.GetItemID(m.Groups[1].Value));
+                switch (e.ErrorCode)
+                {
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+            }
+            catch
+            {
+                throw;
             }
         }
 
         private async Task GetAvatarCashItems(string ocid, LoadedAvatarData result)
         {
-            result.CashBaseItemList = new List<string>();
-            result.CashPresetItemList = new List<string>();
-
-            var item = await API.GetCharacterCashItemEquipment(ocid);
-            result.CashPreset = item.PresetNo ?? 0;
-
-            foreach (var it in item.CashItemEquipmentBase)
+            try
             {
-                var m = Regex.Match(it.CashItemIcon, @"icon/([A-Z]+)$");
-                if (m.Success)
-                    result.CashBaseItemList.Add(Utils.GetItemID(m.Groups[1].Value));
-            }
+                result.CashBaseItemList = new List<string>();
+                result.CashPresetItemList = new List<string>();
 
-            if (result.CashPreset > 0)
-            {
-                foreach (var it in result.CashPreset == 1 ? item.CashItemEquipmentPreset1 : result.CashPreset == 2 ? item.CashItemEquipmentPreset2 : item.CashItemEquipmentPreset3)
+                var item = await API.GetCharacterCashItemEquipment(ocid);
+                result.CashPreset = item.PresetNo ?? 0;
+
+                foreach (var it in item.CashItemEquipmentBase)
                 {
                     var m = Regex.Match(it.CashItemIcon, @"icon/([A-Z]+)$");
                     if (m.Success)
-                        result.CashPresetItemList.Add(Utils.GetItemID(m.Groups[1].Value));
+                        result.CashBaseItemList.Add(Utils.GetItemID(m.Groups[1].Value));
                 }
+
+                if (result.CashPreset > 0)
+                {
+                    foreach (var it in result.CashPreset == 1 ? item.CashItemEquipmentPreset1 : result.CashPreset == 2 ? item.CashItemEquipmentPreset2 : item.CashItemEquipmentPreset3)
+                    {
+                        var m = Regex.Match(it.CashItemIcon, @"icon/([A-Z]+)$");
+                        if (m.Success)
+                            result.CashPresetItemList.Add(Utils.GetItemID(m.Groups[1].Value));
+                    }
+                }
+            }
+            catch (MapleStoryAPIException e)
+            {
+                switch (e.ErrorCode)
+                {
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+            }
+            catch
+            {
+                throw;
             }
         }
 
         private async Task GetAvatarBeautyEquipment(string ocid, LoadedAvatarData result)
         {
-            var item = await API.GetCharacterBeautyEquipment(ocid);
-
-            result.Gender = item.CharacterGender == "남" ? 0 : 1;
-
-            result.HairInfo = new Dictionary<string, string>
+            try
             {
-                { "HairName", item.CharacterHair?.HairName ?? "" },
-                { "BaseColor", item.CharacterHair?.BaseColor ?? "" },
-                { "MixColor", item.CharacterHair?.MixColor ?? "" },
-                { "MixRate", item.CharacterHair?.MixRate ?? "0" },
-            };
+                var item = await API.GetCharacterBeautyEquipment(ocid);
 
-            result.FaceInfo = new Dictionary<string, string>
-            {
-                { "FaceName", item.CharacterFace?.FaceName ?? "" },
-                { "BaseColor", item.CharacterFace?.BaseColor ?? "" },
-                { "MixColor", item.CharacterFace?.MixColor ?? "" },
-                { "MixRate", item.CharacterFace?.MixRate ?? "0" },
-            };
+                result.Gender = item.CharacterGender == "남" ? 0 : 1;
 
-            result.SkinInfo = new Dictionary<string, string>
+                result.HairInfo = new Dictionary<string, string>
+                {
+                    { "HairName", item.CharacterHair?.HairName ?? "" },
+                    { "BaseColor", item.CharacterHair?.BaseColor ?? "" },
+                    { "MixColor", item.CharacterHair?.MixColor ?? "" },
+                    { "MixRate", item.CharacterHair?.MixRate ?? "0" },
+                };
+
+                result.FaceInfo = new Dictionary<string, string>
+                {
+                    { "FaceName", item.CharacterFace?.FaceName ?? "" },
+                    { "BaseColor", item.CharacterFace?.BaseColor ?? "" },
+                    { "MixColor", item.CharacterFace?.MixColor ?? "" },
+                    { "MixRate", item.CharacterFace?.MixRate ?? "0" },
+                };
+
+                result.SkinInfo = new Dictionary<string, string>
+                {
+                    { "SkinName", item.CharacterSkin?.SkinName ?? "" },
+                    { "ColorStyle", item.CharacterSkin?.ColorStyle ?? "" },
+                    { "Hue", item.CharacterSkin?.Hue.ToString() ?? "" },
+                    { "Saturation", item.CharacterSkin?.Saturation.ToString() ?? "" },
+                    { "Brightness", item.CharacterSkin?.Brightness.ToString() ?? "" },
+                };
+            }
+            catch (MapleStoryAPIException e)
             {
-                { "SkinName", item.CharacterSkin?.SkinName ?? "" },
-                { "ColorStyle", item.CharacterSkin?.ColorStyle ?? "" },
-                { "Hue", item.CharacterSkin?.Hue.ToString() ?? "" },
-                { "Saturation", item.CharacterSkin?.Saturation.ToString() ?? "" },
-                { "Brightness", item.CharacterSkin?.Brightness.ToString() ?? "" },
-            };
+                switch (e.ErrorCode)
+                {
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task Debug()
@@ -168,7 +246,6 @@ namespace WzComparerR2.OpenAPI
             }
 
             var result = new UnpackedAvatarData(version);
-            if (result.Unsupported) return;
 
             Utils.Unpack(result, decrypted);
 
@@ -187,6 +264,56 @@ namespace WzComparerR2.OpenAPI
 
     public static class Utils
     {
+        public static string GetExceptionMsg(MapleStoryAPIException e, string forceMsg = "", [CallerMemberName] string funcName = "")
+        {
+            string msg;
+            if (!string.IsNullOrEmpty(forceMsg))
+            {
+                msg = forceMsg;
+            }
+            else
+            {
+                switch (e.ErrorCode)
+                {
+                    case MapleStoryAPIErrorCode.OPENAPI00001:
+                        msg = "서버 내부 오류";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00002:
+                        msg = "권한이 없습니다.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00003:
+                        msg = "캐릭터를 접속해서 갱신해주세요.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00004:
+                        msg = "입력값이 유효하지 않습니다.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00005:
+                        msg = "API 키가 유효하지 않습니다.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00006:
+                        msg = "유효하지 않은 게임 또는 API PATH";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00007:
+                        msg = "API 호출량이 초과되었습니다.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00009:
+                        msg = "데이터 준비 중입니다.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00010:
+                        msg = "게임 점검 중입니다.";
+                        break;
+                    case MapleStoryAPIErrorCode.OPENAPI00011:
+                        msg = "API 점검 중입니다.";
+                        break;
+                    default:
+                        msg = e.Message;
+                        break;
+                }
+            }
+
+            return $"{msg} ({e.ErrorCode.ToString()})\r\n위치: {funcName}";
+        }
+
         public static string ToJson(this object obj)
         {
             return JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
