@@ -254,6 +254,20 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
+            // customChair
+            Wz_Node customChairNode = node.FindNodeByPath("info\\customChair\\self\\tamingMob");
+            if (customChairNode != null)
+            {
+                if (item.Props.ContainsKey(ItemPropType.tamingMob))
+                {
+                    item.Props[ItemPropType.tamingMob] = Convert.ToInt64(customChairNode.Value);
+                }
+                else
+                {
+                    item.Props.Add(ItemPropType.tamingMob, Convert.ToInt64(customChairNode.Value));
+                }
+            }
+
             Wz_Node specNode = node.FindNodeByPath("spec");
             if (specNode != null)
             {
