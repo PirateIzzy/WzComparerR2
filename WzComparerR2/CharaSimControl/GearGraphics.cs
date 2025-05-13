@@ -591,7 +591,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     // draw legay center
                     // Note: item 1143360 (MILESTONE) does not render well, ignore it.
-                    g.DrawImage(wce[1].Bitmap, left - wce[1].Origin.X, picH - wce[1].Origin.Y);                   
+                    if (!aniNameTag) g.DrawImage(wce[1].Bitmap, left - wce[1].Origin.X, picH - wce[1].Origin.Y);                   
                     // draw ani0 based on bg center position
                     g.DrawImage(ani0.Bitmap, left - wce[1].Origin.X - ani0.Origin.X, picH - wce[1].Origin.Y - ani0.Origin.Y);
                     if (!string.IsNullOrEmpty(tagName)) // draw name
