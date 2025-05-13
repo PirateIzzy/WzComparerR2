@@ -1024,6 +1024,10 @@ namespace WzComparerR2.Avatar.UI
             {
                 text = string.Format("{0}\r\n{1}", "(null)", part.ID == null ? "-" : part.ID.ToString());
             }
+            if (!part.HasImage && part.EffectNode == null)
+            {
+                text += " (외형 없음)";
+            }
             btn.Text = text;
             btn.NeedRecalcSize = true;
             btn.Refresh();
