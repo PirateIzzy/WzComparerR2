@@ -662,13 +662,14 @@ namespace WzComparerR2.CharaSim
                 case GearType.chakram: return "Chakram";
                 case GearType.hexSeeker: return "Hex Seeker";
 
+                case GearType.boxingCannon: return "Martial Brace";
+                case GearType.boxingSky: return "Brace Band";
+
                 case GearType.arcaneSymbol: return "Arcane Symbol";
                 case GearType.authenticSymbol: return "Sacred Symbol";
                 case GearType.grandAuthenticSymbol: return "Grand Sacred Symbol";
-                case GearType.boxingCannon: return "拳封";//Mo Xuan weapon
-                case GearType.boxingSky: return "拳天";//Mo Xuan weapon
-                case GearType.jewel: return "宝玉";
 
+                case GearType.jewel: return "宝玉";
                 default: return null;
             }
         }
