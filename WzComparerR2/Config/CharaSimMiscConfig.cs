@@ -8,7 +8,7 @@ namespace WzComparerR2.Config
 {
     public class CharaSimMiscConfig : ConfigurationElement
     {
-        [ConfigurationProperty("enable22AniStyle", DefaultValue = true)]
+        [ConfigurationProperty("enable22AniStyle", DefaultValue = false)]
         public bool Enable22AniStyle
         {
             get { return (bool)this["enable22AniStyle"]; }
