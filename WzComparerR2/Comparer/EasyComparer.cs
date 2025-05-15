@@ -482,7 +482,7 @@ namespace WzComparerR2.Comparer
                     {
                         case DifferenceType.Changed:
                             {
-                                StateInfo = string.Format("{0}/{1} Modified: {2}", count[0], count[3], diff.NodeNew.FullPath);
+                                StateInfo = string.Format("{0}/{1} Modified: {2}", count[0], count[3], diff.NodeNew.FullPathToFile);
                                 Wz_Image imgNew, imgOld;
                                 if ((imgNew = diff.ValueNew as Wz_Image) != null
                                     && ((imgOld = diff.ValueOld as Wz_Image) != null))
@@ -498,7 +498,7 @@ namespace WzComparerR2.Comparer
                         case DifferenceType.Append:
                             if (this.OutputAddedImg)
                             {
-                                StateInfo = string.Format("{0}/{1} Added: {2}", count[1], count[4], diff.NodeNew.FullPath);
+                                StateInfo = string.Format("{0}/{1} Added: {2}", count[1], count[4], diff.NodeNew.FullPathToFile);
                                 Wz_Image imgNew = diff.ValueNew as Wz_Image;
                                 if (imgNew != null)
                                 {
@@ -513,7 +513,7 @@ namespace WzComparerR2.Comparer
                         case DifferenceType.Remove:
                             if (this.OutputRemovedImg)
                             {
-                                StateInfo = string.Format("{0}/{1} Removed: {2}", count[2], count[5], diff.NodeOld.FullPath);
+                                StateInfo = string.Format("{0}/{1} Removed: {2}", count[2], count[5], diff.NodeOld.FullPathToFile);
                                 Wz_Image imgOld = diff.ValueOld as Wz_Image;
                                 if (imgOld != null)
                                 {
