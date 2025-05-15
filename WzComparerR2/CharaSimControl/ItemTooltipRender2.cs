@@ -718,7 +718,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 else if ((!item.Props.TryGetValue(ItemPropType.tradeBlock, out value) || value == 0))
                 {
-                    if (!(item.ItemID / 10000 != 501 || item.ItemID / 10000 != 502 || item.ItemID / 10000 != 516 || item.ItemID / 1000 != 5157 || item.ItemID / 1000 != 5158))
+                    if (!(item.ItemID / 10000 == 501 || item.ItemID / 10000 == 502 || item.ItemID / 10000 == 516 || item.ItemID / 1000 == 5157 || item.ItemID / 1000 == 5158))
                     {
                         GearGraphics.DrawString(g, "\n#c넥슨캐시로 구매하면 사용 전 1회에 한해 타인과 교환 할 수 있습니다.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
                     }
