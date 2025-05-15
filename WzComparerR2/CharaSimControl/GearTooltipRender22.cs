@@ -571,16 +571,17 @@ namespace WzComparerR2.CharaSimControl
                 {
                     GearGraphics.DrawString(g, $"#c{string.Join(", ", randomParts)} 이미지는 예시 중 하나로 최초 장착 시 외형이 결정되는 안드로이드이다.#", GearGraphics.EquipMDMoris9Font, null, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
                 }
-            }
-            // 안드로이드 등급
-            if (Gear.Props.TryGetValue(GearPropType.grade, out value) && value > 0)
-            {
-                hasThirdContents = true;
-                hasOptionPart = true;
 
-                picH += 4;
-                TextRenderer.DrawText(g, "등급 : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
-                picH += 12;
+                // 안드로이드 등급
+                if (Gear.Props.TryGetValue(GearPropType.grade, out value) && value > 0)
+                {
+                    hasThirdContents = true;
+                    hasOptionPart = true;
+
+                    picH += 4;
+                    TextRenderer.DrawText(g, "등급 : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                    picH += 12;
+                }
             }
 
             // 세트 아이템
