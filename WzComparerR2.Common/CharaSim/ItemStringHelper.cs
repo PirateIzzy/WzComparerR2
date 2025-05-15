@@ -310,6 +310,7 @@ namespace WzComparerR2.CharaSim
                     res[0] = "몬스터 방어율 무시";
                     res[1] = "+" + value + "%";
                     return res;
+                    /*
                 case GearPropType.attackSpeed:
                     if (2 <= value && value <= 9)
                     {
@@ -317,6 +318,7 @@ namespace WzComparerR2.CharaSim
                         res[1] = $"{10 - value}단계";
                     }
                     return res;
+                    */
                 case GearPropType.nbdR:
                     res[0] = "일반 몬스터 데미지";
                     res[1] = "+" + value + "%";
@@ -353,16 +355,16 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$r장착 시 교환 불가#";
                     return res;
                 case GearPropType.notExtend:
-                    res[0] = value == 0 ? null : ", 연장 불가";
+                    res[0] = value == 0 ? null : " (연장 불가)";
                     return res;
                 case GearPropType.accountSharableAfterExchange:
-                    res[0] = value == 0 ? null : "1회 교환 가능 (거래 후 월드 내 나의 캐릭터 간 이동만 가능)";
+                    res[0] = value == 0 ? null : "#$r1회 교환 가능 (거래 후 월드 내 나의 캐릭터 간 이동만 가능)#";
                     return res;
                 case GearPropType.timeLimited:
-                    res[0] = value == 0 ? null : "#$r기간제 아이템#";
+                    res[0] = value == 0 ? null : "유효 기간";
                     return res;
                 case GearPropType.abilityTimeLimited:
-                    res[0] = value == 0 ? null : "#$r기간 한정 능력치#";
+                    res[0] = value == 0 ? null : "능력치 유효 기간";
                     return res;
                 case GearPropType.noLookChange:
                     res[0] = value == 0 ? null : "#$r훈장 신비의 모루 사용 불가#";
@@ -418,7 +420,7 @@ namespace WzComparerR2.CharaSim
                     return res;
 
                 case GearPropType.Etuc:
-                    res[0] = $"#$d익셉셔널 : 없음# (최대 {value}회)";
+                    res[0] = $"#$d익셉셔널 : 없음 (최대 {value}회)#";
                     return res;
                 case GearPropType.CuttableCount:
                     res[0] = $" #$r(가위 사용 잔여 횟수：{value} / {value})#";
