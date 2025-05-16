@@ -246,8 +246,10 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmi1Sort = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmi1Export = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmi1DumpAsXml = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmi1UpdateStringLinker = new System.Windows.Forms.ToolStripMenuItem();
             this.nodeConnector1 = new DevComponents.AdvTree.NodeConnector();
             this.elementStyle1 = new DevComponents.DotNetBar.ElementStyle();
             this.listViewExString = new DevComponents.DotNetBar.Controls.ListViewEx();
@@ -2928,6 +2930,11 @@
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(151, 6);
             // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(151, 6);
+            // 
             // tsmi1Export
             // 
             this.tsmi1Export.Name = "tsmi1Export";
@@ -2941,6 +2948,13 @@
             this.tsmi1DumpAsXml.Size = new System.Drawing.Size(154, 22);
             this.tsmi1DumpAsXml.Text = "Export XML";
             this.tsmi1DumpAsXml.Click += new System.EventHandler(this.tsmi1DumpAsXml_Click);
+            // 
+            // tsmi1UpdateStringLinker
+            // 
+            this.tsmi1UpdateStringLinker.Name = "tsmi1UpdateStringLinker";
+            this.tsmi1UpdateStringLinker.Size = new System.Drawing.Size(154, 22);
+            this.tsmi1UpdateStringLinker.Text = "Update StringLinker";
+            this.tsmi1UpdateStringLinker.Click += new System.EventHandler(this.tsmi1UpdateStringLinker_Click); 
             // 
             // elementStyle1
             // 
@@ -3426,6 +3440,7 @@
         private DevComponents.DotNetBar.LabelX labelXComp2;
         private System.Windows.Forms.ToolStripMenuItem tsmi1Export;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
         private DevComponents.DotNetBar.ComboBoxItem comboBoxItemLanguage;
         private DevComponents.Editors.ComboItem comboItem13;
         private DevComponents.Editors.ComboItem comboItem14;
@@ -3468,6 +3483,7 @@
         private DevComponents.DotNetBar.ComboBoxItem cmbItemAniNames;
         private DevComponents.DotNetBar.ButtonItem buttonItemUpdate;
         private System.Windows.Forms.ToolStripMenuItem tsmi1DumpAsXml;
+        private System.Windows.Forms.ToolStripMenuItem tsmi1UpdateStringLinker;
         private DevComponents.Editors.ComboItem comboItem18;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;

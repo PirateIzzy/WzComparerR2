@@ -1,6 +1,6 @@
 ﻿namespace WzComparerR2.Avatar.UI
 {
-    partial class AvatarCodeForm
+    partial class AvatarAPIForm
     {
         /// <summary>
         /// Required designer variable.
@@ -34,6 +34,7 @@
             this.checkBoxX1 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX2 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
+            this.cmbRegion = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.SuspendLayout();
             // 
             // buttonX1
@@ -42,12 +43,12 @@
             this.buttonX1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonX1.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.buttonX1.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonX1.Location = new System.Drawing.Point(107, 126);
+            this.buttonX1.Location = new System.Drawing.Point(107, 75);
             this.buttonX1.Name = "buttonX1";
             this.buttonX1.Size = new System.Drawing.Size(75, 23);
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.buttonX1.TabIndex = 0;
-            this.buttonX1.Text = "Confirm";
+            this.buttonX1.TabIndex = 4;
+            this.buttonX1.Text = "확인";
             // 
             // buttonX2
             // 
@@ -55,17 +56,17 @@
             this.buttonX2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonX2.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.buttonX2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonX2.Location = new System.Drawing.Point(197, 126);
+            this.buttonX2.Location = new System.Drawing.Point(197, 75);
             this.buttonX2.Name = "buttonX2";
             this.buttonX2.Size = new System.Drawing.Size(75, 23);
             this.buttonX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.buttonX2.TabIndex = 1;
-            this.buttonX2.Text = "Cancel";
+            this.buttonX2.TabIndex = 5;
+            this.buttonX2.Text = "취소";
             // 
             // textBoxX1
             // 
-            this.textBoxX1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.textBoxX1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // 
@@ -73,12 +74,11 @@
             this.textBoxX1.Border.Class = "TextBoxBorder";
             this.textBoxX1.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.textBoxX1.Location = new System.Drawing.Point(12, 12);
-            this.textBoxX1.Multiline = true;
             this.textBoxX1.Name = "textBoxX1";
             this.textBoxX1.PreventEnterBeep = true;
             this.textBoxX1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxX1.Size = new System.Drawing.Size(260, 85);
-            this.textBoxX1.TabIndex = 2;
+            this.textBoxX1.Size = new System.Drawing.Size(180, 21);
+            this.textBoxX1.TabIndex = 0;
             this.textBoxX1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxX1_KeyDown);
             // 
             // checkBoxX1
@@ -92,12 +92,12 @@
             this.checkBoxX1.Checked = true;
             this.checkBoxX1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxX1.CheckValue = "Y";
-            this.checkBoxX1.Location = new System.Drawing.Point(71, 103);
+            this.checkBoxX1.Location = new System.Drawing.Point(60, 45);
             this.checkBoxX1.Name = "checkBoxX1";
             this.checkBoxX1.Size = new System.Drawing.Size(51, 18);
             this.checkBoxX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX1.TabIndex = 3;
-            this.checkBoxX1.Text = "Cover";
+            this.checkBoxX1.TabIndex = 1;
+            this.checkBoxX1.Text = "외형";
             // 
             // checkBoxX2
             // 
@@ -107,12 +107,12 @@
             // 
             this.checkBoxX2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.checkBoxX2.CheckBoxStyle = DevComponents.DotNetBar.eCheckBoxStyle.RadioButton;
-            this.checkBoxX2.Location = new System.Drawing.Point(125, 103);
+            this.checkBoxX2.Location = new System.Drawing.Point(120, 45);
             this.checkBoxX2.Name = "checkBoxX2";
             this.checkBoxX2.Size = new System.Drawing.Size(51, 18);
             this.checkBoxX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX2.TabIndex = 4;
-            this.checkBoxX2.Text = "Add";
+            this.checkBoxX2.TabIndex = 2;
+            this.checkBoxX2.Text = "장비창";
             // 
             // labelX1
             // 
@@ -121,28 +121,44 @@
             // 
             // 
             this.labelX1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX1.Location = new System.Drawing.Point(10, 103);
+            this.labelX1.Location = new System.Drawing.Point(10, 45);
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(56, 18);
             this.labelX1.TabIndex = 5;
-            this.labelX1.Text = "Method :";
+            this.labelX1.Text = "기준 :";
             // 
-            // AvatarCodeForm
+            // cmbRegion
             // 
-            this.ClientSize = new System.Drawing.Size(284, 161);
-            this.Controls.Add(this.labelX1);
-            this.Controls.Add(this.checkBoxX2);
-            this.Controls.Add(this.checkBoxX1);
+            this.cmbRegion.DisplayMember = "Text";
+            this.cmbRegion.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbRegion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbRegion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbRegion.FormattingEnabled = true;
+            this.cmbRegion.ItemHeight = 13;
+            this.cmbRegion.Width = 75;
+            this.cmbRegion.Location = new System.Drawing.Point(200, 12);
+            this.cmbRegion.Name = "cmbRegion";
+            this.cmbRegion.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbRegion.TabIndex = 3;
+            this.cmbRegion.SelectedIndexChanged += cmbRegion_SelectedIndexChanged;
+            // 
+            // AvatarAPIForm
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 105);
             this.Controls.Add(this.textBoxX1);
             this.Controls.Add(this.buttonX2);
             this.Controls.Add(this.buttonX1);
+            this.Controls.Add(this.checkBoxX1);
+            this.Controls.Add(this.checkBoxX2);
+            this.Controls.Add(this.labelX1);
+            this.Controls.Add(this.cmbRegion);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "AvatarCodeForm";
+            this.Name = "AvatarAPIForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Character Simulator - Preset Code";
+            this.Text = "불러올 캐릭터 이름을 입력하세요.";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -156,5 +172,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX1;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX2;
         private DevComponents.DotNetBar.LabelX labelX1;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbRegion;
     }
 }

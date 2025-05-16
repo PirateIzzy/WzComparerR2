@@ -259,6 +259,8 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
 
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
+            tooltipQuickView.RecipeRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+
             tooltipQuickView.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             GearGraphics.is22aniStyle = Setting.Misc.Enable22AniStyle;
         }
@@ -339,7 +341,7 @@ namespace WzComparerR2
                     {
                         if (wz_f.Type == e.WzType)
                         {
-                            if (e.HasChildNodes && wz_f.Node.Nodes.Count <= 0)
+                            if (wz_f.Node.Nodes.Count <= 0)
                             {
                                 continue;
                             }
@@ -507,12 +509,22 @@ namespace WzComparerR2
                     aniItem.SelectedAnimationName = aniName;
                     this.cmbItemAniNames.Tooltip = aniName;
                 }
-                var aniItem2 = this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator;
-                if (aniItem2 != null)
+                else if ((this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator) != null)
                 {
                     string aniName = this.cmbItemAniNames.SelectedItem as string;
-                    aniItem2.SelectedAnimationName = aniName;
+                    (this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator).SelectedAnimationName = aniName;
                     this.cmbItemAniNames.Tooltip = aniName;
+                }
+                else if (this.pictureBoxEx1.Items[0] is FrameAnimator frameAni && this.cmbItemAniNames.SelectedItem is int selectedpage)
+                {
+                    if (frameAni.Data.Frames.Count == 1)
+                    {
+                        var png = frameAni.Data.Frames[0].Png;
+                        if (png != null && png.ActualPages > 1 && 0 <= selectedpage && selectedpage < png.ActualPages)
+                        {
+                            this.pictureBoxEx1.ShowImage(png, selectedpage);
+                        }
+                    }
                 }
             }
         }
@@ -904,7 +916,8 @@ namespace WzComparerR2
             if (frame.Png != null)
             {
                 var config = ImageHandlerConfig.Default;
-                string pngFileName = pictureBoxEx1.PictureName + ".png";
+                int page = frame.Page;
+                string pngFileName = pictureBoxEx1.PictureName + (frame.Png.ActualPages > 1 ? $".{page}" : null) + ".png";
 
                 if (config.AutoSaveEnabled)
                 {
@@ -923,7 +936,7 @@ namespace WzComparerR2
                     pngFileName = dlg.FileName;
                 }
 
-                using (var bmp = frame.Png.ExtractPng())
+                using (var bmp = frame.Png.ExtractPng(page))
                 {
                     bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
                 }
@@ -1314,6 +1327,20 @@ namespace WzComparerR2
                 return;
             }
 
+            if (selectedNode.FullPathToFile.Contains("Language"))
+            {
+                this.advTree1.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.toolStripMenuItem5,
+                this.tsmi1UpdateStringLinker});
+            }
+            else if (this.advTree1.ContextMenuStrip.Items.Contains(this.tsmi1UpdateStringLinker))
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    this.advTree1.ContextMenuStrip.Items.RemoveAt(this.advTree1.ContextMenuStrip.Items.Count - 1);
+                }
+            }
+
             listViewExWzDetail.BeginUpdate();
             listViewExWzDetail.Items.Clear();
 
@@ -1437,7 +1464,7 @@ namespace WzComparerR2
             switch (value)
             {
                 case Wz_Png png:
-                    return $"png {png.Width}*{png.Height} ({png.Form})";
+                    return $"PNG {png.Width}*{png.Height} ({(int)png.Format}{(png.Scale > 0 ? $", {png.Scale}" : null)})";
 
                 case Wz_Vector vector:
                     return $"({vector.X}, {vector.Y})";
@@ -1512,11 +1539,19 @@ namespace WzComparerR2
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     pictureBoxEx1.ShowImage(png);
                     this.cmbItemAniNames.Items.Clear();
+                    if (png.ActualPages > 1)
+                    {
+                        for (int i = 0; i < png.ActualPages; i++)
+                            this.cmbItemAniNames.Items.Add(i);
+                    }
+
                     advTree3.PathSeparator = ".";
                     textBoxX1.Text = "dataLength: " + png.DataLength + " bytes\r\n" +
                         "offset: " + png.Offset + "\r\n" +
                         "size: " + png.Width + "*" + png.Height + "\r\n" +
-                        "png format: " + png.Form;
+                        "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
+                        "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
+                        "pages: " + png.Pages + "(" + png.ActualPages + ")";
 
                     var sourceNode = selectedNode.GetLinkedSourceNode(PluginManager.FindWz);
                     if (sourceNode != selectedNode)
@@ -1538,7 +1573,9 @@ namespace WzComparerR2
                             textBoxX1.AppendText("\r\n\r\ndataLength: " + png.DataLength + " bytes\r\n" +
                                 "offset: " + png.Offset + "\r\n" +
                                 "size: " + png.Width + "*" + png.Height + "\r\n" +
-                                "png format: " + png.Form);
+                                "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
+                                "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
+                                "pages: " + png.Pages + "(" + png.ActualPages + ")");
                         }
                     }
                     break;
@@ -1618,9 +1655,11 @@ namespace WzComparerR2
                                         this.cmbItemAniNames.Items.Clear();
                                         advTree3.PathSeparator = ".";
                                         textBoxX1.AppendText("\r\n\r\ndataLength: " + png.DataLength + " bytes\r\n" +
-                                        "offset: " + png.Offset + "\r\n" +
-                                        "size: " + png.Width + "*" + png.Height + "\r\n" +
-                                            "png format: " + png.Form);
+                                            "offset: " + png.Offset + "\r\n" +
+                                            "size: " + png.Width + "*" + png.Height + "\r\n" +
+                                            "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
+                                            "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
+                                            "pages: " + png.Pages + "(" + png.ActualPages + ")");
                                     }
                                 }
                             }
@@ -2167,6 +2206,26 @@ namespace WzComparerR2
                         fs.Close();
                     }
                 }
+            }
+        }
+
+        private void tsmi1UpdateStringLinker_Click(object sender, EventArgs e)
+        {
+            Wz_Node stringNode = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("String");
+            Wz_Node itemNode = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Item");
+            Wz_Node etcNode = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Etc");
+
+            QueryPerformance.Start();
+            bool r = this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz()) && stringLinker.Update(stringNode, itemNode, etcNode); //reset(needed?) and update
+            QueryPerformance.End();
+            if (r)
+            {
+                double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
+                labelItemStatus.Text = "StringLinker update complete. Time taken: " + ms + "ms";
+            }
+            else
+            {
+                MessageBoxEx.Show("StringLinker update failed.", "Error");
             }
         }
         #endregion
@@ -2838,6 +2897,29 @@ namespace WzComparerR2
                     catch (Exception ex)
                     {
                         MessageBoxEx.Show("Failed to save\r\n" + ex.ToString(), "Error");
+                    }
+                }
+            }
+            else if (item is Wz_Png png)
+            {
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.Title = "원본 데이터 저장";
+                dlg.FileName = advTree3.SelectedNode.Text + ".bin";
+                dlg.Filter = "모든 파일 (*.*)|*.*";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        using (var dataReader = png.UnsafeOpenRead())
+                        using (var outputFile = dlg.OpenFile())
+                        {
+                            dataReader.CopyTo(outputFile);
+                        }
+                        this.labelItemStatus.Text = "파일 저장 완료";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBoxEx.Show("파일 저장 실패\r\n" + ex.ToString(), "오류");
                     }
                 }
             }
@@ -3776,6 +3858,39 @@ namespace WzComparerR2
 
         private void buttonItem1_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            var characWz = PluginManager.FindWz(Wz_Type.Character);
+            Wz_Node wpNode = null;
+            foreach (var node1 in characWz.Nodes)
+            {
+                if (node1.Text.Contains("_Canvas"))
+                {
+                    continue;
+                }
+
+                if (node1.Text == "Weapon")
+                {
+                    wpNode = node1;
+                    foreach (var imgNode in wpNode.Nodes)
+                    {
+                        Wz_Image img = imgNode.GetValue<Wz_Image>();
+                        if (img != null && img.TryExtract())
+                        {
+                            var c = img.Node?.FindNodeByPath("info")?.FindNodeByPath("reqJob");
+                            if (c != null)
+                            {
+                                var d = c.GetValueEx<int>() ?? 0;
+                                if (!(d % 2 == 0 || d == 1 || d == 0))
+                                {
+                                    Debug.WriteLine($"{img.Node.Text}, {d}");
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+#endif
         }
 
         private void labelItemStatus_TextChanged(object sender, EventArgs e)

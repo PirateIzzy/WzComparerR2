@@ -60,7 +60,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     foreach (var locMapNode in locNode.Nodes)
                     {
-                        int mapID;
+                        int mapID = locMapNode.GetValueEx<int>(-1);
                         string mapName = null;
                         if (int.TryParse(locMapNode.Text, out mapID))
                         {

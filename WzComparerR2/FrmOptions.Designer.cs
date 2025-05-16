@@ -858,7 +858,7 @@
         private DevComponents.DotNetBar.LabelX labelX1;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzEncoding;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoCheckExtFiles;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID; 
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoDetectUpdate;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkImgCheckDisabled;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOpenAIExtraOption;

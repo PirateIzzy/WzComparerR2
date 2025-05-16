@@ -813,7 +813,8 @@ namespace WzComparerR2.MapRender
                             break;
 
                         case "set":
-                            Music multiBgm = LoadBgm(this.mapData, arguments.ElementAtOrDefault(2));
+                            string bgmName = string.Join(" ", arguments.Skip(2));
+                            Music multiBgm = LoadBgm(this.mapData, bgmName);
                             if (multiBgm != null)
                             {
                                 this.ui.ChatBox.AppendTextSystem($"Changed the Multi BGM to {arguments.ElementAtOrDefault(2)}.");

@@ -357,7 +357,11 @@ namespace WzComparerR2.CharaSimControl
             if (isTranslateRequired)
             {
                 string translatedItemName = Translator.MergeString(itemName, Translator.TranslateString(itemName, true), 0, false, true);
-                if (translatedItemName != itemName)
+                if (translatedItemName == itemName)
+                {
+                    // isTranslateRequired = false;
+                }
+                else
                 {
                     itemName = translatedItemName;
                 }
@@ -587,7 +591,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             value = 0;
-            if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) || item.ItemID / 10000 == 301 || item.ItemID / 1000 == 5204)
+            if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) && value > 0)
             {
                 picH += 4;//default value is 4
                 g.DrawImage(Resource.ToolTip_Equip_Can_reqLEV, 100, picH);
@@ -694,6 +698,8 @@ namespace WzComparerR2.CharaSimControl
                 }
                 desc += "#";
             }
+            desc = ReplaceDescTags(desc);
+
             if (!string.IsNullOrEmpty(desc))
             {
                 if (isTranslateRequired)
@@ -751,15 +757,19 @@ namespace WzComparerR2.CharaSimControl
                 {
                     GearGraphics.DrawString(g, "\n#cCan only be purchased with NX.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
                 }
-                else if ((!item.Props.TryGetValue(ItemPropType.tradeBlock, out value) || value == 0) && item.ItemID / 10000 != 501 && item.ItemID / 10000 != 502 && item.ItemID / 10000 != 516)
+                else if ((!item.Props.TryGetValue(ItemPropType.tradeBlock, out value) || value == 0))
                 {
-                    /*GearGraphics.DrawString(g, "\n#cThis item cannot be traded once it has been used.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);*/ //GMS - Enable when GMS uses this line.
+                    /* GMS - Enable when GMS uses this line.
+                    if (!(item.ItemID / 10000 == 501 || item.ItemID / 10000 == 502 || item.ItemID / 10000 == 516 || item.ItemID / 1000 == 5157 || item.ItemID / 1000 == 5158))
+                    {
+                        GearGraphics.DrawString(g, "\n#cThis item cannot be traded once it has been used.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                    }*/
                 }
             }
-            if (item.Props.TryGetValue(ItemPropType.flatRate, out value) && value > 0)
+            /*if (item.Props.TryGetValue(ItemPropType.flatRate, out value) && value > 0)
             {
                 GearGraphics.DrawString(g, "\n#c기간 정액제 아이템입니다.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }
+            }*/
             if (item.Props.TryGetValue(ItemPropType.noScroll, out value) && value > 0)
             {
                 GearGraphics.DrawString(g, "#cYou cannot use the Pet Skill Scroll or Pet Name tag at this time.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
@@ -1085,6 +1095,10 @@ namespace WzComparerR2.CharaSimControl
             long value, value2;
             List<string> tags = new List<string>();
 
+            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.only, value));
+            }
             if (item.Props.TryGetValue(ItemPropType.quest, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.quest, value));
@@ -1092,10 +1106,6 @@ namespace WzComparerR2.CharaSimControl
             if (item.Props.TryGetValue(ItemPropType.pquest, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.pquest, value));
-            }
-            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.only, value));
             }
             if (item.Props.TryGetValue(ItemPropType.tradeBlock, out value) && value != 0)
             {
@@ -1156,6 +1166,7 @@ namespace WzComparerR2.CharaSimControl
                 RecipeTooltipRender defaultRenderer = new RecipeTooltipRender();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
+                defaultRenderer.Enable22AniStyle = this.Enable22AniStyle;
                 renderer = defaultRenderer;
             }
 
@@ -1196,6 +1207,7 @@ namespace WzComparerR2.CharaSimControl
                 ItemTooltipRender2 defaultRenderer = new ItemTooltipRender2();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
+                defaultRenderer.Enable22AniStyle = this.Enable22AniStyle;
                 renderer = defaultRenderer;
             }
 
@@ -1277,7 +1289,7 @@ namespace WzComparerR2.CharaSimControl
                     }
                     if (info.Skills.Count > 0)
                     {
-                        string title = string.Format("{2:P2}({0}/{1}) 확률로 스킬 강화 옵션 추가 :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
+                        string title = string.Format("{2:P2} ({0}/{1}) chance to obtain a skill:", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
                         TextRenderer.DrawText(g, title, GearGraphics.EquipDetailFont, new Point(10, picHeight), Color.White, TextFormatFlags.NoPadding);
                         picHeight += 15;
                         foreach (var kv in info.Skills)
@@ -1297,11 +1309,11 @@ namespace WzComparerR2.CharaSimControl
                         string title;
                         if (info.Prob < info.ProbTotal)
                         {
-                            title = string.Format("{2:P2}({0}/{1}) 확률로 스킬 사용 가능 :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
+                            title = string.Format("Have {2:P2}({0}/{1}) chance to obtain skill:", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
                         }
                         else
                         {
-                            title = "스킬 사용 가능 :";
+                            title = "Skill obtained when equipped:";
                         }
                         TextRenderer.DrawText(g, title, GearGraphics.EquipDetailFont, new Point(10, picHeight), Color.White, TextFormatFlags.NoPadding);
                         picHeight += 15;
@@ -1312,7 +1324,7 @@ namespace WzComparerR2.CharaSimControl
                             {
                                 this.StringLinker.StringSkill.TryGetValue(kv.Key, out sr);
                             }
-                            string text = string.Format(" {0} {2}레벨", sr == null ? null : sr.Name, kv.Key, kv.Value);
+                            string text = string.Format("+{2} {0}", sr == null ? null : sr.Name, kv.Key, kv.Value);
                             TextRenderer.DrawText(g, text, GearGraphics.EquipDetailFont, new Point(10, picHeight), ((SolidBrush)GearGraphics.OrangeBrush).Color, TextFormatFlags.NoPadding);
                             picHeight += 15;
                         }
@@ -1341,6 +1353,34 @@ namespace WzComparerR2.CharaSimControl
         {
             resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/nick/" + nickTag);
             return resNode != null;
+        }
+
+        private string ReplaceDescTags(string text)
+        {
+            if (text.Contains("#cosmetic_EULO#"))
+            {
+                this.Item.Specs.TryGetValue(ItemSpecType.cosmetic, out long cosmeticID);
+                var gender = Gear.GetGender((int)cosmeticID);
+                var name = "";
+                if (StringLinker == null || !StringLinker.StringEqp.TryGetValue((int)cosmeticID, out var sr))
+                {
+                    sr = new StringResult();
+                    sr.Name = "(null)";
+                }
+                name = $"#c{sr.Name}{(gender == 0 ? "(Male)" : (gender == 1 ? "(Female)" : ""))}#";
+
+                int last = (name.LastOrDefault(c => c >= '가' && c <= '힣') - '가') % 28;
+                name += ((last == 0 || last == 8 ? "" : "으") + "로");
+
+                foreach (var color in AvatarCanvas.HairColor)
+                {
+                    name = name.Replace($"{color} ", "");
+                }
+
+                text = text.Replace("#cosmetic_EULO#", name);
+            }
+            
+            return text;
         }
     }
 }

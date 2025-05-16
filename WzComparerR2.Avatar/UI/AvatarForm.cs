@@ -168,7 +168,7 @@ namespace WzComparerR2.Avatar.UI
                                 this.ResumeUpdateDisplay();
                             }
                         }
-                        
+
                         brm = itemNode.FindNodeByPath("info\\bodyRelMove").GetValueEx<Wz_Vector>(null);
                         bool isSitActionExists = itemNode.FindNodeByPath("info\\sitAction").GetValueEx<string>(null) != null;
                         if (itemID / 10000 == 301 || itemID / 1000 == 5204 || brm != null || isSitActionExists) // 의자 아이템, 아이템 코드나 bodyRelMove과 sitAction 속성 유무로 결정
@@ -1690,7 +1690,7 @@ namespace WzComparerR2.Avatar.UI
         }
 
         private void SaveGif(object sender, EventArgs e, bool isBodyPlayingChecked = true, bool isEmotionPlayingChecked = true, bool isTamingPlayingChecked = true, string outputFileName = null)
-        { 
+        {
             bool bodyPlaying = isBodyPlayingChecked && cmbBodyFrame.Items.Count > 1;
             bool emoPlaying = isEmotionPlayingChecked && cmbEmotionFrame.Items.Count > 1;
             bool tamingPlaying = isTamingPlayingChecked && cmbTamingFrame.Items.Count > 1;

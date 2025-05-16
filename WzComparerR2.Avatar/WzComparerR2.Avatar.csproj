@@ -54,5 +54,10 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="UI\AvatarAPIForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(ProjectDir)..\Build\WcR2Plugin.targets" />
 </Project>

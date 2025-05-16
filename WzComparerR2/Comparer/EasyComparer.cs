@@ -2042,7 +2042,7 @@ namespace WzComparerR2.Comparer
                     return "(img)";
 
                 default:
-                    return string.Format("<span title=\"{0}\">{1}</span>", value.GetType().Name, WebUtility.HtmlEncode(Convert.ToString(value.Value)));
+                    return string.Format("<span title=\"{0}\">{1}</span>", value.Value?.GetType().Name, WebUtility.HtmlEncode(Convert.ToString(value.Value)));
             }
         }
 

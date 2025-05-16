@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using DevComponents.Editors;
 using WzComparerR2.Config;
+using WzComparerR2.AvatarCommon;
 
 
 namespace WzComparerR2
@@ -24,7 +25,6 @@ namespace WzComparerR2
 #endif
             this.comboBoxEx1.SelectedIndex = 0;
             this.comboBoxEx2.SelectedIndex = 0;
-
             cmbPreferredStringCopyMethod.Items.AddRange(new[]
                 {
                 new ComboItem("Raw String") { Value = 0 },

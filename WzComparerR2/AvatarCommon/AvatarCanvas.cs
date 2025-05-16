@@ -54,7 +54,7 @@ namespace WzComparerR2.AvatarCommon
         public string CapType { get; set; }
         public string GroupChair { get; set; }
 
-        public const int PartLength = 20;
+        public const int PartLength = 25;
         public const int LayerSlotLength = PartLength + 4;
         public const int IndexChairLayer1 = 18;
         public const int IndexChairLayer2 = PartLength + 0;
@@ -390,6 +390,11 @@ namespace WzComparerR2.AvatarCommon
                 case GearType.taming3:
                 case GearType.tamingChair: this.Taming = part; break;
                 case GearType.saddle: this.Saddle = part; break;
+                case GearType.pendant: this.Pendant = part; break;
+                case GearType.belt: this.Belt = part; break;
+                case GearType.shoulderPad: this.ShoulderPad = part; break;
+                case GearType.pocket: this.Pocket = part; break;
+                case GearType.emblem: this.Emblem = part; break;
                 default:
                     if (Gear.IsWeapon(gearType))
                     {
@@ -573,7 +578,7 @@ namespace WzComparerR2.AvatarCommon
                 List<ActionFrame> frames = new List<ActionFrame>();
                 for (int i = 0; ; i++)
                 {
-                    var frameNode = actionNode.FindNodeByPath(i.ToString());
+                    var frameNode = actionNode.FindNodeByPath(i.ToString())?.ResolveUol();
                     if (frameNode == null)
                     {
                         break;
@@ -615,7 +620,7 @@ namespace WzComparerR2.AvatarCommon
             Wz_Node bodyNode = PluginBase.PluginManager.FindWz("Character\\00002000.img");
             if (action.Level == 2)
             {
-                var frameNode = bodyNode.FindNodeByPath($@"{action.Name}\{frameIndex}");
+                var frameNode = bodyNode.FindNodeByPath($@"{action.Name}\{frameIndex}")?.ResolveUol();
                 if (frameNode != null)
                 {
                     ActionFrame frame = new ActionFrame();
@@ -2004,6 +2009,33 @@ namespace WzComparerR2.AvatarCommon
             return (byte)((byte)((float)((baseColor >> 4) * baseOpacity) + (float)((mixColor >> 4) * mixOpacity)) * 17);
         }
 
+        public bool IsPartEffectVisible(int index)
+        {
+            var realIndex = index;
+
+            if (realIndex >= PartLength)
+            {
+                switch (realIndex)
+                {
+                    case IndexChairLayer1:
+                    case IndexChairLayer2:
+                    case IndexChairEffectLayer1:
+                    case IndexChairEffectLayer2:
+                        realIndex = Array.IndexOf(Parts, Chair);
+                        break;
+                    case IndexEffectLayer1:
+                    case IndexEffectLayer2:
+                        realIndex = Array.IndexOf(Parts, Effect);
+                        break;
+                    default:
+                        realIndex = 0;
+                        break;
+                }
+            }
+
+            return (this.Parts[realIndex]?.Visible ?? false) && (this.Parts[realIndex]?.EffectVisible ?? false);
+        }
+
         #region parts
         /// <summary>
         /// 身体
@@ -2184,6 +2216,51 @@ namespace WzComparerR2.AvatarCommon
             get { return this.Parts[19]; }
             set { this.Parts[19] = value; }
         }
+
+        /// <summary>
+        /// Pendant
+        /// </summary>
+        public AvatarPart Pendant //112
+        {
+            get { return this.Parts[20]; }
+            set { this.Parts[20] = value; }
+        }
+
+        /// <summary>
+        /// Belt
+        /// </summary>
+        public AvatarPart Belt //113
+        {
+            get { return this.Parts[21]; }
+            set { this.Parts[21] = value; }
+        }
+
+        /// <summary>
+        /// ShoulderPad
+        /// </summary>
+        public AvatarPart ShoulderPad //115
+        {
+            get { return this.Parts[22]; }
+            set { this.Parts[22] = value; }
+        }
+
+        /// <summary>
+        /// Pocket
+        /// </summary>
+        public AvatarPart Pocket //116
+        {
+            get { return this.Parts[23]; }
+            set { this.Parts[23] = value; }
+        }
+
+        /// <summary>
+        /// Pocket
+        /// </summary>
+        public AvatarPart Emblem //119
+        {
+            get { return this.Parts[24]; }
+            set { this.Parts[24] = value; }
+        }
         #endregion
 
         #region statics
@@ -2200,6 +2277,9 @@ namespace WzComparerR2.AvatarCommon
         };
 
         public static readonly ReadOnlyCollection<string> BaseActions = new ReadOnlyCollection<string>(baseActions);
+
+        public static readonly string[] HairColor = new[] { "Black", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown" };
+        public static readonly string[] FaceColor = new[] { "Black", "Blue", "Red", "Green", "Brown", "Emerald", "Purple", "Amethyst" };
         #endregion
 
         private class AvatarLayer

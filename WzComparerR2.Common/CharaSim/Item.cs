@@ -241,8 +241,7 @@ namespace WzComparerR2.CharaSim
                             break;
 
                         default:
-                            ItemPropType type;
-                            if (Enum.TryParse(subNode.Text, out type))
+                            if (!int.TryParse(subNode.Text, out _) && Enum.TryParse(subNode.Text, out ItemPropType type))
                             {
                                 try
                                 {
@@ -254,6 +253,20 @@ namespace WzComparerR2.CharaSim
                             }
                             break;
                     }
+                }
+            }
+
+            // customChair
+            Wz_Node customChairNode = node.FindNodeByPath("info\\customChair\\self\\tamingMob");
+            if (customChairNode != null)
+            {
+                if (item.Props.ContainsKey(ItemPropType.tamingMob))
+                {
+                    item.Props[ItemPropType.tamingMob] = Convert.ToInt64(customChairNode.Value);
+                }
+                else
+                {
+                    item.Props.Add(ItemPropType.tamingMob, Convert.ToInt64(customChairNode.Value));
                 }
             }
 
