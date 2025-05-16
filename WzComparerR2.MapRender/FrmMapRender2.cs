@@ -815,10 +815,11 @@ namespace WzComparerR2.MapRender
                             break;
 
                         case "set":
-                            Music multiBgm = LoadBgm(this.mapData, arguments.ElementAtOrDefault(2));
+                            string bgmName = string.Join(" ", arguments.Skip(2));
+                            Music multiBgm = LoadBgm(this.mapData, bgmName);
                             if (multiBgm != null)
                             {
-                                this.ui.ChatBox.AppendTextSystem($"Multi BGM을 {arguments.ElementAtOrDefault(2)}(으)로 변경했습니다.");
+                                this.ui.ChatBox.AppendTextSystem($"Multi BGM을 {bgmName}(으)로 변경했습니다.");
 
                                 Task bgmTask = null;
                                 bool willSwitchBgm = this.bgm != multiBgm;
