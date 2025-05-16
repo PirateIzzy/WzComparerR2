@@ -113,7 +113,6 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.nbdR: return "Damage Against Normal Monsters: +" + value + "%"; //KMST 1069
 
                 case GearPropType.only: return value == 0 ? null : "One-of-a-kind Item";
-                case GearPropType.cash:
                 case GearPropType.tradeBlock: return value == 0 ? null : "Untradable";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "Cannot be Traded when equipped";
                 case GearPropType.accountSharable: return value == 0 ? null : "Account-bound. Transferable within world."; //v218 Transferable within world
@@ -916,6 +915,7 @@ namespace WzComparerR2.CharaSim
         {
             switch (propType)
             {
+                case ItemPropType.cash:
                 case ItemPropType.tradeBlock:
                     return GetGearPropString(GearPropType.tradeBlock, value);
                 case ItemPropType.useTradeBlock:
