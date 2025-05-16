@@ -915,7 +915,6 @@ namespace WzComparerR2.CharaSim
         {
             switch (propType)
             {
-                case ItemPropType.cash:
                 case ItemPropType.tradeBlock:
                     return GetGearPropString(GearPropType.tradeBlock, value);
                 case ItemPropType.useTradeBlock:
