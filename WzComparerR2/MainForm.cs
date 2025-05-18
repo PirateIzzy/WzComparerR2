@@ -831,17 +831,18 @@ namespace WzComparerR2
             if (this.pictureBoxEx1.ShowOverlayAni)
             {
                 this.pictureBoxEx1.ShowOverlayAni = false;
-                this.pictureBoxEx1.Items.Clear();
+                this.pictureBoxEx1.ClearItemList();
             }
         }
 
-        private void buttonOverlayRect_Click(object sender, EventArgs e)
+        private void buttonHitboxOverlay_Click(object sender, EventArgs e)
         {
             if (this.pictureBoxEx1.ShowOverlayAni)
             {
-                this.pictureBoxEx1.AddOverlayRect();
+                this.pictureBoxEx1.AddHitboxOverlay();
             }
         }
+
 
         private void buttonLoadMultiFrameAniList_Click(object sender, EventArgs e)
         {
@@ -849,7 +850,7 @@ namespace WzComparerR2
                 return;
 
             Wz_Node node = advTree3.SelectedNode.AsWzNode();
-            string aniNameKey = "중첩_" + GetSelectedNodeImageName();
+            string aniNameKey = "Nest_" + GetSelectedNodeImageName();
 
             if ((sender as ButtonItem).Name == aniNameKey)
             {
@@ -928,7 +929,7 @@ namespace WzComparerR2
 
                 if (config.AutoSaveEnabled)
                 {
-                    pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
+                    pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Replace("/", "").Replace("\\", ".").Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
                 }
                 else
                 {
@@ -949,14 +950,14 @@ namespace WzComparerR2
                 }
                 labelItemStatus.Text = "Image saved: " + pngFileName;
             }
-            else if (pictureBoxEx1.ShowOverlayAni && frame.Texture != null) // 애니메이션 중첩
+            else if (pictureBoxEx1.ShowOverlayAni && frame.Texture != null) // 애니메이션 Nest
             {
                 var config = ImageHandlerConfig.Default;
                 string pngFileName = pictureBoxEx1.PictureName + ".png";
 
                 if (config.AutoSaveEnabled)
                 {
-                    pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
+                    pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Replace("/", "").Replace("\\", ".").Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
                 }
                 else
                 {
@@ -1006,7 +1007,7 @@ namespace WzComparerR2
 
             if (config.AutoSaveEnabled)
             {
-                var fullFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", aniFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
+                var fullFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", aniFileName.Replace("/", "").Replace("\\", ".").Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
                 int i = 1;
                 while (File.Exists(fullFileName))
                 {
@@ -1628,7 +1629,7 @@ namespace WzComparerR2
                 case Wz_Video video:
                     textBoxX1.Text = "dataLength: " + video.Length + " bytes\r\n" +
                         "offset: " + video.Offset;
-                    if (this.pictureBoxEx1.ShowOverlayAni) break; // 애니메이션 중첩 중일때는 자동 video 미리보기 없음
+                    if (this.pictureBoxEx1.ShowOverlayAni) break; // 애니메이션 Nest 중일때는 자동 video 미리보기 없음
                     var videoFrameData = this.pictureBoxEx1.LoadVideo(video);
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     this.pictureBoxEx1.ShowAnimation(videoFrameData);
@@ -3290,12 +3291,13 @@ namespace WzComparerR2
                 case Wz_Type.Map:
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
+                    if (!image.Node.FullPathToFile.StartsWith("Map\\Map\\Map")) return; // Ignore other assets to prevent Auto Preview crash
                     var map = Map.CreateFromNode(image.Node, PluginManager.FindWz);
                     obj = map;
                     if (stringLinker == null || !stringLinker.StringMap.TryGetValue(map.MapID, out sr))
                     {
                         sr = new StringResult();
-                        sr.Name = "未知のマップ";
+                        sr.Name = "Unknown Map";
                     }
                     if (map != null)
                     {

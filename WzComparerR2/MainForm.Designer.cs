@@ -178,7 +178,7 @@
             this.itemContainer44 = new DevComponents.DotNetBar.ItemContainer();
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
             this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonOverlayRect = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonHitboxOverlay = new DevComponents.DotNetBar.ButtonItem();
             this.buttonLoadMultiFrameAniList = new DevComponents.DotNetBar.ButtonItem();
             this.buttonOverlayExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
@@ -2119,7 +2119,7 @@
             this.itemContainer44.Name = "itemContainer44";
             this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonDisableOverlayAni,
-            this.buttonOverlayRect,
+            this.buttonHitboxOverlay,
             this.buttonOverlayExtractGifEx,
             this.buttonLoadMultiFrameAniList});
             // 
@@ -2133,12 +2133,26 @@
             this.buttonDisableOverlayAni.Text = "Disable Animation Overlay";
             this.buttonDisableOverlayAni.Click += new System.EventHandler(this.buttonDisableOverlayAni_Click);
             // 
-            // buttonOverlayRect
+            // buttonHitboxOverlay
             // 
-            this.buttonOverlayRect.Name = "buttonOverlayRect";
-            this.buttonOverlayRect.Text = "Add Boundary Rectangle";
-            this.buttonOverlayRect.Tooltip = "Draws a semi-transparent rectangle for the input range.";
-            this.buttonOverlayRect.Click += new System.EventHandler(this.buttonOverlayRect_Click);
+            this.buttonHitboxOverlay.Name = "buttonHitboxOverlay";
+            this.buttonHitboxOverlay.Text = "Draw Range";
+            this.buttonHitboxOverlay.Tooltip = "Draws a semi-transparent shape for the input range.";
+            this.buttonHitboxOverlay.Click += new System.EventHandler(this.buttonHitboxOverlay_Click);
+            // 
+            // buttonItemExtractGifEx
+            //
+            this.buttonOverlayExtractGifEx.Name = "buttonOverlayExtractGifEx";
+            this.buttonOverlayExtractGifEx.Text = "Add Nest";
+            this.buttonOverlayExtractGifEx.Tooltip = "Nest by calling the animation on all child nodes instead of sequentially starting from 0.";
+            this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
+            // 
+            // buttonLoadMultiFrameAniList
+            // 
+            this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
+            this.buttonLoadMultiFrameAniList.Text = "Load Multi Frame";
+            this.buttonLoadMultiFrameAniList.Tooltip = "Calls a list of found frames. You can select any of the loaded lists to nest them.";
+            this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // buttonItemExtractGifEx
             //
@@ -2146,13 +2160,6 @@
             this.buttonOverlayExtractGifEx.Text = "Nesting+";
             this.buttonOverlayExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node and nest them, without using ordinal node names.";
             this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
-            // 
-            // buttonOverlayRect
-            // 
-            this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
-            this.buttonLoadMultiFrameAniList.Text = "Load Multiframe Animation";
-            this.buttonLoadMultiFrameAniList.Tooltip = "Load a list of frames to find. You can select one of the loaded lists and nest it..";
-            this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // textBoxX1
             // 
@@ -3438,7 +3445,7 @@
         private DevComponents.DotNetBar.ItemContainer itemContainer44;
         private DevComponents.DotNetBar.ButtonItem buttonItemGifSetting;
         private DevComponents.DotNetBar.ButtonItem buttonDisableOverlayAni;
-        private DevComponents.DotNetBar.ButtonItem buttonOverlayRect; 
+        private DevComponents.DotNetBar.ButtonItem buttonHitboxOverlay; 
         private DevComponents.DotNetBar.ButtonItem buttonLoadMultiFrameAniList;
         private DevComponents.DotNetBar.ButtonItem buttonOverlayExtractGifEx;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;

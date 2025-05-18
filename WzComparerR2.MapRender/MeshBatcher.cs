@@ -328,6 +328,26 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void DrawItem(RectMesh rect)
+        {
+            if (rect != null)
+            {
+                if (this.D2DEnabled)
+                {
+                    Prepare(ItemType.D2DObject);
+                    this.d2dRender.DrawRectangle(rect.Rect, rect.Color, rect.Thickness);
+                    this.d2dRender.FillRectangle(rect.Rect, rect.FillColor);
+                }
+                else
+                {
+                    Prepare(ItemType.Sprite);
+                    if (rect.Thickness == 1) sprite.DrawRectangle(rect.Rect, rect.Color);
+                    else sprite.DrawThickRectangle(rect.Rect, rect.Color, rect.Thickness);
+                    sprite.FillRectangle(rect.Rect, rect.FillColor);
+                }
+            }
+        }
+
         private void DrawItem(MeshItem mesh, ParticleSystem particleSystem)
         {
             if (particleSystem.Texture?.Texture != null)
