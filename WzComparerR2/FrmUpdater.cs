@@ -27,7 +27,7 @@ namespace WzComparerR2
             InitializeComponent();
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
-            this.Font = new Font(new FontFamily("Arial"), 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
 #endif
 
             // this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, Program.GetArchitecture());
@@ -101,11 +101,9 @@ namespace WzComparerR2
                 // fileurl = downloadUrls[0];
 
                 this.lblLatestVer.Text = BuildNumber;
-                this.advTree1.Nodes.Add(new Node("<font color=\"#FF0000\">" + ChangeTitle + "</font>"));
-                foreach (string line in Changelog.Split('\r'))
-                {
-                    this.advTree1.Nodes.Add(new Node(line));
-                }
+                AppendText(ChangeTitle + "\r\n", Color.Red);
+                AppendText(Changelog, Color.Black);
+                this.richTextBoxEx1.SelectionStart = 0;
 
                 if (Int64.Parse(BuildNumber) > Int64.Parse(BuildInfo.BuildTime))
                 {
@@ -209,6 +207,16 @@ namespace WzComparerR2
 #else
             Process.Start(url, argument);
 #endif
+        }
+
+        private void AppendText(string text, Color color)
+        {
+            this.richTextBoxEx1.SelectionStart = this.richTextBoxEx1.TextLength;
+            this.richTextBoxEx1.SelectionLength = 0;
+
+            this.richTextBoxEx1.SelectionColor = color;
+            this.richTextBoxEx1.AppendText(text);
+            this.richTextBoxEx1.SelectionColor = this.richTextBoxEx1.ForeColor;
         }
 
         class UpdaterSession
