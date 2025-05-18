@@ -150,15 +150,7 @@ namespace WzComparerR2
 
         public void ShowAnimation(AnimationItem animator)
         {
-            if (this.Items.Count > 0)
-            {
-                var itemsCopy = new List<AnimationItem>(this.Items);
-                this.Items.Clear();
-                foreach (var aniItem in itemsCopy)
-                {
-                    this.DisposeAnimationItem(aniItem);
-                }
-            }
+            ClearItemList();
 
             this.Items.Add(animator);
 
@@ -176,7 +168,7 @@ namespace WzComparerR2
             if (!ShowOverlayAni)
             {
                 ShowOverlayAni = !ShowOverlayAni;
-                this.Items.Clear();
+                ClearItemList();
             }
 
             FrameAnimator baseAniItem;
@@ -217,12 +209,11 @@ namespace WzComparerR2
                 aniItem.Data.Frames[0].Delay = pngDelay;
             }
 
-            this.Items.Clear();
-
             var config = ImageHandlerConfig.Default;
             var newAniItem = new FrameAnimator(FrameAnimationData.MergeAnimationData(baseAniItem.Data, aniItem.Data,
                     this.GraphicsDevice, delayOffset, moveX, moveY, frameStart, frameEnd));
 
+            this.Items.Clear();
             this.Items.Add(newAniItem);
 
             if (this.AutoAdjustPosition)
@@ -233,7 +224,7 @@ namespace WzComparerR2
             this.Invalidate();
         }
 
-        public void AddOverlayRect()
+        public void AddHitboxOverlay()
         {
             FrameAnimator baseAniItem;
             if (this.Items.Count == 0)
@@ -257,19 +248,29 @@ namespace WzComparerR2
             var frmOverlayAniOptions = new FrmOverlayRectOptions(0, baseDelayAll, config);
             int startTime = 0;
             int endTime = 0;
-            int rectBlend = 153;
-            int outlineBlend = 255;
+            int radius = 0;
             Point lt;
             Point rb;
             Color bgColor = System.Drawing.Color.FromArgb(config.BackgroundType.Value == ImageBackgroundType.Transparent ? 0 : 255, config.BackgroundColor.Value).ToXnaColor();
 
             if (frmOverlayAniOptions.ShowDialog() == DialogResult.OK)
             {
-                frmOverlayAniOptions.GetValues(out lt, out rb, out startTime, out endTime, config);
-                Color rectColor = System.Drawing.Color.FromArgb(rectBlend, config.OverlayRectColor.Value).ToXnaColor();
-                Color outlineColor = System.Drawing.Color.FromArgb(outlineBlend, config.OverlayRectColor.Value).ToXnaColor();
+                frmOverlayAniOptions.GetValues(out lt, out rb, out startTime, out endTime, out radius, out int alpha, out int type, config);
+                Color fillColor = System.Drawing.Color.FromArgb((255 * alpha / 100), config.OverlayRectColor.Value).ToXnaColor();
+                Color outlineColor = System.Drawing.Color.FromArgb(255, config.OverlayRectColor.Value).ToXnaColor();
 
-                var aniItemData = FrameAnimationData.CreateRectData(lt, rb, endTime - startTime, this.GraphicsDevice, rectColor, outlineColor);
+                FrameAnimationData aniItemData = null;
+                switch (type)
+                {
+                    case 0:
+                        aniItemData = FrameAnimationData.CreateRectData(lt, rb, endTime - startTime, this.GraphicsDevice, fillColor, outlineColor);
+                        break;
+                    case 1:
+                        aniItemData = FrameAnimationData.CreateCircleData(lt, radius, endTime - startTime, this.GraphicsDevice, fillColor, outlineColor);
+                        break;
+                    default:
+                        break;
+                }
 
                 if (aniItemData == null) return;
 
@@ -277,11 +278,10 @@ namespace WzComparerR2
             }
             else return;
 
-            this.Items.Clear();
-
             var newAniItem = new FrameAnimator(FrameAnimationData.MergeAnimationData(baseAniItem.Data, aniItem.Data,
                     this.GraphicsDevice, startTime, 0, 0, 0, 0));
 
+            this.Items.Clear();
             this.Items.Add(newAniItem);
 
             if (this.AutoAdjustPosition)
@@ -761,7 +761,7 @@ namespace WzComparerR2
                 case SpineAnimatorV2 spineV2:
                     if (spineV2.Skeleton != null)
                     {
-                        foreach(var slot in spineV2.Skeleton.Slots.Items)
+                        foreach (var slot in spineV2.Skeleton.Slots.Items)
                         {
                             var atlasRegion = (slot.Attachment switch
                             {
@@ -795,6 +795,19 @@ namespace WzComparerR2
                         }
                     }
                     break;
+            }
+        }
+
+        public void ClearItemList()
+        {
+            if (this.Items.Count > 0)
+            {
+                var itemsCopy = new List<AnimationItem>(this.Items);
+                this.Items.Clear();
+                foreach (var aniItem in itemsCopy)
+                {
+                    this.DisposeAnimationItem(aniItem);
+                }
             }
         }
     }
