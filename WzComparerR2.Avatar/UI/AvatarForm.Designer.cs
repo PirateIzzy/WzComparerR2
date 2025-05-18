@@ -546,6 +546,7 @@ namespace WzComparerR2.Avatar.UI
             this.cmbActionBody.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.cmbActionBody.TabIndex = 0;
             this.cmbActionBody.SelectedIndexChanged += new System.EventHandler(this.cmbActionBody_SelectedIndexChanged);
+            this.cmbActionBody.BringToFront();
             // 
             // chkHairShade
             // 
@@ -640,6 +641,7 @@ namespace WzComparerR2.Avatar.UI
             this.cmbGroupChair.TabIndex = 18;
             this.cmbGroupChair.Enabled = false;
             this.cmbGroupChair.SelectedIndexChanged += new System.EventHandler(this.cmbGroupChair_SelectedIndexChanged);
+            this.cmbGroupChair.BringToFront();
             // 
             // dockContainerItem2
             // 
