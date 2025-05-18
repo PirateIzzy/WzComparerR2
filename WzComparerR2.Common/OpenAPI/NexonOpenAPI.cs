@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.IO;
-using AES = System.Security.Cryptography.Aes;
-using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using AES = System.Security.Cryptography.Aes;
 
 #if NET6_0_OR_GREATER
+using HtmlAgilityPack;
 using MapleStory.OpenAPI;
+using System.Net; 
 using System.Net.Http;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Encodings.Web;
+
 
 namespace WzComparerR2.OpenAPI
 {
@@ -49,16 +50,196 @@ namespace WzComparerR2.OpenAPI
                 switch (e.ErrorCode)
                 {
                     case MapleStoryAPIErrorCode.OPENAPI00004:
-                        throw new Exception(Utils.GetExceptionMsg(e, forceMsg: $"캐릭터 이름이 올바르지 않습니다."));
+                        throw new Exception(Utils.GetExceptionMsg(e, forceMsg: $"Please input correct IGN."));
                     default:
                         throw new Exception(Utils.GetExceptionMsg(e));
                 }
-                
             }
             catch
             {
                 throw;
             }
+        }
+
+        public async Task<bool> isJMSUnderMaintenance()
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }))
+                {
+                    string url = "https://maplestory.nexon.co.jp/maintenance";
+                    HttpResponseMessage response = await client.GetAsync(url);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        public async Task<string> GetAvatarCode(string characterName, string region)
+        {
+            string serviceBackend = "";
+            string avatarCode = "";
+            string jmsBaseUrl = "https://maplestory.nexon.co.jp";
+            switch (region)
+            {
+                default:
+                    return avatarCode;
+                case "KMS":
+                    serviceBackend = "https://maple.dakgg.io/api/v1/bypass/characters/" + Uri.EscapeDataString(characterName); // Used Maple GG API
+                    break;
+                case "JMS":
+                    serviceBackend = $"{jmsBaseUrl}/community/avatar/search/?writer=" + Uri.EscapeDataString(characterName);
+                    break;
+                case "GMS-NA":
+                    serviceBackend = "https://www.nexon.com/api/maplestory/no-auth/ranking/v2/na?type=overall&id=weekly&character_name=" + Uri.EscapeDataString(characterName);
+                    break;
+                case "GMS-EU":
+                    serviceBackend = "https://www.nexon.com/api/maplestory/no-auth/ranking/v2/eu?type=overall&id=weekly&character_name=" + Uri.EscapeDataString(characterName);
+                    break;
+                case "MSEA":
+                    serviceBackend = "https://msea.dakgg.io/api/v1/bypass/characters/" + Uri.EscapeDataString(characterName); // Used Maple GG API
+                    break;
+                case "TMS":
+                    serviceBackend = "https://tw-event.beanfun.com/MapleStory/api/UnionWebRank/GetRank";
+                    break;
+                case "MSN":
+                    serviceBackend = "https://msu.io/maplestoryn/api/gateway/msn/ranking/by-name?characterName=" + Uri.EscapeDataString(characterName);
+                    break;
+            }
+            try
+            {
+                if (region == "JMS")
+                {
+                    var client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36");
+                    string html = await client.GetStringAsync(serviceBackend);
+                    HtmlDocument doc = new HtmlDocument();
+                    doc.LoadHtml(html);
+
+                    var avatarLinks = doc.DocumentNode.SelectNodes("//a[@href]")
+                        ?.Select(node => WebUtility.HtmlDecode(node.GetAttributeValue("href", "")))
+                        .Where(href => href.StartsWith("/mypage/avatar"))
+                        .Select(href => $"{jmsBaseUrl}{href}")
+                        .ToList();
+
+                    if (avatarLinks != null && avatarLinks.Count == 2)
+                    {
+                        string avatarHtml = await client.GetStringAsync(avatarLinks[0]);
+                        HtmlDocument avatarDoc = new HtmlDocument();
+                        avatarDoc.LoadHtml(avatarHtml);
+
+                        avatarCode = avatarDoc.DocumentNode.SelectNodes("//img[@src]")
+                            ?.Select(node => node.GetAttributeValue("src", ""))
+                            .FirstOrDefault(src => src.StartsWith("//avatar-maplestory.nexon.co.jp")).Replace("//avatar-maplestory.nexon.co.jp/Character/", "").Replace(".png", "");
+                    }
+                    else if (avatarLinks.Count > 2)
+                    {
+                        throw new Exception("Please input correct IGN.");
+                    }
+                    else
+                    {
+                        throw new Exception("Unable to find the character. Please sign up your representative character on JMS website.");
+                    }
+                }
+                else if (region.StartsWith("GMS"))
+                {
+                    var client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36");
+                    var response = await client.GetAsync(serviceBackend);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+                        using JsonDocument doc = JsonDocument.Parse(json);
+                        JsonElement root = doc.RootElement;
+                        JsonElement ranksArray = root.GetProperty("ranks");
+
+                        if (ranksArray.GetArrayLength() > 0)
+                        {
+                            avatarCode = ranksArray[0].GetProperty("characterImgURL").GetString().Replace("https://msavatar1.nexon.net/Character/", "").Replace(".png", "");
+                        }
+                    }
+                    else
+                    {
+                        avatarCode = "";
+                    }
+                }
+                else if (region == "MSEA" || region == "KMS")
+                {
+                    var client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36");
+                    var response = await client.GetAsync(serviceBackend);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+                        using JsonDocument doc = JsonDocument.Parse(json);
+                        JsonElement root = doc.RootElement;
+                        if (root.TryGetProperty("data", out JsonElement dataElement) &&
+                            dataElement.TryGetProperty("characterBasic", out JsonElement characterBasicElement) &&
+                            characterBasicElement.TryGetProperty("character_image", out JsonElement characterImageElement))
+                        {
+                            avatarCode = characterImageElement.GetString().Replace("https://open.api.nexon.com/static/maplestorysea/character/look/", "").Replace("https://open.api.nexon.com/static/maplestory/character/look/", "");
+                        }
+                    }
+                    else
+                    {
+                        avatarCode = "";
+                    }
+                }
+                else if (region == "TMS")
+                {
+                    var client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36");
+                    string jsonPayload = $"{{\"RankType\":1,\"GameWorldId\":\"-1\",\"CharacterName\":\"{characterName}\"}}";
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(serviceBackend, content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+                        using JsonDocument doc = JsonDocument.Parse(json);
+                        JsonElement root = doc.RootElement;
+                        if (root.TryGetProperty("Data", out JsonElement dataElement) &&
+                            dataElement.TryGetProperty("CharacterLookCipherText", out JsonElement characterLookCipherText))
+                        {
+                            avatarCode = characterLookCipherText.GetString();
+                        }
+                    }
+                    else
+                    {
+                        avatarCode = "";
+                    }
+                }
+                else if (region == "MSN")
+                {
+                    EdgeWebView webView = new EdgeWebView();
+                    EdgeWebView.webViewUri = serviceBackend;
+                    webView.ShowDialog();
+                    var json = webView.jsonResult;
+                    using JsonDocument doc = JsonDocument.Parse(json);
+                    JsonElement root = doc.RootElement;
+                    if (root.TryGetProperty("ranking", out JsonElement rankingData) &&
+                        rankingData.TryGetProperty("imageUrl", out JsonElement imageUrl))
+                    {
+                        avatarCode = imageUrl.GetString().Replace("https://market-static.msu.io/msu/platform/charimages/transient/", "").Replace(".png", "");
+                    }
+                }
+            }
+            catch
+            {
+                throw new Exception("Unable to find the character.");
+            }
+
+            return avatarCode;
         }
 
         public async Task<UnpackedAvatarData> GetAvatarResult(string ocid)
@@ -97,6 +278,72 @@ namespace WzComparerR2.OpenAPI
             }
         }
 
+        public async Task<UnpackedAvatarData> ParseAvatarCode(string avatarCode)
+        {
+            try
+            {
+                var decrypted = Utils.Decrypt(avatarCode);
+                var version = Utils.CheckVer(decrypted);
+
+                var unpackedData = new UnpackedAvatarData(version);
+
+                Utils.Unpack(unpackedData, decrypted);
+                unpackedData.SetProperties();
+
+                return unpackedData;
+            }
+            catch (MapleStoryAPIException e)
+            {
+                switch (e.ErrorCode)
+                {
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<UnpackedAvatarData> ParseCharacterLookCipherText(string cipherText)
+        {
+            if (cipherText.StartsWith("0x"))
+                cipherText = cipherText.Substring(2);
+
+            int length = cipherText.Length / 2;
+            byte[] bytes = new byte[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                bytes[i] = Convert.ToByte(cipherText.Substring(i * 2, 2), 16);
+            }
+            try
+            {
+                var decrypted = bytes;
+                var version = Utils.CheckVer(decrypted);
+
+                var unpackedData = new UnpackedAvatarData(version);
+
+                Utils.Unpack(unpackedData, decrypted);
+                unpackedData.SetProperties();
+
+                return unpackedData;
+            }
+            catch (MapleStoryAPIException e)
+            {
+                switch (e.ErrorCode)
+                {
+                    default:
+                        throw new Exception(Utils.GetExceptionMsg(e));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<LoadedAvatarData> GetAvatarResult2(string ocid)
         {
             var result = new LoadedAvatarData();
@@ -111,7 +358,7 @@ namespace WzComparerR2.OpenAPI
         private async Task GetAvatarItems(string ocid, LoadedAvatarData result)
         {
             try
-            { 
+            {
                 result.ItemList = new List<string>();
 
                 var item = await API.GetCharacterItemEquipment(ocid);
@@ -278,34 +525,34 @@ namespace WzComparerR2.OpenAPI
                 switch (e.ErrorCode)
                 {
                     case MapleStoryAPIErrorCode.OPENAPI00001:
-                        msg = "서버 내부 오류";
+                        msg = "サーバー内部エラー";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00002:
-                        msg = "권한이 없습니다.";
+                        msg = "権限はありません。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00003:
-                        msg = "캐릭터를 접속해서 갱신해주세요.";
+                        msg = "キャラクターを接続して更新してください。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00004:
-                        msg = "입력값이 유효하지 않습니다.";
+                        msg = "入力値が無効です。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00005:
-                        msg = "API 키가 유효하지 않습니다.";
+                        msg = "APIキーが無効です。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00006:
-                        msg = "유효하지 않은 게임 또는 API PATH";
+                        msg = "無効なゲームまたはAPI PATH";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00007:
-                        msg = "API 호출량이 초과되었습니다.";
+                        msg = "API呼び出し量を超えました。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00009:
-                        msg = "데이터 준비 중입니다.";
+                        msg = "データ準備中です。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00010:
-                        msg = "게임 점검 중입니다.";
+                        msg = "ゲームをチェックしています。";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00011:
-                        msg = "API 점검 중입니다.";
+                        msg = "APIチェック中です。";
                         break;
                     default:
                         msg = e.Message;
@@ -313,7 +560,7 @@ namespace WzComparerR2.OpenAPI
                 }
             }
 
-            return $"{msg} ({e.ErrorCode.ToString()})\r\n위치: {funcName}";
+            return $"{msg} ({e.ErrorCode.ToString()})\r\n場所: {funcName}";
         }
 
         public static string ToJson(this object obj)

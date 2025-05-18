@@ -1,4 +1,6 @@
-﻿namespace WzComparerR2.Avatar.UI
+﻿using System.Windows.Forms;
+
+namespace WzComparerR2.Avatar.UI
 {
     partial class AvatarForm
     {
@@ -48,6 +50,18 @@
             this.chkBodyPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbTamingFrame = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbEmotionFrame = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            // virtual comboboxes for item effects, not shown
+            this.cmbEffectFrames = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            this.cmbActionEffects = new DevComponents.DotNetBar.Controls.ComboBoxEx[18];
+            for (int i = 0; i < 18; i++)
+            {
+                var t1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t1.SelectedIndexChanged += new System.EventHandler(this.cmbEffectFrames_SelectedIndexChanged);
+                cmbEffectFrames[i] = t1;
+                var t2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+                t2.SelectedIndexChanged += new System.EventHandler(this.cmbActionEffect_SelectedIndexChanged);
+                cmbActionEffects[i] = t2;
+            }
             this.cmbBodyFrame = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbActionTaming = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbEmotion = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -71,9 +85,15 @@
             this.btnCharac = new DevComponents.DotNetBar.ButtonItem();
             this.btnMale = new DevComponents.DotNetBar.ButtonItem();
             this.btnFemale = new DevComponents.DotNetBar.ButtonItem();
+            this.btnCustomPreset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnAPI = new DevComponents.DotNetBar.ButtonItem();
+            this.Separator1 = new DevComponents.DotNetBar.Separator();
             this.btnReset = new DevComponents.DotNetBar.ButtonItem();
             this.btnLock = new DevComponents.DotNetBar.ButtonItem();
             this.btnSaveAsGif = new DevComponents.DotNetBar.ButtonItem();
+            this.btnSaveOptions = new DevComponents.DotNetBar.ButtonItem();
+            this.btnEnableAutosave = new DevComponents.DotNetBar.ButtonItem();
+            this.btnSpecifySavePath = new DevComponents.DotNetBar.ButtonItem();
             this.btnExport = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -158,7 +178,7 @@
             this.bar1.AutoSyncBarCaption = true;
             this.bar1.CloseSingleTab = true;
             this.bar1.Controls.Add(this.panelDockContainer1);
-            this.bar1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.bar1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.bar1.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar1.IsMaximized = false;
             this.bar1.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
@@ -683,6 +703,7 @@
             this.btnReset,
             this.btnLock,
             this.btnSaveAsGif,
+            this.btnSaveOptions,
             this.btnExport});
             this.bar3.Location = new System.Drawing.Point(0, 0);
             this.bar3.Name = "bar3";
@@ -698,6 +719,10 @@
             this.btnCode.Name = "btnCode";
             this.btnCode.Tooltip = "Preset";
             this.btnCode.Click += new System.EventHandler(this.btnCode_Click);
+            //
+            // Separator1
+            //
+            this.Separator1.SeparatorOrientation = DevComponents.DotNetBar.eDesignMarkerOrientation.Vertical;
             // 
             // btnCharac
             // 
@@ -705,9 +730,19 @@
             this.btnCharac.Image = global::WzComparerR2.Avatar.Properties.Resources.user;
             this.btnCharac.Name = "btnCharac";
             this.btnCharac.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnCustomPreset,
+            this.btnAPI,
+            this.Separator1,
             this.btnMale,
             this.btnFemale});
             this.btnCharac.Tooltip = "Default Settings";
+            // 
+            // 
+            // btnCustomPreset
+            // 
+            this.btnCustomPreset.Name = "btnCustomPreset";
+            this.btnCustomPreset.Text = "Custom Preset";
+            this.btnCustomPreset.Click += new System.EventHandler(this.btnCustomPreset_Click);
             // 
             // btnMale
             // 
@@ -720,6 +755,11 @@
             this.btnFemale.Name = "btnFemale";
             this.btnFemale.Text = "Female character";
             this.btnFemale.Click += new System.EventHandler(this.btnFemale_Click);
+            // btnAPI
+            // 
+            this.btnAPI.Name = "btnAPI";
+            this.btnAPI.Text = "In game character";
+            this.btnAPI.Click += new System.EventHandler(this.btnAPI_Click);
             // 
             // btnReset
             // 
@@ -741,14 +781,30 @@
             this.btnSaveAsGif.Name = "btnSaveAsGif";
             this.btnSaveAsGif.Tooltip = "Save";
             this.btnSaveAsGif.Click += new System.EventHandler(this.btnSaveAsGif_Click);
-            //
-            // btnExport
-            //
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Image = global::WzComparerR2.Avatar.Properties.Resources.export;
-            this.btnExport.Tooltip = "Export Action";
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
+            // btnSaveOptions
+            // 
+            this.btnSaveOptions.AutoExpandOnClick = true;
+            this.btnSaveOptions.Image = global::WzComparerR2.Avatar.Properties.Resources.autosave;
+            this.btnSaveOptions.Name = "btnSaveOptions";
+            this.btnSaveOptions.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnEnableAutosave,
+            this.btnSpecifySavePath});
+            this.btnSaveOptions.Tooltip = "Auto save options";
+            // 
+            // btnEnableAutosave
+            // 
+            this.btnEnableAutosave.AutoCheckOnClick = true;
+            this.btnEnableAutosave.Name = "btnEnableAutosave";
+            this.btnEnableAutosave.Text = "Enable Auto Save";
+            this.btnEnableAutosave.Click += new System.EventHandler(this.btnEnableAutosave_Click);
+            // 
+            // btnSpecifySavePath
+            // 
+            this.btnSpecifySavePath.Name = "btnSpecifySavePath";
+            this.btnSpecifySavePath.Text = "Specify Save Path...";
+            this.btnSpecifySavePath.Enabled = this.btnEnableAutosave.Checked;
+            this.btnSpecifySavePath.Click += new System.EventHandler(this.btnSpecifySavePath_Click);
             // dockSite3
             // 
             this.dockSite3.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
@@ -849,8 +905,14 @@
         private DevComponents.DotNetBar.ButtonItem btnLock;
         private DevComponents.DotNetBar.ButtonItem btnMale;
         private DevComponents.DotNetBar.ButtonItem btnFemale;
+        private DevComponents.DotNetBar.ButtonItem btnCustomPreset;
+        private DevComponents.DotNetBar.ButtonItem btnAPI;
         private DevComponents.DotNetBar.ButtonItem btnSaveAsGif;
+        private DevComponents.DotNetBar.ButtonItem btnSaveOptions;
+        private DevComponents.DotNetBar.ButtonItem btnEnableAutosave;
+        private DevComponents.DotNetBar.ButtonItem btnSpecifySavePath;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEar;
+        private DevComponents.DotNetBar.Separator Separator1;
         private DevComponents.DotNetBar.LabelX labelX5;
         private DevComponents.DotNetBar.ButtonItem btnExport;
         private DevComponents.DotNetBar.LabelX labelX6;
