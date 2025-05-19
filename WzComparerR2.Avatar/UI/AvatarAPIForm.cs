@@ -123,10 +123,25 @@ namespace WzComparerR2.Avatar.UI
             }
             switch ((int)selectedItem.Value)
             {
+                case 2:
+                    labelX1.Text = "The resulting avatar may be inaccurate.";
+                    labelX1.Visible = true;
+                    break;
+                case 4:
+                case 5:
+                    labelX1.Text = "Characters who have not logged in for many years\r\nmay not be read correctly.";
+                    labelX1.Visible = true;
+                    break;
+                case 6:
+                    labelX1.Text = "If the character cannot be found, please log in to the\r\ncharacter.";
+                    labelX1.Visible = true;
+                    break;
+                case 7:
+                    labelX1.Text = "Only characters listed in the TMS Union Ranking\r\nwebsite can be searched.";
+                    labelX1.Visible = true;
+                    break;
                 default:
-                    labelX1.Enabled = false;
-                    checkBoxX1.Enabled = false;
-                    checkBoxX2.Enabled = false;
+                    labelX1.Visible = false;
                     break;
             }
         }
