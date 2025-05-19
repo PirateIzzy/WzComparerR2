@@ -1,36 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using DevComponents.Editors;
+using System;
 using System.Drawing;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
-using DevComponents.DotNetBar;
-using DevComponents.Editors;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.Avatar.UI
 {
-    public partial class AvatarAPIForm : DevComponents.DotNetBar.OfficeForm
+    public partial class AvatarAPIForm : DevComponents.DotNetBar.Office2007Form
     {
         public AvatarAPIForm()
         {
             InitializeComponent();
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
-            this.Font = new Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
 #endif
-
             cmbRegion.Items.AddRange(new[]
             {
                 new ComboItem("KMS"){ Value = 1 },
-                //new ComboItem("JMS"){ Value = 2 },
+                new ComboItem("JMS"){ Value = 2 },
                 //new ComboItem("CMS"){ Value = 3 },
-                //new ComboItem("GMS(북미)"){ Value = 4 },
-                //new ComboItem("GMS(유럽)"){ Value = 5 },
-                //new ComboItem("MSEA"){ Value = 6 },
-                //new ComboItem("TMS"){ Value = 7 },
-                //new ComboItem("MSN"){ Value = 8 },
+                new ComboItem("GMS-NA"){ Value = 4 },
+                new ComboItem("GMS-EU"){ Value = 5 },
+                new ComboItem("MSEA"){ Value = 6 },
+                new ComboItem("TMS"){ Value = 7 },
+                new ComboItem("MSN"){ Value = 8 },
             });
-            cmbRegion.SelectedIndex = 0;
         }
 
         public string CharaName
@@ -48,20 +44,29 @@ namespace WzComparerR2.Avatar.UI
         {
             get
             {
-                return cmbRegion.SelectedIndex + 1;
+                return ((cmbRegion.SelectedItem as ComboItem)?.Value as int?) ?? 0;
             }
             set
             {
-                for (int i = 0; i < cmbRegion.Items.Count; i++)
-                {
-                    if ((int)(cmbRegion.Items[i] as ComboItem).Value == value + 1)
-                    {
-                        cmbRegion.SelectedIndex = i;
-                        return;
-                    }
-                }
-                cmbRegion.SelectedIndex = -1;
+                var items = cmbRegion.Items.Cast<ComboItem>();
+                var item = items.FirstOrDefault(_item => _item.Value as int? == value)
+                    ?? items.Last();
+                item.Value = value;
+                cmbRegion.SelectedItem = item;
             }
+        }
+
+        private bool IsFullWidth(char c)
+        {
+           return (c >= 0xFF01 && c <= 0xFF5E) || // Full-width ASCII
+           (c >= 0x3000 && c <= 0x30FF) || // CJK symbols & kana
+           (c >= 0x4E00 && c <= 0x9FFF) || // Common CJK ideographs
+           (c >= 0xF900 && c <= 0xFAFF);   // CJK Compatibility
+        }
+
+        private bool IsEmoji(char c)
+        {
+            return char.GetUnicodeCategory(c) == System.Globalization.UnicodeCategory.OtherSymbol;
         }
 
         private void textBoxX1_KeyDown(object sender, KeyEventArgs e)
@@ -73,16 +78,51 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
+        private void textBoxX1_TextChanged(object sender, EventArgs e)
+        {
+            string text = textBoxX1.Text;
+            int fullWidthCount = 0;
+            int halfWidthCount = 0;
+            string filteredText = "";
+
+            foreach (char c in text)
+            {
+                if (IsEmoji(c))
+                    continue;
+                else if (IsFullWidth(c))
+                    fullWidthCount++;
+                else
+                    halfWidthCount++;
+
+                filteredText += c;
+            }
+
+            if (fullWidthCount * 2 + halfWidthCount > 12)
+            {
+                filteredText = filteredText.Substring(0, filteredText.Length - 1);
+            }
+
+            if (textBoxX1.Text != filteredText)
+            {
+                int cursorPos = textBoxX1.SelectionStart;
+                textBoxX1.Text = filteredText;
+                textBoxX1.SelectionStart = Math.Min(cursorPos, textBoxX1.Text.Length);
+            }
+
+            ComboItem selectedItem = (ComboItem)cmbRegion.SelectedItem;
+            buttonX1.Enabled = (textBoxX1.Text.Length > 0 && selectedItem != null);
+        }
+
         private void cmbRegion_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ComboItem selectedItem = cmbRegion.SelectedItem as ComboItem;
+            buttonX1.Enabled = textBoxX1.Text.Length > 0;
+            ComboItem selectedItem = (ComboItem)cmbRegion.SelectedItem;
+            if (selectedItem == null)
+            {
+                return;
+            }
             switch ((int)selectedItem.Value)
             {
-                case 1:
-                    labelX1.Enabled = true;
-                    checkBoxX1.Enabled = true;
-                    checkBoxX2.Enabled = true;
-                    break;
                 default:
                     labelX1.Enabled = false;
                     checkBoxX1.Enabled = false;
