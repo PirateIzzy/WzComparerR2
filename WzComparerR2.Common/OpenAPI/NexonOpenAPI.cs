@@ -525,34 +525,34 @@ namespace WzComparerR2.OpenAPI
                 switch (e.ErrorCode)
                 {
                     case MapleStoryAPIErrorCode.OPENAPI00001:
-                        msg = "サーバー内部エラー";
+                        msg = "Internal Server Error";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00002:
-                        msg = "権限はありません。";
+                        msg = "Access Denied";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00003:
-                        msg = "キャラクターを接続して更新してください。";
+                        msg = "Connect and update your character";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00004:
-                        msg = "入力値が無効です。";
+                        msg = "Invalid Input";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00005:
-                        msg = "APIキーが無効です。";
+                        msg = "Invalid API Key";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00006:
-                        msg = "無効なゲームまたはAPI PATH";
+                        msg = "Invalid Game or API Path";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00007:
-                        msg = "API呼び出し量を超えました。";
+                        msg = "API Call Volume has been exceeded";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00009:
-                        msg = "データ準備中です。";
+                        msg = "Preparing Data";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00010:
-                        msg = "ゲームをチェックしています。";
+                        msg = "Checking the Game";
                         break;
                     case MapleStoryAPIErrorCode.OPENAPI00011:
-                        msg = "APIチェック中です。";
+                        msg = "API Check In Progress";
                         break;
                     default:
                         msg = e.Message;
@@ -560,7 +560,7 @@ namespace WzComparerR2.OpenAPI
                 }
             }
 
-            return $"{msg} ({e.ErrorCode.ToString()})\r\n場所: {funcName}";
+            return $"{msg} ({e.ErrorCode.ToString()})\r\nLocated at: {funcName}";
         }
 
         public static string ToJson(this object obj)

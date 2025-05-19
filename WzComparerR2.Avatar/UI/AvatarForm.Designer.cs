@@ -804,7 +804,7 @@ namespace WzComparerR2.Avatar.UI
             // btnSpecifySavePath
             // 
             this.btnSpecifySavePath.Name = "btnSpecifySavePath";
-            this.btnSpecifySavePath.Text = "Specify Save Path...";
+            this.btnSpecifySavePath.Text = "Specify Save Path";
             this.btnSpecifySavePath.Enabled = this.btnEnableAutosave.Checked;
             this.btnSpecifySavePath.Click += new System.EventHandler(this.btnSpecifySavePath_Click);
             // dockSite3

@@ -1757,7 +1757,7 @@ namespace WzComparerR2.Avatar.UI
 #if NET6_0_OR_GREATER
             if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                ToastNotification.Show(this, $"ERROR: Please load Base.wz.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                ToastNotification.Show(this, $"Error: Please load Base.wz.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
 
@@ -2125,8 +2125,8 @@ namespace WzComparerR2.Avatar.UI
                 {
                     var dlg = new SaveFileDialog()
                     {
-                        Title = "アバターを保存",
-                        Filter = string.Format("{0} (*{1})|*{1}|すべてのファイル(*.*)|*.*", encoder.Name, extensionFilter),
+                        Title = "Save Avatar",
+                        Filter = string.Format("{0} (*{1})|*{1}|All files (*.*)|*.*", encoder.Name, extensionFilter),
                         FileName = defaultFileName
                     };
                     if (dlg.ShowDialog() != DialogResult.OK)
@@ -2325,7 +2325,7 @@ namespace WzComparerR2.Avatar.UI
 
                 if (gifLayer.Frames.Count <= 0)
                 {
-                    MessageBoxEx.Show(this, "Animation data calculation failed.", "ERROR");
+                    MessageBoxEx.Show(this, "Animation data calculation failed.", "Error");
                     return;
                 }
 
@@ -2393,13 +2393,13 @@ namespace WzComparerR2.Avatar.UI
             var matches = Regex.Matches(code, @"s?(\d+)(\+([0-7])\*(\d{1,2}))?([,\s]|$)");
             if (matches.Count <= 0)
             {
-                ToastNotification.Show(this, $"ERROR: アイテムコードに該当するアイテムはありません。", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                ToastNotification.Show(this, $"Error: There is no item corresponding to the item code.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
 
             if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                ToastNotification.Show(this, $"ERROR: Base.wz ファイルを開けません。", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                ToastNotification.Show(this, $"Error: Please open Base.wz.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
 
@@ -2410,7 +2410,7 @@ namespace WzComparerR2.Avatar.UI
             //试图初始化
             if (!this.inited && !this.AvatarInit())
             {
-                ToastNotification.Show(this, $"ERROR: アバタープラグインを初期化できません。", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                ToastNotification.Show(this, $"Error: Unable to start the Avatar plugin.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
             var sl = this.PluginEntry.Context.DefaultStringLinker;
@@ -2939,7 +2939,7 @@ namespace WzComparerR2.Avatar.UI
                 }
                 catch (Exception ex)
                 {
-                    context.Message = $"ERROR: {ex.Message}";
+                    context.Message = $"Error: {ex.Message}";
                     throw;
                 }
                 finally
