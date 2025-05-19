@@ -89,6 +89,8 @@ namespace WzComparerR2.Avatar.UI
         private bool updatingActionEffect = false;
 #if NET6_0_OR_GREATER
         private NexonOpenAPI API;
+        private string characterName = "";
+        private int previousRegion = 4;
 #endif
 
         private string chairName;
@@ -1762,9 +1764,13 @@ namespace WzComparerR2.Avatar.UI
             }
 
             var dlg = new AvatarAPIForm();
+            dlg.CharaName = characterName;
+            dlg.selectedRegion = previousRegion;
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
+                characterName = dlg.CharaName;
+                previousRegion = dlg.selectedRegion;
                 string avatarCode;
                 switch (dlg.selectedRegion)
                 {
@@ -1793,30 +1799,22 @@ namespace WzComparerR2.Avatar.UI
                         break;
                     case 2: // JMS
                         this.API = new NexonOpenAPI("-");
-                        bool isUnderMaintenance = await this.API.isJMSUnderMaintenance();
-                        if (isUnderMaintenance)
+                        try
                         {
-                            ToastNotification.Show(this, $"JMS is currently under maintenance.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                            ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
+                            avatarCode = await this.API.GetAvatarCode(dlg.CharaName, "JMS");
+                            if (string.IsNullOrEmpty(avatarCode))
+                            {
+                                ToastNotification.Show(this, $"Unable to find character.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                            }
+                            else
+                            {
+                                await Type3(avatarCode);
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
-                                avatarCode = await this.API.GetAvatarCode(dlg.CharaName, "JMS");
-                                if (string.IsNullOrEmpty(avatarCode))
-                                {
-                                    ToastNotification.Show(this, $"Unable to find character.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
-                                }
-                                else
-                                {
-                                    await Type3(avatarCode);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                ToastNotification.Show(this, $"Warning: {ex.Message}", null, 3000, eToastGlowColor.Orange, eToastPosition.TopCenter);
-                            }
+                            ToastNotification.Show(this, $"Warning: {ex.Message}", null, 3000, eToastGlowColor.Orange, eToastPosition.TopCenter);
                         }
                         break;
                     case 4: // GMS-NA
@@ -2036,7 +2034,7 @@ namespace WzComparerR2.Avatar.UI
                     }
                 }
 
-                var code = $"20{res.Skin}, {res.Face + mixFace}, {res.Hair + mixHair}, {res.Cap}, {res.FaceAcc}, {res.EyeAcc}, {res.EarAcc}, {res.Coat}, {res.Pants}, {res.Shoes}, {res.Gloves}, {res.Cape}, {res.Shield}, {res.Weapon}, {res.CashWeapon}";
+                var code = $"20{res.Skin}, {res.Face}, {res.Face + mixFace}, {res.Hair}, {res.Hair + mixHair}, {res.Cap}, {res.FaceAcc}, {res.EyeAcc}, {res.EarAcc}, {res.Coat}, {res.Pants}, {res.Shoes}, {res.Gloves}, {res.Cape}, {res.Shield}, {res.Weapon}, {res.CashWeapon}";
                 LoadCode(code, 0);
 
                 if (res.UnknownVer)
