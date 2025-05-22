@@ -1374,6 +1374,19 @@ namespace WzComparerR2.CharaSim
                 case 17513: return "Mo Xuan(5)";
                 case 17514: return "Mo Xuan(6)";
 
+                case 18000: return "Sia Astelle";
+                case 18001: return "Erel Light";
+                case 18100: return "Erel Light(1)";
+                case 18110: return "Erel Light(2)";
+                case 18111: return "Erel Light(3)";
+                case 18112: return "Erel Light(4)";
+                case 18114: return "Erel Light(6)";
+                case 18200: return "Sia Astelle(1)";
+                case 18210: return "Sia Astelle(2)";
+                case 18211: return "Sia Astelle(3)";
+                case 18212: return "Sia Astelle(4)";
+                case 18214: return "Sia Astelle(6)";
+
                 case 40000: return "5th";
                 case 40001: return "5th (Warrior)";
                 case 40002: return "5th (Magician)";
