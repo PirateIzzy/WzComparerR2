@@ -245,10 +245,13 @@ namespace WzComparerR2
             tooltipQuickView.GearRender.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.GearRender.ShowMedalTag = Setting.Gear.ShowMedalTag;
+            tooltipQuickView.GearRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
+            tooltipQuickView.GearRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.GearRender22.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender22.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender22.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
-
+            tooltipQuickView.GearRender22.CosmeticHairColor = Setting.Item.CosmeticHairColor;
+            tooltipQuickView.GearRender22.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;

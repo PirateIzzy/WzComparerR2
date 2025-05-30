@@ -543,11 +543,14 @@ namespace WzComparerR2.CharaSim
             {
                 //case GearType.body: return "Avatar (Body)";
                 case GearType.head: return "Avatar (Head)";
+                case GearType.head_n: return "Head";
                 case GearType.face:
-                case GearType.face2: return "Face";
+                case GearType.face2:
+                case GearType.face_n: return "Face";
                 case GearType.hair:
                 case GearType.hair2:
-                case GearType.hair3: return "Hair";
+                case GearType.hair3:
+                case GearType.hair_n: return "Hair";
                 case GearType.faceAccessory: return "Face Accessory";
                 case GearType.eyeAccessory: return "Eye Accessory";
                 case GearType.earrings: return "Earrings";
