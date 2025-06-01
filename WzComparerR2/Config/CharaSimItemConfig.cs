@@ -36,6 +36,13 @@ namespace WzComparerR2.Config
             set { this["showNickTag"] = value; }
         }
 
+        [ConfigurationProperty("showLinkedTamingMob", DefaultValue = false)]
+        public bool ShowLinkedTamingMob
+        {
+            get { return (bool)this["showLinkedTamingMob"]; }
+            set { this["showLinkedTamingMob"] = value; }
+        }
+
         [ConfigurationProperty("cosmeticHairColor", DefaultValue = 0)]
         public int CosmeticHairColor
         {

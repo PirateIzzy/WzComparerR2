@@ -257,10 +257,14 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
             tooltipQuickView.ItemRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.ItemRender.ShowNickTag = Setting.Item.ShowNickTag;
+            tooltipQuickView.ItemRender.ShowLinkedTamingMob = Setting.Item.ShowLinkedTamingMob;
             tooltipQuickView.ItemRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
-
+            tooltipQuickView.MapRender.ShowMiniMap = Setting.Map.ShowMiniMap;
+            tooltipQuickView.MapRender.ShowObjectID = Setting.Map.ShowMapObjectID;
+            tooltipQuickView.MapRender.ShowMobNpcObjectID = Setting.Map.ShowMobNpcObjectID;
+            tooltipQuickView.MapRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
             tooltipQuickView.RecipeRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
 
@@ -3283,6 +3287,22 @@ namespace WzComparerR2
                     }
                     break;
 
+                case Wz_Type.Map:
+                    if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                        return;
+                    var map = Map.CreateFromNode(image.Node, PluginManager.FindWz);
+                    obj = map;
+                    if (stringLinker == null || !stringLinker.StringMap.TryGetValue(map.MapID, out sr))
+                    {
+                        sr = new StringResult();
+                        sr.Name = "未知のマップ";
+                    }
+                    if (map != null)
+                    {
+                        fileName = "map_" + map.MapID + "_" + RemoveInvalidFileNameChars(sr.Name.Replace(" : ", ":")) + ".png";
+                    }
+                    break;
+
                 case Wz_Type.Mob:
                     if (selectedNode.FullPathToFile.Contains("BossPattern")) return; // Ignore BossPattern to prevent Auto Preview crash
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
@@ -3685,12 +3705,14 @@ namespace WzComparerR2
                     comparer.OutputSkillTooltip = chkOutputSkillTooltip.Checked;
                     comparer.OutputItemTooltip = chkOutputItemTooltip.Checked;
                     comparer.OutputGearTooltip = chkOutputEqpTooltip.Checked;
+                    comparer.OutputMapTooltip = chkOutputMapTooltip.Checked;
                     comparer.OutputMobTooltip = chkOutputMobTooltip.Checked;
                     comparer.OutputNpcTooltip = chkOutputNpcTooltip.Checked;
                     comparer.OutputCashTooltip = chkOutputCashTooltip.Checked;
                     comparer.HashPngFileName = chkHashPngFileName.Checked;
                     comparer.ShowObjectID = chkShowObjectID.Checked;
                     comparer.ShowChangeType = chkShowChangeType.Checked;
+                    comparer.ShowLinkedTamingMob = chkShowLinkedTamingMob.Checked;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try
@@ -3719,11 +3741,13 @@ namespace WzComparerR2
                                     chkOutputSkillTooltip.Enabled = false;
                                     chkOutputItemTooltip.Enabled = false;
                                     chkOutputEqpTooltip.Enabled = false;
+                                    chkOutputMapTooltip.Enabled = false;
                                     chkOutputMobTooltip.Enabled = false;
                                     chkOutputNpcTooltip.Enabled = false;
                                     // chkOutputCashTooltip.Enabled = false;
                                     chkShowObjectID.Enabled = false;
                                     chkShowChangeType.Enabled = false;
+                                    chkShowLinkedTamingMob.Enabled = false;
                                     chkHashPngFileName.Enabled = false;
                                     comparer.EasyCompareWzFiles(fileNew, fileOld, dlg.SelectedPath);
                                     return;
@@ -3765,11 +3789,13 @@ namespace WzComparerR2
                         chkOutputSkillTooltip.Enabled = true;
                         chkOutputItemTooltip.Enabled = true;
                         chkOutputEqpTooltip.Enabled = true;
+                        chkOutputMapTooltip.Enabled = true;
                         chkOutputMobTooltip.Enabled = true;
                         chkOutputNpcTooltip.Enabled = true;
                         // chkOutputCashTooltip.Enabled = true;
                         chkShowObjectID.Enabled = true;
                         chkShowChangeType.Enabled = true;
+                        chkShowLinkedTamingMob.Enabled = true;
                         chkHashPngFileName.Enabled = true;
                     }
                 });

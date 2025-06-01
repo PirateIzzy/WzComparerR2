@@ -46,6 +46,7 @@ namespace WzComparerR2.CharaSimControl
         public bool LinkRecipeItem { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowNickTag { get; set; }
+        public bool ShowLinkedTamingMob { get; set; }
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
         public bool Enable22AniStyle { get; set; }
@@ -121,7 +122,7 @@ namespace WzComparerR2.CharaSimControl
                                             }
                                         }
                                     }
-                                    recipeItemBmps.Add(RenderLinkRecipeGear(gear));
+                                    if (ShowLinkedTamingMob) recipeItemBmps.Add(RenderLinkRecipeGear(gear));
                                 }
 
                                 break;
