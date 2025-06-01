@@ -31,6 +31,11 @@
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX23 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX21 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowMiniMap = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowMapObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowMobNpcObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX16 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX15 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX14 = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -68,10 +73,13 @@
             this.checkBoxX8 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX5 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel4 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.superTabControlPanel5 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.superTabControlPanel6 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.checkBoxX7 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem4 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabItem5 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabItem6 = new DevComponents.DotNetBar.SuperTabItem();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
@@ -90,6 +98,7 @@
             this.superTabControlPanel3.SuspendLayout();
             this.superTabControlPanel4.SuspendLayout();
             this.superTabControlPanel5.SuspendLayout();
+            this.superTabControlPanel6.SuspendLayout();
             this.panelEx1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,6 +124,7 @@
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel4);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel6);
             this.superTabControl1.Controls.Add(this.superTabControlPanel5);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
@@ -131,6 +141,7 @@
             this.superTabItem2,
             this.superTabItem3,
             this.superTabItem4,
+            this.superTabItem6,
             this.superTabItem5});
             this.superTabControl1.Text = "superTabControl1";
             // 
@@ -417,6 +428,7 @@
             // 
             // superTabControlPanel3
             // 
+            this.superTabControlPanel3.Controls.Add(this.checkBoxX23);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX12);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX9);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX8);
@@ -433,6 +445,21 @@
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
             this.superTabControlPanel3.Visible = false;
+            // 
+            // checkBoxX23
+            // 
+            this.checkBoxX23.AutoSize = true;
+            this.checkBoxX23.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX23.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX23.Location = new System.Drawing.Point(13, 154);
+            this.checkBoxX23.Name = "checkBoxX23";
+            this.checkBoxX23.Size = new System.Drawing.Size(126, 16);
+            this.checkBoxX23.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX23.TabIndex = 5;
+            this.checkBoxX23.Text = "Show Linked Taming Mob";
             // 
             // checkBoxX12
             // 
@@ -665,6 +692,72 @@
             this.panelEx1.Style.GradientAngle = 90;
             this.panelEx1.TabIndex = 1;
             // 
+            // superTabControlPanel6
+            // 
+            this.superTabControlPanel6.Controls.Add(this.chkShowMiniMap);
+            this.superTabControlPanel6.Controls.Add(this.chkShowMapObjectID);
+            this.superTabControlPanel6.Controls.Add(this.chkShowMobNpcObjectID);
+            this.superTabControlPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel6.Location = new System.Drawing.Point(62, 0);
+            this.superTabControlPanel6.Name = "superTabControlPanel6";
+            this.superTabControlPanel6.Size = new System.Drawing.Size(242, 211);
+            this.superTabControlPanel6.TabIndex = 0;
+            this.superTabControlPanel6.TabItem = this.superTabItem6;
+            this.superTabControlPanel6.Visible = false;
+            // 
+            // superTabItem6
+            // 
+            this.superTabItem6.AttachedControl = this.superTabControlPanel6;
+            this.superTabItem6.GlobalItem = false;
+            this.superTabItem6.Name = "superTabItem6";
+            this.superTabItem6.Text = "Map";
+            // 
+            // chkShowMiniMap
+            // 
+            this.chkShowMiniMap.AutoSize = true;
+            this.chkShowMiniMap.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMiniMap.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMiniMap.Location = new System.Drawing.Point(15, 12);
+            this.chkShowMiniMap.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkShowMiniMap.Name = "chkShowMiniMap";
+            this.chkShowMiniMap.Size = new System.Drawing.Size(145, 16);
+            this.chkShowMiniMap.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMiniMap.TabIndex = 1;
+            this.chkShowMiniMap.Text = "Show Minimap";
+            // 
+            // chkShowMapObjectID
+            // 
+            this.chkShowMapObjectID.AutoSize = true;
+            this.chkShowMapObjectID.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMapObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMapObjectID.Location = new System.Drawing.Point(13, 36);
+            this.chkShowMapObjectID.Name = "chkShowMapObjectID";
+            this.chkShowMapObjectID.Size = new System.Drawing.Size(172, 16);
+            this.chkShowMapObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMapObjectID.TabIndex = 2;
+            this.chkShowMapObjectID.Text = "Show Map Code";
+            // 
+            // chkShowMobNpcObjectID
+            // 
+            this.chkShowMobNpcObjectID.AutoSize = true;
+            this.chkShowMobNpcObjectID.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMobNpcObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMobNpcObjectID.Location = new System.Drawing.Point(13, 60);
+            this.chkShowMobNpcObjectID.Name = "chkShowMobNpcObjectID";
+            this.chkShowMobNpcObjectID.Size = new System.Drawing.Size(172, 16);
+            this.chkShowMobNpcObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMobNpcObjectID.TabIndex = 3;
+            this.chkShowMobNpcObjectID.Text = "Show Mob and NPC's Code";
+            // 
             // superTabControlPanel5
             // 
             this.superTabControlPanel5.Controls.Add(this.chkCopyParsedSkillString);
@@ -840,6 +933,8 @@
             this.superTabControlPanel4.PerformLayout();
             this.superTabControlPanel5.ResumeLayout(false);
             this.superTabControlPanel5.PerformLayout();
+            this.superTabControlPanel6.ResumeLayout(false);
+            this.superTabControlPanel6.PerformLayout();
             this.panelEx1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -879,8 +974,10 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX4;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel4;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel5;
+        private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel6;
         private DevComponents.DotNetBar.SuperTabItem superTabItem4;
         private DevComponents.DotNetBar.SuperTabItem superTabItem5;
+        private DevComponents.DotNetBar.SuperTabItem superTabItem6;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX6;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX7;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX9;
@@ -896,10 +993,17 @@
         private DevComponents.DotNetBar.LabelX labelCosmeticFaceColor;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX21;
-        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredStringCopyMethod;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkCopyParsedSkillString;
-        private DevComponents.DotNetBar.LabelX labelX4;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
+        private DevComponents.DotNetBar.LabelX labelX14;
+        private DevComponents.DotNetBar.LabelX labelX15;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMap;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMapObjectID;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMobNpcObjectID;
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx3;
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx4;
+        private DevComponents.DotNetBar.LabelX labelX4;
+
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredStringCopyMethod;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkCopyParsedSkillString;
     }
 }
