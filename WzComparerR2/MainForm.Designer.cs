@@ -224,6 +224,8 @@
             this.chkShowObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowChangeType = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowLinkedTamingMob = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkSkipKMSContent = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
@@ -2464,6 +2466,7 @@
             this.superTabControlPanel2.Controls.Add(this.chkShowObjectID);
             this.superTabControlPanel2.Controls.Add(this.chkShowChangeType);
             this.superTabControlPanel2.Controls.Add(this.chkShowLinkedTamingMob);
+            this.superTabControlPanel2.Controls.Add(this.chkSkipKMSContent);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2641,6 +2644,21 @@
             this.chkShowLinkedTamingMob.TabIndex = 20;
             this.chkShowLinkedTamingMob.Text = "Show Linked Taming Mob";
             this.chkShowLinkedTamingMob.Checked = false;
+            // 
+            // chkSkipKMSContent
+            // 
+            // 
+            // 
+            // 
+            this.chkSkipKMSContent.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkSkipKMSContent.Location = new System.Drawing.Point(550, 304);
+            this.chkSkipKMSContent.Name = "chkSkipKMSContent";
+            this.chkSkipKMSContent.Size = new System.Drawing.Size(145, 23);
+            this.chkSkipKMSContent.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkSkipKMSContent, new DevComponents.DotNetBar.SuperTooltipInfo("Skip KMS Skills", "", "Do not compare skills that exist in KMS.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
+            this.chkSkipKMSContent.TabIndex = 22;
+            this.chkSkipKMSContent.Text = "Skip KMS Skills";
+            this.chkSkipKMSContent.Checked = false;
             // 
             // chkOutputRemovedImg
             // 
@@ -3542,6 +3560,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowObjectID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowChangeType;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowLinkedTamingMob;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipKMSContent;
         private DevComponents.Editors.ComboItem comboItem19;
         private DevComponents.Editors.ComboItem comboItem12_2;
     }
