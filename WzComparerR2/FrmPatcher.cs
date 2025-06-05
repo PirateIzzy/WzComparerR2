@@ -42,6 +42,7 @@ namespace WzComparerR2
                 settings.Add(new PatcherSetting("GMS", "http://download2.nexon.net/Game/MapleStory/patch/patchdir/{1:d5}/CustomPatch{0}to{1}.exe", 2));
                 settings.Add(new PatcherSetting("TMS", "http://tw.cdnpatch.maplestory.beanfun.com/maplestory/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
                 settings.Add(new PatcherSetting("MSEA", "http://patch.maplesea.com/sea/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
+                settings.Add(new PatcherSetting("MSEA-ZIP", "http://download-maple.playpark.net/manual/MaplePatch{0:d3}to{1:d3}.zip", 2));
                 settings.Add(new PatcherSetting("CMS", "http://mxd.clientdown.sdo.com/maplestory/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
             }
 
@@ -58,20 +59,6 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
-            SortedDictionary<string, long> patchedFileSizes = new SortedDictionary<string, long>();
-            List<string> patchedFileIndex = new List<string>();
-            Dictionary<string, string> finishedFileIndex = new Dictionary<string, string>();
-
-            typedParts = Enum.GetValues(typeof(Wz_Type)).Cast<Wz_Type>().ToDictionary(type => type, type => new List<PatchPartContext>());
-
-            // Disable until the bug is fixed
-            this.chkCompare.Enabled = false;
-            this.cmbComparePng.Enabled = false;
-            this.chkOutputPng.Enabled = false;
-            this.chkResolvePngLink.Enabled = false;
-            this.chkOutputAddedImg.Enabled = false;
-            this.chkOutputRemovedImg.Enabled = false;
-            this.chkEnableDarkMode.Enabled = false;
         }
 
         SortedDictionary<string, long> patchedFileSizes = new SortedDictionary<string, long>();
@@ -283,6 +270,11 @@ namespace WzComparerR2
                     return;
                 }
             }
+            if (!HasWritePermission(txtMSFolder.Text))
+            {
+                MessageBoxEx.Show("You do not have permission to patch games installed in this folder.\r\n\r\nPlease run WzComparerR2 with administrator privileges.", "Error", MessageBoxButtons.OK);
+                return;
+            }
             if (this.patcherSession != null)
             {
                 if (this.patcherSession.State == PatcherTaskState.WaitForContinue)
@@ -314,17 +306,11 @@ namespace WzComparerR2
                 MSFolder = txtMSFolder.Text,
                 PrePatch = chkPrePatch.Checked,
                 DeadPatch = chkDeadPatch.Checked,
-                CompareFolder = compareFolder,
             };
             session.LoggingFileName = Path.Combine(session.MSFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
             session.PatchExecTask = Task.Run(() => this.ExecutePatchAsync(session, session.CancellationToken));
             this.patcherSession = session;
         }
-
-        string htmlFilePath;
-        FileStream htmlFile;
-        StreamWriter sw;
-        Dictionary<Wz_Type, List<PatchPartContext>> typedParts;
 
         private async Task ExecutePatchAsync(PatcherSession session, CancellationToken cancellationToken)
         {
@@ -342,8 +328,7 @@ namespace WzComparerR2
                 this.advTreePatchFiles.Nodes.Clear();
                 this.txtNotice.Clear();
                 this.txtPatchState.Clear();
-                this.panelEx2.Visible = true;
-                this.expandablePanel2.Height = 340;
+                this.panelEx2.Enabled = true;
             });
 
             WzPatcher patcher = null;
@@ -352,6 +337,15 @@ namespace WzComparerR2
             try
             {
                 patcher = new WzPatcher(session.PatchFile);
+                this.chkPrePatch.Enabled = false;
+                this.chkDeadPatch.Enabled = false;
+                this.txtPatchFile.Enabled = false;
+                this.txtMSFolder.Enabled = false;
+                this.buttonXOpen1.Enabled = false;
+                this.buttonXOpen2.Enabled = false;
+                this.labelX1.Enabled = false;
+                this.labelX2.Enabled = false;
+                this.buttonXPatch.Enabled = false;
                 patcher.NoticeEncoding = this.PatcherNoticeEncoding ?? Encoding.Default;
                 patcher.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, AppendStateText);
                 AppendStateText($"Patch file name: {session.PatchFile}\r\n");
@@ -458,6 +452,7 @@ namespace WzComparerR2
                     {
                         this.advTreePatchFiles.BeginUpdate();
                         this.advTreePatchFiles.Enabled = true;
+                        this.buttonXPatch.Enabled = true;
                         this.advTreePatchFiles.EndUpdate();
                     });
 
@@ -467,6 +462,7 @@ namespace WzComparerR2
                     this.Invoke(() =>
                     {
                         this.advTreePatchFiles.Enabled = false;
+                        this.buttonXPatch.Enabled = false;
                     });
                     session.State = PatcherTaskState.Patching;
                     patcher.PatchParts.Clear();
@@ -525,9 +521,18 @@ namespace WzComparerR2
             }
             finally
             {
-                patchedFileSizes.Clear();
-                patchedFileIndex.Clear();
-                finishedFileIndex.Clear();
+                this.chkPrePatch.Enabled = true;
+                this.chkDeadPatch.Enabled = true;
+                this.txtPatchFile.Enabled = true;
+                this.txtMSFolder.Enabled = true;
+                this.buttonXOpen1.Enabled = true;
+                this.buttonXOpen2.Enabled = true;
+                this.buttonXPatch.Enabled = true;
+                this.labelX1.Enabled = true;
+                this.labelX2.Enabled = true;
+                this.patchedFileSizes.Clear();
+                this.patchedFileIndex.Clear();
+                this.finishedFileIndex.Clear();
                 session.State = PatcherTaskState.Complete;
                 if (patcher != null)
                 {
@@ -535,8 +540,7 @@ namespace WzComparerR2
                     patcher = null;
                 }
                 GC.Collect();
-                panelEx2.Visible = false;
-                expandablePanel2.Height = 157;
+                panelEx2.Enabled = false;
             }
         }
 
@@ -670,6 +674,7 @@ namespace WzComparerR2
                 case 2: node.Cells.Add(new Cell("Removed", style)); break;
                 default: node.Cells.Add(new Cell(part.Type.ToString(), style)); break;
             }
+            node.Cells.Add(new Cell(part.Type.ToString(), style));
             node.Cells.Add(new Cell(part.NewFileLength.ToString("n0"), style));
             node.Cells.Add(new Cell(part.NewChecksum.ToString("x8"), style));
             node.Cells.Add(new Cell(part.OldChecksum?.ToString("x8"), style));
@@ -783,6 +788,20 @@ namespace WzComparerR2
             else
             {
                 return $"{size:N0} bytes ({targetbytes:0.##} {sizes[order]})";
+            }
+        }
+
+        static bool HasWritePermission(string directoryPath)
+        {
+            try
+            {
+                string testFilePath = Path.Combine(directoryPath, "test.tmp");
+                using (FileStream fs = File.Create(testFilePath, 1, FileOptions.DeleteOnClose)) { }
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
