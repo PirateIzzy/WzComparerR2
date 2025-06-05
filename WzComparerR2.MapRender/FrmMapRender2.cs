@@ -817,7 +817,7 @@ namespace WzComparerR2.MapRender
                             Music multiBgm = LoadBgm(this.mapData, bgmName);
                             if (multiBgm != null)
                             {
-                                this.ui.ChatBox.AppendTextSystem($"Changed the Multi BGM to {arguments.ElementAtOrDefault(2)}.");
+                                this.ui.ChatBox.AppendTextSystem($"Changed the Multi BGM to {bgmName}.");
 
                                 Task bgmTask = null;
                                 bool willSwitchBgm = this.bgm != multiBgm;
