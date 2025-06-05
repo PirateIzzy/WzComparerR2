@@ -178,7 +178,7 @@
   <data name="UIWindow_img_ToolTip_WorldMap_ArcaneForce" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-    <data name="UIWindow_img_ToolTip_WorldMap_AuthenticForce" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="UIWindow_img_ToolTip_WorldMap_AuthenticForce" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UIWindow.img.ToolTip.WorldMap.AuthenticForce.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="UIWindow_img_ToolTip_WorldMap_enchantMob" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -279,5 +279,146 @@
   </data>
   <data name="UIWindow2_img_Teleport_customBG" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UIWindow2_img_Teleport_customBG.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_backgrnd" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.backgrnd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_e" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.e.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_n" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.n.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_ne" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.ne.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_nw" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.nw.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_s" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.s.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_se" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.se.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_sw" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.sw.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_w" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.w.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToCurrentMap_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToCurrentMap.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToCurrentMap_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToCurrentMap.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToCurrentMap_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToCurrentMap.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToCurrentMap_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToCurrentMap.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToUpperWorldMap_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToUpperWorldMap.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToUpperWorldMap_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToUpperWorldMap.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToUpperWorldMap_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToUpperWorldMap.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_goToUpperWorldMap_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_goToUpperWorldMap.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtFilter_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtFilter.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtFilter_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtFilter.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtFilter_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtFilter.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtFilter_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtFilter.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtMap_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtMap.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtMap_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtMap.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtMap_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtMap.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtMap_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtMap.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNavigation_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNavigation.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNavigation_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNavigation.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNavigation_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNavigation.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNavigation_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNavigation.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNpc_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNpc.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNpc_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNpc.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNpc_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNpc.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtNpc_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtNpc.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtTown_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtTown.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtTown_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtTown.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtTown_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtTown.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_BtTown_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.BtTown.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_MaxMap_sw2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.MaxMap.sw2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_close_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_close.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_close_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_close.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_close_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_close.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_button_close_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.button_close.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_WorldMap_mapInfo_layer_mapInfoCover" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.WorldMap.mapInfo.layer_mapInfoCover.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_Min_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.Min.c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_Min_e" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.Min.e.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UI_UIMap_img_MiniMap_Min_w" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UI.UIMap.img.MiniMap.Min.w.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

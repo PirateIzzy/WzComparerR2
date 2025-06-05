@@ -105,6 +105,10 @@ namespace WzComparerR2.MapRender
             {
                 this.DrawItem(lineList);
             }
+            else if (mesh.RenderObject is RectMesh rect)
+            {
+                this.DrawItem(rect);
+            }
             else if (mesh.RenderObject is ParticleSystem particle)
             {
                 this.DrawItem(mesh, particle);

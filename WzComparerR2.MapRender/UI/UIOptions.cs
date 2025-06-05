@@ -571,7 +571,7 @@ namespace WzComparerR2.MapRender.UI
                  "[Ctrl+U] Remove Map Range Limit",
                  "[`] Chat Window",
                  "[Alt+Enter] Change Resolution",
-                 "[Ctrl + S] Show Screenshot Range",
+                 "[S] Show Screenshot Range",
                  "[ScrollLock] Screenshot",
             };
 

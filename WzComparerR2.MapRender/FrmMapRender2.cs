@@ -173,6 +173,8 @@ namespace WzComparerR2.MapRender
             this.resLoader = new ResourceLoader(this.Services);
             this.resLoader.PatchVisibility = this.patchVisibility;
             this.ui = new MapRenderUIRoot();
+            this.ui.Minimap.uiRoot = this.ui;
+            this.ui.Minimap.mapRender2Root = this;
             this.BindingUIInput();
             this.tooltip = new Tooltip2(this.Content);
             this.tooltip.StringLinker = this.StringLinker;
@@ -183,7 +185,7 @@ namespace WzComparerR2.MapRender
             this.Components.Add(fpsCounter);
 
             this.ApplySetting();
-            SwitchResolution(Resolution.Window_800_600);
+            SwitchResolution(Resolution.Window_1366_768);
             base.Initialize();
 
             //init UI teleport
@@ -255,6 +257,7 @@ namespace WzComparerR2.MapRender
                 this.patchVisibility.SkyWhaleVisible = !visible;
                 this.patchVisibility.IlluminantClusterPathVisible = !visible;
                 this.patchVisibility.SpringPortalPathVisible = !visible;
+                this.patchVisibility.ObstacleAreaVisible = !visible;
             }), KeyCode.D7, ModifierKeys.Control));
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ =>
             {
@@ -581,10 +584,15 @@ namespace WzComparerR2.MapRender
                 this.attachedEvent.Add(EventDisposable(mouseBtnEv, _ev => this.ui.MouseUp -= _ev));
 
                 //更新事件
-                EventHandler ev = (o, e) =>
+                EventHandler ev = async (o, e) =>
                 {
                     this.renderEnv.Camera.Center += direction1 + direction2 * ((boostMoveFlag != 0) ? 3 : 1);
                     keyboardMoveSlowDown();
+                    if (this.CamaraChangedEffState)
+                    {
+                        this.CamaraChangedEffState = false;
+                        await SetCameraChangedEffect(this.renderEnv.Camera.Center);
+                    }
                 };
                 this.ui.InputUpdated += ev;
                 this.attachedEvent.Add(EventDisposable(ev, _ev => this.ui.InputUpdated -= _ev));
@@ -703,7 +711,7 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        private async void ChatCommand(string command)
+        public async void ChatCommand(string command)
         {
             string[] arguments = command.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
             if (arguments.Length <= 0)
@@ -786,7 +794,7 @@ namespace WzComparerR2.MapRender
                         historyCount--;
                     }
                     break;
-
+                    
                 case "/minimap":
                     var canvasList = this.mapData?.MiniMap?.ExtraCanvas;
                     switch (arguments.ElementAtOrDefault(1))
@@ -912,6 +920,8 @@ namespace WzComparerR2.MapRender
                             break;
                     }
                     break;
+
+
 
                 case "/date":
                     switch (arguments.ElementAtOrDefault(1))
@@ -1492,7 +1502,7 @@ namespace WzComparerR2.MapRender
 
         private void SwitchResolution()
         {
-            var r = (Resolution)(((int)this.resolution + 1) % 4);
+            var r = (Resolution)(((int)this.resolution + 1) % 9);
             SwitchResolution(r);
             ResetCaptureRect();
         }
@@ -1500,12 +1510,31 @@ namespace WzComparerR2.MapRender
         private void SwitchResolution(Resolution r)
         {
             Form gameWindow = (Form)Form.FromHandle(this.Window.Handle);
+            int currentWidth = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
+            int currentHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
             switch (r)
             {
                 case Resolution.Window_800_600:
-                case Resolution.Window_1024_768:
-                case Resolution.Window_1366_768:
                     gameWindow.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+                    break;
+                case Resolution.Window_1024_768:
+                case Resolution.Window_1280_720:
+                case Resolution.Window_1366_768:
+                case Resolution.Window_1920_1080:
+                case Resolution.Window_2560_1080:
+                case Resolution.Window_2560_1440:
+                case Resolution.Window_3440_1440:
+                    string[] resolutionName = r.ToString().Split('_');
+                    if (currentWidth <= Int32.Parse(resolutionName[1]) || currentHeight <= Int32.Parse(resolutionName[2]))
+                    {
+                        r = Resolution.WindowFullScreen;
+                        gameWindow.SetDesktopLocation(0, 0);
+                        gameWindow.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                    }
+                    else
+                    {
+                        gameWindow.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+                    }
                     break;
                 case Resolution.WindowFullScreen:
                     gameWindow.SetDesktopLocation(0, 0);
@@ -1532,8 +1561,13 @@ namespace WzComparerR2.MapRender
         {
             Window_800_600 = 0,
             Window_1024_768 = 1,
-            Window_1366_768 = 2,
-            WindowFullScreen = 3,
+            Window_1280_720 = 2,
+            Window_1366_768 = 3,
+            Window_1920_1080 = 4,
+            Window_2560_1080 = 5,
+            Window_2560_1440 = 6,
+            Window_3440_1440 = 7,
+            WindowFullScreen = 8,
         }
 
         struct ItemRect

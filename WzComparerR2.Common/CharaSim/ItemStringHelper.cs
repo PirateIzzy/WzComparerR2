@@ -311,15 +311,15 @@ namespace WzComparerR2.CharaSim
                     res[0] = "Ignored Enemy DEF";
                     res[1] = "+" + value + "%";
                     return res;
-                    /*
-                case GearPropType.attackSpeed:
-                    if (2 <= value && value <= 9)
-                    {
-                        res[0] = "공격 속도";
-                        res[1] = $"{10 - value}단계";
-                    }
-                    return res;
-                    */
+                /*
+            case GearPropType.attackSpeed:
+                if (2 <= value && value <= 9)
+                {
+                    res[0] = "공격 속도";
+                    res[1] = $"{10 - value}단계";
+                }
+                return res;
+                */
                 case GearPropType.nbdR:
                     res[0] = "Damage Against Normal Monsters";
                     res[1] = "+" + value + "%";
@@ -1422,5 +1422,67 @@ namespace WzComparerR2.CharaSim
             return sb.Length > 0 ? sb.ToString() : "0";
         }
         */
+
+        public static string GetMobSkillName(int id)
+        {
+            switch (id)
+            {
+                case 100: return "ATT increase";
+                case 101: return "Magic ATT increase";
+                case 102: return "DEF increase";
+                case 103: return "Magic DEF increase";
+                case 105: return "HP absorption";
+                case 110: return "Area ATT increase";
+                case 111: return "Area Magic ATT increase";
+                case 112: return "Area DEF increase";
+                case 113: return "Area Magic DEF increase";
+                case 114: return "HP recovery";
+                case 115: return "Movement speed increase";
+                case 120: return "Seal";
+                case 121: return "Miss";
+                case 122: return "Weak";
+                case 123: return "Faint";
+                case 124: return "Curse";
+                case 125: return "Poisoning";
+                case 126: return "Slow";
+                case 127: return "Remove buff";
+                case 128: return "Temptation";
+                case 129: return "Banish";
+                case 131: return "Area continuous damage";
+                case 132: return "Confusion";
+                case 133: return "Undead";
+                case 134: return "Potion seal";
+                case 135: return "Do not stop";
+                case 136: return "Darkness";
+                case 137: return "Pronounced";
+                case 138: return "Nullify potential";
+                case 140: return "Ignore physical attacks";
+                case 141: return "Ignore magic attacks";
+                case 142: return "Hard skin";
+                case 143: return "Physical attack reflection";
+                case 144: return "Magic attack reflection";
+                case 145: return "Attack reflection";
+                case 146: return "Invincible";
+
+                case 150: return "ATT increase";
+                case 151: return "Magic ATT increase";
+                case 152: return "DEF increase";
+                case 153: return "Magic DEF increase";
+                case 154: return "Accuracy rate increase";
+                case 155: return "Evasion rate increase";
+                case 156: return "Movement speed increase";
+
+                case 170: return "Teleport";
+                case 171: return "Explosion";
+                case 172: return "Mutation";
+                case 173: return "Airborne";
+                case 174: return "Petrification";
+
+                case 200: return "Summon";
+                case 201: return "Summon";
+
+                default: return null;
+            }
+        }
     }
 }

@@ -159,7 +159,7 @@ namespace WzComparerR2.MapRender
             {
                 var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
                 {
-                    return item.rect.Contains(mouse) && (item.item is LifeItem || item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem);
+                    return item.rect.Contains(mouse) && (item.item is LifeItem || item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem || (item.item is ObjItem && (item.item as ObjItem).Obstacle));
                 });
                 target = mouseTarget.item;
             }
@@ -214,6 +214,15 @@ namespace WzComparerR2.MapRender
             var mouse = this.renderEnv.Input.MousePosition;
             var mousePos = this.renderEnv.Camera.CameraToWorld(mouse);
             sb.AppendFormat("{0},{1}", mousePos.X, mousePos.Y);
+
+
+            //Power Requirement
+            if (this.mapData?.Barrier > 0 || this.mapData?.BarrierArc > 0 || this.mapData?.BarrierAut > 0)
+            {
+                sb.Append(" ReqPwr:").Append(this.mapData?.Barrier > 0 ? "★" + this.mapData?.Barrier.ToString() : "").Append(this.mapData?.BarrierArc > 0 ? "●" + this.mapData?.BarrierArc.ToString() : "").Append(this.mapData?.BarrierAut > 0 ? "⬢ " + this.mapData?.BarrierAut.ToString() : "");
+            }
+            
+            sb.AppendFormat(" Time: [{0:f3}]", cm.GameTime.TotalGameTime.TotalMilliseconds / 1000);
             this.ui.TopBar.Text = sb.ToString();
         }
 
@@ -490,13 +499,11 @@ namespace WzComparerR2.MapRender
             if (patchVisibility.SpringPortalPathVisible)
             {
                 var lines = new List<Point>();
-                var portalList = this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>();
+                var portalList = this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>().Where(p => p.IsSpring);
                 var arrowScaler = 15;
                 var barScaler = 0;
                 foreach (var item in portalList)
                 {
-                    if (!item.IsSpring) continue;
-
                     var angle = Math.Atan2(item.VerticalImpact, item.HorizontalImpact);
                     var sin = Math.Sin(angle);
                     var cos = Math.Cos(angle);
@@ -953,7 +960,7 @@ namespace WzComparerR2.MapRender
                     // For spine animation, we don't know how to calculate the correct cx and cy
                     renderSize = aniItem.Measure().Size;
                 }
-                
+
                 if (cx == 0) cx = renderSize.X;
                 if (cy == 0) cy = renderSize.Y;
             }
@@ -1048,32 +1055,12 @@ namespace WzComparerR2.MapRender
             var mesh = batcher.MeshPop();
             mesh.RenderObject = renderObj;
             mesh.Position = new Vector2(obj.X, obj.Y);
-            mesh.FlipX = obj.Flip;
             mesh.Z0 = obj.Z;
             mesh.Z1 = obj.Index;
 
             if (obj.MoveW != 0 || obj.MoveH != 0)
             {
-                double movingX = 0;
-                double movingY = 0;
-                double time = obj.View.Time / Math.PI / 1000 * 4 / obj.MoveP * 5000;
-                switch (obj.MoveType)
-                {
-                    case 0: // none
-                        break;
-                    case 1:
-                    case 2: // line
-                        movingX = obj.MoveW * Math.Cos(time);
-                        movingY = obj.MoveH * Math.Cos(time);
-                        break;
-                    case 3: // circle
-                        movingX = obj.MoveW * Math.Cos(time);
-                        movingY = obj.MoveH * Math.Sin(time);
-                        break;
-                    default:
-                        break;
-                }
-                mesh.Position += new Vector2((float)movingX, (float)movingY);
+                mesh.Position += GetMovingObjPos(obj);
             }
             mesh.FlipX = obj.View.Flip;
 
