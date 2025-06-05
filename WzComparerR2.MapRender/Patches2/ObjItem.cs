@@ -93,7 +93,7 @@ namespace WzComparerR2.MapRender.Patches2
                     if (int.TryParse(questNode.Text, out int questID))
                     {
                         item.Quest.Add(new QuestInfo(questID, Convert.ToInt32(questNode.Value)));
-                    }
+                    }  
                 }
             }
 

@@ -7,7 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
 using WzComparerR2.WzLib;
+using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
+using WzComparerR2.Config;
 using WzComparerR2.Rendering;
 using WzComparerR2.Animation;
 using WzComparerR2.MapRender.Patches2;
@@ -17,7 +19,6 @@ using Res = CharaSimResource.Resource;
 using MRes = WzComparerR2.MapRender.Properties.Resources;
 using static WzComparerR2.MapRender.UI.TooltipHelper;
 using TextureBlock = WzComparerR2.MapRender.UI.UIGraphics.RenderBlock<Microsoft.Xna.Framework.Graphics.Texture2D>;
-using WzComparerR2.Config;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -108,6 +109,10 @@ namespace WzComparerR2.MapRender.UI
             else if (target is IlluminantClusterItem)
             {
                 return DrawItem(gameTime, env, (IlluminantClusterItem)target);
+            }
+            else if (target is ObjItem)
+            {
+                return DrawItem(gameTime, env, (ObjItem)target);
             }
             else if (target is ReactorItem)
             {
@@ -268,6 +273,72 @@ namespace WzComparerR2.MapRender.UI
             return new TooltipContent() { blocks = blocks, size = size };
         }
 
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, ObjItem item)
+        {
+            var blocks = new List<TextBlock>();
+            Vector2 size = Vector2.Zero;
+            Vector2 current = Vector2.Zero;
+
+            if (item.Obstacle)
+            {
+                var sb = new StringBuilder();
+
+                sb.Append("ダメージ: ").AppendLine(item.Damage.ToString());
+
+                if (item.Impact > 0)
+                    sb.Append("影響: ").AppendLine(item.Impact.ToString());
+
+                int angle = item.Angle > 0 ? item.Angle : item.Dir * 30;
+                if (angle > 0)
+                {
+                    angle = (angle - 1) % 360 + 1;
+                    angle = item.View.Flip ? 360 - angle : angle;
+                    sb.Append("角度: ").Append((angle).ToString());
+
+                    sb.Append(" (");
+                    switch (((angle + 23) % 360) / 45)
+                    {
+                        case 0:
+                            sb.Append("↑");
+                            break;
+                        case 1:
+                            sb.Append("↗");
+                            break;
+                        case 2:
+                            sb.Append("→");
+                            break;
+                        case 3:
+                            sb.Append("↘");
+                            break;
+                        case 4:
+                            sb.Append("↓");
+                            break;
+                        case 5:
+                            sb.Append("↙");
+                            break;
+                        case 6:
+                            sb.Append("←");
+                            break;
+                        case 7:
+                            sb.Append("↖");
+                            break;
+                        default:
+                            break;
+                    }   
+                    sb.AppendLine(")");
+                }
+
+                if (item.Disease > 0 && item.DiseaseLevel > 0)
+                {
+                    sb.Append("状態異常: ").AppendLine($"{ItemStringHelper.GetMobSkillName(item.Disease)} ({item.DiseaseLevel})");
+                }
+
+                sb.Length -= 2;
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, sb.ToString(), ref current, Color.White, ref size.X));
+                size.Y = current.Y;
+            }
+            return new TooltipContent() { blocks = blocks, size = size };
+        }
 
         private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, ReactorItem item)
         {

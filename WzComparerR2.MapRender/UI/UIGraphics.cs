@@ -68,7 +68,7 @@ namespace WzComparerR2.MapRender.UI
             }
 
             //绘制左下
-            blocks.Add(new RenderBlock<T>(res.SW, new Rectangle(x[0], y[2], x[1] - x[0], y[3] - y[2])));
+            blocks.Add(new RenderBlock<T>(res.SW, new Rectangle(x[0], y[2], sw.X, y[3] - y[2])));
 
             //绘制下
             if (sw.Y == s.Y)

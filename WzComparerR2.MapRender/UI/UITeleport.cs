@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -179,7 +179,7 @@ namespace WzComparerR2.MapRender.UI
             }
             return res;
         }
-        
+
         public class TextBlockTooltip : Control, ITooltipTarget // 마우스오버시 툴팁 출력 영역
         {
             public TextBlockTooltip()
