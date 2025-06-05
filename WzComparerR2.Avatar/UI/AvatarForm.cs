@@ -2085,7 +2085,7 @@ namespace WzComparerR2.Avatar.UI
                 {
                     var dlg = new SaveFileDialog()
                     {
-                        Title = "アバターフレームを保存",
+                        Title = "Save Avatar Frame",
                         Filter = "PNG (*.png)|*.png|*.*|*.*",
                         FileName = defaultFileName
                     };

@@ -128,7 +128,7 @@ namespace WzComparerR2.Animation
 
                 if (frame.Delay == 0)
                 {
-                    frame.Delay = 120;//给予默认delay
+                    frame.Delay = 120; // Default delay
                 }
                 return frame;
             }
