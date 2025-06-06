@@ -80,7 +80,7 @@ namespace WzComparerR2.MapRender.UI
         protected override void InitializeComponents()
         {
             var canvas = new Canvas();
-            var canvasBackTexture = Engine.Instance.AssetManager.LoadTexture(null, nameof(MRes.UIWindow2_img_WorldMap_Border_0));
+            var canvasBackTexture = Engine.Instance.AssetManager.LoadTexture(null, nameof(MRes.UI_UIMap_img_WorldMap_backgrnd));
             canvas.Background = new ImageBrush() { ImageSource = new BitmapImage() { Texture = canvasBackTexture }, Stretch = Stretch.None };
             canvas.SetBinding(Canvas.WidthProperty, new Binding(UIWorldMap.WidthProperty) { Source = this, Mode = BindingMode.TwoWay });
             canvas.SetBinding(Canvas.HeightProperty, new Binding(UIWorldMap.HeightProperty) { Source = this, Mode = BindingMode.TwoWay });
@@ -88,7 +88,7 @@ namespace WzComparerR2.MapRender.UI
             this.Content = canvas;
 
             Border title = new Border();
-            title.Height = 17;
+            title.Height = 30;
             title.SetBinding(Canvas.WidthProperty, new Binding(Canvas.WidthProperty) { Source = canvas });
             canvas.Children.Add(title);
             this.SetDragTarget(title);
@@ -96,8 +96,8 @@ namespace WzComparerR2.MapRender.UI
             ComboBox cmbMaps = new ComboBox();
             cmbMaps.Width = 150;
             cmbMaps.Height = 20;
-            Canvas.SetLeft(cmbMaps, 10);
-            Canvas.SetTop(cmbMaps, 23);
+            Canvas.SetLeft(cmbMaps, 294);
+            Canvas.SetTop(cmbMaps, 42);
             cmbMaps.SetBinding(ComboBox.SelectedItemProperty, new Binding(UIWorldMap.CurrentWorldMapProperty) { Source = this, Mode = BindingMode.TwoWay });
             canvas.Children.Add(cmbMaps);
             this.CmbMaps = cmbMaps;
@@ -105,8 +105,8 @@ namespace WzComparerR2.MapRender.UI
             ComboBox cmbQuestList = new ComboBox();
             cmbQuestList.Width = 100;
             cmbQuestList.Height = 20;
-            Canvas.SetLeft(cmbQuestList, 250);
-            Canvas.SetTop(cmbQuestList, 23);
+            Canvas.SetLeft(cmbQuestList, 450);
+            Canvas.SetTop(cmbQuestList, 42);
             cmbQuestList.SetBinding(ComboBox.SelectedIndexProperty, new Binding(UIWorldMap.SelectedQuestLimitIndexProperty) { Source = this, Mode = BindingMode.TwoWay });
             canvas.Children.Add(cmbQuestList);
             this.CmbQuestList = cmbQuestList;
@@ -114,8 +114,8 @@ namespace WzComparerR2.MapRender.UI
             ComboBox cmbFogList = new ComboBox();
             cmbFogList.Width = 100;
             cmbFogList.Height = 20;
-            Canvas.SetLeft(cmbFogList, 250);
-            Canvas.SetTop(cmbFogList, 23);
+            Canvas.SetLeft(cmbFogList, 450);
+            Canvas.SetTop(cmbFogList, 42);
             cmbFogList.SetBinding(ComboBox.SelectedIndexProperty, new Binding(UIWorldMap.SelectedFogIndexProperty) { Source = this, Mode = BindingMode.TwoWay });
             canvas.Children.Add(cmbFogList);
             this.CmbFogList = cmbFogList;
@@ -124,8 +124,8 @@ namespace WzComparerR2.MapRender.UI
             mapArea.Width = 640;
             mapArea.Height = 480;
             mapArea.InputBindings.Add(new InputBinding(new RelayCommand(MapArea_RightClick), new MouseGesture(MouseAction.RightClick)));
-            Canvas.SetLeft(mapArea, 7);
-            Canvas.SetTop(mapArea, 44);
+            Canvas.SetLeft(mapArea, 196);
+            Canvas.SetTop(mapArea, 66);
             canvas.Children.Add(mapArea);
             this.SetBinding(CurrentWorldMapProperty, new Binding(Control.DataContextProperty) { Source = mapArea, Mode = BindingMode.OneWayToSource });
             this.SetBinding(CurrentMapIDProperty, new Binding("CurrentMapID") { Source = mapArea, Mode = BindingMode.OneWayToSource });
@@ -133,21 +133,28 @@ namespace WzComparerR2.MapRender.UI
             this.SetBinding(SelectedFogIndexProperty, new Binding("SelectedFogIndex") { Source = mapArea, Mode = BindingMode.OneWayToSource });
             this.MapArea = mapArea;
 
-            Button btnBack = new Button();
-            btnBack.Width = 50;
-            btnBack.Height = 20;
-            btnBack.Content = "Return";
+            ImageButton btnGoToCurrentMap = new ImageButton();
+            btnGoToCurrentMap.Name = "GoToCurrentMap";
+            btnGoToCurrentMap.Click += BtnGoToCurrentMap_Click;
+            btnGoToCurrentMap.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
+            Canvas.SetLeft(btnGoToCurrentMap, 205);
+            Canvas.SetTop(btnGoToCurrentMap, 40);
+            canvas.Children.Add(btnGoToCurrentMap);
+
+            ImageButton btnBack = new ImageButton();
+            btnBack.Name = "Back";
             btnBack.Click += BtnBack_Click;
-            Canvas.SetLeft(btnBack, 180);
-            Canvas.SetTop(btnBack, 23);
+            btnBack.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
+            Canvas.SetLeft(btnBack, 247);
+            Canvas.SetTop(btnBack, 40);
             canvas.Children.Add(btnBack);
 
             ImageButton btnClose = new ImageButton();
             btnClose.Name = "Close";
             btnClose.Click += BtnClose_Click;
             btnClose.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
-            Canvas.SetRight(btnClose, 7);
-            Canvas.SetTop(btnClose, 5);
+            Canvas.SetRight(btnClose, 12);
+            Canvas.SetTop(btnClose, 12);
             canvas.Children.Add(btnClose);
 
             this.Width = canvasBackTexture.Width;
@@ -568,6 +575,11 @@ namespace WzComparerR2.MapRender.UI
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             this.GoBack();
+        }
+
+        private void BtnGoToCurrentMap_Click(object sender, RoutedEventArgs e)
+        {
+            this.JumpToCurrentMap();
         }
 
         private void MapArea_RightClick(object obj)

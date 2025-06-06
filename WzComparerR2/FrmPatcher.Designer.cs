@@ -1,4 +1,6 @@
-﻿namespace WzComparerR2
+﻿using DevComponents.DotNetBar;
+
+namespace WzComparerR2
 {
     partial class FrmPatcher
     {
@@ -28,6 +30,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo2 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo3 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo4 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo5 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo6 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo7 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo8 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo9 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmPatcher));
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo10 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo11 = new DevComponents.DotNetBar.SuperTooltipInfo();
+            DevComponents.DotNetBar.SuperTooltipInfo superTooltipInfo1 = new DevComponents.DotNetBar.SuperTooltipInfo();
             this.comboBoxEx1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.integerInput1 = new DevComponents.Editors.IntegerInput();
             this.txtUrl = new DevComponents.DotNetBar.Controls.TextBoxX();
@@ -44,6 +58,7 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.buttonXCheck = new DevComponents.DotNetBar.ButtonX();
             this.expandablePanel2 = new DevComponents.DotNetBar.ExpandablePanel();
+            this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -52,9 +67,6 @@
             this.chkCompare = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.panelEx2 = new DevComponents.DotNetBar.PanelEx();
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
-            this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
-            this.txtNotice = new DevComponents.DotNetBar.Controls.TextBoxX();
-            this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.advTreePatchFiles = new DevComponents.AdvTree.AdvTree();
             this.columnHeader1 = new DevComponents.AdvTree.ColumnHeader();
@@ -66,6 +78,9 @@
             this.nodeConnector1 = new DevComponents.AdvTree.NodeConnector();
             this.elementStyle1 = new DevComponents.DotNetBar.ElementStyle();
             this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.txtNotice = new DevComponents.DotNetBar.Controls.TextBoxX();
+            this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.txtPatchState = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.progressBarX1 = new DevComponents.DotNetBar.Controls.ProgressBarX();
@@ -81,7 +96,6 @@
             this.labelX5 = new DevComponents.DotNetBar.LabelX();
             this.labelX3 = new DevComponents.DotNetBar.LabelX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
-            this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.integerInput1)).BeginInit();
             this.expandablePanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -89,9 +103,9 @@
             this.panelEx2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
-            this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.advTreePatchFiles)).BeginInit();
+            this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanel3.SuspendLayout();
             this.panelEx1.SuspendLayout();
             this.expandablePanel3.SuspendLayout();
@@ -102,11 +116,12 @@
             this.comboBoxEx1.DisplayMember = "Text";
             this.comboBoxEx1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.comboBoxEx1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxEx1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxEx1.FormattingEnabled = true;
-            this.comboBoxEx1.ItemHeight = 15;
+            this.comboBoxEx1.ItemHeight = 13;
             this.comboBoxEx1.Location = new System.Drawing.Point(12, 35);
             this.comboBoxEx1.Name = "comboBoxEx1";
-            this.comboBoxEx1.Size = new System.Drawing.Size(86, 21);
+            this.comboBoxEx1.Size = new System.Drawing.Size(86, 19);
             this.comboBoxEx1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.comboBoxEx1.TabIndex = 0;
             this.comboBoxEx1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEx1_SelectedIndexChanged);
@@ -126,7 +141,7 @@
             this.integerInput1.MinValue = 0;
             this.integerInput1.Name = "integerInput1";
             this.integerInput1.ShowUpDown = true;
-            this.integerInput1.Size = new System.Drawing.Size(60, 21);
+            this.integerInput1.Size = new System.Drawing.Size(60, 19);
             this.integerInput1.TabIndex = 1;
             this.integerInput1.ValueChanged += new System.EventHandler(this.integerInput_ValueChanged);
             // 
@@ -166,11 +181,11 @@
             // 
             // 
             this.chkDeadPatch.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkDeadPatch.Location = new System.Drawing.Point(81, 87);
+            this.chkDeadPatch.Location = new System.Drawing.Point(120, 87);
             this.chkDeadPatch.Name = "chkDeadPatch";
-            this.chkDeadPatch.Size = new System.Drawing.Size(82, 16);
+            this.chkDeadPatch.Size = new System.Drawing.Size(88, 18);
             this.chkDeadPatch.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkDeadPatch, new DevComponents.DotNetBar.SuperTooltipInfo("Immediate Patch", "", "After launching, and after updating each file, the temporary files will be overwritten with the original files. By doing this it will reduce the file required space, but may cause problems.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(200, 140)));
+            this.superTooltip1.SetSuperTooltip(this.chkDeadPatch, new DevComponents.DotNetBar.SuperTooltipInfo("Immediate Patch", "", "After launching, and after updating each file, the temporary files will be overwritten with the original files. By doing this it will reduce the file required space, but may cause problems.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(200, 200)));
             this.chkDeadPatch.TabIndex = 7;
             this.chkDeadPatch.Text = "Immediate Patch";
             // 
@@ -184,7 +199,7 @@
             this.chkPrePatch.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkPrePatch.Location = new System.Drawing.Point(6, 87);
             this.chkPrePatch.Name = "chkPrePatch";
-            this.chkPrePatch.Size = new System.Drawing.Size(76, 16);
+            this.chkPrePatch.Size = new System.Drawing.Size(125, 18);
             this.chkPrePatch.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.superTooltip1.SetSuperTooltip(this.chkPrePatch, new DevComponents.DotNetBar.SuperTooltipInfo("Prepatch", "", "Preload will start before opening the launcher and before patching. Once the preload is finished, you may freely choose your necessary files to renew or change the order of the files that require patching. Once finished choosing, please click on the Patch button to start the renewal process.", null, null, DevComponents.DotNetBar.eTooltipColor.Default, true, false, new System.Drawing.Size(200, 200)));
             this.chkPrePatch.TabIndex = 6;
@@ -277,9 +292,9 @@
             this.expandablePanel1.CanvasColor = System.Drawing.SystemColors.Control;
             this.expandablePanel1.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.expandablePanel1.Controls.Add(this.flowLayoutPanel1);
-            this.expandablePanel1.Controls.Add(this.buttonXCheck);
             this.expandablePanel1.Controls.Add(this.comboBoxEx1);
             this.expandablePanel1.Controls.Add(this.txtUrl);
+            this.expandablePanel1.Controls.Add(this.buttonXCheck);
             this.expandablePanel1.DisabledBackColor = System.Drawing.Color.Empty;
             this.expandablePanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.expandablePanel1.ExpandOnTitleClick = true;
@@ -332,13 +347,13 @@
             // 
             this.expandablePanel2.CanvasColor = System.Drawing.SystemColors.Control;
             this.expandablePanel2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.expandablePanel2.Controls.Add(this.chkResolvePngLink);
-            this.expandablePanel2.Controls.Add(this.chkEnableDarkMode);
-            this.expandablePanel2.Controls.Add(this.chkOutputRemovedImg);
-            this.expandablePanel2.Controls.Add(this.chkOutputAddedImg);
-            this.expandablePanel2.Controls.Add(this.cmbComparePng);
-            this.expandablePanel2.Controls.Add(this.chkOutputPng);
-            this.expandablePanel2.Controls.Add(this.chkCompare);
+            //this.expandablePanel2.Controls.Add(this.chkResolvePngLink);
+            //this.expandablePanel2.Controls.Add(this.chkEnableDarkMode);
+            //this.expandablePanel2.Controls.Add(this.chkOutputRemovedImg);
+            //this.expandablePanel2.Controls.Add(this.chkOutputAddedImg);
+            //this.expandablePanel2.Controls.Add(this.cmbComparePng);
+            //this.expandablePanel2.Controls.Add(this.chkOutputPng);
+            //this.expandablePanel2.Controls.Add(this.chkCompare);
             this.expandablePanel2.Controls.Add(this.panelEx2);
             this.expandablePanel2.Controls.Add(this.buttonXPatch);
             this.expandablePanel2.Controls.Add(this.chkDeadPatch);
@@ -354,7 +369,7 @@
             this.expandablePanel2.ExpandOnTitleClick = true;
             this.expandablePanel2.Location = new System.Drawing.Point(0, 87);
             this.expandablePanel2.Name = "expandablePanel2";
-            this.expandablePanel2.Size = new System.Drawing.Size(384, 157);
+            this.expandablePanel2.Size = new System.Drawing.Size(384, 340);
             this.expandablePanel2.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.expandablePanel2.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
             this.expandablePanel2.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
@@ -478,7 +493,7 @@
             this.panelEx2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.panelEx2.Controls.Add(this.superTabControl1);
             this.panelEx2.DisabledBackColor = System.Drawing.Color.Empty;
-            this.panelEx2.Location = new System.Drawing.Point(3, 157);
+            this.panelEx2.Location = new System.Drawing.Point(3, 111);
             this.panelEx2.Name = "panelEx2";
             this.panelEx2.Size = new System.Drawing.Size(360, 180);
             this.panelEx2.Style.Alignment = System.Drawing.StringAlignment.Center;
@@ -490,7 +505,7 @@
             this.panelEx2.Style.GradientAngle = 90;
             this.panelEx2.TabIndex = 9;
             this.panelEx2.Text = "panelEx2";
-            this.panelEx2.Visible = false;
+            this.panelEx2.Enabled = false;
             // 
             // superTabControl1
             // 
@@ -517,7 +532,7 @@
             this.superTabControl1.Name = "superTabControl1";
             this.superTabControl1.ReorderTabsEnabled = true;
             this.superTabControl1.SelectedTabFont = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold);
-            this.superTabControl1.SelectedTabIndex = 1;
+            this.superTabControl1.SelectedTabIndex = 2;
             this.superTabControl1.Size = new System.Drawing.Size(360, 180);
             this.superTabControl1.TabAlignment = DevComponents.DotNetBar.eTabStripAlignment.Left;
             this.superTabControl1.TabFont = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -528,48 +543,15 @@
             this.superTabItem3});
             this.superTabControl1.Text = "superTabControl1";
             // 
-            // superTabControlPanel1
-            // 
-            this.superTabControlPanel1.Controls.Add(this.txtNotice);
-            this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel1.Location = new System.Drawing.Point(63, 0);
-            this.superTabControlPanel1.Name = "superTabControlPanel1";
-            this.superTabControlPanel1.Size = new System.Drawing.Size(297, 180);
-            this.superTabControlPanel1.TabIndex = 1;
-            this.superTabControlPanel1.TabItem = this.superTabItem1;
-            // 
-            // txtNotice
-            // 
-            // 
-            // 
-            // 
-            this.txtNotice.Border.Class = "TextBoxBorder";
-            this.txtNotice.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.txtNotice.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtNotice.Location = new System.Drawing.Point(0, 0);
-            this.txtNotice.Multiline = true;
-            this.txtNotice.Name = "txtNotice";
-            this.txtNotice.ReadOnly = true;
-            this.txtNotice.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtNotice.Size = new System.Drawing.Size(297, 180);
-            this.txtNotice.TabIndex = 0;
-            // 
-            // superTabItem1
-            // 
-            this.superTabItem1.AttachedControl = this.superTabControlPanel1;
-            this.superTabItem1.GlobalItem = false;
-            this.superTabItem1.Name = "superTabItem1";
-            this.superTabItem1.Text = "Notice";
-            // 
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.advTreePatchFiles);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel2.Location = new System.Drawing.Point(63, 0);
+            this.superTabControlPanel2.Location = new System.Drawing.Point(236, 0);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
-            this.superTabControlPanel2.Size = new System.Drawing.Size(257, 180);
+            this.superTabControlPanel2.Size = new System.Drawing.Size(124, 180);
             this.superTabControlPanel2.TabIndex = 0;
-            this.superTabControlPanel2.TabItem = this.superTabItem2;
+            this.superTabControlPanel2.TabItem = this.superTabItem3;
             // 
             // advTreePatchFiles
             // 
@@ -591,7 +573,7 @@
             this.advTreePatchFiles.DoubleClickTogglesNode = false;
             this.advTreePatchFiles.DragDropNodeCopyEnabled = false;
             this.advTreePatchFiles.DropAsChildOffset = 65535;
-            this.advTreePatchFiles.Enabled = true;
+            this.advTreePatchFiles.Enabled = false;
             this.advTreePatchFiles.ExpandWidth = 0;
             this.advTreePatchFiles.GridRowLines = true;
             this.advTreePatchFiles.Location = new System.Drawing.Point(0, 0);
@@ -662,6 +644,40 @@
             this.superTabItem2.Name = "superTabItem2";
             this.superTabItem2.Text = "File";
             // 
+            // superTabControlPanel1
+            // 
+            this.superTabControlPanel1.Controls.Add(this.txtNotice);
+            this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel1.Location = new System.Drawing.Point(63, 0);
+            this.superTabControlPanel1.Name = "superTabControlPanel1";
+            this.superTabControlPanel1.Size = new System.Drawing.Size(297, 180);
+            this.superTabControlPanel1.TabIndex = 1;
+            this.superTabControlPanel1.TabItem = this.superTabItem1;
+            this.superTabControlPanel1.Visible = false;
+            // 
+            // txtNotice
+            // 
+            // 
+            // 
+            // 
+            this.txtNotice.Border.Class = "TextBoxBorder";
+            this.txtNotice.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtNotice.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtNotice.Location = new System.Drawing.Point(0, 0);
+            this.txtNotice.Multiline = true;
+            this.txtNotice.Name = "txtNotice";
+            this.txtNotice.ReadOnly = true;
+            this.txtNotice.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtNotice.Size = new System.Drawing.Size(297, 180);
+            this.txtNotice.TabIndex = 0;
+            // 
+            // superTabItem1
+            // 
+            this.superTabItem1.AttachedControl = this.superTabControlPanel1;
+            this.superTabItem1.GlobalItem = false;
+            this.superTabItem1.Name = "superTabItem1";
+            this.superTabItem1.Text = "Notice";
+            // 
             // superTabControlPanel3
             // 
             this.superTabControlPanel3.Controls.Add(this.txtPatchState);
@@ -672,6 +688,7 @@
             this.superTabControlPanel3.Size = new System.Drawing.Size(257, 180);
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
+            this.superTabControlPanel3.Visible = false;
             // 
             // txtPatchState
             // 
@@ -688,6 +705,7 @@
             this.txtPatchState.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtPatchState.Size = new System.Drawing.Size(257, 162);
             this.txtPatchState.TabIndex = 1;
+            this.txtPatchState.Text = "This patcher supports the following types of patch files:\r\n\r\n1. Manual patcher (MaplePatchXXXtoYYY.exe)\r\n2. Automatic patch files (XXXXXtoYYYYY.patch, MaplePatchXXXtoYYY.patch)\r\n\r\nYou must select a valid MapleStory installation folder where MapleStory.exe or MapleStoryT.exe is located.\r\n\r\nIf you are low on disk space, you can enable Immediate Patch.";
             // 
             // progressBarX1
             // 
@@ -713,14 +731,14 @@
             // 
             this.panelEx1.CanvasColor = System.Drawing.SystemColors.Control;
             this.panelEx1.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.panelEx1.Controls.Add(this.expandablePanel3);
+            //this.panelEx1.Controls.Add(this.expandablePanel3);
             this.panelEx1.Controls.Add(this.expandablePanel2);
             this.panelEx1.Controls.Add(this.expandablePanel1);
             this.panelEx1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelEx1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelEx1.Location = new System.Drawing.Point(0, 0);
             this.panelEx1.Name = "panelEx1";
-            this.panelEx1.Size = new System.Drawing.Size(384, 361);
+            this.panelEx1.Size = new System.Drawing.Size(384, 374);
             this.panelEx1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelEx1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
             this.panelEx1.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
@@ -787,9 +805,9 @@
             // 
             this.txtPatchFile2.Border.Class = "TextBoxBorder";
             this.txtPatchFile2.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.txtPatchFile2.Location = new System.Drawing.Point(68, 34);
+            this.txtPatchFile2.Location = new System.Drawing.Point(92, 34);
             this.txtPatchFile2.Name = "txtPatchFile2";
-            this.txtPatchFile2.Size = new System.Drawing.Size(259, 21);
+            this.txtPatchFile2.Size = new System.Drawing.Size(235, 21);
             this.txtPatchFile2.TabIndex = 6;
             // 
             // buttonXOpen4
@@ -870,35 +888,20 @@
             this.labelX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.labelX3.Location = new System.Drawing.Point(12, 86);
             this.labelX3.Name = "labelX3";
-            this.labelX3.Size = new System.Drawing.Size(285, 18);
+            this.labelX3.Size = new System.Drawing.Size(340, 18);
             this.labelX3.TabIndex = 1;
             this.labelX3.Text = "This feature is unstable. Use this with caution!";
             // 
             // superTooltip1
             // 
-            this.superTooltip1.DefaultTooltipSettings = new DevComponents.DotNetBar.SuperTooltipInfo("", "", "", null, null, DevComponents.DotNetBar.eTooltipColor.Gray);
+            this.superTooltip1.DefaultTooltipSettings = superTooltipInfo1;
             // 
-            // chkResolvePngLink
-            //
-            this.chkResolvePngLink.AutoSize = true;
-            this.chkResolvePngLink.BackColor = System.Drawing.Color.Transparent;
-            //
-            //
-            //
-            this.chkResolvePngLink.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkResolvePngLink.Location = new System.Drawing.Point(290, 111);
-            this.chkResolvePngLink.Name = "chkResolvePngLink";
-            this.chkResolvePngLink.Size = new System.Drawing.Size(95, 16);
-            this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("Resolve Link", "", "Comparison report will analyze and compare linked pictures.\r\nThis will filter out redundant changes.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(190, 100)));
-            this.chkResolvePngLink.TabIndex = 18;
-            this.chkResolvePngLink.Text = "Resolve Link";
-            //
             // FrmPatcher
             // 
-            this.ClientSize = new System.Drawing.Size(384, 361);
+            this.ClientSize = new System.Drawing.Size(384, 444);
             this.Controls.Add(this.panelEx1);
             this.DoubleBuffered = true;
+            this.Font = new System.Drawing.Font("Arial", 9F);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmPatcher";
@@ -912,9 +915,9 @@
             this.panelEx2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).EndInit();
             this.superTabControl1.ResumeLayout(false);
-            this.superTabControlPanel1.ResumeLayout(false);
             this.superTabControlPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.advTreePatchFiles)).EndInit();
+            this.superTabControlPanel1.ResumeLayout(false);
             this.superTabControlPanel3.ResumeLayout(false);
             this.panelEx1.ResumeLayout(false);
             this.expandablePanel3.ResumeLayout(false);

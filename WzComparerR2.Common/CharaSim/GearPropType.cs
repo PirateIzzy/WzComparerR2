@@ -194,10 +194,16 @@ namespace WzComparerR2.CharaSim
         tucIgnoreForPotential,
         Etuc,
         CuttableCount,
-        //MSN专属属性
+        price,
+        notSale,
+        scissorAmount_wz2,
+        illusionGrade,
+
+        //MSN exclusive stats
         blockUpgradeExtraOption,
         blockUpgradeStarforce,
         mintable,
+        cosmetic,
 
         gatherTool_incSkillLevel = 2000,
         gatherTool_incSpeed,

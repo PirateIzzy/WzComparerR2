@@ -311,15 +311,15 @@ namespace WzComparerR2.CharaSim
                     res[0] = "Ignored Enemy DEF";
                     res[1] = "+" + value + "%";
                     return res;
-                    /*
-                case GearPropType.attackSpeed:
-                    if (2 <= value && value <= 9)
-                    {
-                        res[0] = "공격 속도";
-                        res[1] = $"{10 - value}단계";
-                    }
-                    return res;
-                    */
+                /*
+            case GearPropType.attackSpeed:
+                if (2 <= value && value <= 9)
+                {
+                    res[0] = "공격 속도";
+                    res[1] = $"{10 - value}단계";
+                }
+                return res;
+                */
                 case GearPropType.nbdR:
                     res[0] = "Damage Against Normal Monsters";
                     res[1] = "+" + value + "%";
@@ -543,11 +543,14 @@ namespace WzComparerR2.CharaSim
             {
                 //case GearType.body: return "Avatar (Body)";
                 case GearType.head: return "Avatar (Head)";
+                case GearType.head_n: return "Head";
                 case GearType.face:
-                case GearType.face2: return "Face";
+                case GearType.face2:
+                case GearType.face_n: return "Face";
                 case GearType.hair:
                 case GearType.hair2:
-                case GearType.hair3: return "Hair";
+                case GearType.hair3:
+                case GearType.hair_n: return "Hair";
                 case GearType.faceAccessory: return "Face Accessory";
                 case GearType.eyeAccessory: return "Eye Accessory";
                 case GearType.earrings: return "Earrings";
@@ -1371,6 +1374,19 @@ namespace WzComparerR2.CharaSim
                 case 17513: return "Mo Xuan(5)";
                 case 17514: return "Mo Xuan(6)";
 
+                case 18000: return "Sia Astelle";
+                case 18001: return "Erel Light";
+                case 18100: return "Erel Light(1)";
+                case 18110: return "Erel Light(2)";
+                case 18111: return "Erel Light(3)";
+                case 18112: return "Erel Light(4)";
+                case 18114: return "Erel Light(6)";
+                case 18200: return "Sia Astelle(1)";
+                case 18210: return "Sia Astelle(2)";
+                case 18211: return "Sia Astelle(3)";
+                case 18212: return "Sia Astelle(4)";
+                case 18214: return "Sia Astelle(6)";
+
                 case 40000: return "5th";
                 case 40001: return "5th (Warrior)";
                 case 40002: return "5th (Magician)";
@@ -1419,5 +1435,67 @@ namespace WzComparerR2.CharaSim
             return sb.Length > 0 ? sb.ToString() : "0";
         }
         */
+
+        public static string GetMobSkillName(int id)
+        {
+            switch (id)
+            {
+                case 100: return "ATT increase";
+                case 101: return "Magic ATT increase";
+                case 102: return "DEF increase";
+                case 103: return "Magic DEF increase";
+                case 105: return "HP absorption";
+                case 110: return "Area ATT increase";
+                case 111: return "Area Magic ATT increase";
+                case 112: return "Area DEF increase";
+                case 113: return "Area Magic DEF increase";
+                case 114: return "HP recovery";
+                case 115: return "Movement speed increase";
+                case 120: return "Seal";
+                case 121: return "Miss";
+                case 122: return "Weak";
+                case 123: return "Faint";
+                case 124: return "Curse";
+                case 125: return "Poisoning";
+                case 126: return "Slow";
+                case 127: return "Remove buff";
+                case 128: return "Temptation";
+                case 129: return "Banish";
+                case 131: return "Area continuous damage";
+                case 132: return "Confusion";
+                case 133: return "Undead";
+                case 134: return "Potion seal";
+                case 135: return "Do not stop";
+                case 136: return "Darkness";
+                case 137: return "Pronounced";
+                case 138: return "Nullify potential";
+                case 140: return "Ignore physical attacks";
+                case 141: return "Ignore magic attacks";
+                case 142: return "Hard skin";
+                case 143: return "Physical attack reflection";
+                case 144: return "Magic attack reflection";
+                case 145: return "Attack reflection";
+                case 146: return "Invincible";
+
+                case 150: return "ATT increase";
+                case 151: return "Magic ATT increase";
+                case 152: return "DEF increase";
+                case 153: return "Magic DEF increase";
+                case 154: return "Accuracy rate increase";
+                case 155: return "Evasion rate increase";
+                case 156: return "Movement speed increase";
+
+                case 170: return "Teleport";
+                case 171: return "Explosion";
+                case 172: return "Mutation";
+                case 173: return "Airborne";
+                case 174: return "Petrification";
+
+                case 200: return "Summon";
+                case 201: return "Summon";
+
+                default: return null;
+            }
+        }
     }
 }

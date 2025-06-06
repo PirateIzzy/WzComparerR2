@@ -20,8 +20,16 @@ namespace WzComparerR2.MapRender.Patches2
         public int MoveW { get; set; }
         public int MoveH { get; set; }
         public int MoveP { get; set; }
+        public int MoveDelay { get; set; }
         public bool Flip { get; set; }
         public bool Light { get; set; }
+        public bool Obstacle { get; set; }
+        public int Damage { get; set; }
+        public int Dir { get; set; }
+        public int Angle { get; set; }
+        public int Impact { get; set; }
+        public int Disease { get; set; }
+        public int DiseaseLevel { get; set; }
         public string SpineAni { get; set; }
         public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
         public List<QuestExInfo> Questex { get; private set; } = new List<QuestExInfo>();
@@ -45,10 +53,19 @@ namespace WzComparerR2.MapRender.Patches2
                 MoveW = 0,
                 MoveH = 0,
                 MoveP = 5000,
+                MoveDelay = 0,
 
                 Flip = node.Nodes["f"].GetValueEx(false),
                 Light = node.Nodes["light"].GetValueEx<int>(0) != 0,
                 SpineAni = node.Nodes["spineAni"].GetValueEx<string>(null),
+
+                Obstacle = false,
+                Damage = 0,
+                Dir = 0,
+                Angle = 0,
+                Impact = 0,
+                Disease = 0,
+                DiseaseLevel = 0,
             };
 
             string objTags = node.Nodes["tags"].GetValueEx<string>(null);
@@ -76,7 +93,7 @@ namespace WzComparerR2.MapRender.Patches2
                     if (int.TryParse(questNode.Text, out int questID))
                     {
                         item.Quest.Add(new QuestInfo(questID, Convert.ToInt32(questNode.Value)));
-                    }
+                    }  
                 }
             }
 
@@ -96,14 +113,26 @@ namespace WzComparerR2.MapRender.Patches2
                 }
             }
 
-            string path = $@"Map\Obj\{item.OS}.img\{item.L0}\{item.L1}\{item.L2}\0";
-            var obj_node = PluginManager.FindWz(path);
-            if (obj_node != null)
+            string path = $@"Map\Obj\{item.OS}.img\{item.L0}\{item.L1}\{item.L2}";
+            var top_obj_node = PluginManager.FindWz(path);
+            if (top_obj_node != null)
             {
-                item.MoveType = obj_node.Nodes["moveType"].GetValueEx(0);
-                item.MoveW = obj_node.Nodes["moveW"].GetValueEx(0);
-                item.MoveH = obj_node.Nodes["moveH"].GetValueEx(0);
-                item.MoveP = obj_node.Nodes["moveP"].GetValueEx(5000);
+                var obj_node = top_obj_node.FindNodeByPath("0");
+                if (obj_node != null)
+                {
+                    item.MoveType = obj_node.Nodes["moveType"].GetValueEx(0);
+                    item.MoveW = obj_node.Nodes["moveW"].GetValueEx(0);
+                    item.MoveH = obj_node.Nodes["moveH"].GetValueEx(0);
+                    item.MoveP = obj_node.Nodes["moveP"].GetValueEx(5000);
+                    item.MoveDelay = obj_node.Nodes["moveDelay"].GetValueEx(0);
+                }
+                item.Obstacle = top_obj_node.Nodes["obstacle"].GetValueEx(false);
+                item.Damage = top_obj_node.Nodes["damage"].GetValueEx(0);
+                item.Dir = top_obj_node.Nodes["dir"].GetValueEx(0);
+                item.Angle = top_obj_node.Nodes["angle"].GetValueEx(0);
+                item.Impact = top_obj_node.Nodes["impact"].GetValueEx(0);
+                item.Disease = top_obj_node.Nodes["disease"].GetValueEx(0);
+                item.DiseaseLevel = top_obj_node.Nodes["level"].GetValueEx(0);
             }
 
             return item;
@@ -120,6 +149,11 @@ namespace WzComparerR2.MapRender.Patches2
             /// 动画资源。
             /// </summary>
             public object Animator { get; set; }
+
+            /// <summary>
+            /// Flip state of item.
+            /// </summary>
+            public bool Flip { get; set; }
         }
     }
 }

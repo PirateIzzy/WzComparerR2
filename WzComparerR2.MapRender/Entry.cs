@@ -43,6 +43,7 @@ namespace WzComparerR2.MapRender
             btnItemMapRenderV2 = new ButtonItem("", "MapRenderV2");
             btnItemMapRenderV2.Click += btnItem_Click;
             bar2.Items.Add(btnItemMapRenderV2);
+
             ConfigManager.RegisterAllSection(this.GetType().Assembly);
         }
 
@@ -101,31 +102,31 @@ namespace WzComparerR2.MapRender
                         else
 #endif
                         {
-                            if (this.mapRenderGame2 != null)
-                            {
-                                // post message to the opening game.
-                                this.mapRenderGame2.LoadMap(img);
-                                return;
-                            }
-                            else
-                            {
-                                this.mapRenderGame2 = new FrmMapRender2() { StringLinker = sl };
-                                this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
-                                this.mapRenderGame2.LoadMap(img);
-
-                                try
+                                if (this.mapRenderGame2 != null)
                                 {
-                                    using (this.mapRenderGame2)
+                                    // post message to the opening game.
+                                    this.mapRenderGame2.LoadMap(img);
+                                    return;
+                                }
+                                else
+                                {
+                                    this.mapRenderGame2 = new FrmMapRender2() { StringLinker = sl };
+                                    this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
+                                    this.mapRenderGame2.LoadMap(img);
+
+                                    try
                                     {
-                                        this.mapRenderGame2.Run();
+                                        using (this.mapRenderGame2)
+                                        {
+                                            this.mapRenderGame2.Run();
+                                        }
+                                    }
+                                    finally
+                                    {
+                                        this.mapRenderGame2 = null;
                                     }
                                 }
-                                finally
-                                {
-                                    this.mapRenderGame2 = null;
-                                }
                             }
-                        }
 #if !DEBUG
                         }
                         catch (Exception ex)

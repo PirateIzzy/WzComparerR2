@@ -13,7 +13,12 @@ namespace WzComparerR2.CharaSim
         hair2 = 4,
         face2 = 5,
         hair3 = 6,
-
+        /// <summary>
+        /// MSU support
+        /// </summary>
+        face_n = 1790,
+        hair_n = 1791,
+        head_n = 1792,
         /// <summary>
         /// Face Accessory 101
         /// </summary>

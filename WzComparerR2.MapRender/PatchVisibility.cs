@@ -20,6 +20,9 @@ namespace WzComparerR2.MapRender
             this.PortalInEditMode = false;
             this.DefaultTagVisible = true;
             this.IlluminantClusterVisible = true;
+            this.SpringPortalPathVisible = true;
+            this.ObstacleAreaVisible = true;
+            this.CaptureRectVisible = true;
         }
 
         public bool BackVisible
@@ -75,6 +78,10 @@ namespace WzComparerR2.MapRender
         public bool IlluminantClusterPathVisible { get; set; }
 
         public bool SpringPortalPathVisible { get; set; }
+
+        public bool ObstacleAreaVisible { get; set; }
+
+        public bool CaptureRectVisible { get; set; }
 
         public bool PortalVisible
         {

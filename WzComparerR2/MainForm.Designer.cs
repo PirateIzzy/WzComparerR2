@@ -178,7 +178,7 @@
             this.itemContainer44 = new DevComponents.DotNetBar.ItemContainer();
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
             this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonOverlayRect = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonHitboxOverlay = new DevComponents.DotNetBar.ButtonItem();
             this.buttonLoadMultiFrameAniList = new DevComponents.DotNetBar.ButtonItem();
             this.buttonOverlayExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
@@ -217,11 +217,15 @@
             this.chkOutputCashTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputEqpTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputItemTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputMapTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputMobTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputNpcTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputSkillTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowChangeType = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowLinkedTamingMob = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkSkipKMSContent = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
@@ -2117,7 +2121,7 @@
             this.itemContainer44.Name = "itemContainer44";
             this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonDisableOverlayAni,
-            this.buttonOverlayRect,
+            this.buttonHitboxOverlay,
             this.buttonOverlayExtractGifEx,
             this.buttonLoadMultiFrameAniList});
             // 
@@ -2131,12 +2135,26 @@
             this.buttonDisableOverlayAni.Text = "Disable Animation Overlay";
             this.buttonDisableOverlayAni.Click += new System.EventHandler(this.buttonDisableOverlayAni_Click);
             // 
-            // buttonOverlayRect
+            // buttonHitboxOverlay
             // 
-            this.buttonOverlayRect.Name = "buttonOverlayRect";
-            this.buttonOverlayRect.Text = "Add Boundary Rectangle";
-            this.buttonOverlayRect.Tooltip = "Draws a semi-transparent rectangle for the input range.";
-            this.buttonOverlayRect.Click += new System.EventHandler(this.buttonOverlayRect_Click);
+            this.buttonHitboxOverlay.Name = "buttonHitboxOverlay";
+            this.buttonHitboxOverlay.Text = "Draw Range";
+            this.buttonHitboxOverlay.Tooltip = "Draws a semi-transparent shape for the input range.";
+            this.buttonHitboxOverlay.Click += new System.EventHandler(this.buttonHitboxOverlay_Click);
+            // 
+            // buttonItemExtractGifEx
+            //
+            this.buttonOverlayExtractGifEx.Name = "buttonOverlayExtractGifEx";
+            this.buttonOverlayExtractGifEx.Text = "Add Nest";
+            this.buttonOverlayExtractGifEx.Tooltip = "Nest by calling the animation on all child nodes instead of sequentially starting from 0.";
+            this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
+            // 
+            // buttonLoadMultiFrameAniList
+            // 
+            this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
+            this.buttonLoadMultiFrameAniList.Text = "Load Multi Frame";
+            this.buttonLoadMultiFrameAniList.Tooltip = "Calls a list of found frames. You can select any of the loaded lists to nest them.";
+            this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // buttonItemExtractGifEx
             //
@@ -2144,13 +2162,6 @@
             this.buttonOverlayExtractGifEx.Text = "Nesting+";
             this.buttonOverlayExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node and nest them, without using ordinal node names.";
             this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
-            // 
-            // buttonOverlayRect
-            // 
-            this.buttonLoadMultiFrameAniList.Name = "buttonLoadMultiFrameAniList";
-            this.buttonLoadMultiFrameAniList.Text = "Load Multiframe Animation";
-            this.buttonLoadMultiFrameAniList.Tooltip = "Load a list of frames to find. You can select one of the loaded lists and nest it..";
-            this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
             // textBoxX1
             // 
@@ -2448,11 +2459,14 @@
             this.superTabControlPanel2.Controls.Add(this.chkOutputCashTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputEqpTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputItemTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputMapTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputMobTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputNpcTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputSkillTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkShowObjectID);
             this.superTabControlPanel2.Controls.Add(this.chkShowChangeType);
+            this.superTabControlPanel2.Controls.Add(this.chkShowLinkedTamingMob);
+            this.superTabControlPanel2.Controls.Add(this.chkSkipKMSContent);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2550,17 +2564,30 @@
             this.chkOutputItemTooltip.TabIndex = 14;
             this.chkOutputItemTooltip.Text = "Save Item Tooltip";
             // 
+            // chkOutputMapTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputMapTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputMapTooltip.Location = new System.Drawing.Point(550, 142);
+            this.chkOutputMapTooltip.Name = "chkOutputMapTooltip";
+            this.chkOutputMapTooltip.Size = new System.Drawing.Size(155, 23);
+            this.chkOutputMapTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkOutputMapTooltip.TabIndex = 15;
+            this.chkOutputMapTooltip.Text = "Save Map Tooltip";
+            // 
             // chkOutputMobTooltip
             // 
             // 
             // 
             // 
             this.chkOutputMobTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputMobTooltip.Location = new System.Drawing.Point(550, 142);
+            this.chkOutputMobTooltip.Location = new System.Drawing.Point(550, 169);
             this.chkOutputMobTooltip.Name = "chkOutputMobTooltip";
             this.chkOutputMobTooltip.Size = new System.Drawing.Size(155, 23);
             this.chkOutputMobTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkOutputMobTooltip.TabIndex = 15;
+            this.chkOutputMobTooltip.TabIndex = 16;
             this.chkOutputMobTooltip.Text = "Save Mob Tooltip";
             // 
             // chkOutputNpcTooltip
@@ -2569,11 +2596,11 @@
             // 
             // 
             this.chkOutputNpcTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputNpcTooltip.Location = new System.Drawing.Point(550, 169);
+            this.chkOutputNpcTooltip.Location = new System.Drawing.Point(550, 196);
             this.chkOutputNpcTooltip.Name = "chkOutputNpcTooltip";
             this.chkOutputNpcTooltip.Size = new System.Drawing.Size(135, 23);
             this.chkOutputNpcTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkOutputNpcTooltip.TabIndex = 16;
+            this.chkOutputNpcTooltip.TabIndex = 17;
             this.chkOutputNpcTooltip.Text = "Save NPC Tooltip";
             // 
             // chkShowObjectID
@@ -2582,11 +2609,11 @@
             // 
             // 
             this.chkShowObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowObjectID.Location = new System.Drawing.Point(550, 196);
+            this.chkShowObjectID.Location = new System.Drawing.Point(550, 223);
             this.chkShowObjectID.Name = "chkShowObjectID";
             this.chkShowObjectID.Size = new System.Drawing.Size(185, 23);
             this.chkShowObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkShowObjectID.TabIndex = 17;
+            this.chkShowObjectID.TabIndex = 18;
             this.chkShowObjectID.Text = "Show ID in Saved Tooltip";
             this.chkShowObjectID.Checked = true;
             // 
@@ -2596,13 +2623,42 @@
             // 
             // 
             this.chkShowChangeType.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowChangeType.Location = new System.Drawing.Point(550, 223);
+            this.chkShowChangeType.Location = new System.Drawing.Point(550, 250);
             this.chkShowChangeType.Name = "chkShowChangeType";
             this.chkShowChangeType.Size = new System.Drawing.Size(135, 23);
             this.chkShowChangeType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkShowChangeType.TabIndex = 18;
+            this.chkShowChangeType.TabIndex = 19;
             this.chkShowChangeType.Text = "Show Change Type";
             this.chkShowChangeType.Checked = true;
+            // 
+            // chkShowLinkedTamingMob
+            // 
+            // 
+            // 
+            // 
+            this.chkShowLinkedTamingMob.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowLinkedTamingMob.Location = new System.Drawing.Point(550, 277);
+            this.chkShowLinkedTamingMob.Name = "chkShowLinkedTamingMob";
+            this.chkShowLinkedTamingMob.Size = new System.Drawing.Size(185, 23);
+            this.chkShowLinkedTamingMob.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowLinkedTamingMob.TabIndex = 20;
+            this.chkShowLinkedTamingMob.Text = "Show Linked Taming Mob";
+            this.chkShowLinkedTamingMob.Checked = false;
+            // 
+            // chkSkipKMSContent
+            // 
+            // 
+            // 
+            // 
+            this.chkSkipKMSContent.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkSkipKMSContent.Location = new System.Drawing.Point(550, 304);
+            this.chkSkipKMSContent.Name = "chkSkipKMSContent";
+            this.chkSkipKMSContent.Size = new System.Drawing.Size(145, 23);
+            this.chkSkipKMSContent.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkSkipKMSContent, new DevComponents.DotNetBar.SuperTooltipInfo("Skip KMS Skills", "", "Do not compare skills that exist in KMS.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
+            this.chkSkipKMSContent.TabIndex = 22;
+            this.chkSkipKMSContent.Text = "Skip KMS Skills";
+            this.chkSkipKMSContent.Checked = false;
             // 
             // chkOutputRemovedImg
             // 
@@ -3407,7 +3463,7 @@
         private DevComponents.DotNetBar.ItemContainer itemContainer44;
         private DevComponents.DotNetBar.ButtonItem buttonItemGifSetting;
         private DevComponents.DotNetBar.ButtonItem buttonDisableOverlayAni;
-        private DevComponents.DotNetBar.ButtonItem buttonOverlayRect; 
+        private DevComponents.DotNetBar.ButtonItem buttonHitboxOverlay; 
         private DevComponents.DotNetBar.ButtonItem buttonLoadMultiFrameAniList;
         private DevComponents.DotNetBar.ButtonItem buttonOverlayExtractGifEx;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
@@ -3496,12 +3552,15 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputCashTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputEqpTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputItemTooltip;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputMapTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputMobTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputNpcTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputSkillTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowObjectID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowChangeType;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowLinkedTamingMob;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipKMSContent;
         private DevComponents.Editors.ComboItem comboItem19;
         private DevComponents.Editors.ComboItem comboItem12_2;
     }

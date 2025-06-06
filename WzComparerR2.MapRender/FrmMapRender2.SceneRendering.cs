@@ -159,7 +159,7 @@ namespace WzComparerR2.MapRender
             {
                 var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
                 {
-                    return item.rect.Contains(mouse) && (item.item is LifeItem || item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem);
+                    return item.rect.Contains(mouse) && (item.item is LifeItem || item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem || (item.item is ObjItem && (item.item as ObjItem).Obstacle));
                 });
                 target = mouseTarget.item;
             }
@@ -214,6 +214,15 @@ namespace WzComparerR2.MapRender
             var mouse = this.renderEnv.Input.MousePosition;
             var mousePos = this.renderEnv.Camera.CameraToWorld(mouse);
             sb.AppendFormat("{0},{1}", mousePos.X, mousePos.Y);
+
+
+            //Power Requirement
+            if (this.mapData?.Barrier > 0 || this.mapData?.BarrierArc > 0 || this.mapData?.BarrierAut > 0)
+            {
+                sb.Append(" ReqPwr:").Append(this.mapData?.Barrier > 0 ? "★" + this.mapData?.Barrier.ToString() : "").Append(this.mapData?.BarrierArc > 0 ? "●" + this.mapData?.BarrierArc.ToString() : "").Append(this.mapData?.BarrierAut > 0 ? "⬢ " + this.mapData?.BarrierAut.ToString() : "");
+            }
+            
+            sb.AppendFormat(" Time: [{0:f3}]", cm.GameTime.TotalGameTime.TotalMilliseconds / 1000);
             this.ui.TopBar.Text = sb.ToString();
         }
 
@@ -490,13 +499,11 @@ namespace WzComparerR2.MapRender
             if (patchVisibility.SpringPortalPathVisible)
             {
                 var lines = new List<Point>();
-                var portalList = this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>();
+                var portalList = this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>().Where(p => p.IsSpring);
                 var arrowScaler = 15;
                 var barScaler = 0;
                 foreach (var item in portalList)
                 {
-                    if (!item.IsSpring) continue;
-
                     var angle = Math.Atan2(item.VerticalImpact, item.HorizontalImpact);
                     var sin = Math.Sin(angle);
                     var cos = Math.Cos(angle);
@@ -525,6 +532,68 @@ namespace WzComparerR2.MapRender
                     this.batcher.Draw(meshItem);
                     this.batcher.MeshPush(meshItem);
                 }
+            }
+
+            if (patchVisibility.ObstacleAreaVisible)
+            {
+                var rectList = new List<Rectangle>();
+                var objList = this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.OfType<ObjItem>()).Where(o => o.Obstacle);
+                foreach (var obj in objList)
+                {
+                    var lt = (obj.View.Animator as FrameAnimator).CurrentFrame.LT;
+                    var rb = (obj.View.Animator as FrameAnimator).CurrentFrame.RB;
+
+                    if (lt != Point.Zero || rb != Point.Zero)
+                    {
+                        var x = obj.X;
+                        var y = obj.Y;
+                        Vector2 move = Vector2.Zero;
+                        Rectangle rect = new Rectangle(x + lt.X, y + lt.Y, rb.X - lt.X, rb.Y - lt.Y);
+
+                        if (obj.MoveW != 0 || obj.MoveH != 0)
+                        {
+                            move = GetMovingObjPos(obj);
+                        }
+                        if (obj.View.Flip)
+                        {
+                            rect.X = 2 * x - rect.X - rect.Width;
+                        }
+                        rect.Offset(move);
+
+                        rectList.Add(rect);
+                    }
+                }
+
+                foreach (var rect in rectList)
+                {
+                    var meshItem = this.batcher.MeshPop();
+                    meshItem.RenderObject = new RectMesh(rect, color, 1);
+                    this.batcher.Draw(meshItem);
+                    this.batcher.MeshPush(meshItem);
+                }
+            }
+        }
+
+        private void DrawCaptureRect(GameTime gameTime)
+        {
+            if (patchVisibility.CaptureRectVisible)
+            {
+                var origin = this.renderEnv.Camera.Origin.ToPoint();
+                this.batcher.Begin(Matrix.CreateTranslation(new Vector3(-origin.X, -origin.Y, 0)));
+
+                Rectangle rect = this.renderEnv.Camera.WorldRect;
+                if (!this.CaptureRect.IsEmpty)
+                {
+                    rect = this.CaptureRect;
+                }
+                if (!rect.IsEmpty)
+                {
+                    var meshItem = this.batcher.MeshPop();
+                    meshItem.RenderObject = new RectMesh(rect, new Color(204, 204, 204), 5);
+                    this.batcher.Draw(meshItem);
+                    this.batcher.MeshPush(meshItem);
+                }
+                this.batcher.End();
             }
         }
 
@@ -679,7 +748,7 @@ namespace WzComparerR2.MapRender
                     if (item is ObjItem obj && obj.Light && obj.View.Animator is FrameAnimator frameAni)
                     {
                         var frame = frameAni.CurrentFrame;
-                        this.lightRenderer.DrawTextureLight(frame.Texture, new Vector2(obj.X, obj.Y), frame.AtlasRect, frame.Origin.ToVector2(), obj.Flip, new Color(Color.White, frame.A0));
+                        this.lightRenderer.DrawTextureLight(frame.Texture, new Vector2(obj.X, obj.Y), frame.AtlasRect, frame.Origin.ToVector2(), obj.View.Flip, new Color(Color.White, frame.A0));
                     }
                 }
             }
@@ -891,7 +960,7 @@ namespace WzComparerR2.MapRender
                     // For spine animation, we don't know how to calculate the correct cx and cy
                     renderSize = aniItem.Measure().Size;
                 }
-                
+
                 if (cx == 0) cx = renderSize.X;
                 if (cy == 0) cy = renderSize.Y;
             }
@@ -978,7 +1047,7 @@ namespace WzComparerR2.MapRender
 
         private MeshItem GetMeshObj(ObjItem obj)
         {
-            var renderObj = GetRenderObject(obj.View.Animator, flip: obj.Flip);
+            var renderObj = GetRenderObject(obj.View.Animator, flip: obj.View.Flip);
             if (renderObj == null)
             {
                 return null;
@@ -986,33 +1055,14 @@ namespace WzComparerR2.MapRender
             var mesh = batcher.MeshPop();
             mesh.RenderObject = renderObj;
             mesh.Position = new Vector2(obj.X, obj.Y);
-            mesh.FlipX = obj.Flip;
             mesh.Z0 = obj.Z;
             mesh.Z1 = obj.Index;
 
             if (obj.MoveW != 0 || obj.MoveH != 0)
             {
-                double movingX = 0;
-                double movingY = 0;
-                double time = obj.View.Time / Math.PI / 1000 * 4 / obj.MoveP * 5000;
-                switch (obj.MoveType)
-                {
-                    case 0: // none
-                        break;
-                    case 1:
-                    case 2: // line
-                        movingX = obj.MoveW * Math.Cos(time);
-                        movingY = obj.MoveH * Math.Cos(time);
-                        break;
-                    case 3: // circle
-                        movingX = obj.MoveW * Math.Cos(time);
-                        movingY = obj.MoveH * Math.Sin(time);
-                        break;
-                    default:
-                        break;
-                }
-                mesh.Position += new Vector2((float)movingX, (float)movingY);
+                mesh.Position += GetMovingObjPos(obj);
             }
+            mesh.FlipX = obj.View.Flip;
 
             return mesh;
         }
@@ -1167,6 +1217,57 @@ namespace WzComparerR2.MapRender
             }
 
             return null;
+        }
+
+        private Vector2 GetMovingObjPos(ObjItem obj)
+        {
+            double movingX = 0;
+            double movingY = 0;
+            double time = obj.View.Time;
+            switch (obj.MoveType)
+            {
+                case 1:
+                case 2: // line
+                    time *= Math.PI * 2 / obj.MoveP;
+                    movingX = obj.MoveW * Math.Cos(time);
+                    movingY = obj.MoveH * Math.Cos(time);
+                    break;
+                case 3: // circle
+                    time *= Math.PI * 2 / obj.MoveP;
+                    movingX = obj.MoveW * Math.Cos(time);
+                    movingY = obj.MoveH * Math.Sin(time);
+                    break;
+
+                case 6:
+                case 7:
+                case 8:
+                    int sign = -1;
+                    double freq = (double)(obj.MoveP + obj.MoveDelay) * 2;
+                    time = time % freq;
+                    if (time >= freq / 2)
+                    {
+                        time -= freq / 2;
+                        if (obj.MoveType == 8)
+                            obj.View.Flip = !obj.Flip;
+
+                        if (obj.MoveType != 6)
+                            sign = +1;
+                    }
+                    else
+                    {
+                        if (obj.MoveType == 8)
+                            obj.View.Flip = obj.Flip;
+                    }
+
+                    movingX = (Math.Min(1, Math.Max(-1, (time - obj.MoveDelay) * -2 / obj.MoveP + 1)) * sign + 1) / 2 * obj.MoveW;
+                    movingY = (Math.Min(1, Math.Max(-1, (time - obj.MoveDelay) * -2 / obj.MoveP + 1)) * sign + 1) / 2 * obj.MoveH;
+
+                    break;
+
+                default:
+                    break;
+            }
+            return new Vector2((float)movingX, (float)movingY);
         }
     }
 }

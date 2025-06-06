@@ -17,6 +17,10 @@ namespace WzComparerR2.OpenAPI
 
         public static string webViewUri { get; set; }
 
+        public static string customCheckUri { get; set; } = "https://www.example.com/";
+        public static string customCheckCondition { get; set; } = "https://www.example.com/directoryCondition";
+        public string currentUri { get; private set; } = "";
+
         private async void WebViewDialog_Load(object sender, EventArgs e)
         {
             await webView.EnsureCoreWebView2Async();
@@ -26,18 +30,88 @@ namespace WzComparerR2.OpenAPI
 
         private async void WebResourceResponseReceived(object sender, CoreWebView2WebResourceResponseReceivedEventArgs e)
         {
+            if (webView.Source.ToString().Contains(customCheckUri))
+            {
+                if (webView.Source.ToString().Contains(customCheckCondition))
+                {
+                    try
+                    {
+                        currentUri = webView.CoreWebView2.Source;
+
+                        this.Invoke((Action)(() => this.Close()));
+                    }
+                    catch
+                    {
+                    }
+                }
+                else
+                {
+                    RemoveLiElements("btn-stamp-push");
+                    RemovePElements("btn-public");
+                    RemovePElements("btn-avatar-top");
+                    ScrollToElement("anc02");
+                }
+            }
+            else
+            {
+                try
+                {
+                    using Stream stream = await e.Response.GetContentAsync();
+                    using StreamReader reader = new StreamReader(stream);
+                    jsonResult = await reader.ReadToEndAsync();
+
+                    var jsonData = JsonSerializer.Deserialize<MyJsonModel>(jsonResult);
+                    // Close dialog after processing
+                    this.Invoke((Action)(() => this.Close()));
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private async void ScrollToElement(string elementId)
+        {
             try
             {
-                using Stream stream = await e.Response.GetContentAsync();
-                using StreamReader reader = new StreamReader(stream);
-                jsonResult = await reader.ReadToEndAsync();
-
-                var jsonData = JsonSerializer.Deserialize<MyJsonModel>(jsonResult);
-                // Close dialog after processing
-                this.Invoke((Action)(() => this.Close()));
+                string script = $"document.getElementById('{elementId}').scrollIntoView();";
+                await webView.CoreWebView2.ExecuteScriptAsync(script);
             }
-            catch
+            catch (Exception ex)
             {
+                throw ex;
+            }
+        }
+
+        private async void RemoveLiElements(string className)
+        {
+            try
+            {
+                string script = $@"
+                    var elements = document.querySelectorAll('li.{className}');
+                    elements.forEach(el => el.remove());
+                ";
+                await webView.CoreWebView2.ExecuteScriptAsync(script);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private async void RemovePElements(string className)
+        {
+            try
+            {
+                string script = $@"
+                    var elements = document.querySelectorAll('p.{className}');
+                    elements.forEach(el => el.remove());
+                ";
+                await webView.CoreWebView2.ExecuteScriptAsync(script);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }

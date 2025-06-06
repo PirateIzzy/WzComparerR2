@@ -40,6 +40,10 @@ namespace WzComparerR2.MapRender
         public int? ReturnMap { get; set; }
         public bool HideMinimap { get; set; }
         public int FieldLimit { get; set; }
+
+        public int? Barrier { get; set; }
+        public int? BarrierArc { get; set; }
+        public int? BarrierAut { get; set; }
         public string FieldScript { get; set; }
 
         public MiniMap MiniMap { get; private set; }
@@ -178,6 +182,11 @@ namespace WzComparerR2.MapRender
             this.HideMinimap = infoNode.Nodes["hideMinimap"].GetValueEx(false);
             this.FieldLimit = infoNode.Nodes["fieldLimit"].GetValueEx(0);
             this.FieldScript = infoNode.Nodes["fieldScript"].GetValueEx<string>(null);
+
+
+            this.Barrier = infoNode.Nodes["barrier"].GetValueEx<int>();
+            this.BarrierArc = infoNode.Nodes["barrierArc"].GetValueEx<int>();
+            this.BarrierAut = infoNode.Nodes["barrierAut"].GetValueEx<int>();
         }
 
         private void LoadMinimap(Wz_Node miniMapNode, ResourceLoader resLoader)
@@ -306,14 +315,14 @@ namespace WzComparerR2.MapRender
                     item.Index = int.Parse(node.Text);
                 }
 
-                /*if (item.Type == LifeItem.LifeType.Npc)
+                if (item.Type == LifeItem.LifeType.Npc)
                 {
                     var npcNode = PluginManager.FindWz(string.Format("Npc/{0:D7}.img/info", item.ID));
                     if ((npcNode?.Nodes["hide"].GetValueEx(0) ?? 0) != 0)
                     {
                         continue;
                     }
-                }*/
+                }
 
                 //直接绑定foothold
                 ContainerNode<FootholdItem> fhNode;
@@ -509,7 +518,7 @@ namespace WzComparerR2.MapRender
                 BackColor = node.Nodes["back_color"].GetXnaColor(),
             };
 
-            for (int i=0; ; i++)
+            for (int i = 0; ; i++)
             {
                 var lightNode = node.Nodes[i.ToString()];
                 if (lightNode == null)
@@ -680,7 +689,8 @@ namespace WzComparerR2.MapRender
             var aniItem = resLoader.LoadAnimationData(path);
             obj.View = new ObjItem.ItemView()
             {
-                Animator = CreateAnimator(aniItem, obj.SpineAni)
+                Animator = CreateAnimator(aniItem, obj.SpineAni),
+                Flip = obj.Flip
             };
         }
 
@@ -1027,7 +1037,8 @@ namespace WzComparerR2.MapRender
 
         private object CreateAnimator(object animationData, string aniName = null)
         {
-            switch (animationData) {
+            switch (animationData)
+            {
                 case RepeatableFrameAnimationData repFrameAni:
                     return new RepeatableFrameAnimator(repFrameAni);
 
@@ -1052,7 +1063,7 @@ namespace WzComparerR2.MapRender
             var actions = new[] { "stand", "say", "mouse", "move", "hand", "laugh", "eye" };
             ani.AnimationEnd += (o, e) =>
             {
-                switch(e.CurrentState)
+                switch (e.CurrentState)
                 {
                     case "regen":
                         if (ani.Data.States.Contains("stand")) e.NextState = "stand";
@@ -1091,7 +1102,7 @@ namespace WzComparerR2.MapRender
                         else if (ani.Data.States.Contains("fly")) e.NextState = "fly";
                         break;
 
-                    default: 
+                    default:
                         goto case "regen";
                 }
             };

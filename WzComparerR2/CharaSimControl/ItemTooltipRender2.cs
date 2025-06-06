@@ -46,6 +46,7 @@ namespace WzComparerR2.CharaSimControl
         public bool LinkRecipeItem { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowNickTag { get; set; }
+        public bool ShowLinkedTamingMob { get; set; }
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
         public bool Enable22AniStyle { get; set; }
@@ -121,7 +122,7 @@ namespace WzComparerR2.CharaSimControl
                                             }
                                         }
                                     }
-                                    recipeItemBmps.Add(RenderLinkRecipeGear(gear));
+                                    if (ShowLinkedTamingMob) recipeItemBmps.Add(RenderLinkRecipeGear(gear));
                                 }
 
                                 break;
@@ -555,7 +556,7 @@ namespace WzComparerR2.CharaSimControl
                 picH + 6 + (33 - item.Icon.Origin.Y) * 2);
                 //picH + 8 + (33 - item.Icon.Bitmap.Height) * 2);
             }
-            if (item.Cash)
+            if (item.Cash && !(item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0))
             {
                 Bitmap cashImg = null;
                 Point cashOrigin = new Point(12, 12);

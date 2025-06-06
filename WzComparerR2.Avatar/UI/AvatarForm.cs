@@ -89,6 +89,8 @@ namespace WzComparerR2.Avatar.UI
         private bool updatingActionEffect = false;
 #if NET6_0_OR_GREATER
         private NexonOpenAPI API;
+        private string characterName = "";
+        private int previousRegion = 4;
 #endif
 
         private string chairName;
@@ -1762,9 +1764,13 @@ namespace WzComparerR2.Avatar.UI
             }
 
             var dlg = new AvatarAPIForm();
+            dlg.CharaName = characterName;
+            dlg.selectedRegion = previousRegion;
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
+                characterName = dlg.CharaName;
+                previousRegion = dlg.selectedRegion;
                 string avatarCode;
                 switch (dlg.selectedRegion)
                 {
@@ -1793,30 +1799,22 @@ namespace WzComparerR2.Avatar.UI
                         break;
                     case 2: // JMS
                         this.API = new NexonOpenAPI("-");
-                        bool isUnderMaintenance = await this.API.isJMSUnderMaintenance();
-                        if (isUnderMaintenance)
+                        try
                         {
-                            ToastNotification.Show(this, $"JMS is currently under maintenance.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                            ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
+                            avatarCode = await this.API.GetAvatarCode(dlg.CharaName, "JMS");
+                            if (string.IsNullOrEmpty(avatarCode))
+                            {
+                                ToastNotification.Show(this, $"Unable to find character.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                            }
+                            else
+                            {
+                                await Type3(avatarCode);
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
-                                avatarCode = await this.API.GetAvatarCode(dlg.CharaName, "JMS");
-                                if (string.IsNullOrEmpty(avatarCode))
-                                {
-                                    ToastNotification.Show(this, $"Unable to find character.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
-                                }
-                                else
-                                {
-                                    await Type3(avatarCode);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                ToastNotification.Show(this, $"Warning: {ex.Message}", null, 3000, eToastGlowColor.Orange, eToastPosition.TopCenter);
-                            }
+                            ToastNotification.Show(this, $"Warning: {ex.Message}", null, 3000, eToastGlowColor.Orange, eToastPosition.TopCenter);
                         }
                         break;
                     case 4: // GMS-NA
@@ -2036,7 +2034,7 @@ namespace WzComparerR2.Avatar.UI
                     }
                 }
 
-                var code = $"20{res.Skin}, {res.Face + mixFace}, {res.Hair + mixHair}, {res.Cap}, {res.FaceAcc}, {res.EyeAcc}, {res.EarAcc}, {res.Coat}, {res.Pants}, {res.Shoes}, {res.Gloves}, {res.Cape}, {res.Shield}, {res.Weapon}, {res.CashWeapon}";
+                var code = $"20{res.Skin}, {res.Face}, {res.Face + mixFace}, {res.Hair}, {res.Hair + mixHair}, {res.Cap}, {res.FaceAcc}, {res.EyeAcc}, {res.EarAcc}, {res.Coat}, {res.Pants}, {res.Shoes}, {res.Gloves}, {res.Cape}, {res.Shield}, {res.Weapon}, {res.CashWeapon}";
                 LoadCode(code, 0);
 
                 if (res.UnknownVer)
@@ -2087,7 +2085,7 @@ namespace WzComparerR2.Avatar.UI
                 {
                     var dlg = new SaveFileDialog()
                     {
-                        Title = "アバターフレームを保存",
+                        Title = "Save Avatar Frame",
                         Filter = "PNG (*.png)|*.png|*.*|*.*",
                         FileName = defaultFileName
                     };
@@ -2138,6 +2136,12 @@ namespace WzComparerR2.Avatar.UI
                 else
                 {
                     outputFileName = System.IO.Path.Combine(specifiedSavePath, defaultFileName.Replace('\\', '.'));
+                }
+
+                string framesDirName = Path.Combine(Path.GetDirectoryName(outputFileName), Path.GetFileNameWithoutExtension(outputFileName) + ".frames");
+                if (config.SavePngFramesEnabled && !Directory.Exists(framesDirName))
+                {
+                    Directory.CreateDirectory(framesDirName);
                 }
 
                 var actPlaying = new[] { bodyPlaying, emoPlaying, tamingPlaying };
@@ -2367,6 +2371,7 @@ namespace WzComparerR2.Avatar.UI
 
                 using var bgBrush = CreateBackgroundBrush();
                 encoder.Init(outputFileName, clientRect.Width, clientRect.Height);
+                int currentFrame = 1;
                 foreach (IGifFrame gifFrame in gifLayer.Frames)
                 {
                     using (var bmp = new Bitmap(clientRect.Width, clientRect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -2379,6 +2384,11 @@ namespace WzComparerR2.Avatar.UI
                                 g.FillRectangle(bgBrush, 0, 0, bmp.Width, bmp.Height);
                             }
                             gifFrame.Draw(g, clientRect);
+                        }
+                        if (config.SavePngFramesEnabled)
+                        {
+                            bmp.Save(Path.Combine(framesDirName, currentFrame.ToString().PadLeft(3, '0') + ".png"), System.Drawing.Imaging.ImageFormat.Png);
+                            currentFrame++;
                         }
                         encoder.AppendFrame(bmp, Math.Max(cap.MinFrameDelay, gifFrame.Delay));
                     }

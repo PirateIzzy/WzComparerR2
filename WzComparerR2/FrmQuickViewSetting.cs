@@ -186,6 +186,50 @@ namespace WzComparerR2
             set { checkBoxX12.Checked = value; }
         }
 
+
+        [Link]
+        public bool Item_ShowLinkedTamingMob
+        {
+            get { return checkBoxX23.Checked; }
+            set { checkBoxX23.Checked = value; }
+        }
+
+        [Link]
+        public int Item_CosmeticHairColor
+        {
+            get { return comboBoxEx3.SelectedIndex; }
+            set { comboBoxEx3.SelectedIndex = value; }
+        }
+
+        [Link]
+        public int Item_CosmeticFaceColor
+        {
+            get { return comboBoxEx4.SelectedIndex; }
+            set { comboBoxEx4.SelectedIndex = value; }
+        }
+
+        [Link]
+        public bool Map_ShowMiniMap
+        {
+            get { return chkShowMiniMap.Checked; }
+            set { chkShowMiniMap.Checked = value; }
+        }
+
+        [Link]
+        public bool Map_ShowMapObjectID
+        {
+            get { return chkShowMapObjectID.Checked; }
+            set { chkShowMapObjectID.Checked = value; }
+        }
+
+        [Link]
+        public bool Map_ShowMobNpcObjectID
+        {
+            get { return chkShowMobNpcObjectID.Checked; }
+            set { chkShowMobNpcObjectID.Checked = value; }
+        }
+
+
         public int PreferredStringCopyMethod
         {
             get
@@ -206,20 +250,6 @@ namespace WzComparerR2
         {
             get { return chkCopyParsedSkillString.Checked; }
             set { chkCopyParsedSkillString.Checked = value; }
-        }
-
-        [Link]
-        public int Item_CosmeticHairColor
-        {
-            get { return comboBoxEx3.SelectedIndex; }
-            set { comboBoxEx3.SelectedIndex = value; }
-        }
-
-        [Link]
-        public int Item_CosmeticFaceColor
-        {
-            get { return comboBoxEx4.SelectedIndex; }
-            set { comboBoxEx4.SelectedIndex = value; }
         }
 
         [Link]
