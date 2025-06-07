@@ -291,7 +291,6 @@ namespace WzComparerR2.CharaSimControl
                 //GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, Skill.Icon.Bitmap == null ? 10 : 86, 485, ref picH, 16);
                 GearGraphics.DrawString(g, "#c" + sr2.Name + expireStr + "#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
-            /* Commenting until GMS receives the foreach (var kv in Skill.Lt)m
             if (Skill.IsSequenceOn)
             {
                 string colortag = "#c";
@@ -299,9 +298,8 @@ namespace WzComparerR2.CharaSimControl
                 {
                     colortag = "#$g";
                 }
-                GearGraphics.DrawString(g, colortag + "스킬 시퀀스 등록 가능#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
+                GearGraphics.DrawString(g, colortag + "Can add Skill Sequence#", GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
-            */
             if (Skill.IsPetAutoBuff)
             {
                 string colortag = "#c";
