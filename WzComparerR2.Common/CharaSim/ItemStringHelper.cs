@@ -695,7 +695,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.grandAuthenticSymbol: return "Grand Sacred Symbol";
 
                 case GearType.jewel: return "宝玉";
-                default: return null;
+
+                case GearType.longSword: return "Long Sword";
+                case GearType.yeouiGem: return "여의보주";
             }
         }
 
@@ -840,6 +842,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.chakram:
                 case GearType.hexSeeker: return GetExtraJobReqString(154);
+
+                case GearType.longSword:
+                case GearType.yeouiGem: return GetExtraJobReqString(161);
                 default: return null;
             }
         }
@@ -876,6 +881,7 @@ namespace WzComparerR2.CharaSim
                 case 152: return "Illium only";
                 case 154: return "Khali only";
                 case 155: return "Ark only";
+                case 161: return "Len only";
                 case 162: return "Lara only";
                 case 164: return "Hoyoung only";
                 case 172: return "Lynn only";
@@ -1346,6 +1352,12 @@ namespace WzComparerR2.CharaSim
 
                 case 16000: return "Anima Thief";
                 case 16001: return "Lara";
+                case 16002: return "Len";
+                case 16100: return "Len(1)";
+                case 16110: return "Len(2)";
+                case 16111: return "Len(3)";
+                case 16112: return "Len(4)";
+                case 16114: return "Len(6)";
                 case 16200: return "Lara(1)";
                 case 16210: return "Lara(2)";
                 case 16211: return "Lara(3)";

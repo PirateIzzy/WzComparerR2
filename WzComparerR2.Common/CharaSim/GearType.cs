@@ -161,7 +161,11 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         breathShooter = 1214,
         /// <summary>
-        /// Soul Shooter 122
+        /// Long Sword 1215
+        /// </summary>
+        longSword = 1215,
+        /// <summary>
+        /// Sould SHooter 122
         /// </summary>
         soulShooter = 122,
         /// <summary>
@@ -396,6 +400,10 @@ namespace WzComparerR2.CharaSim
         /// Hex Seeker 135403x
         /// </summary>
         hexSeeker = 135403,
+        /// <summary>
+        /// yeouiGem 135404
+        /// </summary>
+        yeouiGem = 135404,
         /// <summary>
         /// Cane 136
         /// </summary>
