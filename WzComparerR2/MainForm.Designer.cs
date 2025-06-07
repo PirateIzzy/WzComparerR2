@@ -2653,11 +2653,11 @@
             this.chkSkipKMSContent.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkSkipKMSContent.Location = new System.Drawing.Point(550, 304);
             this.chkSkipKMSContent.Name = "chkSkipKMSContent";
-            this.chkSkipKMSContent.Size = new System.Drawing.Size(145, 23);
+            this.chkSkipKMSContent.Size = new System.Drawing.Size(185, 23);
             this.chkSkipKMSContent.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkSkipKMSContent, new DevComponents.DotNetBar.SuperTooltipInfo("Skip KMS Skills", "", "Do not compare skills that exist in KMS.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
+            this.superTooltip1.SetSuperTooltip(this.chkSkipKMSContent, new DevComponents.DotNetBar.SuperTooltipInfo("Skip KMS Contents", "", "Do not compare contents that exist in KMS.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
             this.chkSkipKMSContent.TabIndex = 22;
-            this.chkSkipKMSContent.Text = "Skip KMS Skills";
+            this.chkSkipKMSContent.Text = "Skip KMS Contents";
             this.chkSkipKMSContent.Checked = false;
             // 
             // chkOutputRemovedImg

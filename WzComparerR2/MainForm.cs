@@ -3754,6 +3754,20 @@ namespace WzComparerR2
                                     chkShowLinkedTamingMob.Enabled = false;
                                     chkHashPngFileName.Enabled = false;
                                     chkSkipKMSContent.Enabled = false;
+                                    if (chkSkipKMSContent.Checked)
+                                    {
+                                        switch (MessageBoxEx.Show(this, "Would you like to download database of KMS content?\r\n\r\nIf you select \"No\", only KMS Skills will be skipped. ", "WZ Compare", MessageBoxButtons.YesNo))
+                                        {
+                                            case DialogResult.Yes:
+                                                comparer.DownloadKMSContentDB = true;
+                                                break;
+                                            case DialogResult.No:
+                                                comparer.DownloadKMSContentDB = false;
+                                                break;
+                                            default:
+                                                return;
+                                        }
+                                    }
                                     comparer.EasyCompareWzFiles(fileNew, fileOld, dlg.SelectedPath);
                                     return;
 
