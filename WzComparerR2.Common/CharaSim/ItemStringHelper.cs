@@ -698,6 +698,7 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.longSword: return "장검";
                 case GearType.yeouiGem: return "여의보주";
+                default: return null;
             }
         }
 
