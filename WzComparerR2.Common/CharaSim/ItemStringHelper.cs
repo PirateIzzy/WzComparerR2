@@ -696,6 +696,12 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.jewel: return "宝玉";
 
+                case GearType.celestialLight: return "Celestial Light";
+                case GearType.compass: return "Compass";
+
+                // case GearType.keir: return "Keir";
+                // case GearType.gram: return "Gram";
+
                 case GearType.longSword: return "장검";
                 case GearType.yeouiGem: return "여의보주";
                 default: return null;

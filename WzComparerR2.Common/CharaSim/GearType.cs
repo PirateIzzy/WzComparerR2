@@ -181,6 +181,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         memorialStaff = 1252,
         /// <summary>
+        /// Celestial Light 1253
+        /// </summary>
+        celestialLight = 1253,
+        /// <summary>
         /// Beast Tamer Scepter 1259
         /// </summary>
         magicStick = 1259,
@@ -312,6 +316,10 @@ namespace WzComparerR2.CharaSim
         /// 拳天 135_86
         /// </summary>
         boxingSky = 135286,
+        /// <summary>
+        /// compass 135_87
+        /// </summary>
+        compass = 135287,
         /// <summary>
         /// Wrist Band 135_90
         /// </summary>

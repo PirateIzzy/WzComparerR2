@@ -64,6 +64,7 @@ namespace WzComparerR2.CharaSimControl
         public bool AutoTitleWrap { get; set; }
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
+        public bool CompareMode { get; set; } = false;
         private string titleLanguage = "";
 
         private bool isPostNEXTClient;
@@ -606,6 +607,38 @@ namespace WzComparerR2.CharaSimControl
                     GearGraphics.DrawString(g, $"#c{string.Join(", ", randomParts)} 이미지는 예시 중 하나로 최초 장착 시 외형이 결정되는 안드로이드이다.#", GearGraphics.EquipMDMoris9Font, null, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
                 }
             }
+            //Regular Cosmetic
+            if (Gear.type == GearType.body || Gear.type == GearType.head || Gear.type == GearType.face || Gear.type == GearType.face2 || Gear.type == GearType.hair || Gear.type == GearType.hair2 || Gear.type == GearType.hair3)
+            {
+                if (this.avatar == null)
+                {
+                    this.avatar = new AvatarCanvasManager();
+                }
+                if (Gear.type == GearType.body) this.avatar.AddBodyFromSkin4(Gear.ItemID);
+                if (Gear.type == GearType.head) this.avatar.AddBodyFromSkin4(Gear.ItemID - 10000);
+                else this.avatar.AddBodyFromSkin4(2015);
+                if (Gear.type == GearType.face || Gear.type == GearType.face2 || Gear.type == GearType.hair || Gear.type == GearType.hair2 || Gear.type == GearType.hair3) this.avatar.AddHairOrFace(Gear.ItemID);
+
+                this.avatar.AddGears([1042194, 1062153]);
+
+                var appearance = this.avatar.GetBitmapOrigin();
+                if (appearance.Bitmap != null)
+                {
+                    var imgrect = new Rectangle(Math.Max(appearance.Origin.X - 50, 0),
+                        Math.Max(appearance.Origin.Y - 100, 0),
+                        Math.Min(appearance.Bitmap.Width, appearance.Origin.X + 50) - Math.Max(appearance.Origin.X - 50, 0),
+                        Math.Min(appearance.Origin.Y, 100));
+                    g.DrawImage(appearance.Bitmap, 88 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
+                    Gear.AndroidBitmap = appearance.Bitmap;
+                    picH += appearance.Bitmap.Height;
+                    picH += 2;
+
+                    Gear.AndroidBitmap = appearance.Bitmap;
+                    picH += 30;
+                }
+
+                this.avatar.ClearCanvas();
+            }
             //MSN Cosmetic
             if ((Gear.type == GearType.face_n || Gear.type == GearType.hair_n) && Gear.Props.TryGetValue(GearPropType.cosmetic, out value) && value > 0)
             {
@@ -672,8 +705,19 @@ namespace WzComparerR2.CharaSimControl
             // 세트 아이템
             {
                 List<string> setList = new List<string>();
-                if (Gear.Props.TryGetValue(GearPropType.setItemID, out int setID) && CharaSimLoader.LoadedSetItems.TryGetValue(setID, out SetItem setItem)) setList.Add(setItem.SetItemName);
-                if (Gear.Props.TryGetValue(GearPropType.jokerToSetItem, out value) && value > 0) setList.Add("럭키 아이템");
+                if (Gear.Props.TryGetValue(GearPropType.setItemID, out int setID))
+                {
+                    SetItem setItem;
+                    if (CompareMode)
+                    {
+                        setItem = CharaSimLoader.LoadSetItem(setID, this.SourceWzFile);
+                        if (setItem != null)
+                            setList.Add(setItem.SetItemName);
+                    }
+                    else if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                        setList.Add(setItem.SetItemName);
+                } 
+                if (Gear.Props.TryGetValue(GearPropType.jokerToSetItem, out value) && value > 0) setList.Add("Lucky Item");
 
                 var text = string.Join(", ", setList);
                 if (!string.IsNullOrEmpty(text))
@@ -1474,7 +1518,12 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.setItemID, out setID))
             {
                 SetItem setItem;
-                if (!CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                if (CompareMode)
+                {
+                    setItem = CharaSimLoader.LoadSetItem(setID, this.SourceWzFile);
+                    if (setItem == null) return null;
+                }
+                else if (!CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
                     return null;
 
                 TooltipRender renderer = this.SetItemRender;
