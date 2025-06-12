@@ -1094,7 +1094,7 @@ namespace WzComparerR2.CharaSim
                 case 430: return "Blade Recruit";
                 case 431: return "Blade Acolyte";
                 case 432: return "Blade Specialist";
-                case 433: return "Blade Loard";
+                case 433: return "Blade Lord";
                 case 434: return "Blade Master";
                 case 435: return "Blade Master(5)";
                 case 436: return "Blade Master(6)";
