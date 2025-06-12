@@ -40,28 +40,30 @@ for n in enumAllWzNodes(topNode) do
         Directory.CreateDirectory(dir)
       end
       
-      --create file
-      env:WriteLine('(output)'..xmlFileName)
-      local fs = File.Create(xmlFileName)
-      local xsetting = XmlWriterSettings()
-      xsetting.CloseOutput = true
-      xsetting.Indent = true
-      xsetting.Encoding = Encoding.UTF8
-      xsetting.CheckCharacters = false
-      xsetting.NewLineChars = "\r\n"
-      xsetting.NewLineHandling = NewLineHandling.None
-      xsetting.NewLineOnAttributes = false
-      local xw = XmlWriter.Create(fs, xsetting)
+      --create file, skip _Canvas
+      if not string.find(xmlFileName, "_Canvas") then
+          env:WriteLine('(output)'..xmlFileName)
+          local fs = File.Create(xmlFileName)
+          local xsetting = XmlWriterSettings()
+          xsetting.CloseOutput = true
+          xsetting.Indent = true
+          xsetting.Encoding = Encoding.UTF8
+          xsetting.CheckCharacters = false
+          xsetting.NewLineChars = "\r\n"
+          xsetting.NewLineHandling = NewLineHandling.None
+          xsetting.NewLineOnAttributes = false
+          local xw = XmlWriter.Create(fs, xsetting)
       
-      xw:WriteStartDocument(true);
-      Wz_NodeExtension.DumpAsXml(img.Node, xw)
-      xw:WriteEndDocument()
+          xw:WriteStartDocument(true);
+          Wz_NodeExtension.DumpAsXml(img.Node, xw)
+          xw:WriteEndDocument()
       
-      xw:Flush()
-      fs:Close()
-      env:WriteLine('(close)'..xmlFileName)
+          xw:Flush()
+          fs:Close()
+          env:WriteLine('(close)'..xmlFileName)
       
-      img:Unextract()
+          img:Unextract()
+      end
       
     else --error
       
