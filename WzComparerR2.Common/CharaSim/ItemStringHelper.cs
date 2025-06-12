@@ -852,6 +852,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.longSword:
                 case GearType.yeouiGem: return GetExtraJobReqString(161);
+
+                case GearType.celestialLight:
+                case GearType.compass: return GetExtraJobReqString(182);
                 default: return null;
             }
         }
