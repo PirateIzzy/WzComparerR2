@@ -893,6 +893,7 @@ namespace WzComparerR2.CharaSim
                 case 164: return "Hoyoung only";
                 case 172: return "Lynn only";
                 case 175: return "Mo Xuan only";
+                case 182: return "Sia Astelle only";
                 default: return null;
             }
         }
