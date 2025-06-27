@@ -4106,6 +4106,11 @@ namespace WzComparerR2
                 if (isUpdateRequired) new FrmUpdater().ShowDialog();
             }
         }
+        
+        private void colorPickerPicBoxBgColor_SelectedColorChanged(object sender, EventArgs e)
+        {
+            this.pictureBoxEx1.BackColor = ((ColorPickerDropDown)sender).SelectedColor;
+        }
     }
 
     #region 内部用扩展方法
