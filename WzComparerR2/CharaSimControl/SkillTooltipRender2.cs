@@ -174,7 +174,6 @@ namespace WzComparerR2.CharaSimControl
 
             // for 6th job skills
 
-
             //绘制技能名称
             if (isTranslateRequired)
             {
@@ -187,15 +186,16 @@ namespace WzComparerR2.CharaSimControl
                 {
                     mergedSkillName = Translator.MergeString(sr.Name, translatedSkillName, 0, false, true);
                 }
-                if (!Skill.Origin)
+                if (!Skill.Origin && !Skill.Ascent)
                 {
                     g.DrawImage(Resource.ToolTip_Equip_Dot_0, 9, picH + 15);//GMS Version blue dot in SKILLS
                     format.Alignment = StringAlignment.Near;
                     TextRenderer.DrawText(g, mergedSkillName, GearGraphics.ItemNameFont2, new Point(13, 10), Color.White, TextFormatFlags.Left | TextFormatFlags.NoPrefix);
                 }
-                if (Skill.Origin)
+                if (Skill.Origin || Skill.Ascent)
                 {
-                    g.DrawImage(Resource.UIWindow2_img_Skill_skillTypeIcon_origin, 20, 11);
+                    if (Skill.Origin) g.DrawImage(Resource.UIWindow2_img_Skill_skillTypeIcon_origin, 20, 11);
+                    else if (Skill.Ascent) g.DrawImage(Resource.UIWindow2_img_Skill_skillTypeIcon_ascent, 20, 11);
                     g.DrawImage(Resource.ToolTip_Equip_Dot_0, 92, picH + 15);//GMS Version blue dot in SKILLS
                     format.Alignment = StringAlignment.Near;
                     TextRenderer.DrawText(g, mergedSkillName, GearGraphics.ItemNameFont2, new Point(96, 10), Color.White, TextFormatFlags.Left | TextFormatFlags.NoPrefix);
