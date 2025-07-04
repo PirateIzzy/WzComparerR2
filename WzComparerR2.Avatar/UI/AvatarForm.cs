@@ -91,6 +91,7 @@ namespace WzComparerR2.Avatar.UI
         private NexonOpenAPI API;
         private string characterName = "";
         private int previousRegion = 4;
+        private string APIregion;
 #endif
 
         private string chairName;
@@ -1778,7 +1779,7 @@ namespace WzComparerR2.Avatar.UI
                         ToastNotification.Show(this, $"Please select a region.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
                         return;
                     case 1: // KMS
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
@@ -1798,7 +1799,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                         break;
                     case 2: // JMS
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
@@ -1818,7 +1819,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                         break;
                     case 4: // GMS-NA
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
@@ -1838,7 +1839,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                         break;
                     case 5: // GMS-EU
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
@@ -1858,7 +1859,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                         break;
                     case 6: // MSEA
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
@@ -1878,7 +1879,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                         break;
                     case 7: // TMS
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             ToastNotification.Show(this, $"Fetching avatar, please wait...", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
@@ -1898,7 +1899,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                         break;
                     case 8: // MSN
-                        this.API = new NexonOpenAPI("-");
+                        this.API = new NexonOpenAPI("-", "KMS");
                         try
                         {
                             avatarCode = await this.API.GetAvatarCode(dlg.CharaName, "MSN");
