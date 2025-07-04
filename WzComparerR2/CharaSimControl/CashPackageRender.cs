@@ -205,7 +205,31 @@ namespace WzComparerR2.CharaSimControl
                 picH += 16 * term.Split('\n').Length;
                 //picH += 12; < --- commented because of line above, check!
             }
-            if (commodityPackage.Limit > 0)
+            if (commodityPackage.LimitMax > 0)
+            {
+                string limit = null;
+                switch (commodityPackage.LimitMax)
+                {
+                    case 1:
+                        limit = "Purchase Limit per Maple ID";
+                        break;
+                    case 2:
+                        limit = "Purchase Limit per World";
+                        break;
+                    case 3:
+                        limit = "Purchase Limit per Nexon ID";
+                        break;
+                    default:
+                        limit = commodityPackage.LimitMax.ToString();
+                        break;
+                }
+                if (!string.IsNullOrEmpty(limit))
+                {
+                    TextRenderer.DrawText(g, "<" + limit + " >", GearGraphics.ItemDetailFont, new Point(cashBitmap.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter);
+                    picH += 12;
+                }
+            }
+            else if (commodityPackage.Limit > 0)
             {
                 string limit = null;
                 switch (commodityPackage.Limit)
@@ -223,7 +247,7 @@ namespace WzComparerR2.CharaSimControl
                         limit = commodityPackage.Limit.ToString();
                         break;
                 }
-                if (limit != null && limit.Length > 0)
+                if (!string.IsNullOrEmpty(limit))
                 {
                     TextRenderer.DrawText(g, "<" + limit + ">", GearGraphics.ItemDetailFont2, new Point(cashBitmap.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter);
                     picH += 12;

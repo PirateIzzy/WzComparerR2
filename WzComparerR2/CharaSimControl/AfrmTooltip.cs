@@ -97,6 +97,7 @@ namespace WzComparerR2.CharaSimControl
                 this.showID = value;
                 this.GearRender.ShowObjectID = value;
                 this.GearRender22.ShowObjectID = value;
+                this.MapRender.ShowObjectID = value;
                 this.ItemRender.ShowObjectID = value;
                 this.SkillRender.ShowObjectID = value;
                 this.RecipeRender.ShowObjectID = value;

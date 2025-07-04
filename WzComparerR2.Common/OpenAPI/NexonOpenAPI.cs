@@ -8,8 +8,10 @@ using AES = System.Security.Cryptography.Aes;
 
 #if NET6_0_OR_GREATER
 using HtmlAgilityPack;
-using MapleStory.OpenAPI;
 using System.Net; 
+using KMS = MapleStory.OpenAPI.KMS;
+using MSEA = MapleStory.OpenAPI.MSEA;
+using MapleStory.OpenAPI.Common;
 using System.Net.Http;
 using System.Linq;
 using System.Text;
@@ -21,29 +23,74 @@ namespace WzComparerR2.OpenAPI
 {
     public class NexonOpenAPI
     {
-        public NexonOpenAPI(string apiKey)
+        public NexonOpenAPI(string apiKey, string region)
         {
             APIKey = apiKey;
-            if (API == null)
+            
+            switch (region)
             {
-                API = new MapleStoryAPI(apiKey);
+                case "KMS":
+                    this.region = 0;
+                    if (API_KMS == null)
+                    {
+                        API_KMS = new KMS.MapleStoryAPI(apiKey);
+                    }
+                    break;
+
+                case "MSEA":
+                    this.region = 1;
+                    if (API_MSEA == null)
+                    {
+                        API_MSEA = new MSEA.MapleStoryAPI(apiKey);
+                    }
+                    break;
+
+                default:
+                    break;
             }
         }
 
         private string APIKey;
-        private MapleStoryAPI API;
+        private int region;
+        private KMS.MapleStoryAPI API_KMS;
+        private MSEA.MapleStoryAPI API_MSEA;
 
         public bool CheckSameAPIKey(string apiKey)
         {
             return APIKey == apiKey;
         }
 
+        public bool CheckRegion(string region)
+        {
+            switch (region)
+            {
+                case "KMS":
+                    return this.region == 0;
+                case "MSEA":
+                    return this.region == 1;
+                default:
+                    return false;
+            }
+        }
+
         public async Task<string> GetCharacterOCID(string characterName)
         {
             try
             {
-                var character = await API.GetCharacter(characterName);
-                return character.OCID;
+                MapleStory.OpenAPI.Common.DTO.CharacterDTO character = null;
+                switch (region)
+                {
+                    case 0:
+                        character = await API_KMS.GetCharacter(characterName);
+                        return character.OCID;
+
+                    case 1:
+                        character = await API_MSEA.GetCharacter(characterName);
+                        return character.OCID;
+
+                    default:
+                        return null;
+                }
             }
             catch (MapleStoryAPIException e)
             {
@@ -269,7 +316,17 @@ namespace WzComparerR2.OpenAPI
         {
             try
             {
-                var basic = await API.GetCharacterBasic(ocid);
+                MapleStory.OpenAPI.Common.DTO.CharacterBasicDTO basic = null;
+                switch (region)
+                {
+                    case 0:
+                        basic = await API_KMS.GetCharacterBasic(ocid);
+                        break;
+
+                    case 1:
+                        basic = await API_MSEA.GetCharacterBasic(ocid);
+                        break;
+                }
                 var m = Regex.Match(basic.CharacterImage, @"look/([A-Z]+)$");
                 if (m.Success)
                 {
@@ -384,7 +441,17 @@ namespace WzComparerR2.OpenAPI
             {
                 result.ItemList = new List<string>();
 
-                var item = await API.GetCharacterItemEquipment(ocid);
+                dynamic item = null;
+                switch (region)
+                {
+                    case 0:
+                        item = await API_KMS.GetCharacterItemEquipment(ocid);
+                        break;
+
+                    case 1:
+                        item = await API_MSEA.GetCharacterItemEquipment(ocid);
+                        break;
+                }
                 result.Preset = item.PresetNo ?? 0;
 
                 foreach (var it in item.ItemEquipment)
@@ -415,7 +482,17 @@ namespace WzComparerR2.OpenAPI
                 result.CashBaseItemList = new List<string>();
                 result.CashPresetItemList = new List<string>();
 
-                var item = await API.GetCharacterCashItemEquipment(ocid);
+                dynamic item = null;
+                switch (region)
+                {
+                    case 0:
+                        item = await API_KMS.GetCharacterCashItemEquipment(ocid);
+                        break;
+
+                    case 1:
+                        item = await API_MSEA.GetCharacterCashItemEquipment(ocid);
+                        break;
+                }
                 result.CashPreset = item.PresetNo ?? 0;
 
                 foreach (var it in item.CashItemEquipmentBase)
@@ -453,8 +530,17 @@ namespace WzComparerR2.OpenAPI
         {
             try
             {
-                var item = await API.GetCharacterBeautyEquipment(ocid);
+                dynamic item = null;
+                switch (region)
+                {
+                    case 0:
+                        item = await API_KMS.GetCharacterBeautyEquipment(ocid);
+                        break;
 
+                    case 1:
+                        item = await API_MSEA.GetCharacterBeautyEquipment(ocid);
+                        break;
+                }
                 result.Gender = item.CharacterGender == "남" ? 0 : 1;
 
                 result.HairInfo = new Dictionary<string, string>
@@ -496,12 +582,20 @@ namespace WzComparerR2.OpenAPI
             }
         }
 
-        public async Task Debug()
+        public async Task Debug(string cname = "창섭")
         {
             var data = "";
-            var cname = "창섭";
             var ocid = await GetCharacterOCID(cname);
-            var basic = await API.GetCharacterBasic(ocid);
+            MapleStory.OpenAPI.Common.DTO.CharacterBasicDTO basic = null;
+            switch (region)
+            {
+                case 0:
+                    basic = await API_KMS.GetCharacterBasic(ocid);
+                    break;
+                case 1:
+                    basic = await API_MSEA.GetCharacterBasic(ocid);
+                    break;
+            }
             var m = Regex.Match(basic.CharacterImage, @"look/([A-Z]+)$");
             if (m.Success)
                 data = m.Groups[1].Value;
@@ -686,6 +780,7 @@ namespace WzComparerR2.OpenAPI
             { 27, new List<DataInfo>() {new DataInfo("gender", 1), new DataInfo("skinID", 10), new DataInfo("face50k", 1), new DataInfo("faceID", 10), new DataInfo("faceGender", 4), new DataInfo("hair10k", 4), new DataInfo("hairID", 10), new DataInfo("hairGender", 4), new DataInfo("capID", 10), new DataInfo("capGender", 3), new DataInfo("faceAccID", 10), new DataInfo("faceAccGender", 2), new DataInfo("eyeAccID", 10), new DataInfo("eyeAccGender", 2), new DataInfo("earAccID", 10), new DataInfo("earAccGender", 2), new DataInfo("isLongCoat", 1), new DataInfo("coatID", 10), new DataInfo("coatGender", 4), new DataInfo("pantsID", 10), new DataInfo("pantsGender", 2), new DataInfo("shoesID", 10), new DataInfo("shoesGender", 2), new DataInfo("glovesID", 10), new DataInfo("glovesGender", 2), new DataInfo("capeID", 10), new DataInfo("capeGender", 2), new DataInfo("isNotBlade", 1), new DataInfo("isSubWeapon", 1), new DataInfo("shieldID", 10), new DataInfo("shieldGender", 4), new DataInfo("isCashWeapon", 1), new DataInfo("weaponID", 10), new DataInfo("weaponGender", 2), new DataInfo("weaponType", 8), new DataInfo("earType", 4), new DataInfo("mixHairColor", 4), new DataInfo("mixHairRatio", 7), new DataInfo("unknown1", 1), new DataInfo("mixFaceInfo", 10), new DataInfo("unknown2", 2), new DataInfo("jobWingTailType", 2), new DataInfo("unknown3", 30), new DataInfo("weaponMotionType", 2), new DataInfo("unknown4", 11), new DataInfo("hasCapPrism", 1), new DataInfo("hasCoatPrism", 1), new DataInfo("hasPantsPrism", 1), new DataInfo("hasShoesPrism", 1), new DataInfo("hasGlovesPrism", 1), new DataInfo("hasCapePrism", 1), new DataInfo("hasWeaponPrism", 1), new DataInfo("hasSkinPrism", 1) } },
             { 28, new List<DataInfo>() {new DataInfo("gender", 1), new DataInfo("skinID", 10), new DataInfo("face50k", 1), new DataInfo("faceID", 10), new DataInfo("faceGender", 4), new DataInfo("hair10k", 4), new DataInfo("hairID", 10), new DataInfo("hairGender", 4), new DataInfo("capID", 10), new DataInfo("capGender", 3), new DataInfo("faceAccID", 10), new DataInfo("faceAccGender", 2), new DataInfo("eyeAccID", 10), new DataInfo("eyeAccGender", 2), new DataInfo("earAccID", 10), new DataInfo("earAccGender", 2), new DataInfo("isLongCoat", 1), new DataInfo("coatID", 10), new DataInfo("coatGender", 4), new DataInfo("pantsID", 10), new DataInfo("pantsGender", 2), new DataInfo("shoesID", 10), new DataInfo("shoesGender", 2), new DataInfo("glovesID", 10), new DataInfo("glovesGender", 2), new DataInfo("capeID", 10), new DataInfo("capeGender", 2), new DataInfo("isNotBlade", 1), new DataInfo("isSubWeapon", 1), new DataInfo("shieldID", 10), new DataInfo("shieldGender", 4), new DataInfo("isCashWeapon", 1), new DataInfo("weaponID", 10), new DataInfo("weaponGender", 2), new DataInfo("weaponType", 8), new DataInfo("earType", 4), new DataInfo("mixHairColor", 4), new DataInfo("mixHairRatio", 7), new DataInfo("unknown1", 1), new DataInfo("mixFaceInfo", 10), new DataInfo("unknown2", 2), new DataInfo("jobWingTailType", 2), new DataInfo("unknown3", 30), new DataInfo("weaponMotionType", 2), new DataInfo("unknown4", 11), new DataInfo("hasCapPrism", 1), new DataInfo("hasCoatPrism", 1), new DataInfo("hasPantsPrism", 1), new DataInfo("hasShoesPrism", 1), new DataInfo("hasGlovesPrism", 1), new DataInfo("hasCapePrism", 1), new DataInfo("hasWeaponPrism", 1), new DataInfo("hasSkinPrism", 1), new DataInfo("ringID1", 10), new DataInfo("ringGender1", 4), new DataInfo("ringID2", 10), new DataInfo("ringGender2", 4), new DataInfo("ringID3", 10), new DataInfo("ringGender3", 4), new DataInfo("ringID4", 10), new DataInfo("ringGender4", 4), new DataInfo("unknown5", 32), new DataInfo("unknown6", 32), new DataInfo("unknown7", 32), new DataInfo("unknown8", 16) } },
             { 29, new List<DataInfo>() {new DataInfo("gender", 1), new DataInfo("skinID", 10), new DataInfo("face50k", 1), new DataInfo("faceID", 10), new DataInfo("faceGender", 4), new DataInfo("hair10k", 4), new DataInfo("hairID", 10), new DataInfo("hairGender", 4), new DataInfo("capID", 10), new DataInfo("capGender", 3), new DataInfo("faceAccID", 10), new DataInfo("faceAccGender", 2), new DataInfo("eyeAccID", 10), new DataInfo("eyeAccGender", 2), new DataInfo("earAccID", 10), new DataInfo("earAccGender", 2), new DataInfo("isLongCoat", 1), new DataInfo("coatID", 10), new DataInfo("coatGender", 4), new DataInfo("pantsID", 10), new DataInfo("pantsGender", 2), new DataInfo("shoesID", 10), new DataInfo("shoesGender", 4), new DataInfo("glovesID", 10), new DataInfo("glovesGender", 2), new DataInfo("capeID", 10), new DataInfo("capeGender", 2), new DataInfo("isNotBlade", 1), new DataInfo("isSubWeapon", 1), new DataInfo("shieldID", 10), new DataInfo("shieldGender", 4), new DataInfo("isCashWeapon", 1), new DataInfo("weaponID", 10), new DataInfo("weaponGender", 2), new DataInfo("weaponType", 8), new DataInfo("earType", 4), new DataInfo("mixHairColor", 4), new DataInfo("mixHairRatio", 7), new DataInfo("unknown1", 1), new DataInfo("mixFaceInfo", 10), new DataInfo("unknown2", 2), new DataInfo("jobWingTailType", 2), new DataInfo("unknown3", 30), new DataInfo("weaponMotionType", 2), new DataInfo("unknown4", 11), new DataInfo("hasCapPrism", 1), new DataInfo("hasCoatPrism", 1), new DataInfo("hasPantsPrism", 1), new DataInfo("hasShoesPrism", 1), new DataInfo("hasGlovesPrism", 1), new DataInfo("hasCapePrism", 1), new DataInfo("hasWeaponPrism", 1), new DataInfo("hasSkinPrism", 1), new DataInfo("ringID1", 10), new DataInfo("ringGender1", 4), new DataInfo("ringID2", 10), new DataInfo("ringGender2", 4), new DataInfo("ringID3", 10), new DataInfo("ringGender3", 4), new DataInfo("ringID4", 10), new DataInfo("ringGender4", 4), new DataInfo("unknown5", 32), new DataInfo("unknown6", 32), new DataInfo("unknown7", 32), new DataInfo("unknown8", 16) } },
+            { 30, new List<DataInfo>() {new DataInfo("gender", 1), new DataInfo("skinID", 10), new DataInfo("face50k", 1), new DataInfo("faceID", 10), new DataInfo("faceGender", 4), new DataInfo("hair10k", 4), new DataInfo("hairID", 10), new DataInfo("hairGender", 4), new DataInfo("capID", 10), new DataInfo("capGender", 3), new DataInfo("faceAccID", 10), new DataInfo("faceAccGender", 2), new DataInfo("eyeAccID", 10), new DataInfo("eyeAccGender", 2), new DataInfo("earAccID", 10), new DataInfo("earAccGender", 2), new DataInfo("isLongCoat", 1), new DataInfo("coatID", 10), new DataInfo("coatGender", 4), new DataInfo("pantsID", 10), new DataInfo("pantsGender", 2), new DataInfo("shoesID", 10), new DataInfo("shoesGender", 4), new DataInfo("glovesID", 10), new DataInfo("glovesGender", 2), new DataInfo("capeID", 10), new DataInfo("capeGender", 2), new DataInfo("isNotBlade", 1), new DataInfo("isSubWeapon", 1), new DataInfo("shieldID", 10), new DataInfo("shieldGender", 4), new DataInfo("isCashWeapon", 1), new DataInfo("weaponID", 10), new DataInfo("weaponGender", 2), new DataInfo("weaponType", 8), new DataInfo("earType", 4), new DataInfo("mixHairColor", 4), new DataInfo("mixHairRatio", 7), new DataInfo("unknown1", 1), new DataInfo("mixFaceInfo", 10), new DataInfo("unknown2", 2), new DataInfo("jobWingTailType", 10), new DataInfo("jobWingTailTypeDetail", 2), new DataInfo("unknown3", 30), new DataInfo("weaponMotionType", 2), new DataInfo("unknown4", 11), new DataInfo("hasCapPrism", 1), new DataInfo("hasCoatPrism", 1), new DataInfo("hasPantsPrism", 1), new DataInfo("hasShoesPrism", 1), new DataInfo("hasGlovesPrism", 1), new DataInfo("hasCapePrism", 1), new DataInfo("hasWeaponPrism", 1), new DataInfo("hasSkinPrism", 1), new DataInfo("ringID1", 10), new DataInfo("ringGender1", 4), new DataInfo("ringID2", 10), new DataInfo("ringGender2", 4), new DataInfo("ringID3", 10), new DataInfo("ringGender3", 4), new DataInfo("ringID4", 10), new DataInfo("ringGender4", 4), new DataInfo("unknown5", 32), new DataInfo("unknown6", 32), new DataInfo("unknown7", 32), new DataInfo("unknown8", 16) } },
         };
 
         public static readonly int[] WeaponsKMS = { -1, 130, 131, 132, 133, 137, 138, 140, 141, 142,

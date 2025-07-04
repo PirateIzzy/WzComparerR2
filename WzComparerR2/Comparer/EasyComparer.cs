@@ -127,11 +127,47 @@ namespace WzComparerR2.Comparer
                     this.WzNewOld[1] = fileOld.Node;
                     this.WzFileNewOld[0] = fileNew.Node.GetNodeWzFile();
                     this.WzFileNewOld[1] = fileOld.Node.GetNodeWzFile();
+
+                    StateInfo = "Initialize V Skill Information...";
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Wz_Node vCoreData = PluginManager.FindWz("Etc\\VCore.img\\CoreData", WzFileNewOld[i]);
+                        if (vCoreData == null) break;
+
+                        foreach (Wz_Node data in vCoreData.Nodes)
+                        {
+                            Wz_Node connectSkill = data.FindNodeByPath("connectSkill").ResolveUol();
+                            Wz_Node jobIDValue = data.FindNodeByPath("job").ResolveUol();
+                            List<int> applicableJobID = new List<int>();
+                            foreach (Wz_Node jobID in jobIDValue.Nodes)
+                            {
+                                applicableJobID.Add(jobID.GetValueEx<int>(0));
+                            }
+                            if (connectSkill == null)
+                            {
+                                int skillIDValue = data.FindNodeByPath("spCoreOption\\effect\\skill_id").ResolveUol().GetValueEx<int>(0);
+                                if (!FifthJobSkillToJobID.ContainsKey(skillIDValue)) FifthJobSkillToJobID.Add(skillIDValue, [0]);
+                            }
+                            else
+                            {
+                                foreach (Wz_Node skillID in connectSkill.Nodes)
+                                {
+                                    int skillIDValue = skillID.GetValueEx<int>(0);
+                                    if (skillIDValue > 0 && !FifthJobSkillToJobID.ContainsKey(skillIDValue))
+                                    {
+                                        FifthJobSkillToJobID.Add(skillIDValue, applicableJobID);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     if (SkipKMSContent)
                     {
+                        KMSContentID["Skill"] = new List<int>();
                         if (DownloadKMSContentDB)
                         {
-                            foreach (string item in new string[] { "Item", "Map", "Mob", "Npc" })
+                            foreach (string item in new string[] { "Item", "Map", "Mob", "Npc", "Skill" })
                             {
                                 StateInfo = string.Format("Downloading KMS's {0} database...", item);
                                 var request = (HttpWebRequest)WebRequest.Create(string.Format("https://raw.githubusercontent.com/HikariCalyx/KMSContent/refs/heads/main/{0}ID.txt", item));
@@ -169,7 +205,7 @@ namespace WzComparerR2.Comparer
                                     }
                                 }
                             }
-                            foreach (string item in new string[] { "Effect", "MapBack", "MapObj", "MapTile", "MapWorldMap" })
+                            foreach (string item in new string[] { "Effect", "MapBack", "MapObj", "MapTile", "MapWorldMap", "MobBossPattern" })
                             {
                                 StateInfo = string.Format("Downloading KMS's {0} database...", item);
                                 var request = (HttpWebRequest)WebRequest.Create(string.Format("https://raw.githubusercontent.com/HikariCalyx/KMSContent/refs/heads/main/{0}ImgList.txt", item));
@@ -204,58 +240,22 @@ namespace WzComparerR2.Comparer
                                     }
                                 }
                             }
-                        }                        
+                        }
                         else
                         {
                             foreach (string item in new string[] { "Item", "Map", "Mob", "Npc", "Skill" })
                             {
-                                foreach (string item in new string[] { "Item", "Map", "Mob", "Npc", "Skill" })
+                                if (!KMSContentID.ContainsKey(item))
                                 {
-                                    if (!KMSContentID.ContainsKey(item))
-                                    {
-                                        KMSContentID[item] = new List<int>();
-                                    }
-                                }
-                                foreach (string item in new string[] { "Effect", "MapBack", "MapObj", "MapTile", "MapWorldMap" })
-                                {
-                                    if (!KMSComponentDict.ContainsKey(item))
-                                    {
-                                        KMSComponentDict[item] = new List<string>();
-
-                                    }
+                                    KMSContentID[item] = new List<int>();
                                 }
                             }
-                        }
-                        StateInfo = "Initialize V Skill Information...";
-                        for (int i = 0; i < 2; i++)
-                        {
-                            Wz_Node vCoreData = PluginManager.FindWz("Etc\\VCore.img\\CoreData", WzFileNewOld[i]);
-                            if (vCoreData == null) break;
-
-                            foreach (Wz_Node data in vCoreData.Nodes)
+                            foreach (string item in new string[] { "Effect", "MapBack", "MapObj", "MapTile", "MapWorldMap" })
                             {
-                                Wz_Node connectSkill = data.FindNodeByPath("connectSkill").ResolveUol();
-                                Wz_Node jobIDValue = data.FindNodeByPath("job").ResolveUol();
-                                List<int> applicableJobID = new List<int>();
-                                foreach (Wz_Node jobID in jobIDValue.Nodes)
+                                if (!KMSComponentDict.ContainsKey(item))
                                 {
-                                    applicableJobID.Add(jobID.GetValueEx<int>(0));
-                                }
-                                if (connectSkill == null)
-                                {
-                                    int skillIDValue = data.FindNodeByPath("spCoreOption\\effect\\skill_id").ResolveUol().GetValueEx<int>(0);
-                                    if (!FifthJobSkillToJobID.ContainsKey(skillIDValue)) FifthJobSkillToJobID.Add(skillIDValue, [0]);
-                                }
-                                else
-                                {
-                                    foreach (Wz_Node skillID in connectSkill.Nodes)
-                                    {
-                                        int skillIDValue = skillID.GetValueEx<int>(0);
-                                        if (skillIDValue > 0 && !FifthJobSkillToJobID.ContainsKey(skillIDValue))
-                                        {
-                                            FifthJobSkillToJobID.Add(skillIDValue, applicableJobID);
-                                        }
-                                    }
+                                    KMSComponentDict[item] = new List<string>();
+
                                 }
                             }
                         }
@@ -793,6 +793,7 @@ namespace WzComparerR2.Comparer
         private void SaveSkillTooltip(string skillTooltipPath)
         {
             SkillTooltipRender2[] skillRenderNewOld = new SkillTooltipRender2[2];
+            bool[] isSkillNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputSkillTooltipIDs.Count;
             var skillTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -865,6 +866,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isSkillNull[i] = true;
                         nullSkillIdx = i + 1;
                     }
                 }
@@ -898,14 +900,14 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         skillType = "Removed";
-
+                        if (isSkillNull[1]) continue;
                         resultImage = skillRenderNewOld[1].Render();
                         g = Graphics.FromImage(resultImage);
                         break;
 
                     case 2: // add
                         skillType = "Added";
-
+                        if (isSkillNull[0]) continue;
                         resultImage = skillRenderNewOld[0].Render();
                         g = Graphics.FromImage(resultImage);
                         break;
@@ -986,6 +988,7 @@ namespace WzComparerR2.Comparer
         private void SaveItemTooltip(string itemTooltipPath)
         {
             ItemTooltipRender2[] itemRenderNewOld = new ItemTooltipRender2[2];
+            bool[] isItemNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputItemTooltipIDs.Count;
             var itemTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1087,6 +1090,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isItemNull[i] = true;
                         nullItemIdx = i + 1;
                     }
                 }
@@ -1120,14 +1124,14 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         itemType = "Removed";
-
+                        if (isItemNull[1]) continue;
                         resultImage = itemRenderNewOld[1].Render();
                         g = Graphics.FromImage(resultImage);
                         break;
 
                     case 2: // add
                         itemType = "Added";
-
+                        if (isItemNull[0]) continue;
                         resultImage = itemRenderNewOld[0].Render();
                         g = Graphics.FromImage(resultImage);
                         break;
@@ -1166,6 +1170,7 @@ namespace WzComparerR2.Comparer
         private void SaveGearTooltip(string gearTooltipPath)
         {
             GearTooltipRender2[] gearRenderNewOld = new GearTooltipRender2[2];
+            bool[] isGearNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputGearTooltipIDs.Count;
             var gearTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1351,6 +1356,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isGearNull[i] = true;
                         nullEqpIdx = i + 1;
                     }
                 }
@@ -1384,7 +1390,7 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         gearType = "Removed";
-
+                        if (isGearNull[1]) continue;
                         resultImage = gearRenderNewOld[1].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1392,7 +1398,7 @@ namespace WzComparerR2.Comparer
 
                     case 2: // add
                         gearType = "Added";
-
+                        if (isGearNull[0]) continue;
                         resultImage = gearRenderNewOld[0].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1431,6 +1437,7 @@ namespace WzComparerR2.Comparer
         private void SaveMapTooltip(string mapTooltipPath)
         {
             MapTooltipRenderer[] mapRenderNewOld = new MapTooltipRenderer[2];
+            bool[] isMapNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputMapTooltipIDs.Count;
             var mapTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1447,6 +1454,9 @@ namespace WzComparerR2.Comparer
                 mapRenderNewOld[i].Enable22AniStyle = this.Enable22AniStyle;
                 mapRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 mapRenderNewOld[i].ShowMiniMap = true;
+                mapRenderNewOld[i].ShowMiniMapMob = true;
+                mapRenderNewOld[i].ShowMiniMapNpc = true;
+                mapRenderNewOld[i].ShowMiniMapPortal = true;
                 mapRenderNewOld[i].ShowMobNpcObjectID = this.ShowObjectID;
             }
 
@@ -1496,6 +1506,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isMapNull[i] = true;
                         nullMapIdx = i + 1;
                     }
                 }
@@ -1529,7 +1540,7 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         mapType = "Removed";
-
+                        if (isMapNull[1]) continue;
                         resultImage = mapRenderNewOld[1].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1537,7 +1548,7 @@ namespace WzComparerR2.Comparer
 
                     case 2: // add
                         mapType = "Added";
-
+                        if (isMapNull[0]) continue;
                         resultImage = mapRenderNewOld[0].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1571,6 +1582,7 @@ namespace WzComparerR2.Comparer
         private void SaveMobTooltip(string mobTooltipPath)
         {
             MobTooltipRenderer[] mobRenderNewOld = new MobTooltipRenderer[2];
+            bool[] isMobNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputMobTooltipIDs.Count;
             var mobTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1632,6 +1644,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isMobNull[i] = true;
                         nullMobIdx = i + 1;
                     }
                 }
@@ -1665,7 +1678,7 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         mobType = "Removed";
-
+                        if (isMobNull[1]) continue;
                         resultImage = mobRenderNewOld[1].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1673,7 +1686,7 @@ namespace WzComparerR2.Comparer
 
                     case 2: // add
                         mobType = "Added";
-
+                        if (isMobNull[0]) continue;
                         resultImage = mobRenderNewOld[0].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1707,6 +1720,7 @@ namespace WzComparerR2.Comparer
         private void SaveNpcTooltip(string npcTooltipPath)
         {
             NpcTooltipRenderer[] npcRenderNewOld = new NpcTooltipRenderer[2];
+            bool[] isNpcNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputNpcTooltipIDs.Count;
             var npcTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1768,6 +1782,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isNpcNull[i] = true;
                         nullNpcIdx = i + 1;
                     }
                 }
@@ -1801,7 +1816,7 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         npcType = "Removed";
-
+                        if (isNpcNull[1]) continue;
                         resultImage = npcRenderNewOld[1].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1809,7 +1824,7 @@ namespace WzComparerR2.Comparer
 
                     case 2: // add
                         npcType = "Added";
-
+                        if (isNpcNull[0]) continue;
                         resultImage = npcRenderNewOld[0].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1843,6 +1858,7 @@ namespace WzComparerR2.Comparer
         private void SaveCashTooltip(string itemTooltipPath)
         {
             CashPackageTooltipRender[] cashRenderNewOld = new CashPackageTooltipRender[2];
+            bool[] isCashNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputCashTooltipIDs.Count;
             var itemTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1909,6 +1925,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
+                        isCashNull[i] = true;
                         nullItemIdx = i + 1;
                     }
                 }
@@ -1942,7 +1959,7 @@ namespace WzComparerR2.Comparer
 
                     case 1: // delete
                         itemType = "Removed";
-
+                        if (isCashNull[1]) continue;
                         resultImage = cashRenderNewOld[1].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -1950,7 +1967,7 @@ namespace WzComparerR2.Comparer
 
                     case 2: // add
                         itemType = "Added";
-
+                        if (isCashNull[0]) continue;
                         resultImage = cashRenderNewOld[0].Render();
                         if (resultImage == null) continue;
                         g = Graphics.FromImage(resultImage);
@@ -2704,7 +2721,25 @@ namespace WzComparerR2.Comparer
             else if (node.FullPathToFile.StartsWith("Mob"))
             {
                 string[] mobNodePath = node.FullPathToFile.Split('\\');
-                if (mobNodePath.Contains("BossPattern")) return true;
+                if (mobNodePath.Contains("BossPattern"))
+                {
+                    string bossPatternImgStr = mobNodePath.LastOrDefault(part => part.EndsWith(".img"));
+                    if (bossPatternImgStr == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (KMSComponentDict.ContainsKey("MobBossPattern"))
+                        {
+                            return KMSComponentDict["MobBossPattern"].Contains(bossPatternImgStr);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
                 string mobImgStr = mobNodePath.LastOrDefault(part => part.EndsWith(".img"));
                 if (mobImgStr == null)
                 {
@@ -2843,7 +2878,7 @@ namespace WzComparerR2.Comparer
                     }
                     else
                     {
-                        return false;
+                        return KMSContentID["Skill"].Contains(skillID);
                     }
                 default:
                     return true;

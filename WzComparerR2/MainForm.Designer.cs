@@ -125,7 +125,6 @@
             this.comboItem10 = new DevComponents.Editors.ComboItem();
             this.comboItem11 = new DevComponents.Editors.ComboItem();
             this.comboItem12 = new DevComponents.Editors.ComboItem();
-            this.comboItem12_2 = new DevComponents.Editors.ComboItem();
             this.itemContainer17 = new DevComponents.DotNetBar.ItemContainer();
             this.checkBoxItemRegex1 = new DevComponents.DotNetBar.CheckBoxItem();
             this.buttonItemSearchWz = new DevComponents.DotNetBar.ButtonItem();
@@ -181,6 +180,7 @@
             this.buttonHitboxOverlay = new DevComponents.DotNetBar.ButtonItem();
             this.buttonLoadMultiFrameAniList = new DevComponents.DotNetBar.ButtonItem();
             this.buttonOverlayExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
+            this.colorPickerPicBoxBgColor = new DevComponents.DotNetBar.ColorPickerDropDown();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -280,6 +280,10 @@
             this.chkHashPngFileName = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.comboItem20 = new DevComponents.Editors.ComboItem();
+            this.comboItem22 = new DevComponents.Editors.ComboItem();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
@@ -1370,7 +1374,8 @@
             this.comboItem10,
             this.comboItem11,
             this.comboItem12,
-            this.comboItem12_2});
+            this.comboItem20,
+            this.comboItem22});
             this.comboBoxItem1.Name = "comboBoxItem1";
             this.comboBoxItem1.SelectedIndex = 0;
             // 
@@ -1386,9 +1391,13 @@
             // 
             this.comboItem12.Text = "Image Value";
             // 
-            // comboItem12_2
+            // comboItem20
+            //
+            this.comboItem20.Text = "Node,Value";
+            //
+            // comboItem22
             // 
-            this.comboItem12_2.Text = "Node,Value";
+            this.comboItem22.Text = "Node Path";
             // 
             // itemContainer17
             // 
@@ -1941,6 +1950,7 @@
             this.pictureBoxEx1.MouseDragEnabled = true;
             this.pictureBoxEx1.MouseDragSaveEnabled = true;
             this.pictureBoxEx1.Name = "pictureBoxEx1";
+            this.pictureBoxEx1.Padding = new System.Windows.Forms.Padding(0, 14, 0, 0);
             this.pictureBoxEx1.PictureName = null;
             this.pictureBoxEx1.ShowInfo = true;
             this.pictureBoxEx1.ShowPositionGridOnDrag = true;
@@ -1967,7 +1977,8 @@
             this.cmbItemSkins,
             this.buttonItemSaveImage,
             this.buttonItemGif,
-            this.buttonItemGif2});
+            this.buttonItemGif2,
+            this.colorPickerPicBoxBgColor});
             this.ribbonBar5.Location = new System.Drawing.Point(0, 202);
             this.ribbonBar5.Name = "ribbonBar5";
             this.ribbonBar5.Size = new System.Drawing.Size(292, 26);
@@ -2097,9 +2108,9 @@
             // 
             // 
             this.itemContainer36.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            //
+            // 
             // buttonItemExtractGifEx
-            //
+            // 
             this.buttonItemExtractGifEx.Name = "buttonItemExtractGifEx";
             this.buttonItemExtractGifEx.Text = "Activate+";
             this.buttonItemExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node, without using ordinal node names.";
@@ -2162,6 +2173,22 @@
             this.buttonOverlayExtractGifEx.Text = "Nesting+";
             this.buttonOverlayExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node and nest them, without using ordinal node names.";
             this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
+            // colorPickerPicBoxBgColor
+            // 
+            this.colorPickerPicBoxBgColor.AutoExpandOnClick = true;
+            this.colorPickerPicBoxBgColor.BeginGroup = true;
+            this.colorPickerPicBoxBgColor.ImagePaddingHorizontal = 6;
+            this.colorPickerPicBoxBgColor.ImagePaddingVertical = 0;
+            this.colorPickerPicBoxBgColor.ImagePosition = DevComponents.DotNetBar.eImagePosition.Bottom;
+            this.colorPickerPicBoxBgColor.Name = "colorPickerPicBoxBgColor";
+            this.colorPickerPicBoxBgColor.SelectedColorImageRectangle = new System.Drawing.Rectangle(0, 0, 100, 100);
+            this.colorPickerPicBoxBgColor.ShowSubItems = false;
+            this.colorPickerPicBoxBgColor.SubItemsExpandWidth = 14;
+            this.colorPickerPicBoxBgColor.Symbol = "57914";
+            this.colorPickerPicBoxBgColor.SymbolSet = DevComponents.DotNetBar.eSymbolSet.Material;
+            this.colorPickerPicBoxBgColor.SymbolSize = 12F;
+            this.colorPickerPicBoxBgColor.Tooltip = "Set Background Color for Image Viewer";
+            this.colorPickerPicBoxBgColor.SelectedColorChanged += new System.EventHandler(this.colorPickerPicBoxBgColor_SelectedColorChanged);
             // 
             // textBoxX1
             // 
@@ -2297,9 +2324,11 @@
             this.tsmi2CollapseType,
             this.toolStripMenuItem3,
             this.tsmi2Prev,
-            this.tsmi2Next});
+            this.tsmi2Next,
+            this.toolStripMenuItem6,
+            this.tsmi2CopyFullPath});
             this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(196, 198);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(196, 226);
             this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip2_Opening);
             // 
             // tsmi2SaveAs
@@ -3265,6 +3294,18 @@
             this.chkHashPngFileName.TabIndex = 9;
             this.chkHashPngFileName.Text = "Hash PNG Names";
             //
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(192, 6);
+            // 
+            // tsmi2CopyFullPath
+            // 
+            this.tsmi2CopyFullPath.Name = "tsmi2CopyFullPath";
+            this.tsmi2CopyFullPath.Size = new System.Drawing.Size(195, 22);
+            this.tsmi2CopyFullPath.Text = "Copy Full Path";
+            this.tsmi2CopyFullPath.Click += new System.EventHandler(this.tsmi2CopyFullPath_Click);
             // MainForm
             // 
             this.ClientSize = new System.Drawing.Size(750, 512);
@@ -3562,6 +3603,11 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowLinkedTamingMob;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipKMSContent;
         private DevComponents.Editors.ComboItem comboItem19;
-        private DevComponents.Editors.ComboItem comboItem12_2;
+        private DevComponents.Editors.ComboItem comboItem20;
+        private DevComponents.Editors.ComboItem comboItem21;
+        private DevComponents.Editors.ComboItem comboItem22;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem tsmi2CopyFullPath;
+        private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
     }
 }

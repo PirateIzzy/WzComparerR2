@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.IO.Compression;
 using System.Threading;
-using System.Threading.Tasks;
 using WzComparerR2.Patcher.Builder;
 using PartialStream = WzComparerR2.Patcher.Builder.PartialStream;
 
@@ -772,7 +769,8 @@ namespace WzComparerR2.Patcher
                         || (op.OperType != 1 && (op.Length + preLoadByteCount > msBuffer.Capacity)))
                     {
                         //排序预读原文件
-                        readFileOperList.Sort((left, right) => {
+                        readFileOperList.Sort((left, right) =>
+                        {
                             int cmp;
                             if ((cmp = string.Compare(left.FromFileName, right.FromFileName, StringComparison.OrdinalIgnoreCase)) != 0)
                                 return cmp;
