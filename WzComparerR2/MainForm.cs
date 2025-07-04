@@ -265,6 +265,10 @@ namespace WzComparerR2
             tooltipQuickView.MapRender.ShowObjectID = Setting.Map.ShowMapObjectID;
             tooltipQuickView.MapRender.ShowMobNpcObjectID = Setting.Map.ShowMobNpcObjectID;
             tooltipQuickView.MapRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+            tooltipQuickView.MapRender.ShowMiniMapMob = Setting.Map.ShowMiniMapMob;
+            tooltipQuickView.MapRender.ShowMiniMapNpc = Setting.Map.ShowMiniMapNpc;
+            tooltipQuickView.MapRender.ShowMiniMapPortal = Setting.Map.ShowMiniMapPortal;
+
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
             tooltipQuickView.RecipeRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
 
@@ -2262,6 +2266,9 @@ namespace WzComparerR2
                 case 3:
                     searchAdvTreeEx(advTree3, 0, 1, textBoxItemSearchWz.Text);
                     break;
+                case 4: //full path
+                    searchAdvTreeFullPath(textBoxItemSearchWz.Text);
+                    break;
             }
         }
 
@@ -2353,6 +2360,82 @@ namespace WzComparerR2
             }
 
             return null;
+        }
+
+        private void searchAdvTreeFullPath(string fullPath)
+        {
+            string[] pathSegments = fullPath.Split('/');
+
+            bool isNodePathMatches(string pathSegment, string nodeName, StringComparison stringComparison)
+            {
+                if (string.Equals(pathSegment, nodeName, stringComparison))
+                {
+                    return true;
+                }
+                int pathExtIndex = pathSegment.LastIndexOf('.');
+                int nodeExtIndex = nodeName.LastIndexOf(".");
+                if (pathExtIndex != -1 || nodeExtIndex != -1)
+                {
+                    ReadOnlySpan<char> pathWithoutExt = pathExtIndex == -1 ? pathSegment.AsSpan() : pathSegment.AsSpan(0, pathExtIndex);
+                    ReadOnlySpan<char> nodeWithoutExt = nodeExtIndex == -1 ? nodeName.AsSpan() : nodeName.AsSpan(0, nodeExtIndex);
+                    return pathWithoutExt.Equals(nodeWithoutExt, stringComparison);
+                }
+                return false;
+            }
+
+            IEnumerable<(Node result, int resultPathLevel)> searchNode(Node treeNode, int pathLevel)
+            {
+                string pathSegment = pathSegments[pathLevel];
+                if (isNodePathMatches(pathSegment, treeNode.Text, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (treeNode.Nodes.Count == 0 || pathLevel == pathSegments.Length - 1)
+                    {
+                        yield return (treeNode, pathLevel);
+                    }
+                    foreach (Node childNode in treeNode.Nodes)
+                    {
+                        foreach (var resultTuple in searchNode(childNode, pathLevel + 1))
+                        {
+                            yield return resultTuple;
+                        }
+                    }
+                }
+            }
+
+            foreach (var node in findNextNode(this.advTree1))
+            {
+                foreach ((Node result, int resultPathLevel) in searchNode(node, 0))
+                {
+                    if (resultPathLevel == pathSegments.Length - 1)
+                    {
+                        this.advTree1.SelectedNode = node;
+                        return;
+                    }
+
+                    var wzNode = result.AsWzNode();
+                    if (wzNode != null && wzNode.Value is Wz_Image wzImg && wzImg.TryExtract(out _))
+                    {
+                        // find remaining path in wzImg
+                        wzNode = wzImg.Node;
+                        for (int i = resultPathLevel + 1; i < pathSegments.Length; i++)
+                        {
+                            string pathSegment = pathSegments[i];
+                            wzNode = wzNode.Nodes.FirstOrDefault(child => isNodePathMatches(pathSegment, child.Text, StringComparison.OrdinalIgnoreCase));
+                            if (wzNode == null)
+                            {
+                                break;
+                            }
+                        }
+                        if (wzNode != null && this.OnSelectedWzNode(wzNode))
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            this.advTree1.SelectedNode = null;
+            MessageBoxEx.Show(this, "The search has reached the end.");
         }
 
         private IEnumerable<Node> findNextNode(AdvTree advTree)
@@ -3101,6 +3184,17 @@ namespace WzComparerR2
             }
         }
 
+        private void tsmi2CopyFullPath_Click(object sender, EventArgs e)
+        {
+            var selectedWzNode = advTree3.SelectedNode.AsWzNode();
+            if (selectedWzNode != null)
+            {
+                string fullPath = selectedWzNode.FullPathToFile.Replace('\\', '/');
+                Clipboard.SetText(fullPath);
+                ToastNotification.Show(this, "The full path of the currently selected node has been copied.", 1000, eToastPosition.TopCenter);
+            }
+        }
+
         private void contextMenuStrip2_Opening(object sender, CancelEventArgs e)
         {
             var node = advTree3.SelectedNode.AsWzNode();
@@ -3302,6 +3396,7 @@ namespace WzComparerR2
                     if (map != null)
                     {
                         fileName = "map_" + map.MapID + "_" + RemoveInvalidFileNameChars(sr.Name.Replace(" : ", ":")) + ".png";
+                        tooltipQuickView.NodeID = map.MapID;
                     }
                     break;
 
@@ -4010,6 +4105,11 @@ namespace WzComparerR2
                 bool isUpdateRequired = await AutomaticCheckUpdate();
                 if (isUpdateRequired) new FrmUpdater().ShowDialog();
             }
+        }
+        
+        private void colorPickerPicBoxBgColor_SelectedColorChanged(object sender, EventArgs e)
+        {
+            this.pictureBoxEx1.BackColor = ((ColorPickerDropDown)sender).SelectedColor;
         }
     }
 
