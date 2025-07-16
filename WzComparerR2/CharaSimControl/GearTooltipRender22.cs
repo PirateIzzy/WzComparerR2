@@ -533,6 +533,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             // ----------------------------------------------------------------------
+            bool secondLineNeeded = true;
             bool hasThirdContents = false;
             bool hasOptionPart = false;
             bool hasDescPart = false;
@@ -1782,7 +1783,7 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            if (Gear.State == GearState.itemList && Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.limitedLabel, out value) || value <= 0))
+            if (Gear.State == GearState.itemList && Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.noTradeLimitCash, out value) || value <= 0))
             {
                 tags.Add("#$rThis item cannot be traded once it has been used.#");
             }
@@ -1901,13 +1902,13 @@ namespace WzComparerR2.CharaSimControl
             // 프리즘 불가
             if (Gear.Props.TryGetValue(GearPropType.noPrism, out value) && value != 0)
             {
-                tags.Add(ItemStringHelper.GetGearPropString3(GearPropType.noPrism, value)[0]);
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.noPrism, value)[0]);
             }
 
             // 민팅
             if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)
             {
-                tags.Add(ItemStringHelper.GetGearPropString3(GearPropType.mintable, value)[0]);
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.mintable, value)[0]);
             }
 
             return tags.Where(text => !string.IsNullOrEmpty(text)).ToList();

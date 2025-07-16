@@ -200,6 +200,7 @@ namespace WzComparerR2.CharaSim
         illusionGrade,
         limitedLabel,
         noPrism,
+        noTradeLimitCash,
         //MSN exclusive stats
         blockUpgradeExtraOption,
         blockUpgradeStarforce,

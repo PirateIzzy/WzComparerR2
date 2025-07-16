@@ -1176,7 +1176,7 @@ namespace WzComparerR2.CharaSimControl
                     desc.Add($"#cGrants {incline} EXP when first equipped (up to the daily maximum, excluded if max reached).");
                 }
 
-                if (Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.limitedLabel, out value) || value <= 0))
+                if (Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.noTradeLimitCash, out value) || value <= 0))
                 {
                     desc.Add("#cThis item cannot be traded once it has been used.#");
                 }
