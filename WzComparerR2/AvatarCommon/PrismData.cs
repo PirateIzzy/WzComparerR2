@@ -57,19 +57,19 @@ namespace WzComparerR2.AvatarCommon
             switch (this.Type)
             {
                 case 0:
-                    return "全色系";
+                    return "All Color Schemes";
                 case 1:
-                    return "赤色系";
+                    return "Red Color Schemes";
                 case 2:
-                    return "黄色系";
+                    return "Yellow Color Schemes";
                 case 3:
-                    return "緑色系";
+                    return "Green Color Schemes";
                 case 4:
-                    return "ターコイズ色系";
+                    return "Turquoise Color Schemes";
                 case 5:
-                    return "青色系";
+                    return "Blue Color Schemes";
                 case 6:
-                    return "紫色系";
+                    return "Purple Color Schemes";
                 default:
                     return null;
             }

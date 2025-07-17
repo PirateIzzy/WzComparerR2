@@ -1106,7 +1106,7 @@ namespace WzComparerR2.Avatar.UI
                     }
 
                     var labelHue = btn.SubItems.OfType<LabelItem>().FirstOrDefault(Item => Item.Name.Contains("Hue"));
-                    labelHue.Text = $"色相({part.PrismData.Hue})";
+                    labelHue.Text = $"Hue ({part.PrismData.Hue})";
                 }
             }
         }
@@ -1131,7 +1131,7 @@ namespace WzComparerR2.Avatar.UI
                     }
 
                     var labelSaturation = btn.SubItems.OfType<LabelItem>().FirstOrDefault(Item => Item.Name.Contains("Saturation"));
-                    labelSaturation.Text = $"彩度({(part.PrismData.Saturation > 100 ? "+" : "")}{part.PrismData.Saturation - 100})";
+                    labelSaturation.Text = $"Saturation ({(part.PrismData.Saturation > 100 ? "+" : "")}{part.PrismData.Saturation - 100})";
                 }
             }
         }
@@ -1156,7 +1156,7 @@ namespace WzComparerR2.Avatar.UI
                     }
 
                     var labelBrightness = btn.SubItems.OfType<LabelItem>().FirstOrDefault(Item => Item.Name.Contains("Brightness"));
-                    labelBrightness.Text = $"輝度({(part.PrismData.Brightness > 100 ? "+" : "")}{part.PrismData.Brightness - 100})";
+                    labelBrightness.Text = $"Brightness ({(part.PrismData.Brightness > 100 ? "+" : "")}{part.PrismData.Brightness - 100})";
                 }
             }
         }
@@ -1214,7 +1214,7 @@ namespace WzComparerR2.Avatar.UI
                 }
                 if (part.HasPrism)
                 {
-                    text = string.Format("{0}\r\n{1}\r\n色相 {2}, 彩度 {3}, 輝度 {4}\r\n{5}+{6}h{7}s{8}v{9}",
+                    text = string.Format("{0}\r\n{1}\r\nHue {2}, Saturation {3}, Brightness {4}\r\n{5}+{6}h{7}s{8}v{9}",
                         sr.Name,
                         part.PrismData.GetColorType(),
                         part.PrismData.Hue,

@@ -68,7 +68,7 @@
             // btnItemReset
             // 
             this.btnItemReset.Name = "btnItemReset";
-            this.btnItemReset.Text = "設定の初期化";
+            this.btnItemReset.Text = "Reset";
             // 
             // chkShowEffect
             // 
