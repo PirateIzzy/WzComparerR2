@@ -181,7 +181,7 @@
             // btnTransparentWebMPreset
             //
             this.btnTransparentWebMPreset.Name = "btnTransparentWebMPreset";
-            this.btnTransparentWebMPreset.Text = "Transparent WebM (For Video Editing)";
+            this.btnTransparentWebMPreset.Text = "Transparent WebM (For Online Sharing)";
             this.btnTransparentWebMPreset.Click += new System.EventHandler(this.btnTransparentWebMPreset_Click);
             //
             // btnDefaultPreset
