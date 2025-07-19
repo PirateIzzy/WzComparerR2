@@ -84,9 +84,9 @@ namespace WzComparerR2
             this.ShowAnimation(frameData);
         }
 
-        public FrameAnimationData LoadVideo(Wz_Video wzVideo)
+        public FrameAnimationData LoadVideo(Wz_Video wzVideo, Wz_Vector origin = null)
         {
-            return new MaplestoryCanvasVideoLoader().Load(wzVideo, this.GraphicsDevice);
+            return new MaplestoryCanvasVideoLoader().Load(wzVideo, this.GraphicsDevice, origin);
         }
 
         public FrameAnimationData LoadFrameAnimation(Wz_Node node, FrameAnimationCreatingOptions options = default)
@@ -198,9 +198,17 @@ namespace WzComparerR2
                 frameStart = frameStart == -1 ? 0 : frameStart;
                 frameEnd = frameEnd == -1 ? aniItem.Data.Frames.Count - 1 : frameEnd;
 
-                if (frameStart > frameEnd) return;
+                if (frameStart > frameEnd)
+                {
+                    DisposeAnimationItem(aniItem);
+                    return;
+                }
             }
-            else return;
+            else
+            {
+                DisposeAnimationItem(aniItem);
+                return;
+            }
 
             // png 하나의 딜레이 설정
             if (isPngFrameAni)

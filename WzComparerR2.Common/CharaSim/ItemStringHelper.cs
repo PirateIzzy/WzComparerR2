@@ -120,6 +120,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
                 case GearPropType.notExtend: return value == 0 ? null : "Duration cannot be extended.";
                 case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "Tradable once\nOnly tradable to your chars in this world after exch.";
+                case GearPropType.noPrism: return value == 0 ? null : "Cannot use Prism";
                 case GearPropType.mintable: return value == 0 ? null : "Mintable";
                 case GearPropType.tradeAvailable:
                     switch (value)
@@ -369,6 +370,9 @@ namespace WzComparerR2.CharaSim
                     return res;
                 case GearPropType.noLookChange:
                     res[0] = value == 0 ? null : "#$r훈장 신비의 모루 사용 불가#";
+                    return res;
+                case GearPropType.noPrism:
+                    res[0] = value == 0 ? null : "#$rプリズム使用不可#";
                     return res;
                 case GearPropType.mintable:
                     res[0] = value == 0 ? null : "#$r민팅 가능#";
@@ -1399,6 +1403,7 @@ namespace WzComparerR2.CharaSim
 
                 case 18000: return "Sia Astelle";
                 case 18001: return "Erel Light";
+                case 18002: return "Iel";
                 case 18100: return "Erel Light(1)";
                 case 18110: return "Erel Light(2)";
                 case 18111: return "Erel Light(3)";
@@ -1409,6 +1414,11 @@ namespace WzComparerR2.CharaSim
                 case 18211: return "Sia Astelle(3)";
                 case 18212: return "Sia Astelle(4)";
                 case 18214: return "Sia Astelle(6)";
+                case 18300: return "Iel(1)";
+                case 18310: return "Iel(2)";
+                case 18311: return "Iel(3)";
+                case 18312: return "Iel(4)";
+                case 18314: return "Iel(6)";
 
                 case 40000: return "5th";
                 case 40001: return "5th (Warrior)";

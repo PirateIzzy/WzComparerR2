@@ -266,31 +266,42 @@ namespace WzComparerR2.CharaSimControl
                 switch (value)
                 {
                     case 1:
-                        TextRenderer.DrawText(g, "스페셜라벨", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "스페셜Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 2:
-                        TextRenderer.DrawText(g, "레드라벨", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "레드Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 3:
-                        TextRenderer.DrawText(g, "블랙라벨", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "블랙Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
                         break;
                 }
                 picH += 16;
             }
             else if (Gear.Props.TryGetValue(GearPropType.masterSpecial, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "마스터라벨", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "Master Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
                 picH += 16;
             }
             else if (Gear.Props.TryGetValue(GearPropType.BTSLabel, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "BTS 라벨", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(182, 110, 238), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "BTS Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(182, 110, 238), TextFormatFlags.HorizontalCenter);
                 picH += 16;
             }
             else if (Gear.Props.TryGetValue(GearPropType.BLACKPINKLabel, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "BLACKPINK 라벨", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(242, 140, 160), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "BLACKPINK Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(242, 140, 160), TextFormatFlags.HorizontalCenter);
                 picH += 16;
+            }
+            else if (Gear.Props.TryGetValue(GearPropType.limitedLabel, out value) && value > 0)
+            {
+                TextRenderer.DrawText(g, "LIMITED Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(248, 196, 129), TextFormatFlags.HorizontalCenter);
+                picH += 16;
+                if (!string.IsNullOrEmpty(Gear.LabelGradeTooltip))
+                {
+                    var limitedLabelText = Regex.Replace(Gear.LabelGradeTooltip, "%d", "0");
+                    TextRenderer.DrawText(g, limitedLabelText, GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(248, 196, 129), TextFormatFlags.HorizontalCenter);
+                    picH += 16;
+                }
             }
 
             // 기타 속성
@@ -342,7 +353,7 @@ namespace WzComparerR2.CharaSimControl
             }
             else g.DrawImage(Resource.UIToolTipNew_img_Item_Common_ItemIcon_base, 15, picH + 10);
 
-            // 캐시 라벨 아이콘
+            // 캐시 Label 아이콘
             if (Gear.Cash && !(Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0))
             {
                 Bitmap cashImg = null;
@@ -384,6 +395,11 @@ namespace WzComparerR2.CharaSimControl
                             cashOrigin = new Point(cashImg.Width, cashImg.Height);
                             break;
                     }
+                }
+                else if (Gear.Props.TryGetValue(GearPropType.limitedLabel, out value) && value > 0)
+                {
+                    cashImg = Resource.CashShop_img_CashItem_label_15;
+                    cashOrigin = new Point(12, 12);
                 }
                 if (cashImg == null) //default cashImg
                 {
@@ -517,6 +533,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             // ----------------------------------------------------------------------
+            bool secondLineNeeded = true;
             bool hasThirdContents = false;
             bool hasOptionPart = false;
             bool hasDescPart = false;
@@ -839,6 +856,17 @@ namespace WzComparerR2.CharaSimControl
                     TextRenderer.DrawText(g, "공격 속도", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                     GearGraphics.DrawString(g, $"#$g{10 - value}단계#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 305, ref picH, 16, alignment: Text.TextAlignment.Left);
                 }
+            }
+            // 등급
+            if (Gear.type != GearType.android && Gear.Props.TryGetValue(GearPropType.grade, out value) && value > 0)
+            {
+                AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                secondLineNeeded = false;
+                hasThirdContents = true;
+                hasOptionPart = true;
+
+                TextRenderer.DrawText(g, "Grade : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                picH += 16;
             }
 
             // 내구도
@@ -1755,7 +1783,7 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            if (Gear.State == GearState.itemList && Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0))
+            if (Gear.State == GearState.itemList && Gear.Cash && (!Gear.Props.TryGetValue(GearPropType.noMoveToLocker, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.accountSharable, out value) || value == 0) && (!Gear.Props.TryGetValue(GearPropType.noTradeLimitCash, out value) || value <= 0))
             {
                 tags.Add("#$rThis item cannot be traded once it has been used.#");
             }
@@ -1789,6 +1817,11 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.accountShareTag, out value) && value > 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.accountShareTag, value)[0]);
+            }
+
+            if (Gear.Props.TryGetValue(GearPropType.colorvar, out value) && value > 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.colorvar, value));
             }
 
             // 모루
@@ -1865,6 +1898,12 @@ namespace WzComparerR2.CharaSimControl
                 tags.Add(string.Join("#$r,# ", tempTags));
             }
             tempTags.Clear();
+
+            // 프리즘 불가
+            if (Gear.Props.TryGetValue(GearPropType.noPrism, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.noPrism, value)[0]);
+            }
 
             // 민팅
             if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)

@@ -198,7 +198,9 @@ namespace WzComparerR2.CharaSim
         notSale,
         scissorAmount_wz2,
         illusionGrade,
-
+        limitedLabel,
+        noPrism,
+        noTradeLimitCash,
         //MSN exclusive stats
         blockUpgradeExtraOption,
         blockUpgradeStarforce,

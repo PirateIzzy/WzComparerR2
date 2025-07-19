@@ -44,6 +44,7 @@ namespace WzComparerR2.CharaSim
         public string EpicHs { get; internal set; }
         public BitmapOrigin ToolTIpPreview { get; set; }
         public Bitmap AndroidBitmap { get; set; }
+        public string LabelGradeTooltip { get; internal set; }
 
         public bool FixLevel { get; internal set; }
         public List<GearLevelInfo> Levels { get; internal set; }
@@ -362,6 +363,27 @@ namespace WzComparerR2.CharaSim
                 default:
                     return false;
             }
+        }
+
+        public static bool IsSymbol(GearType type)
+        {
+            switch (type)
+            {
+                case GearType.arcaneSymbol:
+                case GearType.authenticSymbol:
+                case GearType.grandAuthenticSymbol:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        
+        public static bool IsTamingMob(GearType type)
+        {
+            if ((int)type >= 190 && (int)type < 200)
+                return true;
+
+            return false;
         }
 
         public static bool IsEnhanceable(GearType type)
@@ -1100,6 +1122,10 @@ namespace WzComparerR2.CharaSim
                             {
                                 gear.ReqSpecJobs.Add(jobNode.GetValue<int>());
                             }
+                            break;
+
+                        case "limitedLabelGradeTooltip":
+                            gear.LabelGradeTooltip = Convert.ToString(subNode.Value);
                             break;
 
                         default:

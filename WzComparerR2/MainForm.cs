@@ -637,6 +637,18 @@ namespace WzComparerR2
                     this.cmbItemSkins.SelectedIndex = aniItem.Skins.IndexOf(aniItem.SelectedSkin);
                 }
             }
+            else if (node.Value is Wz_Video)
+            {
+                var origin = node.FindNodeByPath("origin").GetValueEx<Wz_Vector>(null);
+                var videoFrameData = this.pictureBoxEx1.LoadVideo(node.Value as Wz_Video, origin);
+
+                if (videoFrameData != null)
+                {
+                    this.pictureBoxEx1.ShowAnimation(videoFrameData);
+                    this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemSkins.Visible = false;
+                }
+            }
             else
             {
                 var options = (sender == this.buttonItemExtractGifEx) ? FrameAnimationCreatingOptions.ScanAllChildrenFrames : default;
@@ -691,7 +703,8 @@ namespace WzComparerR2
             }
             else if (node.Value is Wz_Video)
             {
-                var videoFrameData = this.pictureBoxEx1.LoadVideo(node.Value as Wz_Video);
+                var origin = node.FindNodeByPath("origin").GetValueEx<Wz_Vector>(null);
+                var videoFrameData = this.pictureBoxEx1.LoadVideo(node.Value as Wz_Video, origin);
 
                 if (videoFrameData != null)
                 {
@@ -1633,8 +1646,9 @@ namespace WzComparerR2
                 case Wz_Video video:
                     textBoxX1.Text = "dataLength: " + video.Length + " bytes\r\n" +
                         "offset: " + video.Offset;
-                    if (this.pictureBoxEx1.ShowOverlayAni) break; // 애니메이션 Nest 중일때는 자동 video 미리보기 없음
-                    var videoFrameData = this.pictureBoxEx1.LoadVideo(video);
+                    if (this.pictureBoxEx1.ShowOverlayAni) break; // 애니메이션 중첩 중일때는 자동 video 미리보기 없음
+                    var origin = selectedNode.FindNodeByPath("origin").GetValueEx<Wz_Vector>(null);
+                    var videoFrameData = this.pictureBoxEx1.LoadVideo(video, origin);
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     this.pictureBoxEx1.ShowAnimation(videoFrameData);
                     this.cmbItemAniNames.Items.Clear();

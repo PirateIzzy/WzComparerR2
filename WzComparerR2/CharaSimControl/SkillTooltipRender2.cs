@@ -87,6 +87,15 @@ namespace WzComparerR2.CharaSimControl
                 ridingGearOrigin.X = originBmp.Width;
             }
 
+            Point hexaSkillDescOrigin = Point.Empty;
+            Bitmap hexaSkillDescBmp = RenderHexaDesc(region);
+            if ((Skill.Origin || Skill.Ascent) && !Skill.Invisible)
+            {
+                totalSize.Width += hexaSkillDescBmp.Width;
+                totalSize.Height = Math.Max(picHeight, hexaSkillDescBmp.Height);
+                hexaSkillDescOrigin.X = originBmp.Width;
+            }
+
             Bitmap tooltip = new Bitmap(totalSize.Width, totalSize.Height);
             Graphics g = Graphics.FromImage(tooltip);
 
@@ -119,10 +128,19 @@ namespace WzComparerR2.CharaSimControl
                     new Rectangle(Point.Empty, ridingGearBmp.Size), GraphicsUnit.Pixel);
             }
 
+            if (hexaSkillDescBmp != null)
+            {
+                g.DrawImage(hexaSkillDescBmp, hexaSkillDescOrigin.X, hexaSkillDescOrigin.Y,
+                    new Rectangle(Point.Empty, hexaSkillDescBmp.Size), GraphicsUnit.Pixel);
+
+            }
+
             if (originBmp != null)
                 originBmp.Dispose();
             if (ridingGearBmp != null)
                 ridingGearBmp.Dispose();
+            if (hexaSkillDescBmp != null)
+                hexaSkillDescBmp.Dispose();
 
             g.Dispose();
             return tooltip;
@@ -158,14 +176,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 translatedSkillName = Translator.TranslateString(sr.Name, true);
                 SizeF titleSize;
-                if (Translator.IsKoreanStringPresent(translatedSkillName + sr.Name))
-                {
-                    titleSize = TextRenderer.MeasureText(g, translatedSkillName + " (" + sr.Name + ")", GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
-                }
-                else
-                {
-                    titleSize = TextRenderer.MeasureText(g, translatedSkillName + " (" + sr.Name + ")", GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
-                }
+                titleSize = TextRenderer.MeasureText(g, translatedSkillName + " (" + sr.Name + ")", GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
                 if (titleSize.Width > (int)(0.96 * region.Width))
                 {
                     isNewLineRequired = true;
@@ -249,25 +260,11 @@ namespace WzComparerR2.CharaSimControl
                 if (isTranslateRequired)
                 {
                     string mergedDescString = Translator.MergeString(hdesc, Translator.TranslateString(hdesc), 2);
-                    if (Translator.IsKoreanStringPresent(mergedDescString))
-                    {
-                        GearGraphics.DrawString(g, mergedDescString, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                    }
-                    else
-                    {
-                        GearGraphics.DrawString(g, mergedDescString, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                    }
+                    GearGraphics.DrawString(g, mergedDescString, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
                 else
                 {
-                    if (Translator.IsKoreanStringPresent(hdesc))
-                    {
-                        GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                    }
-                    else
-                    {
-                        GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
-                    }
+                    GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, Skill.Icon.Bitmap == null ? region.LevelDescLeft : region.SkillDescLeft, region.TextRight, ref picH, 16);
                 }
                 //string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
 
@@ -397,26 +394,12 @@ namespace WzComparerR2.CharaSimControl
                     if (isTranslateRequired)
                     {
                         string mergedhStr = Translator.MergeString(hStr, Translator.TranslateString(hStr), 2);
-                        if (Translator.IsKoreanStringPresent(mergedhStr))
-                        {
-                            GearGraphics.DrawString(g, mergedhStr, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
-                        }
-                        else
-                        {
-                            GearGraphics.DrawString(g, mergedhStr, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
-                        }
+                        GearGraphics.DrawString(g, mergedhStr, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
                     }
                     else
                     {
 
-                        if (Translator.IsKoreanStringPresent(hStr))
-                        {
-                            GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
-                        }
-                        else
-                        {
-                            GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
-                        }
+                        GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
                     }
                 }
             }
@@ -603,14 +586,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 9;
                 foreach (var descEx in skillDescEx)
                 {
-                    if (Translator.IsKoreanStringPresent(descEx))
-                    {
-                        GearGraphics.DrawString(g, descEx, GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
-                    }
-                    else
-                    {
-                        GearGraphics.DrawString(g, descEx, GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
-                    }
+                    GearGraphics.DrawString(g, descEx, GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 }
                 picH += 3;
             }
@@ -658,6 +634,47 @@ namespace WzComparerR2.CharaSimControl
             return renderer.Render();
         }
 
+
+
+        private Bitmap RenderHexaDesc(CanvasRegion region)
+        {
+            Bitmap bitmap = new Bitmap(1, 1);
+            if (Skill.Origin)
+            {
+                bitmap = new Bitmap(430, 125);
+            }
+            else if (Skill.Ascent)
+            {
+                bitmap = new Bitmap(430, 360);
+            }
+            Graphics g = Graphics.FromImage(bitmap);
+            int picH = 13;
+            if (Skill.Origin && !Skill.Invisible)
+            {
+                string originSkillDesc = "The Origin Skill absolutely stuns all enemies (including enemies immune to stun).\r\nThe resistance duration of the absolute stun is not shared with other stun statuses.";
+                string originSkillH = "When the attack lands, the enemy is completely stunned for 10 sec.";
+                GearGraphics.DrawNewTooltipBack(g, 0, 0, bitmap.Width, 125);
+                GearGraphics.DrawPlainText(g, originSkillDesc, GearGraphics.ItemDetailFont, Color.FromArgb(175, 173, 255), region.LevelDescLeft, region.TextRight, ref picH, 16);
+                picH += 16;
+                DrawV6SkillDotline(g, region.SplitterX1, region.SplitterX2, picH);
+                picH += 10;
+                GearGraphics.DrawPlainText(g, originSkillH, GearGraphics.ItemDetailFont, Color.FromArgb(175, 173, 255), region.LevelDescLeft, region.TextRight, ref picH, 16);
+            }
+            else if (Skill.Ascent && !Skill.Invisible)
+            {
+                string ascentSkillDesc = "어센트 스킬은 보스 전투에서 재사용 대기시간 없이 정해진 횟수만큼 사용 가능하며, 최대 HP가 가장 높은 보스 몬스터가 있을 때만 사용 가능합니다.\r\n직접 공격 적중 시 발동되는 추가 공격 및 효과가 발동하지 않습니다.\r\n어센트 스킬은 최대 HP가 높은 보스 몬스터를 우선 공격하며 공격 반사, 공격 무시 상태의 적에게도 피해를 입힐 수 있습니다.\r\n어센트 스킬의 10레벨, 20레벨, 30레벨의 몬스터 방어율 무시, 보스 몬스터 공격 시 데미지 증가 효과는 기본 효과에 합적용됩니다.\r\n\n아래의 효과로 인해 변동되는 능력치는 어센트 스킬의 데미지에 영향을 주지 않습니다.\r\n- 장비 : 모자\n- 장비 : 반지\n- 조건부로 발동하는 패시브 스킬 효과\n- 액티브 스킬 사용 효과\n- 몬스터의 속성\n- 몬스터의 패턴, 디버프\n- 지속 시간이 30분 미만인 소비, 캐시 아이템";
+                string ascentSkillH = "보스 전투에서 3회 사용 가능\n그 외 필드에서 사용 시 재사용 대기시간 240초";
+                GearGraphics.DrawNewTooltipBack(g, 0, 0, bitmap.Width, 360);
+                GearGraphics.DrawPlainText(g, ascentSkillDesc, GearGraphics.ItemDetailFont, Color.FromArgb(175, 173, 255), region.LevelDescLeft, region.TextRight, ref picH, 16);
+                picH += 16;
+                DrawV6SkillDotline(g, region.SplitterX1, region.SplitterX2, picH);
+                picH += 16;
+                GearGraphics.DrawPlainText(g, ascentSkillH, GearGraphics.ItemDetailFont, Color.FromArgb(175, 173, 255), region.LevelDescLeft, region.TextRight, ref picH, 16);
+            }
+            g.Dispose();
+            return bitmap;
+        }
+
         private class CanvasRegion
         {
             public int Width { get; private set; }
@@ -686,7 +703,7 @@ namespace WzComparerR2.CharaSimControl
                 Width = 430,
                 TitleCenterX = 253,
                 SplitterX1 = 4,
-                SplitterX2 = 501,
+                SplitterX2 = 424,
                 SkillDescLeft = 88,
                 LinkedSkillNameLeft = 46,
                 LevelDescLeft = 11,

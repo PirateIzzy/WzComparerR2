@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using DevComponents.DotNetBar;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Diagnostics;
 using System.Drawing;
-using System.Text;
-using System.Linq;
+using System.IO;
 using System.Windows.Forms;
-using System.Reflection;
-using DevComponents.DotNetBar;
 using WzComparerR2.Config;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
@@ -163,6 +160,28 @@ namespace WzComparerR2
             set { textBoxX3.WatermarkText = value; }
         }
 
+        private void isFFmpegExist(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(this.FFmpegBinPath) || !File.Exists(this.FFmpegBinPath))
+            {
+                MessageBoxEx.Show(this, "Cannot locate FFmpeg executable.\nTo download and specify, click OK.", "Info", MessageBoxButtons.OK);
+#if NET6_0_OR_GREATER
+                Process.Start(new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = "https://www.gyan.dev/ffmpeg/builds/",
+                });
+#else
+                Process.Start("https://www.gyan.dev/ffmpeg/builds/");
+#endif
+                buttonX3_Click(sender, e);
+                if (string.IsNullOrEmpty(this.FFmpegBinPath) || !File.Exists(this.FFmpegBinPath))
+                {
+                    MessageBoxEx.Show(this, "FFmpeg executable is not specified. This preset will not work.", "Info", MessageBoxButtons.OK);
+                }
+            }
+        }
+
         public void Load(ImageHandlerConfig config)
         {
             this.SavePngFramesEnabled = config.SavePngFramesEnabled;
@@ -205,6 +224,105 @@ namespace WzComparerR2
             config.FFmpegOutputFileExtension = this.FFmpegDefaultExtension;
         }
 
+        private void buttonX3_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new();
+            dlg.Title = "FFmpeg.exe: Select File Path";
+            dlg.Filter = "ffmpeg.exe|*.exe|*.*|*.*";
+            dlg.FileName = this.FFmpegBinPath;
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                this.FFmpegBinPath = dlg.FileName;
+            }
+        }
+
+        private void btnDiscordPreset_Click(object sender, EventArgs e)
+        {
+            string discordConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "discord", "settings.json");
+            if (File.Exists(discordConfigPath))
+            {
+                // TO DO: Add support for Nitro exclusive background colors.
+                try
+                {
+                    JObject discordConfig = JObject.Parse(File.ReadAllText(discordConfigPath));
+                    string bgColor = discordConfig.SelectToken("BACKGROUND_COLOR").ToString().Replace("#", "FF");
+                    BackgroundColor = Color.FromArgb(Convert.ToInt32(bgColor, 16));
+                }
+                catch
+                {
+                    BackgroundColor = Color.FromArgb(-13750732);
+                }
+            }
+            else
+            {
+                BackgroundColor = Color.FromArgb(-13750732);
+            }
+            BackgroundType = ImageBackgroundType.Color;
+            GifEncoder = 1;
+        }
+
+        private void btnNonTransparentMP4Preset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Color;
+            BackgroundColor = Color.White;
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+            isFFmpegExist(sender, e);
+        }
+
+        private void btnGreenBackdropMP4Preset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Color;
+            BackgroundColor = Color.FromArgb(0, 255, 0);
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+            isFFmpegExist(sender, e);
+        }
+
+        private void btnBlueBackdropMP4Preset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Color;
+            BackgroundColor = Color.Blue;
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+            isFFmpegExist(sender, e);
+        }
+
+        private void btnTransparentMOVPreset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Transparent;
+            MinMixedAlpha = 0;
+            BackgroundColor = Color.White;
+            FFmpegArgument = @$"-y -f rawvideo -pixel_format bgra -s %w*%h -r 1000/%t -i ""%i"" -vf ""crop=trunc(iw/2)*2:trunc(ih/2)*2"" -vcodec qtrle -pix_fmt argb ""%o""";
+            FFmpegDefaultExtension = ".mov";
+            isFFmpegExist(sender, e);
+        }
+
+        private void btnTransparentWebMPreset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Transparent;
+            MinMixedAlpha = 0;
+            BackgroundColor = Color.White;
+            FFmpegArgument = @$"-y -f rawvideo -pixel_format bgra -s %w*%h -r 1000/%t -i ""%i"" -vf ""crop=trunc(iw/2)*2:trunc(ih/2)*2"" -vcodec libvpx-vp9 -pix_fmt yuva420p ""%o""";
+            FFmpegDefaultExtension = ".webm";
+            isFFmpegExist(sender, e);
+        }
+
+        private void btnDefaultPreset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 0;
+            BackgroundType = ImageBackgroundType.Transparent;
+            MinMixedAlpha = 0;
+            BackgroundColor = Color.White;
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+        }
+
         private void slider1_ValueChanged(object sender, EventArgs e)
         {
             var slider = sender as DevComponents.DotNetBar.Controls.Slider;
@@ -219,18 +337,6 @@ namespace WzComparerR2
         private void rdoMosaic_CheckedChanged(object sender, EventArgs e)
         {
             panelExMosaic.Enabled = rdoMosaic.Checked;
-        }
-
-        private void buttonX3_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dlg = new();
-            dlg.Title = "FFmpeg.exe: Select File Path";
-            dlg.Filter = "ffmpeg.exe|*.exe|*.*|*.*";
-            dlg.FileName = this.FFmpegBinPath;
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                this.FFmpegBinPath = dlg.FileName;
-            }
         }
     }
 }
