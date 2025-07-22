@@ -283,17 +283,17 @@ namespace WzComparerR2.MapRender.UI
             {
                 var sb = new StringBuilder();
 
-                sb.Append("ダメージ: ").AppendLine(item.Damage.ToString());
+                sb.Append("Damage: ").AppendLine(item.Damage.ToString());
 
                 if (item.Impact > 0)
-                    sb.Append("影響: ").AppendLine(item.Impact.ToString());
+                    sb.Append("Impact: ").AppendLine(item.Impact.ToString());
 
                 int angle = item.Angle > 0 ? item.Angle : item.Dir * 30;
                 if (angle > 0)
                 {
                     angle = (angle - 1) % 360 + 1;
                     angle = item.View.Flip ? 360 - angle : angle;
-                    sb.Append("角度: ").Append((angle).ToString());
+                    sb.Append("Angle: ").Append((angle).ToString());
 
                     sb.Append(" (");
                     switch (((angle + 23) % 360) / 45)
@@ -330,7 +330,7 @@ namespace WzComparerR2.MapRender.UI
 
                 if (item.Disease > 0 && item.DiseaseLevel > 0)
                 {
-                    sb.Append("状態異常: ").AppendLine($"{ItemStringHelper.GetMobSkillName(item.Disease)} ({item.DiseaseLevel})");
+                    sb.Append("Abnormal Status: ").AppendLine($"{ItemStringHelper.GetMobSkillName(item.Disease)} ({item.DiseaseLevel})");
                 }
 
                 sb.Length -= 2;

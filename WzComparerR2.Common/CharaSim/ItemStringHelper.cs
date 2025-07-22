@@ -145,7 +145,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "Golden Hammer cannot be used.";
                 case GearPropType.colorvar: return value == 0 ? null : "#cThis item can be dyed using a Dye.#";
                 case GearPropType.cantRepair: return value == 0 ? null : "Cannot be repaired";
-                case GearPropType.noLookChange: return value == 0 ? null : "Cannot use Fusion Anvil";
+                case GearPropType.noLookChange: return value == 0 ? null : "Cannot use Medal Fusion Anvil";
 
                 case GearPropType.incAllStat_incMHP25: return "All Stats: " + sign + value + ", MaxHP : " + sign + (value * 25);// check once Lv 250 set comes out in GMS
                 case GearPropType.incAllStat_incMHP50_incMMP50: return "All Stats: " + sign + value + ", MaxHP / MaxMP : " + sign + (value * 50);

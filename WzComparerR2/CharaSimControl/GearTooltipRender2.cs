@@ -1675,7 +1675,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if ((Gear.ItemID / 10000 >= 161 && Gear.ItemID / 10000 <= 165) || (Gear.ItemID / 10000 >= 194 && Gear.ItemID / 10000 <= 197))
             {
-                tags.Add("Cannot use Fusion Anvil");//Unable to use anvil > change when GMS adds this line to mechanic, dragon gears
+                tags.Add("Cannot use Fusion Anvil");
             }
 
             return tags;
