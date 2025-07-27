@@ -114,7 +114,7 @@ namespace WzComparerR2.WzLib.Utilities
                     ReadOnlySpan<ushort> baseColor = MemoryMarshal.Cast<byte, ushort>(blockData.Slice(8, 4));
                     ExpandColorTable(baseColor[0], baseColor[1], colorTable);
                     ExpandColorIndexTable(blockData.Slice(12, 4), colorIdxTable);
-                    for(int i = 0; i < 16; i++)
+                    for (int i = 0; i < 16; i++)
                     {
                         outputPixels[i] = new ColorBgra(alphaTable[i], colorTable[colorIdxTable[i]]);
                     }
@@ -163,21 +163,23 @@ namespace WzComparerR2.WzLib.Utilities
             }
         }
 
-        public static void BC7ToRGBA32(ReadOnlySpan<byte> blockData, Span<byte> outputRgbaPixels, int width, int stride, int height)
+        public static void BC7ToRGBA32(ReadOnlySpan<byte> blockData, int srcStride, Span<byte> outputRgbaPixels, int width, int stride, int height)
         {
             Span<BC7Decomp.color_rgba> rgba = stackalloc BC7Decomp.color_rgba[16];
             Span<byte> rgbaBytes = MemoryMarshal.AsBytes(rgba);
 
-            for (int y = 0; y < height; y += 4)
+            int blocksPerRow = width & ~3;
+            for (int y = 0, dataStart = 0; y < height; y += 4, dataStart += srcStride)
             {
+                ReadOnlySpan<byte> dataRow = blockData.Slice(dataStart, srcStride);
                 for (int x = 0; x < width; x += 4)
                 {
-                    BC7Decomp.unpack_bc7(blockData, rgba);
+                    BC7Decomp.unpack_bc7(dataRow, rgba);
                     rgbaBytes.Slice(0, 16).CopyTo(outputRgbaPixels.Slice(y * stride + x * 4));
                     rgbaBytes.Slice(16, 16).CopyTo(outputRgbaPixels.Slice((y + 1) * stride + x * 4));
                     rgbaBytes.Slice(32, 16).CopyTo(outputRgbaPixels.Slice((y + 2) * stride + x * 4));
                     rgbaBytes.Slice(48, 16).CopyTo(outputRgbaPixels.Slice((y + 3) * stride + x * 4));
-                    blockData = blockData.Slice(16);
+                    dataRow = dataRow.Slice(16);
                 }
             }
         }
@@ -542,7 +544,7 @@ namespace WzComparerR2.WzLib.Utilities
             0,1,1,0,0,1,1,0,2,2,2,2,2,2,2,2,        0,0,2,2,0,0,1,1,0,0,1,1,0,0,2,2,        0,0,2,2,1,1,2,2,1,1,2,2,0,0,2,2,        0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,2,        0,0,0,2,0,0,0,1,0,0,0,2,0,0,0,1,        0,2,2,2,1,2,2,2,0,2,2,2,1,2,2,2,        0,1,0,1,2,2,2,2,2,2,2,2,2,2,2,2,        0,1,1,1,2,0,1,1,2,2,0,1,2,2,2,0,
         };
 
-        static readonly byte[] g_bc7_table_anchor_index_second_subset = 
+        static readonly byte[] g_bc7_table_anchor_index_second_subset =
         {
             15,15,15,15,15,15,15,15,
             15,15,15,15,15,15,15,15,

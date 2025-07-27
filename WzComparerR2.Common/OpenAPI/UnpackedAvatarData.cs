@@ -305,9 +305,10 @@ namespace WzComparerR2.OpenAPI
                     return "Hoyoung";
                 case 2:
                     return "Lara";
-                case 12:
-                case 16:
-                    return $"Len{detail}";
+                case 3:
+                    return $"Len(♀,{detail})";
+                case 4:
+                    return $"Len(♂,{detail})";
                 default:
                     return null;
             }
@@ -356,7 +357,7 @@ namespace WzComparerR2.OpenAPI
         public PrismInfo GetPrismInfo(string type)
         {
             var ret = new PrismInfo();
-            if (GetValue($"has{type}Prism") != 0)
+            if (GetValue($"has{type}Prism") == 1)
             {
                 ret.ColorType = (byte)GetValue($"{type.ToLower()}PrismColorType");
                 ret.Brightness = GetValue($"{type.ToLower()}PrismBrightness");
@@ -408,11 +409,15 @@ namespace WzComparerR2.OpenAPI
             MixFaceColor = GetMixFaceColor();
 
             CapPrismInfo = GetPrismInfo("Cap");
+            FaceAccPrismInfo = GetPrismInfo("FaceAcc");
+            EyeAccPrismInfo = GetPrismInfo("EyeAcc");
+            EarAccPrismInfo = GetPrismInfo("EarAcc");
             CoatPrismInfo = GetPrismInfo("Coat");
             PantsPrismInfo = GetPrismInfo("Pants");
             ShoesPrismInfo = GetPrismInfo("Shoes");
             GlovesPrismInfo = GetPrismInfo("Gloves");
             CapePrismInfo = GetPrismInfo("Cape");
+            ShieldPrismInfo = GetPrismInfo("Shield");
             WeaponPrismInfo = GetPrismInfo("Weapon");
             SkinPrismInfo = GetPrismInfo("Skin");
         }
@@ -448,10 +453,14 @@ namespace WzComparerR2.OpenAPI
         public string MixFaceRatio { get; set; }
         public string MixFaceColor { get; set; }
         public PrismInfo CapPrismInfo { get; set; }
+        public PrismInfo FaceAccPrismInfo { get; set; }
+        public PrismInfo EyeAccPrismInfo { get; set; }
+        public PrismInfo EarAccPrismInfo { get; set; }
         public PrismInfo CoatPrismInfo { get; set; }
         public PrismInfo PantsPrismInfo { get; set; }
         public PrismInfo ShoesPrismInfo { get; set; }
         public PrismInfo GlovesPrismInfo { get; set; }
+        public PrismInfo ShieldPrismInfo { get; set; }
         public PrismInfo CapePrismInfo { get; set; }
         public PrismInfo WeaponPrismInfo { get; set; }
         public PrismInfo SkinPrismInfo { get; set; }

@@ -46,6 +46,7 @@ namespace WzComparerR2.Comparer
         private Dictionary<string, List<int>> KMSContentID { get; set; } = new Dictionary<string, List<int>>();
         private Dictionary<string, List<string>> KMSComponentDict { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<int, List<int>> FifthJobSkillToJobID { get; set; } = new Dictionary<int, List<int>>();
+        public Dictionary<string, string> FailToExportNodes { get; private set; } = new Dictionary<string, string>();
         public WzFileComparer Comparer { get; protected set; }
         private string stateInfo;
         private string stateDetail;
@@ -2426,11 +2427,20 @@ namespace WzComparerR2.Comparer
                                 Directory.CreateDirectory(outputDir);
                             }
                         }
-                        using (Bitmap bmp = png.ExtractPng())
+                        // Skip unparseable content
+                        try
                         {
-                            bmp.Save(Path.Combine(outputDir, fileName), System.Drawing.Imaging.ImageFormat.Png);
+                            using (Bitmap bmp = png.ExtractPng())
+                            {
+                                bmp.Save(Path.Combine(outputDir, fileName), System.Drawing.Imaging.ImageFormat.Png);
+                            }
                         }
-                        return string.Format("<img src=\"{0}/{1}\" />", isCanvas ? Path.Combine(outputDirName, canvas) : outputDirName, WebUtility.UrlEncode(fileName));
+                        catch (Exception ex)
+                        {
+                            FailToExportNodes.Add(colName + ": " + fullPath.Replace('\\', '/'), ex.Message);
+                            return string.Format("Unable to analyze PNG data: {0} bytes", png.DataLength);
+                        }
+                        return string.Format("<img src=\"{0}/{1}\" />", (isCanvas && !this.Comparer.ResolvePngLink) ? Path.Combine(outputDirName, canvas) : outputDirName, WebUtility.UrlEncode(fileName));
                     }
                     else
                     {
@@ -2454,13 +2464,20 @@ namespace WzComparerR2.Comparer
                         {
                             filePath = filePath.Replace(invalidChars[i].ToString(), null);
                         }
-
-                        byte[] mp3 = sound.ExtractSound();
-                        if (mp3 != null)
+                        try
                         {
-                            FileStream fileStream = new FileStream(Path.Combine(outputDir, filePath), FileMode.Create, FileAccess.Write);
-                            fileStream.Write(mp3, 0, mp3.Length);
-                            fileStream.Close();
+                            byte[] mp3 = sound.ExtractSound();
+                            if (mp3 != null)
+                            {
+                                FileStream fileStream = new FileStream(Path.Combine(outputDir, filePath), FileMode.Create, FileAccess.Write);
+                                fileStream.Write(mp3, 0, mp3.Length);
+                                fileStream.Close();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            FailToExportNodes.Add(colName + ": " + fullPath.Replace('\\', '/'), ex.ToString());
+                            return string.Format("Unable to analyze audio data: {0} bytes", sound.DataLength);
                         }
                         return string.Format("<audio controls src=\"{0}\" type=\"audio/mpeg\">audio {1} ms\n</audio>", Path.Combine(new DirectoryInfo(outputDir).Name, filePath), sound.Ms);
                     }

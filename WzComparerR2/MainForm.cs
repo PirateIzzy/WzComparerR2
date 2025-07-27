@@ -3415,7 +3415,10 @@ namespace WzComparerR2
                     break;
 
                 case Wz_Type.Mob:
-                    if (selectedNode.FullPathToFile.Contains("BossPattern")) return; // Ignore BossPattern to prevent Auto Preview crash
+                    string[] mobNodePath = selectedNode.FullPathToFile.Split('\\');
+                    string mobImgStr = mobNodePath.LastOrDefault(part => part.EndsWith(".img")).Replace(".img", String.Empty);
+                    if (String.IsNullOrEmpty(mobImgStr)) return;
+                    if (!Int64.TryParse(mobImgStr, out _)) return; // Ignore Non-numeral img to prevent Auto Preview crash
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
                     var mob = Mob.CreateFromNode(image.Node, PluginManager.FindWz);
@@ -3926,6 +3929,21 @@ namespace WzComparerR2
                         chkShowLinkedTamingMob.Enabled = true;
                         chkHashPngFileName.Enabled = true;
                         chkSkipKMSContent.Enabled = true;
+                        if (comparer.FailToExportNodes.Count > 0)
+                        {
+                            string failData = Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportNodes, Newtonsoft.Json.Formatting.Indented);
+                            File.WriteAllText(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"), failData, Encoding.UTF8);
+                            MessageBoxEx.Show(this, "The comparison is complete, but some nodes cannot be parsed.\r\nClick OK to see which nodes cannot be exported. ", "WzCompare", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+#if NET6_0_OR_GREATER
+                            Process.Start(new ProcessStartInfo
+                            {
+                                UseShellExecute = true,
+                                FileName = Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"),
+                            });
+#else
+                            Process.Start(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"));
+#endif
+                        }
                     }
                 });
                 compareThread.Priority = ThreadPriority.Highest;
