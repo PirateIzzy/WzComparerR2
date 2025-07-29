@@ -2421,10 +2421,17 @@ namespace WzComparerR2.Comparer
                         bool isCanvas = fileName.Contains(canvas);
                         if (isCanvas)
                         {
-                            outputDir = Path.Combine(outputDir, canvas);
-                            if (!Directory.Exists(outputDir))
+                            if (this.Comparer.ResolvePngLink)
                             {
-                                Directory.CreateDirectory(outputDir);
+                                fileName = fileName.Replace(canvas + ".", string.Empty);
+                            }
+                            else
+                            {
+                                outputDir = Path.Combine(outputDir, canvas);
+                                if (!Directory.Exists(outputDir))
+                                {
+                                    Directory.CreateDirectory(outputDir);
+                                }
                             }
                         }
                         // Skip unparseable content
@@ -2464,6 +2471,7 @@ namespace WzComparerR2.Comparer
                         {
                             filePath = filePath.Replace(invalidChars[i].ToString(), null);
                         }
+
                         try
                         {
                             byte[] mp3 = sound.ExtractSound();
@@ -2496,10 +2504,10 @@ namespace WzComparerR2.Comparer
                     return string.Format("video {0} bytes", video.Length);
 
                 case Wz_Image _:
-                    return "(img)";
+                    return "{ img }";
 
                 default:
-                    return string.Format("<span title=\"{0}\">{1}</span>", value.Value?.GetType().Name, WebUtility.HtmlEncode(Convert.ToString(value.Value)));
+                    return string.Format("<span title=\"{0}\">{1}</span>", value.GetType().Name, WebUtility.HtmlEncode(Convert.ToString(value.Value)));
             }
         }
 
