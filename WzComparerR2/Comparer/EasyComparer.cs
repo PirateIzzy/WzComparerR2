@@ -39,8 +39,8 @@ namespace WzComparerR2.Comparer
         private Dictionary<string, List<string>> DiffCashTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffGearTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffItemTags { get; set; } = new Dictionary<string, List<string>>();
-        private Dictionary<string, List<string>> DiffMobTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffMapTags { get; set; } = new Dictionary<string, List<string>>();
+        private Dictionary<string, List<string>> DiffMobTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffNpcTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffSkillTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<int>> KMSContentID { get; set; } = new Dictionary<string, List<int>>();
@@ -50,7 +50,6 @@ namespace WzComparerR2.Comparer
         public WzFileComparer Comparer { get; protected set; }
         private string stateInfo;
         private string stateDetail;
-        public bool Enable22AniStyle { get; set;  }
         public bool OutputPng { get; set; }
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
@@ -63,6 +62,7 @@ namespace WzComparerR2.Comparer
         public bool OutputNpcTooltip { get; set; }
         public bool OutputSkillTooltip { get; set; }
         public bool HashPngFileName { get; set; }
+        public bool Enable22AniStyle { get; set; }
         public bool ShowObjectID { get; set; }
         public bool ShowChangeType { get; set; }
         public bool ShowLinkedTamingMob { get; set; }
@@ -2832,29 +2832,38 @@ namespace WzComparerR2.Comparer
                         switch (baseSkillIDInt / 1000)
                         {
                             case 0:
-                                return !(new int[] { 508, 570, 571, 572 }.Contains(baseSkillIDInt)); // Jett / Zen
-                            case 4: // Sengoku (Akatsuki no jin)
-                            case 11: // Beast Tamer
-                            case 12: // Anime Collaboration
-                            case 17: // Jianghu
+                                return !(new int[] { 508, 570, 571, 572 }.Contains(baseSkillIDInt)); // ジェット
+                            case 4: // 暁の陣
+                            case 11: // ビーストテイマー
+                            case 12: // アニメコラボ
+                            case 17: // 江湖
                             case 18: // Shine
                                 return false;
-                            case 40: // 5th Job
-                            case 50: // 6th Boost Nodes
+                            case 40: // 5次スキル
+                            case 50: // 6次強化コア
                                 if (skillNodePath.Split('\\').Length < 4)
                                 {
                                     return false;
                                 }
                                 else
                                 {
-                                    if (Int32.TryParse(skillNodePath.Split('\\')[3], out int skillID))
+                                    if (Int32.TryParse(skillNodePath.Split('\\')[3], out int skillID2))
                                     {
-                                        return isKMSSkillID(skillID);
+                                        return isKMSSkillID(skillID2);
                                     }
                                     else
                                     {
                                         return false;
                                     }
+                                }
+                            case 800:
+                                if (Int32.TryParse(skillNodePath.Split('\\')[3], out int skillID))
+                                {
+                                    return isKMSSkillID(skillID);
+                                }
+                                else
+                                {
+                                    return false;
                                 }
                             default:
                                 return true;
@@ -2904,6 +2913,15 @@ namespace WzComparerR2.Comparer
                     else
                     {
                         return KMSContentID["Skill"].Contains(skillID);
+                    }
+                case 8:
+                    if (KMSContentID.ContainsKey("Skill"))
+                    {
+                        return KMSContentID["Skill"].Contains(skillID);
+                    }
+                    else
+                    {
+                        return false;
                     }
                 default:
                     return true;
