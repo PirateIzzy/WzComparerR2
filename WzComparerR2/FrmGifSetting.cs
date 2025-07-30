@@ -250,12 +250,12 @@ namespace WzComparerR2
                 }
                 catch
                 {
-                    BackgroundColor = Color.FromArgb(-13750732);
+                    BackgroundColor = Color.FromArgb(-13487303);
                 }
             }
             else
             {
-                BackgroundColor = Color.FromArgb(-13750732);
+                BackgroundColor = Color.FromArgb(-13487303);
             }
             BackgroundType = ImageBackgroundType.Color;
             GifEncoder = 1;
