@@ -2366,6 +2366,13 @@ namespace WzComparerR2.Avatar.UI
             this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2 + 40);
             this.avatarContainer1.Invalidate();
         }
+        private void btnZoom_Click(object sender, EventArgs e)
+        {
+            if (this.avatar.Parts.Count(p => p != null) > 0)
+            {
+                this.avatarContainer1.ChangeScale();
+            }
+        }
 
         private void SaveGif(object sender, EventArgs e, bool isBodyPlayingChecked = true, bool isEmotionPlayingChecked = true, bool isTamingPlayingChecked = true, string outputFileName = null)
         { 

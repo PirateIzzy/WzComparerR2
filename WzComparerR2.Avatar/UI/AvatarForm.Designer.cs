@@ -95,6 +95,7 @@ namespace WzComparerR2.Avatar.UI
             this.btnEnableAutosave = new DevComponents.DotNetBar.ButtonItem();
             this.btnSpecifySavePath = new DevComponents.DotNetBar.ButtonItem();
             this.btnExport = new DevComponents.DotNetBar.ButtonItem();
+            this.btnZoom = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
@@ -703,6 +704,7 @@ namespace WzComparerR2.Avatar.UI
             this.btnCode,
             this.btnCharac,
             this.btnReset,
+            this.btnZoom,
             this.btnLock,
             this.btnSaveAsGif,
             this.btnSaveOptions,
@@ -769,6 +771,13 @@ namespace WzComparerR2.Avatar.UI
             this.btnReset.Name = "btnReset";
             this.btnReset.Tooltip = "Reset Position";
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            // 
+            // btnZoom
+            // 
+            this.btnZoom.Image = global::WzComparerR2.Avatar.Properties.Resources.magnify;
+            this.btnZoom.Name = "btnZoom";
+            this.btnZoom.Tooltip = "Zoom";
+            this.btnZoom.Click += new System.EventHandler(this.btnZoom_Click);
             // 
             // btnLock
             // 
@@ -917,6 +926,7 @@ namespace WzComparerR2.Avatar.UI
         private DevComponents.DotNetBar.Separator Separator1;
         private DevComponents.DotNetBar.LabelX labelX5;
         private DevComponents.DotNetBar.ButtonItem btnExport;
+        private DevComponents.DotNetBar.ButtonItem btnZoom;
         private DevComponents.DotNetBar.LabelX labelX6;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbGroupChair;
     }

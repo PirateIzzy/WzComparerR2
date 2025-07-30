@@ -61,7 +61,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap _lock {
             get {
@@ -71,7 +71,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap arrow_in {
             get {
@@ -79,9 +79,21 @@ namespace WzComparerR2.Avatar.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap magnify
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("magnify", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap autosave {
             get {
@@ -91,7 +103,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap disk {
             get {
@@ -101,7 +113,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap export {
             get {
@@ -111,7 +123,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap script_code {
             get {
@@ -121,7 +133,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UIWindow2_img_ColoringPrism_ColoringPrismLabel_0 {
             get {
@@ -131,7 +143,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap user {
             get {
@@ -141,7 +153,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor0_normal_0 {
             get {
@@ -151,7 +163,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor0_pressed_0 {
             get {
@@ -161,7 +173,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor1_normal_0 {
             get {
@@ -171,7 +183,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor1_pressed_0 {
             get {
@@ -181,7 +193,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor2_normal_0 {
             get {
@@ -191,7 +203,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor2_pressed_0 {
             get {
@@ -201,7 +213,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor3_normal_0 {
             get {
@@ -211,7 +223,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor3_pressed_0 {
             get {
@@ -221,7 +233,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor4_normal_0 {
             get {
@@ -231,7 +243,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor4_pressed_0 {
             get {
@@ -241,7 +253,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor5_normal_0 {
             get {
@@ -251,7 +263,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor5_pressed_0 {
             get {
@@ -261,7 +273,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor6_normal_0 {
             get {
@@ -271,7 +283,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor6_pressed_0 {
             get {
@@ -281,7 +293,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor7_normal_0 {
             get {
@@ -291,7 +303,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixHair_KR_BtColor_button_BtColor7_pressed_0 {
             get {
@@ -301,7 +313,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor0_normal_0 {
             get {
@@ -311,7 +323,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor0_pressed_0 {
             get {
@@ -321,7 +333,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor1_normal_0 {
             get {
@@ -331,7 +343,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor1_pressed_0 {
             get {
@@ -341,7 +353,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor2_normal_0 {
             get {
@@ -351,7 +363,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor2_pressed_0 {
             get {
@@ -361,7 +373,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor3_normal_0 {
             get {
@@ -371,7 +383,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor3_pressed_0 {
             get {
@@ -381,7 +393,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor4_normal_0 {
             get {
@@ -391,7 +403,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor4_pressed_0 {
             get {
@@ -401,7 +413,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor5_normal_0 {
             get {
@@ -411,7 +423,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor5_pressed_0 {
             get {
@@ -421,7 +433,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor6_normal_0 {
             get {
@@ -431,7 +443,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor6_pressed_0 {
             get {
@@ -441,7 +453,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor7_normal_0 {
             get {
@@ -451,7 +463,7 @@ namespace WzComparerR2.Avatar.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap UtilDlgEx_MixLens_KR_BtColor_button_BtColor7_pressed_0 {
             get {
