@@ -2833,37 +2833,29 @@ namespace WzComparerR2.Comparer
                         {
                             case 0:
                                 return !(new int[] { 508, 570, 571, 572 }.Contains(baseSkillIDInt)); // ジェット
-                            case 4: // 暁の陣
-                            case 11: // ビーストテイマー
-                            case 12: // アニメコラボ
-                            case 17: // 江湖
+                            case 4: // Sengoku
+                            case 11: // Beast Tamer
+                            case 12: // Anime Collaboration
+                            case 17: // Jianghu
                             case 18: // Shine
                                 return false;
-                            case 40: // 5次スキル
-                            case 50: // 6次強化コア
+                            case 40: // 5th Job Skill
+                            case 50: // 6th Job Enhancement Nodes
+                            case 800: // Miscellaneous Skills
                                 if (skillNodePath.Split('\\').Length < 4)
                                 {
                                     return false;
                                 }
                                 else
                                 {
-                                    if (Int32.TryParse(skillNodePath.Split('\\')[3], out int skillID2))
+                                    if (Int32.TryParse(skillNodePath.Split('\\')[3], out int skillID))
                                     {
-                                        return isKMSSkillID(skillID2);
+                                        return isKMSSkillID(skillID);
                                     }
                                     else
                                     {
                                         return false;
                                     }
-                                }
-                            case 800:
-                                if (Int32.TryParse(skillNodePath.Split('\\')[3], out int skillID))
-                                {
-                                    return isKMSSkillID(skillID);
-                                }
-                                else
-                                {
-                                    return false;
                                 }
                             default:
                                 return true;
