@@ -46,7 +46,7 @@ namespace WzComparerR2.Animation
                     this._animationState.ClearTracks();
                     this._selectedAniIndex = -1;
                 }
-                
+
                 this.Skeleton.SetToSetupPose();
                 this._animationState.Apply(this.Skeleton);
                 this.Skeleton.UpdateWorldTransform();
@@ -57,7 +57,7 @@ namespace WzComparerR2.Animation
         {
             get
             {
-                if( this._selectedAniIndex > -1)
+                if (this._selectedAniIndex > -1)
                 {
                     return this.Animations[this._selectedAniIndex];
                 }
@@ -160,6 +160,10 @@ namespace WzComparerR2.Animation
                     bound.Update(vertices, vertexCount);
                 }
             }
+            bound.minX += skeleton.X;
+            bound.maxX += skeleton.X;
+            bound.minY += skeleton.Y;
+            bound.maxY += skeleton.Y;
         }
 
         public override object Clone()
@@ -170,6 +174,8 @@ namespace WzComparerR2.Animation
             {
                 clonedAnimator.SelectedSkin = this.SelectedSkin;
             }
+            clonedAnimator.Skeleton.X = this.Skeleton.X;
+            clonedAnimator.Skeleton.Y = this.Skeleton.Y;
             return clonedAnimator;
         }
 

@@ -18,7 +18,7 @@ namespace WzComparerR2.Common
             {
                 return SpineDetectionResult.Failed("WzNode or its parent cannot be null.");
             }
-           
+
             Wz_Node parentNode = wzNode.ParentNode;
             Wz_Node atlasNode = null;
             Wz_Node skelNode = null;
@@ -177,13 +177,13 @@ namespace WzComparerR2.Common
                 string version = Spine.SkeletonBinary.GetVersionString(stream);
                 return version;
             }
-            catch 
+            catch
             {
                 // ignore error;
                 return null;
             }
-            finally 
-            { 
+            finally
+            {
                 stream.Position = oldPos;
             }
         }
@@ -198,10 +198,13 @@ namespace WzComparerR2.Common
             return null;
         }
 
-        public static Spine.V2.SkeletonData LoadSkeletonV2(SpineDetectionResult detectionResult, Spine.V2.TextureLoader textureLoader)
+        public static Spine.V2.SkeletonData LoadSkeletonV2(SpineDetectionResult detectionResult, Spine.V2.TextureLoader textureLoader, Spine.V2.Atlas atlas = null)
         {
             using var atlasReader = new StringReader((string)detectionResult.ResolvedAtlasNode.Value);
-            var atlas = new Spine.V2.Atlas(atlasReader, "", textureLoader);
+            if (atlas == null)
+            {
+                atlas = new Spine.V2.Atlas(atlasReader, "", textureLoader);
+            }
 
             switch (detectionResult.LoadType)
             {
@@ -234,10 +237,13 @@ namespace WzComparerR2.Common
             return null;
         }
 
-        public static Spine.SkeletonData LoadSkeletonV4(SpineDetectionResult detectionResult, Spine.TextureLoader textureLoader)
+        public static Spine.SkeletonData LoadSkeletonV4(SpineDetectionResult detectionResult, Spine.TextureLoader textureLoader, Spine.Atlas atlas = null)
         {
             using var atlasReader = new StringReader((string)detectionResult.ResolvedAtlasNode.Value);
-            var atlas = new Spine.Atlas(atlasReader, "", textureLoader);
+            if (atlas == null)
+            {
+                atlas = new Spine.Atlas(atlasReader, "", textureLoader);
+            }
 
             switch (detectionResult.LoadType)
             {

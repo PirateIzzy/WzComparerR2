@@ -56,6 +56,7 @@ namespace WzComparerR2.CharaSimControl
         public bool CompareMode { get; set; } = false;
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
+        private bool isMsnClient { get; set; }
 
         private bool isPostNEXTClient;
 
@@ -68,6 +69,7 @@ namespace WzComparerR2.CharaSimControl
                 return null;
             }
 
+            this.isMsnClient = StringLinker?.StringEqp?.ContainsKey(1006514) ?? false;
             int[] picH = new int[4];
             Bitmap left = RenderBase(out picH[0]);
             Bitmap add = RenderAddition(out picH[1]);
@@ -1829,7 +1831,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 else
                 {
-                    extraReq = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs);
+                    extraReq = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs, isMsnClient);
                 }
             }
 

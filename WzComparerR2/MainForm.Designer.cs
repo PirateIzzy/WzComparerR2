@@ -2133,8 +2133,7 @@
             this.itemContainer44.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonDisableOverlayAni,
             this.buttonHitboxOverlay,
-            this.buttonOverlayExtractGifEx,
-            this.buttonLoadMultiFrameAniList});
+            this.buttonOverlayExtractGifEx});
             // 
             // 
             // 

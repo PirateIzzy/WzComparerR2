@@ -905,27 +905,62 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public static string GetExtraJobReqString(IEnumerable<int> specJobs)
+        public static string GetExtraJobReqString(IEnumerable<int> specJobs, bool isMsnMode = false)
         {
-            return string.Join(", ", GetExtraJobReqStringList(specJobs)) + " only";
+            return string.Join(", ", GetExtraJobReqStringList(specJobs, isMsnMode)) + " only";
         }
 
-        public static List<string> GetExtraJobReqStringList(IEnumerable<int> specJobs)
+        public static List<string> GetExtraJobReqStringList(IEnumerable<int> specJobs, bool isMsnMode = false)
         {
             List<string> extraJobNames = new List<string>();
-            foreach (int specJob in specJobs)
+            if (isMsnMode)
             {
-                switch (specJob)
+                if (string.Join(",", specJobs) == "11,12,13,14,15,51")
                 {
-                    case 1: extraJobNames.AddRange(new[] { "Hero", "Paladin" }); break;
-                    case 2: extraJobNames.AddRange(new[] { "Arch Mage (Ice, Lightning)", "Arch Mage (Fire, Poison)", "Bishop" }); break;
-                    case 4: extraJobNames.Add("Shadower"); break;
-                    case 11: extraJobNames.Add("Dawn Warrior"); break;
-                    case 12: extraJobNames.Add("Blaze Wizard"); break;
-                    case 22: extraJobNames.Add("Evan"); break;
-                    case 32: extraJobNames.Add("Battle Mage"); break;
-                    case 172: extraJobNames.Add("Lynn"); break;
-                    default: extraJobNames.Add(specJob.ToString()); break;
+                    extraJobNames.Add("시그너스 기사단 직업군");
+                }
+                else
+                {
+                    int classBranch = 0;
+                    int count = 0;
+                    foreach (int job in specJobs)
+                    {
+                        classBranch += job / 10;
+                        count++;
+                    }
+                    classBranch = classBranch / count;
+                    switch (classBranch)
+                    {
+                        case 0: extraJobNames.Add("Explorer class"); break;
+                        case 1: extraJobNames.Add("Cygnus Knight class"); break;
+                        case 2: extraJobNames.Add("Hero class"); break;
+                        case 3: extraJobNames.Add("Resistance class"); break;
+                        case 4: extraJobNames.Add("Sengoku class"); break;
+                        case 6: extraJobNames.Add("Nova class"); break;
+                        //case 12: extraJobNames.Add("アニメコラボ職業"); break;
+                        case 15: extraJobNames.Add("Flora class"); break;
+                        case 16: extraJobNames.Add("Anima class"); break;
+                        case 17: extraJobNames.Add("Jianghu class"); break;
+                        case 18: extraJobNames.Add("Shine class"); break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (int specJob in specJobs)
+                {
+                    switch (specJob)
+                    {
+                        case 1: extraJobNames.AddRange(new[] { "Hero", "Paladin" }); break;
+                        case 2: extraJobNames.AddRange(new[] { "Arch Mage (Ice, Lightning)", "Arch Mage (Fire, Poison)", "Bishop" }); break;
+                        case 4: extraJobNames.Add("Shadower"); break;
+                        case 11: extraJobNames.Add("Dawn Warrior"); break;
+                        case 12: extraJobNames.Add("Blaze Wizard"); break;
+                        case 22: extraJobNames.Add("Evan"); break;
+                        case 32: extraJobNames.Add("Battle Mage"); break;
+                        case 172: extraJobNames.Add("Lynn"); break;
+                        default: extraJobNames.Add(specJob.ToString()); break;
+                    }
                 }
             }
             if (extraJobNames.Count == 0)

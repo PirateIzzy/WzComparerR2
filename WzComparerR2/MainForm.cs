@@ -521,12 +521,6 @@ namespace WzComparerR2
                     aniItem.SelectedAnimationName = aniName;
                     this.cmbItemAniNames.Tooltip = aniName;
                 }
-                else if ((this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator) != null)
-                {
-                    string aniName = this.cmbItemAniNames.SelectedItem as string;
-                    (this.pictureBoxEx1.Items[0] as Animation.MultiFrameAnimator).SelectedAnimationName = aniName;
-                    this.cmbItemAniNames.Tooltip = aniName;
-                }
                 else if (this.pictureBoxEx1.Items[0] is FrameAnimator frameAni && this.cmbItemAniNames.SelectedItem is int selectedpage)
                 {
                     if (frameAni.Data.Frames.Count == 1)
@@ -538,6 +532,7 @@ namespace WzComparerR2
                         }
                     }
                 }
+                this.pictureBoxEx1.UpdateLength(0);
             }
         }
 
@@ -682,6 +677,8 @@ namespace WzComparerR2
         private void buttonItemGif2_Click(object sender, EventArgs e)
         {
             // code from buttonItemGif_Click()
+            // Todo: reimplement overall overlay feature
+            // keep each animation item instead of merge them into one
             if (advTree3.SelectedNode == null)
                 return;
 
@@ -718,26 +715,45 @@ namespace WzComparerR2
                 return;
             }
 
-            //添加到动画控件
-            if (node.Text.EndsWith(".atlas", StringComparison.OrdinalIgnoreCase))
+            var spineDetectResult = SpineLoader.Detect(node);
+            if (spineDetectResult.Success)
             {
-                /*
-                var spineData = this.pictureBoxEx1.LoadSpineAnimation(node);
+                var spineData = this.pictureBoxEx1.LoadSpineAnimation(spineDetectResult);
+
                 if (spineData != null)
                 {
-                    this.pictureBoxEx1.ShowAnimation(spineData);
-                    var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
-                    this.cmbItemAniNames.Items.Clear();
-                    this.cmbItemAniNames.Items.Add("");
-                    this.cmbItemAniNames.Items.AddRange(aniItem.Animations.ToArray());
-                    this.cmbItemAniNames.SelectedIndex = 0;
-                    this.cmbItemSkins.Visible = true;
-                    this.cmbItemSkins.Items.Clear();
-                    this.cmbItemSkins.Items.AddRange(aniItem.Skins.ToArray());
-                    this.cmbItemSkins.SelectedIndex = aniItem.Skins.IndexOf(aniItem.SelectedSkin);
+                    var aniItem = spineData.CreateAnimator() as AnimationItem;
+
+                    var frmOverlayAniOptions = new FrmOverlaySpineOptions(aniItem);
+                    var name = "";
+                    var skin = "";
+                    var delay = 0;
+
+                    if (frmOverlayAniOptions.ShowDialog() == DialogResult.OK)
+                    {
+                        frmOverlayAniOptions.GetValues(out name, out skin, out delay);
+                        this.pictureBoxEx1.ShowSpineOverlayAnimation(aniItem, delay);
+                        this.cmbItemAniNames.Items.Clear();
+                        this.cmbItemSkins.Visible = false;
+                        this.pictureBoxEx1.PictureName = $"{aniName}_{name}";
+                    }
+                    else
+                    {
+                        this.pictureBoxEx1.DisposeAnimationItem(aniItem);
+                    }
+
+                    /*
+                    var frameData = this.pictureBoxEx1.ConvertSpineToFrameAnimation(aniItem, delay);
+
+                    if (frameData != null)
+                    {
+                        this.pictureBoxEx1.ShowOverlayAnimation(frameData);
+                        this.cmbItemAniNames.Items.Clear();
+                        this.cmbItemSkins.Visible = false;
+                        this.pictureBoxEx1.PictureName = name;
+                    }
+                    */
                 }
-                */
-                MessageBoxEx.Show("Spine animations cannot be nested.", "Not Supported");
                 return;
             }
             else
@@ -758,6 +774,39 @@ namespace WzComparerR2
 
                     if (multiData != null)
                     {
+                        var aniItem = new MultiFrameAnimator(multiData);
+
+                        var frmOverlayAniOptions = new FrmOverlaySpineOptions(aniItem);
+                        var name = "";
+                        var skin = "";
+                        var delay = 0;
+
+                        if (frmOverlayAniOptions.ShowDialog() == DialogResult.OK)
+                        {
+                            frmOverlayAniOptions.GetValues(out name, out skin, out delay);
+
+                            foreach (var kv_frames in aniItem.Data.Frames)
+                            {
+                                var selectedFrameData = new FrameAnimationData(kv_frames.Value);
+                                if (kv_frames.Key == name)
+                                {
+                                    this.pictureBoxEx1.ShowOverlayAnimation(new FrameAnimationData(aniItem.Data.Frames[name]), multiFrameInfo: name);
+                                    this.cmbItemAniNames.Items.Clear();
+                                    this.cmbItemSkins.Visible = false;
+                                    this.pictureBoxEx1.PictureName = $"{aniName}_{name}";
+                                }
+                                else
+                                {
+                                    this.pictureBoxEx1.DisposeAnimationItem(new FrameAnimator(selectedFrameData));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            this.pictureBoxEx1.DisposeAnimationItem(aniItem);
+                        }
+
+                        /*
                         foreach (var kv_frames in multiData.Frames)
                         {
                             var selectedFrameData = new FrameAnimationData(kv_frames.Value);
@@ -767,6 +816,7 @@ namespace WzComparerR2
                         this.cmbItemAniNames.Items.Clear();
                         this.cmbItemSkins.Visible = false;
                         this.pictureBoxEx1.PictureName = aniName;
+                        */
                     }
 
                     return;
@@ -774,7 +824,6 @@ namespace WzComparerR2
             }
             //this.pictureBoxEx1.PictureName = aniName;
         }
-
         private void OverlayMultiFrameWithKey(object sender, EventArgs e)
         {
             if (advTree3.SelectedNode == null)
@@ -849,7 +898,7 @@ namespace WzComparerR2
             if (this.pictureBoxEx1.ShowOverlayAni)
             {
                 this.pictureBoxEx1.ShowOverlayAni = false;
-                this.pictureBoxEx1.ClearItemList();
+                this.pictureBoxEx1.DisposeItemList();
             }
         }
 
@@ -857,7 +906,9 @@ namespace WzComparerR2
         {
             if (this.pictureBoxEx1.ShowOverlayAni)
             {
-                this.pictureBoxEx1.AddHitboxOverlay();
+                Wz_Node node = advTree3.SelectedNode?.AsWzNode() ?? null;
+                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node, loadTexture: false);
+                this.pictureBoxEx1.AddHitboxOverlay(frameData);
             }
         }
 
@@ -922,9 +973,10 @@ namespace WzComparerR2
                 return;
             }
 
-            var aniItem = this.pictureBoxEx1.Items[0];
-            var frameData = (aniItem as FrameAnimator)?.Data;
-            if (frameData != null && frameData.Frames.Count == 1
+            var aniItem = this.pictureBoxEx1.Items;
+            var aniItemTime = this.pictureBoxEx1.ItemTimes;
+            var frameData = (aniItem?.FirstOrDefault(item => item is FrameAnimator) as FrameAnimator)?.Data;
+            if (aniItem.Count == 1 && frameData != null && frameData.Frames.Count == 1
                 && frameData.Frames[0].A0 == 255 && frameData.Frames[0].A1 == 255 && (frameData.Frames[0].Delay == 0 || pictureBoxEx1.ShowOverlayAni))
             {
                 // save still picture as png
@@ -933,7 +985,7 @@ namespace WzComparerR2
             else
             {
                 // save as gif/apng
-                this.OnSaveGifFile(aniItem, options);
+                this.OnSaveGifFile(aniItem, aniItemTime, options);
             }
         }
 
@@ -980,7 +1032,7 @@ namespace WzComparerR2
                 else
                 {
                     var dlg = new SaveFileDialog();
-                    dlg.Filter = "PNG (*.png)|*.png|모든 파일 (*.*)|*.*";
+                    dlg.Filter = "PNG (*.png)|*.png|All Files (*.*)|*.*";
                     dlg.FileName = pngFileName;
                     if (dlg.ShowDialog() != DialogResult.OK)
                     {
@@ -992,7 +1044,7 @@ namespace WzComparerR2
 
                 byte[] frameData = new byte[frame.Texture.Width * frame.Texture.Height * 4];
                 frame.Texture.GetData(frameData);
-                var targetSize = new Point(frame.Texture.Width, frame.Texture.Height);
+                var targetSize = new System.Drawing.Point(frame.Texture.Width, frame.Texture.Height);
                 unsafe
                 {
                     fixed (byte* pFrameBuffer = frameData)
@@ -1012,7 +1064,7 @@ namespace WzComparerR2
 
         }
 
-        private void OnSaveGifFile(AnimationItem aniItem, bool options)
+        private void OnSaveGifFile(IEnumerable<AnimationItem> aniItem, IEnumerable<Tuple<int, int>> aniItemTime, bool options)
         {
             var config = ImageHandlerConfig.Default;
             using var encoder = AnimateEncoderFactory.CreateEncoder(config);
@@ -1049,8 +1101,8 @@ namespace WzComparerR2
                 aniFileName = dlg.FileName;
             }
 
-            var clonedAniItem = (AnimationItem)aniItem.Clone();
-            if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniFileName, config, encoder, options))
+            var clonedAniItem = aniItem.Select(aniItem => (AnimationItem)aniItem.Clone());
+            if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniItemTime, aniFileName, config, encoder, options))
             {
                 labelItemStatus.Text = "Image saved: " + aniFileName;
             }
@@ -3011,7 +3063,7 @@ namespace WzComparerR2
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.Title = "원본 데이터 저장";
                 dlg.FileName = advTree3.SelectedNode.Text + ".bin";
-                dlg.Filter = "모든 파일 (*.*)|*.*";
+                dlg.Filter = "All Files (*.*)|*.*";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     try
