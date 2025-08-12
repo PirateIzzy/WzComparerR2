@@ -215,9 +215,9 @@ namespace WzComparerR2.CharaSimControl
                     target1.Add(RegexTrimNewLinesAtEnd.Replace(this.Quest.DemandSummary, ""));
                     targetNpcPrefix = "> ";
                 }
-                if (this.Quest.Check1NpcID > 0) target1.Add($@"{targetNpcPrefix}#$p{GetNpcName(this.Quest.Check1NpcID)}#を訪ねよう");
+                if (this.Quest.Check1NpcID > 0) target1.Add($@"Go to {targetNpcPrefix}#$p{GetNpcName(this.Quest.Check1NpcID)}#");
 
-                if (!string.IsNullOrEmpty(this.Quest.PlaceSummary)) target2.Add($@"遂行場所 :\n{this.Quest.PlaceSummary}");
+                if (!string.IsNullOrEmpty(this.Quest.PlaceSummary)) target2.Add($@"Quest Location:\n{this.Quest.PlaceSummary}");
 
                 targetr.Add(string.Join(@"\n", target0.Where(t => !string.IsNullOrEmpty(t))));
                 targetr.Add(string.Join(@"\n", target1.Where(t => !string.IsNullOrEmpty(t))));
@@ -252,15 +252,24 @@ namespace WzComparerR2.CharaSimControl
                 switch (Translator.DefaultPreferredLayout)
                 {
                     case 1:
+                        tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        break;
                     case 2:
+                        tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        break;
                     case 3:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     default:
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                 }
                 ClearImageTable();
-
                 picH += 11;
             }
 
