@@ -245,7 +245,7 @@ namespace WzComparerR2
             tooltipQuickView.SkillRender.DisplayCooltimeMSAsSec = Setting.Skill.DisplayCooltimeMSAsSec;
             tooltipQuickView.SkillRender.DisplayPermyriadAsPercent = Setting.Skill.DisplayPermyriadAsPercent;
             tooltipQuickView.SkillRender.IgnoreEvalError = Setting.Skill.IgnoreEvalError;
-            tooltipQuickView.SkillRender.Enable22AniStyle = Setting.Enable22AniStyle;
+            tooltipQuickView.SkillRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
 
             this.skillDefaultLevel = Setting.Skill.DefaultLevel;
             this.skillInterval = Setting.Skill.IntervalLevel;
@@ -269,20 +269,20 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.ShowLinkedTamingMob = Setting.Item.ShowLinkedTamingMob;
             tooltipQuickView.ItemRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
-            tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Enable22AniStyle;
+            tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             tooltipQuickView.MapRender.ShowMiniMap = Setting.Map.ShowMiniMap;
             tooltipQuickView.MapRender.ShowObjectID = Setting.Map.ShowMapObjectID;
             tooltipQuickView.MapRender.ShowMobNpcObjectID = Setting.Map.ShowMobNpcObjectID;
             tooltipQuickView.MapRender.ShowBgmName = Setting.Map.ShowBgmName;
-            tooltipQuickView.MapRender.Enable22AniStyle = Setting.Enable22AniStyle;
+            tooltipQuickView.MapRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             tooltipQuickView.MapRender.ShowMiniMapMob = Setting.Map.ShowMiniMapMob;
             tooltipQuickView.MapRender.ShowMiniMapNpc = Setting.Map.ShowMiniMapNpc;
             tooltipQuickView.MapRender.ShowMiniMapPortal = Setting.Map.ShowMiniMapPortal;
 
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
-            tooltipQuickView.RecipeRender.Enable22AniStyle = Setting.Enable22AniStyle;
-            GearGraphics.is22aniStyle = Setting.Enable22AniStyle;
-            charaSimCtrl.Enable22AniStyle = Setting.Enable22AniStyle;
+            tooltipQuickView.RecipeRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+            GearGraphics.is22aniStyle = Setting.Misc.Enable22AniStyle;
+            charaSimCtrl.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
         }
 
         void UpdateWzLoadingSettings()

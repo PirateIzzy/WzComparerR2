@@ -279,6 +279,7 @@ namespace WzComparerR2
             set { chkShowMiniMapPortal.Checked = value; }
         }
 
+        [Link]
         public bool Enable22AniStyle
         {
             get { return chkEnable22AniStyle.Checked; }

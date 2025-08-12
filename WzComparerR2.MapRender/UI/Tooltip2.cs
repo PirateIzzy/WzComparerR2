@@ -69,7 +69,7 @@ namespace WzComparerR2.MapRender.UI
         private void LoadContent(ContentManager content)
         {
             var res = new NineFormResource();
-            if (CharaSimConfig.Default.Enable22AniStyle)
+            if (CharaSimConfig.Default.Misc.Enable22AniStyle)
             {
                 res.N = content.Load<Texture2D>(nameof(Res.UIToolTipNew_img_Item_Common_frame_flexible_n));
                 res.NE = content.Load<Texture2D>(nameof(Res.UIToolTipNew_img_Item_Common_frame_flexible_ne));
@@ -852,7 +852,7 @@ namespace WzComparerR2.MapRender.UI
                 }
             }
 
-            if (!CharaSimConfig.Default.Enable22AniStyle)
+            if (!CharaSimConfig.Default.Misc.Enable22AniStyle)
             {
                 var cover = Res.UIToolTip_img_Item_Frame2_cover.ToTexture(env.GraphicsDevice);
                 var coverRect = new Rectangle((int)position.X + 3,
