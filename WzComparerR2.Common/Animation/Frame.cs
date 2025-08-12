@@ -64,7 +64,7 @@ namespace WzComparerR2.Animation
                 else
                 {
                     return Rectangle.Empty;
-                }   
+                }
             }
         }
 
@@ -93,7 +93,7 @@ namespace WzComparerR2.Animation
                 var linkNode = frameNode.GetLinkedSourceNode(findNode);
                 Wz_Png png = linkNode?.GetValue<Wz_Png>() ?? (Wz_Png)frameNode.Value;
 
-                var frame = new Frame(loadTexture ? png.ToTexture(graphicsDevice) : null)s
+                var frame = new Frame(loadTexture ? png.ToTexture(graphicsDevice) : null)
                 {
                     Png = png,
                 };
@@ -128,7 +128,7 @@ namespace WzComparerR2.Animation
 
                 if (frame.Delay == 0)
                 {
-                    frame.Delay = 120; // Default delay
+                    frame.Delay = 120;//给予默认delay
                 }
                 return frame;
             }
