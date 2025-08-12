@@ -2746,7 +2746,10 @@ namespace WzComparerR2.Avatar.UI
             var sl = this.PluginEntry.Context.DefaultStringLinker;
             if (!sl.HasValues) //生成默认stringLinker
             {
-                sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null), PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null), PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null));
+                sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null),
+                    PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null),
+                    PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null),
+                    PluginManager.FindWz(Wz_Type.Quest).GetValueEx<Wz_File>(null));
             }
 
             if (loadType == 0) //先清空。。

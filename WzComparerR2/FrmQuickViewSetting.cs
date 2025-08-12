@@ -279,11 +279,24 @@ namespace WzComparerR2
             set { chkShowMiniMapPortal.Checked = value; }
         }
 
-        [Link]
-        public bool Misc_Enable22AniStyle
+        public bool Enable22AniStyle
         {
             get { return chkEnable22AniStyle.Checked; }
             set { chkEnable22AniStyle.Checked = value; }
+        }
+
+        [Link]
+        public int Quest_DefaultState
+        {
+            get { return comboBoxExQuestState.SelectedIndex; }
+            set { comboBoxExQuestState.SelectedIndex = value; }
+        }
+
+        [Link]
+        public bool Quest_ShowID
+        {
+            get { return chkShowQuestObjectID.Checked; }
+            set { chkShowQuestObjectID.Checked = value; }
         }
 
         public void Load(CharaSimConfig config)

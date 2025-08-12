@@ -24,6 +24,7 @@ namespace WzComparerR2.CharaSim
         public string ConsumableFrom { get; set; }
         public string EndUseDate { get; set; }
         public string SamplePath { get; set; }
+        public ItemType type { get; set; }
 
         public List<GearLevelInfo> Levels { get; internal set; }
 
@@ -33,7 +34,6 @@ namespace WzComparerR2.CharaSim
         public List<int> AddTooltips { get; internal set; } // Additional Tooltips
         public List<int> Recipes { get; private set; }
         public Bitmap AvatarBitmap { get; set; }
-
         public bool Cash
         {
             get { return GetBooleanValue(ItemPropType.cash); }
@@ -47,6 +47,25 @@ namespace WzComparerR2.CharaSim
         public bool ShowCosmetic
         {
             get { return this.Specs.TryGetValue(ItemSpecType.cosmetic, out long value) && value > 0; }
+        }
+
+        public static ItemType GetItemType(int code)
+        {
+            switch (code / 1000000)
+            {
+                case 2:
+                    return ItemType.Consume;
+                case 3:
+                    return ItemType.Install;
+                case 4:
+                    return ItemType.Etc;
+                case 5:
+                    if (code / 10000 != 500)
+                        return ItemType.Cash;
+                    return ItemType.Pet;
+                default:
+                    return ItemType.Unknown;
+            }
         }
 
         public bool GetBooleanValue(ItemPropType type)
@@ -256,17 +275,23 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
-            // customChair
-            Wz_Node customChairNode = node.FindNodeByPath("info\\customChair\\self\\tamingMob");
+            // MSEA v241 chair
+            Wz_Node customChairNode = node.FindNodeByPath("info\\customChair\\self");
             if (customChairNode != null)
             {
-                if (item.Props.ContainsKey(ItemPropType.tamingMob))
+                foreach (Wz_Node subNode in customChairNode.Nodes)
                 {
-                    item.Props[ItemPropType.tamingMob] = Convert.ToInt64(customChairNode.Value);
-                }
-                else
-                {
-                    item.Props.Add(ItemPropType.tamingMob, Convert.ToInt64(customChairNode.Value));
+                    if (subNode.Text == "tamingMob")
+                    {
+                        if (item.Props.ContainsKey(ItemPropType.tamingMob))
+                        {
+                            item.Props[ItemPropType.tamingMob] = Convert.ToInt64(subNode.Value);
+                        }
+                        else
+                        {
+                            item.Props.Add(ItemPropType.tamingMob, Convert.ToInt64(subNode.Value));
+                        }
+                    }
                 }
             }
 
@@ -289,7 +314,7 @@ namespace WzComparerR2.CharaSim
                             item.Recipes.Add(subNode.GetValue<int>());
                         }
                     }
-                    else if(Enum.TryParse(subNode.Text, out ItemSpecType type))
+                    else if (Enum.TryParse(subNode.Text, out ItemSpecType type))
                     {
                         try
                         {
@@ -323,7 +348,17 @@ namespace WzComparerR2.CharaSim
                     }
                 }
             }
+            item.type = GetItemType(item.ItemID);
             return item;
+        }
+        public enum ItemType
+        {
+            Unknown = 0,
+            Consume = 200,
+            Install = 300,
+            Etc = 400,
+            Pet = 500,
+            Cash = 501,
         }
 
     }

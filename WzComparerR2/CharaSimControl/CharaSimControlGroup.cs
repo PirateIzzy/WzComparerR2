@@ -18,12 +18,28 @@ namespace WzComparerR2.CharaSimControl
             tooltip.TopMost = true;
         }
 
+        private AfrmTooltip quickView;
         private AfrmTooltip tooltip;
         private AfrmItem frmItem;
         private AfrmStat frmStat;
         private AfrmEquip frmEquip;
         private Character character;
         private StringLinker stringLinker;
+
+        public bool Enable22AniStyle { get; set; }
+        public AfrmTooltip TooltipQuickView
+        {
+            get
+            {
+                if (quickView == null)
+                {
+                    quickView = new AfrmTooltip();
+                    quickView.ObjectMouseMove += new ObjectMouseEventHandler(frmQuickView_ObjectMouseMove);
+                    quickView.ObjectMouseLeave += new EventHandler(frmQuickView_ObjectMouseLeave);
+                }
+                return quickView;
+            }
+        }
 
         public AfrmItem UIItem
         {
@@ -224,6 +240,7 @@ namespace WzComparerR2.CharaSimControl
 
         private void frmItem_ItemMouseMove(object sender, ItemMouseEventArgs e)
         {
+            tooltip.Enable22AniStyle = this.Enable22AniStyle;
             if (e.Item == null)
             {
                 tooltip.Visible = false;
@@ -248,9 +265,13 @@ namespace WzComparerR2.CharaSimControl
 
         private void frmStat_ObjectMouseMove(object sender, ObjectMouseEventArgs e)
         {
+            tooltip.Enable22AniStyle = this.Enable22AniStyle;
             if (e.Obj is Skill && !this.stringLinker.HasValues)
             {
-                this.stringLinker.Load(PluginBase.PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null), PluginBase.PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null), PluginBase.PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null));
+                this.stringLinker.Load(PluginBase.PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null),
+                    PluginBase.PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null),
+                    PluginBase.PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null),
+                    PluginBase.PluginManager.FindWz(Wz_Type.Quest).GetValueEx<Wz_File>(null));
             }
             if (e.Obj == null)
             {
@@ -270,6 +291,31 @@ namespace WzComparerR2.CharaSimControl
         }
 
         private void frmStat_ObjectMouseLeave(object sender, EventArgs e)
+        {
+            tooltip.Visible = false;
+        }
+
+        private void frmQuickView_ObjectMouseMove(object sender, ObjectMouseEventArgs e)
+        {
+            tooltip.Enable22AniStyle = this.Enable22AniStyle;
+            if (e.Obj == null)
+            {
+                tooltip.Visible = false;
+                return;
+            }
+            if (e.Obj != tooltip.TargetItem)
+            {
+                tooltip.TargetItem = e.Obj;
+                tooltip.Refresh();
+            }
+            Point pos = quickView.PointToScreen(e.Location);
+            pos.Offset(5, 5);
+            tooltip.Location = pos;
+            tooltip.Visible = true;
+            tooltip.BringToFront();
+        }
+
+        private void frmQuickView_ObjectMouseLeave(object sender, EventArgs e)
         {
             tooltip.Visible = false;
         }

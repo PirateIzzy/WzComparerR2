@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Controls;
 using SharpDX.XAudio2;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using WzComparerR2.Properties;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -38,6 +39,7 @@ namespace WzComparerR2.CharaSimControl
             this.MapRender = new MapTooltipRenderer();
             this.MobRender = new MobTooltipRenderer();
             this.NpcRender = new NpcTooltipRenderer();
+            this.QuestRender = new QuestTooltipRenderer();
             this.HelpRender = new HelpTooltipRender();
             this.SetItemRender = new SetItemTooltipRender();
             this.SetItemRender22 = new SetItemTooltipRender22();
@@ -52,10 +54,11 @@ namespace WzComparerR2.CharaSimControl
         private bool showMenu;
         private bool showID;
 
+        public bool Enable22AniStyle { get; set; }
+
         private Bitmap AvatarBitmap;
         private FrmWaiting WaitingForm = new FrmWaiting();
         private static readonly SemaphoreSlim TranslateSemaphore = new SemaphoreSlim(1, 1);
-
 
         public Object TargetItem
         {
@@ -74,6 +77,7 @@ namespace WzComparerR2.CharaSimControl
         public MapTooltipRenderer MapRender { get; private set; }
         public MobTooltipRenderer MobRender { get; private set; }
         public NpcTooltipRenderer NpcRender { get; private set; }
+        public QuestTooltipRenderer QuestRender { get; private set; }
         public HelpTooltipRender HelpRender { get; private set; }
         public SetItemTooltipRender SetItemRender { get; private set; }
         public SetItemTooltipRender22 SetItemRender22 { get; private set; }
@@ -88,7 +92,10 @@ namespace WzComparerR2.CharaSimControl
         public int NodeID { get; set; }
         public int PreferredStringCopyMethod { get; set; }
         public bool CopyParsedSkillString { get; set; }
-        public bool Enable22AniStyle { get; set; }
+
+        public event ObjectMouseEventHandler ObjectMouseMove;
+        public event EventHandler ObjectMouseLeave;
+
         public bool ShowID
         {
             get { return this.showID; }
@@ -99,6 +106,8 @@ namespace WzComparerR2.CharaSimControl
                 this.GearRender22.ShowObjectID = value;
                 this.MapRender.ShowObjectID = value;
                 this.ItemRender.ShowObjectID = value;
+                // this.ItemRender3.ShowObjectID = value;
+                this.QuestRender.ShowObjectID = value;
                 this.SkillRender.ShowObjectID = value;
                 this.RecipeRender.ShowObjectID = value;
             }
@@ -127,6 +136,19 @@ namespace WzComparerR2.CharaSimControl
             }
         }
 
+        public async void QuickRefresh()
+        {
+            if (this.Bitmap != null)
+            {
+                TranslateSemaphore.Wait();
+                Thread.Sleep(10);
+                this.SetBitmap(Bitmap);
+                this.CaptionRectangle = new Rectangle(0, 0, Bitmap.Width, Bitmap.Height);
+                base.Refresh();
+                TranslateSemaphore.Release();
+            }
+        }
+
         public async void PreRender()
         {
             AvatarBitmap = null;
@@ -138,6 +160,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 renderer = ItemRender;
                 ItemRender.Item = this.item as Item;
+                ItemRender.Enable22AniStyle = this.Enable22AniStyle;
             }
             else if (item is Gear)
             {
@@ -195,16 +218,19 @@ namespace WzComparerR2.CharaSimControl
             {
                 renderer = SkillRender;
                 SkillRender.Skill = this.item as Skill;
+                SkillRender.Enable22AniStyle = this.Enable22AniStyle;
             }
             else if (item is Recipe)
             {
                 renderer = RecipeRender;
                 RecipeRender.Recipe = this.item as Recipe;
+                RecipeRender.Enable22AniStyle = this.Enable22AniStyle;
             }
             else if (item is Map)
             {
                 renderer = MapRender;
                 MapRender.Map = this.item as Map;
+                MapRender.Enable22AniStyle = this.Enable22AniStyle;
             }
             else if (item is Mob)
             {
@@ -216,6 +242,11 @@ namespace WzComparerR2.CharaSimControl
                 renderer = NpcRender;
                 NpcRender.NpcInfo = this.item as Npc;
             }
+            else if (item is Quest)
+            {
+                renderer = QuestRender;
+                QuestRender.Quest = this.item as Quest;
+            }
             else if (item is TooltipHelp)
             {
                 renderer = HelpRender;
@@ -225,17 +256,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (Enable22AniStyle)
                 {
-                    if ((item as SetItem).ItemIDs.Parts.Any(p => p.Value.ItemIDs.Any(i => i.Key / 1000000 == 5)))
-                    {
-                        renderer = SetItemRender;
-                        SetItemRender.Enable22AniStyle = true;
-                        SetItemRender.SetItem = this.item as SetItem;
-                    }
-                    else
-                    {
-                        renderer = SetItemRender22;
-                        SetItemRender22.SetItem = this.item as SetItem;
-                    }
+                    renderer = SetItemRender22;
+                    SetItemRender22.SetItem = this.item as SetItem;
                 }
                 else
                 {
@@ -278,6 +300,50 @@ namespace WzComparerR2.CharaSimControl
             {
                 this.menu.Show(this, e.Location);
             }
+        }
+
+        public object GetPairByPoint(Point point)
+        {
+            Point p = point;
+            switch (this.item)
+            {
+                case Quest:
+                    if ((this.QuestRender?.RewardRectnItems?.Count ?? 0) > 0)
+                    {
+                        foreach (var ri in this.QuestRender.RewardRectnItems)
+                        {
+                            if (ri.Item1.Contains(p))
+                            {
+                                return ri.Item2;
+                            }
+                        }
+                    }
+                    break;
+            }
+            return null;
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            object obj = GetPairByPoint(e.Location);
+            if (obj != null)
+                this.OnObjectMouseMove(new ObjectMouseEventArgs(e, obj));
+            else
+                this.OnObjectMouseLeave(EventArgs.Empty);
+        }
+
+        protected virtual void OnObjectMouseMove(ObjectMouseEventArgs e)
+        {
+            if (this.ObjectMouseMove != null)
+                this.ObjectMouseMove(this, e);
+        }
+
+        protected virtual void OnObjectMouseLeave(EventArgs e)
+        {
+            if (this.ObjectMouseLeave != null)
+                this.ObjectMouseLeave(this, e);
         }
 
         void tsmiCopy_Click(object sender, EventArgs e)
@@ -526,7 +592,6 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
         }
-
 
         void AfrmTooltip_SizeChanged(object sender, EventArgs e)
         {
