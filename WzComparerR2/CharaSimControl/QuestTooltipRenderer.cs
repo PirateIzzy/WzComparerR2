@@ -120,11 +120,11 @@ namespace WzComparerR2.CharaSimControl
                 if (Translator.IsTranslateEnabled)
                 {
                     string translatedQuestName = Translator.MergeString(this.Quest.Name, Translator.TranslateString(this.Quest.Name, true), 1, false, true);
-                    TextRenderer.DrawText(g, translatedQuestName, Translator.IsKoreanStringPresent(translatedQuestName) ? GearGraphics.ItemDetailFont2 : GearGraphics.EquipMDMoris9Font, new Point(left, 72), Color.White, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, translatedQuestName, GearGraphics.ItemDetailFont2, new Point(left, 72), Color.White, TextFormatFlags.NoPadding);
                 }
                 else
                 {
-                    TextRenderer.DrawText(g, Compact(g, this.Quest.Name, 200), Translator.IsKoreanStringPresent(this.Quest.Name) ? GearGraphics.ItemDetailFont2 : GearGraphics.EquipMDMoris9Font, new Point(left, 72), Color.White, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, Compact(g, this.Quest.Name, 200), GearGraphics.ItemDetailFont2, new Point(left, 72), Color.White, TextFormatFlags.NoPadding);
                 }
             }
             // 권장 레벨
@@ -132,12 +132,12 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (this.Quest.RecommendExcept && !this.Quest.LvLimit)
                 {
-                    TextRenderer.DrawText(g, $"Recommended Lv: {this.Quest.Lvmin}", GearGraphics.EquipMDMoris9Font, new Point(left, 90), ((SolidBrush)GearGraphics.QuestBrushDefault).Color, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, $"Recommended Lv: {this.Quest.Lvmin}", GearGraphics.ItemDetailFont2, new Point(left, 90), ((SolidBrush)GearGraphics.QuestBrushDefault).Color, TextFormatFlags.NoPadding);
                 }
                 else
                 {
                     var lvMax = this.Quest.Lvmax > 0 ? this.Quest.Lvmax : this.Quest.Lvmin + 4;
-                    TextRenderer.DrawText(g, $"Recommended Lv: {this.Quest.Lvmin} - {lvMax}", GearGraphics.EquipMDMoris9Font, new Point(left, 90), ((SolidBrush)GearGraphics.QuestBrushDefault).Color, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, $"Recommended Lv: {this.Quest.Lvmin} - {lvMax}", GearGraphics.ItemDetailFont2, new Point(left, 90), ((SolidBrush)GearGraphics.QuestBrushDefault).Color, TextFormatFlags.NoPadding);
                 }
             }
             // npc 이미지 계산
@@ -231,7 +231,7 @@ namespace WzComparerR2.CharaSimControl
 
                     var targetText = string.Join(@"\n\n", targetr);
                     var replaced = ReplaceQuestString(targetText);
-                    GearGraphics.DrawString(g, replaced, Translator.IsKoreanStringPresent(replaced) ? GearGraphics.ItemDetailFont2 : GearGraphics.EquipMDMoris9Font, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                    GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                     ClearImageTable();
 
                     picH += 11;
@@ -698,7 +698,7 @@ namespace WzComparerR2.CharaSimControl
 
         private static string Compact(Graphics g, string text, int width) // https://www.codeproject.com/Articles/37503/Auto-Ellipsis
         {
-            Size s = TextRenderer.MeasureText(g, text, Translator.IsKoreanStringPresent(text) ? GearGraphics.ItemDetailFont2 : GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
+            Size s = TextRenderer.MeasureText(g, text, GearGraphics.ItemDetailFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
 
             // control is large enough to display the whole text 
             if (s.Width <= width)
@@ -722,7 +722,7 @@ namespace WzComparerR2.CharaSimControl
                 // build and measure a candidate string with ellipsis
                 string tst = text.Substring(0, left) + "..";
 
-                s = TextRenderer.MeasureText(g, tst, Translator.IsKoreanStringPresent(text) ? GearGraphics.ItemDetailFont2 : GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
+                s = TextRenderer.MeasureText(g, tst, GearGraphics.ItemDetailFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
 
                 // candidate string fits into control boundaries, 
                 // try a longer string

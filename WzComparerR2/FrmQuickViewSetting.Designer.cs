@@ -105,7 +105,6 @@
             this.labelXQSHint = new DevComponents.DotNetBar.LabelX();
             this.chkShowQuestObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanel2.SuspendLayout();
@@ -135,9 +134,9 @@
             this.superTabControl1.ControlBox.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabControl1.ControlBox.MenuBox,
             this.superTabControl1.ControlBox.CloseBox});
+            this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
-            this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel4);
             this.superTabControl1.Controls.Add(this.superTabControlPanel6);
             this.superTabControl1.Controls.Add(this.superTabControlPanel7);
@@ -183,6 +182,67 @@
             this.superTabControlPanel1.Size = new System.Drawing.Size(293, 278);
             this.superTabControlPanel1.TabIndex = 1;
             this.superTabControlPanel1.TabItem = this.superTabItem1;
+            // 
+            // checkBoxX16
+            // 
+            this.checkBoxX16.AutoSize = true;
+            this.checkBoxX16.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX16.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX16.Location = new System.Drawing.Point(13, 81);
+            this.checkBoxX16.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.checkBoxX16.Name = "checkBoxX16";
+            this.checkBoxX16.Size = new System.Drawing.Size(109, 18);
+            this.checkBoxX16.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX16.TabIndex = 10;
+            this.checkBoxX16.Text = "Show Skill Range";
+            // 
+            // checkBoxX15
+            // 
+            this.checkBoxX15.AutoSize = true;
+            this.checkBoxX15.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX15.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX15.Location = new System.Drawing.Point(13, 153);
+            this.checkBoxX15.Name = "checkBoxX15";
+            this.checkBoxX15.Size = new System.Drawing.Size(125, 18);
+            this.checkBoxX15.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX15.TabIndex = 10;
+            this.checkBoxX15.Text = "Ignore Calculation Errors";
+            // 
+            // checkBoxX14
+            // 
+            this.checkBoxX14.AutoSize = true;
+            this.checkBoxX14.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX14.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX14.Location = new System.Drawing.Point(13, 129);
+            this.checkBoxX14.Name = "checkBoxX14";
+            this.checkBoxX14.Size = new System.Drawing.Size(150, 18);
+            this.checkBoxX14.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX14.TabIndex = 9;
+            this.checkBoxX14.Text = "Convert PerM to percent";
+            //
+            // checkBoxX13
+            // 
+            this.checkBoxX13.AutoSize = true;
+            this.checkBoxX13.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX13.Location = new System.Drawing.Point(13, 105);
+            this.checkBoxX13.Name = "checkBoxX13";
+            this.checkBoxX13.Size = new System.Drawing.Size(138, 18);
+            this.checkBoxX13.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX13.TabIndex = 8;
+            this.checkBoxX13.Text = "Convert cooltimeMS to seconds";
             // 
             // checkBoxX10
             // 
@@ -942,10 +1002,10 @@
             // 
             // superTabControlPanel5
             // 
+            this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
             this.superTabControlPanel5.Controls.Add(this.chkCopyParsedSkillString);
             this.superTabControlPanel5.Controls.Add(this.labelX4);
             this.superTabControlPanel5.Controls.Add(this.cmbPreferredStringCopyMethod);
-            this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
             this.superTabControlPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel5.Location = new System.Drawing.Point(62, 0);
             this.superTabControlPanel5.Name = "superTabControlPanel5";
@@ -1029,66 +1089,6 @@
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 0;
             this.buttonX1.Text = "Confirm";
-            // checkBoxX13
-            // 
-            this.checkBoxX13.AutoSize = true;
-            this.checkBoxX13.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX13.Location = new System.Drawing.Point(13, 105);
-            this.checkBoxX13.Name = "checkBoxX13";
-            this.checkBoxX13.Size = new System.Drawing.Size(138, 18);
-            this.checkBoxX13.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX13.TabIndex = 8;
-            this.checkBoxX13.Text = "Convert cooltimeMS to seconds";
-            // 
-            // checkBoxX14
-            // 
-            this.checkBoxX14.AutoSize = true;
-            this.checkBoxX14.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX14.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX14.Location = new System.Drawing.Point(13, 129);
-            this.checkBoxX14.Name = "checkBoxX14";
-            this.checkBoxX14.Size = new System.Drawing.Size(150, 18);
-            this.checkBoxX14.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX14.TabIndex = 9;
-            this.checkBoxX14.Text = "Convert PerM to percent";
-            // 
-            // checkBoxX16
-            // 
-            this.checkBoxX16.AutoSize = true;
-            this.checkBoxX16.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX16.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX16.Location = new System.Drawing.Point(13, 81);
-            this.checkBoxX16.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.checkBoxX16.Name = "checkBoxX16";
-            this.checkBoxX16.Size = new System.Drawing.Size(109, 18);
-            this.checkBoxX16.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX16.TabIndex = 10;
-            this.checkBoxX16.Text = "Show Skill Range";
-            // 
-            // checkBoxX15
-            // 
-            this.checkBoxX15.AutoSize = true;
-            this.checkBoxX15.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX15.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX15.Location = new System.Drawing.Point(13, 153);
-            this.checkBoxX15.Name = "checkBoxX15";
-            this.checkBoxX15.Size = new System.Drawing.Size(125, 18);
-            this.checkBoxX15.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX15.TabIndex = 10;
-            this.checkBoxX15.Text = "Ignore Calculation Errors";
             // 
             // FrmQuickViewSetting
             // 
@@ -1177,9 +1177,9 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX16;
         private DevComponents.DotNetBar.LabelX labelCosmeticHairColor;
         private DevComponents.DotNetBar.LabelX labelCosmeticFaceColor;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX21;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.LabelX labelX14;
         private DevComponents.DotNetBar.LabelX labelX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMap;
