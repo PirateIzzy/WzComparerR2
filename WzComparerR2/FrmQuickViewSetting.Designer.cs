@@ -104,6 +104,7 @@
             this.labelXQS = new DevComponents.DotNetBar.LabelX();
             this.labelXQSHint = new DevComponents.DotNetBar.LabelX();
             this.chkShowQuestObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkQAS = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
@@ -904,6 +905,7 @@
             // 
             // superTabControlPanel7
             // 
+            this.superTabControlPanel7.Controls.Add(this.chkQAS);
             this.superTabControlPanel7.Controls.Add(this.labelXQS);
             this.superTabControlPanel7.Controls.Add(this.comboBoxExQuestState);
             this.superTabControlPanel7.Controls.Add(this.labelXQSHint);
@@ -923,6 +925,23 @@
             this.superTabItem7.Name = "superTabItem7";
             this.superTabItem7.Text = "Quest";
             // 
+            // chkQAS
+            // 
+            this.chkQAS.AutoSize = true;
+            this.chkQAS.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkQAS.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkQAS.Location = new System.Drawing.Point(15, 12);
+            this.chkQAS.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkQAS.Name = "chkQAS";
+            this.chkQAS.Size = new System.Drawing.Size(121, 18);
+            this.chkQAS.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkQAS.TabIndex = 1;
+            this.chkQAS.Text = "View All Quest States";
+            this.chkQAS.CheckedChanged += ChkQAS_CheckedChanged;
+            // 
             // labelQS
             // 
             this.labelXQS.AutoSize = true;
@@ -931,7 +950,7 @@
             // 
             // 
             this.labelXQS.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelXQS.Location = new System.Drawing.Point(15, 12);
+            this.labelXQS.Location = new System.Drawing.Point(15, 36);
             this.labelXQS.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.labelXQS.Name = "labelXQS";
             this.labelXQS.Size = new System.Drawing.Size(89, 18);
@@ -950,12 +969,12 @@
             this.comboItemQS1,
             this.comboItemQS2});
             this.comboBoxExQuestState.ItemHeight = 15;
-            this.comboBoxExQuestState.Location = new System.Drawing.Point(100, 12);
+            this.comboBoxExQuestState.Location = new System.Drawing.Point(125, 36);
             this.comboBoxExQuestState.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.comboBoxExQuestState.Name = "comboBoxExQuestState";
             this.comboBoxExQuestState.Size = new System.Drawing.Size(104, 21);
             this.comboBoxExQuestState.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.comboBoxExQuestState.TabIndex = 1;
+            this.comboBoxExQuestState.TabIndex = 2;
             // 
             // comboItemQS0
             // 
@@ -978,11 +997,11 @@
             // 
             this.labelXQSHint.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.labelXQSHint.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.labelXQSHint.Location = new System.Drawing.Point(15, 40);
+            this.labelXQSHint.Location = new System.Drawing.Point(15, 64);
             this.labelXQSHint.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.labelXQSHint.Name = "labelXQSHint";
             this.labelXQSHint.Size = new System.Drawing.Size(236, 30);
-            this.labelXQSHint.TabIndex = 2;
+            this.labelXQSHint.TabIndex = 3;
             this.labelXQSHint.Text = "Change Quest Status<b>- +</b> or <b>← →</b><br/>0: Available<br/>1: In Progress<br/>2: Completed";
             // 
             // chkShowQuestObjectID
@@ -993,11 +1012,11 @@
             // 
             // 
             this.chkShowQuestObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowQuestObjectID.Location = new System.Drawing.Point(13, 108);
+            this.chkShowQuestObjectID.Location = new System.Drawing.Point(13, 120);
             this.chkShowQuestObjectID.Name = "chkShowQuestObjectID";
             this.chkShowQuestObjectID.Size = new System.Drawing.Size(190, 16);
             this.chkShowQuestObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkShowQuestObjectID.TabIndex = 2;
+            this.chkShowQuestObjectID.TabIndex = 4;
             this.chkShowQuestObjectID.Text = "Show Quest ID";
             // 
             // superTabControlPanel5
@@ -1202,5 +1221,6 @@
         private DevComponents.DotNetBar.LabelX labelXQS;
         private DevComponents.DotNetBar.LabelX labelXQSHint;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowQuestObjectID;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkQAS;
     }
 }

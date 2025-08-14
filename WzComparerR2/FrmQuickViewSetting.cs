@@ -300,6 +300,13 @@ namespace WzComparerR2
             set { chkShowQuestObjectID.Checked = value; }
         }
 
+        [Link]
+        public bool Quest_ShowAllStates
+        {
+            get { return chkQAS.Checked; }
+            set { chkQAS.Checked = value; }
+        }
+
         public void Load(CharaSimConfig config)
         {
             this.PreferredStringCopyMethod = config.PreferredStringCopyMethod;
@@ -347,6 +354,13 @@ namespace WzComparerR2
             this.chkShowMiniMapMob.Enabled = this.chkShowMiniMap.Checked;
             this.chkShowMiniMapNpc.Enabled = this.chkShowMiniMap.Checked;
             this.chkShowMiniMapPortal.Enabled = this.chkShowMiniMap.Checked;
+        }
+
+        private void ChkQAS_CheckedChanged(object sender, System.EventArgs e)
+        {
+            this.comboBoxExQuestState.Enabled = !this.chkQAS.Checked;
+            this.labelXQS.Enabled = !this.chkQAS.Checked;
+            this.labelXQSHint.Enabled = !this.chkQAS.Checked;
         }
 
         private sealed class LinkAttribute : Attribute

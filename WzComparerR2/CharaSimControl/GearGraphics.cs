@@ -221,7 +221,7 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Brush QuestBrushMob = new SolidBrush(Color.FromArgb(255, 0, 102));
         public static readonly Brush QuestBrushMap = new SolidBrush(Color.FromArgb(221, 254, 1));
         public static readonly Brush QuestBrushItem = new SolidBrush(Color.FromArgb(204, 143, 255));
-        public static readonly Brush QuestBrushEnd = new SolidBrush(Color.FromArgb(101, 117, 120));
+        public static readonly Brush QuestBrushEnd = new SolidBrush(Color.FromArgb(171, 181, 187));
 
         public static readonly Brush BarrierArcBrush = new SolidBrush(Color.FromArgb(218, 161, 255));
         public static readonly Brush BarrierAutBrush = new SolidBrush(Color.FromArgb(218, 161, 255));
