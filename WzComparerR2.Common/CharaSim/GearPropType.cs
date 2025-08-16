@@ -202,6 +202,9 @@ namespace WzComparerR2.CharaSim
         noPrism,
         noTradeLimitCash,
         magicLayerWz2,
+        setExtraOption,
+        reissueBan,
+
         //MSN exclusive stats
         blockUpgradeExtraOption,
         blockUpgradeStarforce,

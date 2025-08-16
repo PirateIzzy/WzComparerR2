@@ -132,6 +132,14 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
+
+            foreach (var i in Enum.GetValues(typeof(Wz_Type)))
+            {
+                if (i is Wz_Type wzType && wzType != Wz_Type.Unknown)
+                {
+                    this.clbRootNode.Items.Add(wzType.ToString(), true);
+                }
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -2099,6 +2107,14 @@ namespace WzComparerR2
                     addPath();
                     break;
 
+                case "AchievementData":
+                    wzPath.Add("Etc");
+                    wzPath.Add("Achievement");
+                    wzPath.Add("AchievementData");
+                    wzPath.Add($"{id}.img");
+                    addPath();
+                    break;
+
                 default:
                     break;
             }
@@ -2643,6 +2659,7 @@ namespace WzComparerR2
                     dicts.Add(stringLinker.StringQuest);
                     dicts.Add(stringLinker.StringSkill);
                     dicts.Add(stringLinker.StringSetItem);
+                    dicts.Add(stringLinker.StringAchievement);
                     break;
                 case 1:
                     dicts.Add(stringLinker.StringEqp);
@@ -2667,6 +2684,9 @@ namespace WzComparerR2
                     break;
                 case 8:
                     dicts.Add(stringLinker.StringSetItem);
+                    break;
+                case 9:
+                    dicts.Add(stringLinker.StringAchievement);
                     break;
             }
 
@@ -3602,6 +3622,18 @@ namespace WzComparerR2
                             tooltipQuickView.NodeID = setItem.SetItemID;
                         }
                     }
+                    else if (Regex.IsMatch(selectedNode.FullPathToFile, @"^Etc\\Achievement\\AchievementData\\(\d+).img$"))
+                    {
+                        if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                            return;
+                        Achievement achievement = Achievement.CreateFromNode(image.Node, PluginManager.FindWz, PluginManager.FindWz);
+
+                        obj = achievement;
+                        if (achievement != null)
+                        {
+                            fileName = achievement.ID + ".png";
+                        }
+                    }
                     break;
             }
             if (obj != null)
@@ -3993,24 +4025,34 @@ namespace WzComparerR2
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
+                Dictionary<string, bool> selectedNodes = new Dictionary<string, bool>();
+                for (int i = 0; i < clbRootNode.Items.Count; i++)
+                {
+                    string item = clbRootNode.Items[i].ToString();
+                    bool isChecked = clbRootNode.GetItemChecked(i);
+                    selectedNodes[item] = isChecked;
+                }
+                clbRootNode.Visible = false;
                 compareThread = new Thread(() =>
                 {
                     System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
                     EasyComparer comparer = new EasyComparer();
+                    comparer.selectedNodes = selectedNodes;
                     comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
                     comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
                     comparer.OutputPng = chkOutputPng.Checked;
                     comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                     comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
                     comparer.EnableDarkMode = chkEnableDarkMode.Checked;
-                    comparer.OutputSkillTooltip = chkOutputSkillTooltip.Checked;
-                    comparer.OutputItemTooltip = chkOutputItemTooltip.Checked;
-                    comparer.OutputGearTooltip = chkOutputEqpTooltip.Checked;
-                    comparer.OutputMapTooltip = chkOutputMapTooltip.Checked;
-                    comparer.OutputMobTooltip = chkOutputMobTooltip.Checked;
-                    comparer.OutputNpcTooltip = chkOutputNpcTooltip.Checked;
-                    comparer.OutputCashTooltip = chkOutputCashTooltip.Checked;
-                    comparer.OutputQuestTooltip = chkOutputQuestTooltip.Checked;
+                    comparer.OutputSkillTooltip = chkOutputSkillTooltip.Checked && selectedNodes["Skill"] && selectedNodes["String"];
+                    comparer.OutputItemTooltip = chkOutputItemTooltip.Checked && selectedNodes["Item"] && selectedNodes["String"];
+                    comparer.OutputGearTooltip = chkOutputEqpTooltip.Checked && selectedNodes["Character"] && selectedNodes["String"];
+                    comparer.OutputMapTooltip = chkOutputMapTooltip.Checked && selectedNodes["Map"] && selectedNodes["String"];
+                    comparer.OutputMobTooltip = chkOutputMobTooltip.Checked && selectedNodes["Mob"] && selectedNodes["String"];
+                    comparer.OutputNpcTooltip = chkOutputNpcTooltip.Checked && selectedNodes["Npc"] && selectedNodes["String"];
+                    comparer.OutputCashTooltip = chkOutputCashTooltip.Checked && selectedNodes["Item"] && selectedNodes["String"];
+                    comparer.OutputQuestTooltip = chkOutputQuestTooltip.Checked && selectedNodes["Quest"];
+                    comparer.OutputAchvTooltip = chkOutputAchvTooltip.Checked && selectedNodes["Etc"];
                     comparer.HashPngFileName = chkHashPngFileName.Checked;
                     comparer.ShowObjectID = chkShowObjectID.Checked;
                     comparer.ShowChangeType = chkShowChangeType.Checked;
@@ -4049,6 +4091,7 @@ namespace WzComparerR2
                                     chkOutputMobTooltip.Enabled = false;
                                     chkOutputNpcTooltip.Enabled = false;
                                     chkOutputQuestTooltip.Enabled = false;
+                                    chkOutputAchvTooltip.Enabled = false;
                                     // chkOutputCashTooltip.Enabled = false;
                                     chkShowObjectID.Enabled = false;
                                     chkShowChangeType.Enabled = false;
@@ -4113,6 +4156,7 @@ namespace WzComparerR2
                         chkOutputMobTooltip.Enabled = true;
                         chkOutputNpcTooltip.Enabled = true;
                         chkOutputQuestTooltip.Enabled = true;
+                        chkOutputAchvTooltip.Enabled = true;
                         // chkOutputCashTooltip.Enabled = true;
                         chkShowObjectID.Enabled = true;
                         chkShowChangeType.Enabled = true;
@@ -4157,6 +4201,10 @@ namespace WzComparerR2
             {
                 labelXComp2.Text = comp.StateDetail;
             }
+        }
+        private void btnRootNode_Click(object sender, EventArgs e)
+        {
+            clbRootNode.Visible = !clbRootNode.Visible;
         }
 
         private void buttonItemAbout_Click(object sender, EventArgs e)

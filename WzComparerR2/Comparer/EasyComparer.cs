@@ -33,11 +33,11 @@ namespace WzComparerR2.Comparer
         private List<string> OutputCashTooltipIDs { get; set; } = new List<string>();
         private List<string> OutputGearTooltipIDs { get; set; } = new List<string>();
         private List<string> OutputItemTooltipIDs { get; set; } = new List<string>();
-
         private List<string> OutputMapTooltipIDs { get; set; } = new List<string>();
         private List<string> OutputMobTooltipIDs { get; set; } = new List<string>();
         private List<string> OutputNpcTooltipIDs { get; set; } = new List<string>();
         private List<string> OutputQuestTooltipIDs { get; set; } = new List<string>();
+        private List<string> OutputAchvTooltipIDs { get; set; } = new List<string>();
         private Dictionary<string, List<string>> DiffCashTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffGearTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffItemTags { get; set; } = new Dictionary<string, List<string>>();
@@ -46,6 +46,7 @@ namespace WzComparerR2.Comparer
         private Dictionary<string, List<string>> DiffNpcTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffQuestTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffSkillTags { get; set; } = new Dictionary<string, List<string>>();
+        private Dictionary<string, List<string>> DiffAchvTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<int>> KMSContentID { get; set; } = new Dictionary<string, List<int>>();
         private Dictionary<string, List<string>> KMSComponentDict { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<int, List<int>> FifthJobSkillToJobID { get; set; } = new Dictionary<int, List<int>>();
@@ -57,6 +58,7 @@ namespace WzComparerR2.Comparer
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
         public bool EnableDarkMode { get; set; }
+        public bool OutputAchvTooltip { get; set; }
         public bool OutputCashTooltip { get; set; }
         public bool OutputGearTooltip { get; set; }
         public bool OutputItemTooltip { get; set; }
@@ -72,6 +74,7 @@ namespace WzComparerR2.Comparer
         public bool ShowLinkedTamingMob { get; set; }
         public bool SkipKMSContent { get; set; }
         public bool DownloadKMSContentDB { get; set; }
+        public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
         {
@@ -126,7 +129,7 @@ namespace WzComparerR2.Comparer
                 WzFileComparer comparer = new WzFileComparer();
                 comparer.IgnoreWzFile = true;
 
-                if (OutputCashTooltip || OutputGearTooltip || OutputItemTooltip || OutputMapTooltip || OutputMobTooltip || OutputNpcTooltip || OutputSkillTooltip || OutputQuestTooltip || SkipKMSContent)
+                if (OutputCashTooltip || OutputGearTooltip || OutputItemTooltip || OutputMapTooltip || OutputMobTooltip || OutputNpcTooltip || OutputSkillTooltip || OutputQuestTooltip || OutputAchvTooltip || SkipKMSContent)
                 {
                     this.WzNewOld[0] = fileNew.Node;
                     this.WzNewOld[1] = fileOld.Node;
@@ -301,6 +304,7 @@ namespace WzComparerR2.Comparer
                     sw.WriteLine("<tr><th>Filename</th><th>Size New Version</th><th>Size Old Version</th><th>Modified</th><th>Added</th><th>Removed</th></tr>");
                     foreach (var wzType in wzTypeList)
                     {
+                        if (!selectedNodes[wzType.ToString()]) continue;
                         var vNodeNew = dictNew[wzType];
                         var vNodeOld = dictOld[wzType];
                         var cmp = comparer.Compare(vNodeNew, vNodeOld);
@@ -363,6 +367,7 @@ namespace WzComparerR2.Comparer
 
             foreach (var wzType in wzTypeList)
             {
+                if (!selectedNodes[wzType.ToString()]) continue;
                 var vNodeNew = dictNew[wzType];
                 var vNodeOld = dictOld[wzType];
                 var cmp = comparer.Compare(vNodeNew, vNodeOld);
@@ -515,13 +520,14 @@ namespace WzComparerR2.Comparer
             {
                 Directory.CreateDirectory(srcDirPath);
             }
-            string skillTooltipPath = Path.Combine(outputDir, "Skill Tooltip");
-            string itemTooltipPath = Path.Combine(outputDir, "Item Tooltip");
-            string gearTooltipPath = Path.Combine(outputDir, "Gear Tooltip");
-            string mapTooltipPath = Path.Combine(outputDir, "Map Tooltip");
-            string mobTooltipPath = Path.Combine(outputDir, "Mob Tooltip");
-            string npcTooltipPath = Path.Combine(outputDir, "Npc Tooltip");
-            string questTooltipPath = Path.Combine(outputDir, "Quest Tooltip");
+            string skillTooltipPath = Path.Combine(outputDir, "Skill Tooltips");
+            string itemTooltipPath = Path.Combine(outputDir, "Item Tooltips");
+            string gearTooltipPath = Path.Combine(outputDir, "Gear Tooltips");
+            string mapTooltipPath = Path.Combine(outputDir, "Map Tooltips");
+            string mobTooltipPath = Path.Combine(outputDir, "Mob Tooltips");
+            string npcTooltipPath = Path.Combine(outputDir, "Npc Tooltips");
+            string questTooltipPath = Path.Combine(outputDir, "Quest Tooltips");
+            string achvTooltipPath = Path.Combine(outputDir, "Achievement Tooltips");
 
             FileStream htmlFile = null;
             StreamWriter sw = null;
@@ -807,7 +813,6 @@ namespace WzComparerR2.Comparer
         private void SaveSkillTooltip(string skillTooltipPath)
         {
             SkillTooltipRender2[] skillRenderNewOld = new SkillTooltipRender2[2];
-            bool[] isSkillNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputSkillTooltipIDs.Count;
             var skillTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -835,6 +840,8 @@ namespace WzComparerR2.Comparer
             {
                 StateInfo = string.Format("{0}/{1} Skill: {2}", ++count, allCount, skillID);
                 StateDetail = "Outputting skill changes as tooltip images...";
+
+                bool[] isSkillNull = new bool[2] { false, false };
 
                 if (SkipKMSContent && isKMSSkillID(Int32.Parse(skillID))) continue;
 
@@ -936,7 +943,6 @@ namespace WzComparerR2.Comparer
                     continue;
                 }
 
-
                 var skillTypeTextInfo = g.MeasureString(skillType, GearGraphics.ItemDetailFont);
                 int picH = 0;
                 if (ShowChangeType && nullSkillIdx != 0) GearGraphics.DrawPlainText(g, skillType, skillTypeFont, Color.FromArgb(255, 255, 255), 80, 130, ref picH, 10);
@@ -1003,7 +1009,6 @@ namespace WzComparerR2.Comparer
         private void SaveItemTooltip(string itemTooltipPath)
         {
             ItemTooltipRender2[] itemRenderNewOld = new ItemTooltipRender2[2];
-            bool[] isItemNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputItemTooltipIDs.Count;
             var itemTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1028,6 +1033,7 @@ namespace WzComparerR2.Comparer
             {
                 StateInfo = string.Format("{0}/{1} Item: {2}", ++count, allCount, itemID);
                 StateDetail = "Outputting item changes as tooltip images...";
+                bool[] isItemNull = new bool[2] { false, false };
                 string itemType = "";
                 string itemNodePath = null;
                 string categoryPath = "";
@@ -1187,7 +1193,6 @@ namespace WzComparerR2.Comparer
         private void SaveGearTooltip(string gearTooltipPath)
         {
             GearTooltipRender2[] gearRenderNewOld = new GearTooltipRender2[2];
-            bool[] isGearNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputGearTooltipIDs.Count;
             var gearTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1209,6 +1214,7 @@ namespace WzComparerR2.Comparer
             {
                 StateInfo = string.Format("{0}/{1} Gear: {2}", ++count, allCount, gearID);
                 StateDetail = "Outputting gear changes as tooltip images...";
+                bool[] isGearNull = new bool[2] { false, false };
                 string gearType = "";
                 string gearNodePath = null;
                 string categoryPath = "";
@@ -1455,7 +1461,6 @@ namespace WzComparerR2.Comparer
         private void SaveMapTooltip(string mapTooltipPath)
         {
             MapTooltipRenderer[] mapRenderNewOld = new MapTooltipRenderer[2];
-            bool[] isMapNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputMapTooltipIDs.Count;
             var mapTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1484,6 +1489,7 @@ namespace WzComparerR2.Comparer
                 if (!int.TryParse(mapID, out _)) continue;
                 StateInfo = string.Format("{0}/{1} Map: {2}", ++count, allCount, mapID);
                 StateDetail = "Outputting Map changes as tooltip images..";
+                bool[] isMapNull = new bool[2] { false, false };
                 string mapType = "";
                 string mapNodePath = String.Format(@"Map\Map\Map{0}\{1:D}.img", int.Parse(mapID) / 100000000, mapID);
 
@@ -1601,7 +1607,6 @@ namespace WzComparerR2.Comparer
         private void SaveMobTooltip(string mobTooltipPath)
         {
             MobTooltipRenderer[] mobRenderNewOld = new MobTooltipRenderer[2];
-            bool[] isMobNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputMobTooltipIDs.Count;
             var mobTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1623,6 +1628,7 @@ namespace WzComparerR2.Comparer
             {
                 StateInfo = string.Format("{0}/{1} Mob: {2}", ++count, allCount, mobID);
                 StateDetail = "Outputting mob changes as tooltip images...";
+                bool[] isMobNull = new bool[2] { false, false };
                 string mobType = "";
                 string mobNodePath = String.Format(@"Mob\{0:D}.img", mobID);
 
@@ -1740,7 +1746,6 @@ namespace WzComparerR2.Comparer
         private void SaveNpcTooltip(string npcTooltipPath)
         {
             NpcTooltipRenderer[] npcRenderNewOld = new NpcTooltipRenderer[2];
-            bool[] isNpcNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputNpcTooltipIDs.Count;
             var npcTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1762,6 +1767,7 @@ namespace WzComparerR2.Comparer
             {
                 StateInfo = string.Format("{0}/{1} NPC: {2}", ++count, allCount, npcID);
                 StateDetail = "Outputting NPC changes as tooltip images...";
+                bool[] isNpcNull = new bool[2] { false, false };
                 string npcType = "";
                 string npcNodePath = String.Format(@"Npc\{0:D}.img", npcID);
 
@@ -1879,7 +1885,6 @@ namespace WzComparerR2.Comparer
         private void SaveCashTooltip(string itemTooltipPath)
         {
             CashPackageTooltipRender[] cashRenderNewOld = new CashPackageTooltipRender[2];
-            bool[] isCashNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputCashTooltipIDs.Count;
             var itemTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -1901,6 +1906,7 @@ namespace WzComparerR2.Comparer
             {
                 StateInfo = string.Format("{0}/{1} Package: {2}", ++count, allCount, itemID);
                 StateDetail = "Outputting Cash Package changes as tooltip images...";
+                bool[] isCashNull = new bool[2] { false, false };
                 string itemType = "";
                 string itemNodePath = null;
 
@@ -2023,7 +2029,6 @@ namespace WzComparerR2.Comparer
         private void SaveQuestTooltip(string questTooltipPath)
         {
             QuestTooltipRenderer[] questRenderNewOld = new QuestTooltipRenderer[2];
-            bool[] isQuestNull = new bool[2] { false, false };
             int count = 0;
             int allCount = OutputQuestTooltipIDs.Count;
             var questTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
@@ -2048,6 +2053,7 @@ namespace WzComparerR2.Comparer
                 if (!int.TryParse(questID, out _)) continue;
                 StateInfo = string.Format("{0}/{1} Quest: {2}", ++count, allCount, questID);
                 StateDetail = "Outputting Quest changes as tooltip images...";
+                bool[] isQuestNull = new bool[2] { false, false };
                 string questType = "";
                 string questNodePath = String.Format(@"Quest\QuestData\{0:D}.img", questID);
                 string questNodePathLegacy = String.Format(@"Quest\QuestInfo.img\{0:D}", questID);

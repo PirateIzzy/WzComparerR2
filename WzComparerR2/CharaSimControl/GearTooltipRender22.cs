@@ -1247,8 +1247,9 @@ namespace WzComparerR2.CharaSimControl
             int enhance_potential = 0;
             int enhance_addiPotential = 0;
             int tuc = 0;
+            bool enhanceable = Gear.GetBooleanValue(GearPropType.setExtraOption);
             Gear.Props.TryGetValue(GearPropType.tuc, out tuc);
-            if (!Gear.Cash && Gear.IsEnhanceable(Gear.type))
+            if (!Gear.Cash && Gear.IsEnhanceable(Gear.type) || enhanceable)
             {
                 hasThirdContents = true;
 
@@ -1281,7 +1282,7 @@ namespace WzComparerR2.CharaSimControl
                     enhance_starForce = 0;
                 }
 
-                if (Gear.CanEnhanceBonusStat(Gear.type) && !Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption))
+                if ((Gear.CanEnhanceBonusStat(Gear.type) && !Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption)) || Gear.GetBooleanValue(GearPropType.setExtraOption))
                 {
                     enhance_bonusStat = 1;
                 }
@@ -1843,6 +1844,12 @@ namespace WzComparerR2.CharaSimControl
             if ((Gear.ItemID / 10000 >= 161 && Gear.ItemID / 10000 <= 165) || (Gear.ItemID / 10000 >= 194 && Gear.ItemID / 10000 <= 197))
             {
                 tags.Add("#$rCannot use Fusion Anvil#");
+            }
+
+            // 재발급 불가
+            if (Gear.Props.TryGetValue(GearPropType.reissueBan, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.reissueBan, value, 0)[0]);
             }
 
             // 중복 소지/장착

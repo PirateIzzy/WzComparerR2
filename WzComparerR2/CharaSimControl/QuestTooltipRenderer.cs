@@ -202,12 +202,12 @@ namespace WzComparerR2.CharaSimControl
 
                 if (!string.IsNullOrEmpty(this.Quest.DemandBase))
                 {
-                    target1.Add(RegexTrimNewLinesAtEnd.Replace(this.Quest.DemandBase, ""));
+                    target1.Add(RegexTrimNewLinesAtEnd.Replace(this.Quest.DemandBase, "").Replace("\\r\\n", "\n\n"));
                     targetNpcPrefix = "> ";
                 }
                 else if (!string.IsNullOrEmpty(this.Quest.DemandSummary))
                 {
-                    target1.Add(RegexTrimNewLinesAtEnd.Replace(this.Quest.DemandSummary, ""));
+                    target1.Add(RegexTrimNewLinesAtEnd.Replace(this.Quest.DemandSummary, "").Replace("\\r\\n", "\n\n"));
                     targetNpcPrefix = "> ";
                 }
                 if (this.Quest.Check1NpcID > 0) target1.Add($@"Go to {targetNpcPrefix}#$p{GetNpcName(this.Quest.Check1NpcID)}#");
@@ -226,7 +226,7 @@ namespace WzComparerR2.CharaSimControl
 
                     var targetText = string.Join(@"\n\n", targetr);
                     var replaced = ReplaceQuestString(targetText);
-                    GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                    GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                     ClearImageTable();
 
                     picH += 11;
@@ -248,20 +248,20 @@ namespace WzComparerR2.CharaSimControl
                 {
                     case 1:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
-                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
-                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     case 2:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
-                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
-                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     case 3:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
-                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     default:
-                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 293, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                 }
                 ClearImageTable();
@@ -494,7 +494,7 @@ namespace WzComparerR2.CharaSimControl
                             var rect = new Rectangle(x, y - rectH + this.Margin_top, rectW, rectH);
                             if (this.ShowAllStates)
                                 rect.Offset(322 * this.Quest.State, 0);
-                            this.RewardRectnItems.Add(new Tuple<Rectangle, object>(rect, GetItemBase(item.ID, node)));
+                            this.RewardRectnItems.Add(new Tuple<Rectangle, object>(new Rectangle(x, y - rectH + this.Margin_top, rectW, rectH), GetItemBase(item.ID, node)));
                         }
                         bmp.Bitmap.Dispose();
                         if (item.ID >= 2000000)

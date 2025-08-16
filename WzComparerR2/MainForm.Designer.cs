@@ -109,6 +109,9 @@
             this.comboItem8 = new DevComponents.Editors.ComboItem();
             this.comboItem9 = new DevComponents.Editors.ComboItem();
             this.comboItem19 = new DevComponents.Editors.ComboItem();
+            this.comboItem20 = new DevComponents.Editors.ComboItem();
+            this.comboItemSearchQuest = new DevComponents.Editors.ComboItem();
+            this.comboItemSearchAchievement = new DevComponents.Editors.ComboItem();
             this.itemContainer12 = new DevComponents.DotNetBar.ItemContainer();
             this.checkBoxItemRegex2 = new DevComponents.DotNetBar.CheckBoxItem();
             this.buttonItemSearchString = new DevComponents.DotNetBar.ButtonItem();
@@ -173,8 +176,8 @@
             this.buttonItemGif = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemGif2 = new DevComponents.DotNetBar.ButtonItem();
             this.itemContainer36 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.itemContainer44 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
             this.buttonDisableOverlayAni = new DevComponents.DotNetBar.ButtonItem();
             this.buttonHitboxOverlay = new DevComponents.DotNetBar.ButtonItem();
@@ -213,7 +216,6 @@
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputCashTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputEqpTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputItemTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -221,6 +223,7 @@
             this.chkOutputMobTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputNpcTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputQuestTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputAchvTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputSkillTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowChangeType = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -284,9 +287,9 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
-            this.comboItem20 = new DevComponents.Editors.ComboItem();
             this.comboItem22 = new DevComponents.Editors.ComboItem();
-            this.comboItemSearchQuest = new DevComponents.Editors.ComboItem();
+            this.btnRootNode = new DevComponents.DotNetBar.ButtonX();
+            this.clbRootNode = new System.Windows.Forms.CheckedListBox();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
@@ -1183,7 +1186,7 @@
             // comboBoxItem2
             // 
             this.comboBoxItem2.ComboWidth = 85;
-            this.comboBoxItem2.DropDownHeight = 144;
+            this.comboBoxItem2.DropDownHeight = 160;
             this.comboBoxItem2.ItemHeight = 16;
             this.comboBoxItem2.Items.AddRange(new object[] {
             this.comboItem3,
@@ -1194,7 +1197,8 @@
             this.comboItem8,
             this.comboItemSearchQuest,
             this.comboItem9,
-            this.comboItem19});
+            this.comboItem19,
+            this.comboItemSearchAchievement});
             this.comboBoxItem2.Name = "comboBoxItem2";
             this.comboBoxItem2.SelectedIndex = 0;
             // 
@@ -1233,6 +1237,10 @@
             // comboItem19
             // 
             this.comboItem19.Text = "Set Item";
+            // 
+            // comboItemSearchAchievement
+            // 
+            this.comboItemSearchAchievement.Text = "Achievement";
             // 
             // itemContainer12
             // 
@@ -2499,6 +2507,7 @@
             this.superTabControlPanel2.Controls.Add(this.chkOutputMobTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputNpcTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputQuestTooltip);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputAchvTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputSkillTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkShowObjectID);
             this.superTabControlPanel2.Controls.Add(this.chkShowChangeType);
@@ -2513,6 +2522,8 @@
             this.superTabControlPanel2.Controls.Add(this.labelXComp2);
             this.superTabControlPanel2.Controls.Add(this.labelXComp1);
             this.superTabControlPanel2.Controls.Add(this.btnEasyCompare);
+            this.superTabControlPanel2.Controls.Add(this.btnRootNode);
+            this.superTabControlPanel2.Controls.Add(this.clbRootNode);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel2.Location = new System.Drawing.Point(0, 0);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
@@ -2654,17 +2665,31 @@
             this.chkOutputQuestTooltip.TabIndex = 18;
             this.chkOutputQuestTooltip.Text = "Save Quest Tooltip";
             // 
-            // chkShowObjectID            
+            // chkOutputAchvTooltip
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputAchvTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputAchvTooltip.Location = new System.Drawing.Point(550, 250);
+            this.chkOutputAchvTooltip.Name = "chkOutputAchvTooltip";
+            this.chkOutputAchvTooltip.Size = new System.Drawing.Size(200, 23);
+            this.chkOutputAchvTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkOutputAchvTooltip, new DevComponents.DotNetBar.SuperTooltipInfo("Save Achievement Tooltip", "", "Outputs changed achievements。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 80)));
+            this.chkOutputAchvTooltip.TabIndex = 19;
+            this.chkOutputAchvTooltip.Text = "Save Achievement Tooltip";
+            // 
+            // chkShowObjectID
             // 
             // 
             // 
             // 
             this.chkShowObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowObjectID.Location = new System.Drawing.Point(550, 250);
+            this.chkShowObjectID.Location = new System.Drawing.Point(550, 277);
             this.chkShowObjectID.Name = "chkShowObjectID";
             this.chkShowObjectID.Size = new System.Drawing.Size(185, 23);
             this.chkShowObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkShowObjectID.TabIndex = 19;
+            this.chkShowObjectID.TabIndex = 20;
             this.chkShowObjectID.Text = "Show ID in Saved Tooltip";
             this.chkShowObjectID.Checked = true;
             // 
@@ -2674,12 +2699,12 @@
             // 
             // 
             this.chkShowChangeType.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowChangeType.Location = new System.Drawing.Point(550, 277);
+            this.chkShowChangeType.Location = new System.Drawing.Point(550, 304);
             this.chkShowChangeType.Name = "chkShowChangeType";
             this.chkShowChangeType.Size = new System.Drawing.Size(135, 23);
             this.chkShowChangeType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.superTooltip1.SetSuperTooltip(this.chkShowChangeType, new DevComponents.DotNetBar.SuperTooltipInfo("Show Change Type", "", "Displays the change type in the tooltip output.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
-            this.chkShowChangeType.TabIndex = 19;
+            this.chkShowChangeType.TabIndex = 21;
             this.chkShowChangeType.Text = "Show Change Type";
             this.chkShowChangeType.Checked = true;
             // 
@@ -2694,7 +2719,7 @@
             this.chkShowLinkedTamingMob.Size = new System.Drawing.Size(185, 23);
             this.chkShowLinkedTamingMob.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.superTooltip1.SetSuperTooltip(this.chkShowLinkedTamingMob, new DevComponents.DotNetBar.SuperTooltipInfo("Show Linked Taming Mob", "", "Displays associated Mounts in item tooltips.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
-            this.chkShowLinkedTamingMob.TabIndex = 22;
+            this.chkShowLinkedTamingMob.TabIndex = 23;
             this.chkShowLinkedTamingMob.Text = "Show Linked Taming Mob";
             this.chkShowLinkedTamingMob.Checked = false;
             // 
@@ -2709,7 +2734,7 @@
             this.chkSkipKMSContent.Size = new System.Drawing.Size(185, 23);
             this.chkSkipKMSContent.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.superTooltip1.SetSuperTooltip(this.chkSkipKMSContent, new DevComponents.DotNetBar.SuperTooltipInfo("Skip KMS Contents", "", "Do not compare contents that exist in KMS.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
-            this.chkSkipKMSContent.TabIndex = 23;
+            this.chkSkipKMSContent.TabIndex = 24;
             this.chkSkipKMSContent.Text = "Skip KMS Contents";
             this.chkSkipKMSContent.Checked = false;
             // 
@@ -3317,6 +3342,26 @@
             this.superTooltip1.SetSuperTooltip(this.chkHashPngFileName, new DevComponents.DotNetBar.SuperTooltipInfo("Hash PNG Names", "", "Outputs PNG file names as MD5 hashes.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
             this.chkHashPngFileName.TabIndex = 9;
             this.chkHashPngFileName.Text = "Hash PNG Names";
+            // 
+            // btnRootNode
+            // 
+            this.btnRootNode.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnRootNode.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnRootNode.Location = new System.Drawing.Point(105, 3);
+            this.btnRootNode.Name = "btnRootNode";
+            this.btnRootNode.Size = new System.Drawing.Size(100, 30);
+            this.btnRootNode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnRootNode.TabIndex = 25;
+            this.btnRootNode.Text = "Root Node▼";
+            this.btnRootNode.Click += new System.EventHandler(this.btnRootNode_Click);
+            //
+            // clbRootNode
+            //
+            this.clbRootNode.CheckOnClick = true;
+            this.clbRootNode.Location = new System.Drawing.Point(btnRootNode.Location.X, btnRootNode.Location.Y + btnRootNode.Size.Height);
+            this.clbRootNode.Size = new System.Drawing.Size(100, 250);
+            this.clbRootNode.Visible = false;
+            this.clbRootNode.BringToFront();
             //
             // 
             // toolStripMenuItem7
@@ -3374,7 +3419,6 @@
             this.bar1.ResumeLayout(false);
             this.panelDockContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
 
         #endregion
@@ -3621,6 +3665,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputMobTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputNpcTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputQuestTooltip;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputAchvTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputSkillTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowObjectID;
@@ -3634,7 +3679,10 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
         private DevComponents.Editors.ComboItem comboItemSearchQuest;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
+        private DevComponents.Editors.ComboItem comboItemSearchAchievement;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CopyFullPath;
         private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
+        private DevComponents.DotNetBar.ButtonX btnRootNode;
+        private System.Windows.Forms.CheckedListBox clbRootNode;
     }
 }
