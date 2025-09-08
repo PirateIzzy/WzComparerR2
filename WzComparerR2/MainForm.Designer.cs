@@ -233,6 +233,7 @@
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
+            this.labelX2 = new DevComponents.DotNetBar.LabelX();
             this.chkOutputPng = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbComparePng = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelXComp2 = new DevComponents.DotNetBar.LabelX();
@@ -2862,6 +2863,7 @@
             // 
             this.superTabControlPanel3.Controls.Add(this.btnExportSkillOption);
             this.superTabControlPanel3.Controls.Add(this.btnExportSkill);
+            this.superTabControlPanel3.Controls.Add(this.labelX2);
             this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel3.Location = new System.Drawing.Point(0, 0);
             this.superTabControlPanel3.Name = "superTabControlPanel3";
@@ -2892,6 +2894,19 @@
             this.btnExportSkill.TabIndex = 0;
             this.btnExportSkill.Text = "Export Skill";
             this.btnExportSkill.Click += new System.EventHandler(this.btnExportSkill_Click);
+            // 
+            // labelX2
+            // 
+            this.labelX2.AutoSize = true;
+            // 
+            // 
+            // 
+            this.labelX2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX2.Location = new System.Drawing.Point(24, 39);
+            this.labelX2.Name = "labelX2";
+            this.labelX2.Size = new System.Drawing.Size(44, 16);
+            this.labelX2.TabIndex = 2;
+            this.labelX2.Text = "After you click the \"Export Skill\" button and decide where to save it,\r\nthe program will automatically generate a cache of skill names to ensure accurate translation by the translation feature.\r\nThe generation process will automatically determine the client's language.\r\n\r\nWhen you enable the translation feature, the program will check the official name of the skill in the desired language.\r\nIt will use official name if applicable, otherwise it will be translated based on the original language.";
             // 
             // superTabItem3
             // 
@@ -3619,6 +3634,7 @@
         private DevComponents.DotNetBar.ButtonX btnExportSkillOption;
         private DevComponents.DotNetBar.ButtonX btnExportSkill;
         private DevComponents.DotNetBar.LabelX labelX1;
+        private DevComponents.DotNetBar.LabelX labelX2;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputPng;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbComparePng;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputRemovedImg;
