@@ -174,7 +174,7 @@ namespace WzComparerR2.CharaSimControl
             string translatedSkillName = "";
             if (isTranslateRequired)
             {
-                translatedSkillName = Translator.TranslateString(sr.Name, true);
+                translatedSkillName = Translator.TryCheckStringIndex(Skill.SkillID, "ms_skill", out string t) ? t : Translator.TranslateString(sr.Name, true);
                 SizeF titleSize;
                 titleSize = TextRenderer.MeasureText(g, translatedSkillName + " (" + sr.Name + ")", GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
                 if (titleSize.Width > (int)(0.96 * region.Width))
