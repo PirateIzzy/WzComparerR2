@@ -66,7 +66,7 @@ namespace WzComparerR2.CharaSimControl
 
             int patternCnt = (this.Achievement.ShowMissions ? (this.Achievement.Missions.Count + 1) / 2 : 0);
             var categoryList = new List<string>() { this.Achievement.MainCategory, this.Achievement.SubCategory };
-            var category = string.Join(" / ", categoryList.Where(t => !string.IsNullOrEmpty(t)));
+            var category = string.Join("/", categoryList.Where(t => !string.IsNullOrEmpty(t)));
             if (!string.IsNullOrEmpty(category)) patternCnt++;
             if (this.Achievement.PriorIDs.Count > 0) patternCnt++;
             if (this.Achievement.Hide) patternCnt++;
@@ -89,7 +89,7 @@ namespace WzComparerR2.CharaSimControl
                 sr.Name = "(null)";
             }
             var name = sr.Name;
-            TextRenderer.DrawText(g, sr.Name, Translator.IsKoreanStringPresent(sr.Name) ? GearGraphics.KMSAchievementTitleFont : GearGraphics.AchievementTitleFont, new Point(84, 12), Color.White, TextFormatFlags.NoPadding);
+            TextRenderer.DrawText(g, sr.Name,  GearGraphics.AchievementTitleFont, new Point(84, 12), Color.White, TextFormatFlags.NoPadding);
 
             // 등급
             var gradePath = $"UIAchievement_img_achievement_pages_normalCategory_achievementForm_basic_difficultyIcon_{this.Achievement.Difficulty}";
@@ -117,12 +117,12 @@ namespace WzComparerR2.CharaSimControl
                 && DateTime.TryParseExact(this.Achievement.End, timeParseFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var end))
             {
                 var time = $"{start.ToString(timeConvertFormat)} ~ {end.ToString(timeConvertFormat)}";
-                GearGraphics.DrawString(g, time, GearGraphics.EquipMDMoris9Font, null, 84, 550, ref picHD, 15, defaultColor: ((SolidBrush)GearGraphics.AchievementPeriodBrush).Color);
+                GearGraphics.DrawString(g, time, GearGraphics.ItemDetailFont, null, 84, 550, ref picHD, 15, defaultColor: ((SolidBrush)GearGraphics.AchievementPeriodBrush).Color);
             }
             var desc = sr.Desc;
             if (!string.IsNullOrEmpty(desc))
             {
-                GearGraphics.DrawString(g, desc, GearGraphics.EquipDetailFont2, null, 84, 550, ref picHD, 15, defaultColor: GearGraphics.GrayColor2);
+                GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont, null, 84, 550, ref picHD, 15, defaultColor: GearGraphics.GrayColor2);
             }
 
             /************/
@@ -158,7 +158,7 @@ namespace WzComparerR2.CharaSimControl
             if (!string.IsNullOrEmpty(category))
             {
                 g.DrawImage(checkIncomplete, 16, picH);
-                GearGraphics.DrawString(g, $"Category: {category}", GearGraphics.EquipDetailFont2, null, 32, 550, ref picH, bg_pattern.Height, defaultColor: GearGraphics.GrayColor2);
+                GearGraphics.DrawString(g, $"Achievement Category: {category}", GearGraphics.EquipDetailFont2, null, 32, 550, ref picH, bg_pattern.Height, defaultColor: ((SolidBrush)GearGraphics.WhiteBrush).Color);
             }
 
             // 선행 업적
@@ -172,15 +172,15 @@ namespace WzComparerR2.CharaSimControl
                         sr = new StringResult();
                         sr.Name = "null";
                     }
-                    return $"{sr.Name}({id:D5})";
-                }))}", 520), GearGraphics.EquipDetailFont2, null, 32, 550, ref picH, bg_pattern.Height, defaultColor: GearGraphics.GrayColor2);
+                    return $"{sr.Name} ({id:D5})";
+                }))}", 520), GearGraphics.EquipDetailFont2, null, 32, 550, ref picH, bg_pattern.Height, defaultColor: ((SolidBrush)GearGraphics.WhiteBrush).Color);
             }
 
             // hide
             if (this.Achievement.Hide)
             {
                 g.DrawImage(checkIncomplete, 16, picH);
-                GearGraphics.DrawString(g, "Not displayed in the Achievement UI", GearGraphics.EquipDetailFont2, null, 32, 550, ref picH, bg_pattern.Height, defaultColor: GearGraphics.GrayColor2);
+                GearGraphics.DrawString(g, "Not displayed in the Achievement UI", GearGraphics.EquipDetailFont2, null, 32, 550, ref picH, bg_pattern.Height, defaultColor: ((SolidBrush)GearGraphics.WhiteBrush).Color);
             }
 
             /************/

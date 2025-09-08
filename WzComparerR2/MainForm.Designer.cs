@@ -2171,8 +2171,8 @@
             // buttonItemExtractGifEx
             //
             this.buttonOverlayExtractGifEx.Name = "buttonOverlayExtractGifEx";
-            this.buttonOverlayExtractGifEx.Text = "Add Nest";
-            this.buttonOverlayExtractGifEx.Tooltip = "Nest by calling the animation on all child nodes instead of sequentially starting from 0.";
+            this.buttonOverlayExtractGifEx.Text = "Add Overlay";
+            this.buttonOverlayExtractGifEx.Tooltip = "Add overlay by calling the animation on all child nodes instead of sequentially starting from 0.";
             this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
             // 
             // buttonLoadMultiFrameAniList
@@ -2182,12 +2182,6 @@
             this.buttonLoadMultiFrameAniList.Tooltip = "Calls a list of found frames. You can select any of the loaded lists to nest them.";
             this.buttonLoadMultiFrameAniList.Click += new System.EventHandler(this.buttonLoadMultiFrameAniList_Click);
             // 
-            // buttonItemExtractGifEx
-            //
-            this.buttonOverlayExtractGifEx.Name = "buttonOverlayExtractGifEx";
-            this.buttonOverlayExtractGifEx.Text = "Nesting+";
-            this.buttonOverlayExtractGifEx.Tooltip = "Load animations for all child nodes of the selected node and nest them, without using ordinal node names.";
-            this.buttonOverlayExtractGifEx.Click += new System.EventHandler(this.buttonItemGif2_Click);
             // colorPickerPicBoxBgColor
             // 
             this.colorPickerPicBoxBgColor.AutoExpandOnClick = true;

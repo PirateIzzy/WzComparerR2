@@ -2435,11 +2435,11 @@ namespace WzComparerR2
 
                 advTree.SelectedNode = searchNode;
                 if (searchNode == null)
-                    MessageBoxEx.Show("검색 결과가 없습니다.", "오류");
+                    MessageBoxEx.Show("No results found.", "Error");
             }
             catch (Exception ex)
             {
-                MessageBoxEx.Show(this, ex.Message, "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxEx.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -3130,7 +3130,7 @@ namespace WzComparerR2
             else if (item is Wz_Png png)
             {
                 SaveFileDialog dlg = new SaveFileDialog();
-                dlg.Title = "원본 데이터 저장";
+                dlg.Title = "Save Original Data";
                 dlg.FileName = advTree3.SelectedNode.Text + ".bin";
                 dlg.Filter = "All Files (*.*)|*.*";
                 if (dlg.ShowDialog() == DialogResult.OK)
@@ -3142,11 +3142,11 @@ namespace WzComparerR2
                         {
                             dataReader.CopyTo(outputFile);
                         }
-                        this.labelItemStatus.Text = "파일 저장 완료";
+                        this.labelItemStatus.Text = "Saved";
                     }
                     catch (Exception ex)
                     {
-                        MessageBoxEx.Show("파일 저장 실패\r\n" + ex.ToString(), "오류");
+                        MessageBoxEx.Show("Failed to save\r\n" + ex.ToString(), "Error");
                     }
                 }
             }
@@ -3414,9 +3414,14 @@ namespace WzComparerR2
             string fileName = null;
 
             StringResult sr = new StringResult();
+            string altAutoDesc = null;
             switch (wzf.Type)
             {
                 case Wz_Type.Character:
+                    if (!selectedNode.FullPathToFile.Contains(".img")) return;
+                    string[] characterNodePath = selectedNode.FullPathToFile.Split('\\');
+                    string characterImgStr = characterNodePath.LastOrDefault(part => part.EndsWith(".img")).Replace(".img", String.Empty);
+                    if (!Int64.TryParse(characterImgStr, out _)) return; // Ignore Non-numeral img to prevent Auto Preview crash
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
                     CharaSimLoader.LoadSetItemsIfEmpty();
@@ -3627,11 +3632,17 @@ namespace WzComparerR2
                         if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                             return;
                         Achievement achievement = Achievement.CreateFromNode(image.Node, PluginManager.FindWz, PluginManager.FindWz);
-
+                        if (stringLinker == null || !stringLinker.StringAchievement.TryGetValue(achievement.ID, out sr))
+                        {
+                            sr = new StringResult();
+                            sr.Name = "Unknown Achievement";
+                        }
                         obj = achievement;
                         if (achievement != null)
                         {
-                            fileName = achievement.ID + ".png";
+                            fileName = "achievement_" + achievement.ID + "_" + sr.Name + ".png";
+                            altAutoDesc = string.Join("\r\n", achievement.Missions);
+                            tooltipQuickView.NodeID = achievement.ID;
                         }
                     }
                     break;
@@ -3660,7 +3671,7 @@ namespace WzComparerR2
                     tooltipQuickView.NodeName = sr.Name;
                     tooltipQuickView.Desc = sr.Desc;
                     tooltipQuickView.Pdesc = sr.Pdesc;
-                    tooltipQuickView.AutoDesc = sr.AutoDesc;
+                    tooltipQuickView.AutoDesc = altAutoDesc ?? sr.AutoDesc;
                     tooltipQuickView.Hdesc = sr["h"];
                     tooltipQuickView.DescLeftAlign = sr["desc_leftalign"];
                 }
@@ -4163,9 +4174,9 @@ namespace WzComparerR2
                         chkShowLinkedTamingMob.Enabled = true;
                         chkHashPngFileName.Enabled = true;
                         chkSkipKMSContent.Enabled = true;
-                        if (comparer.FailToExportNodes.Count > 0)
+                        if (comparer.FailToExportNodes.Count > 0 || comparer.FailToExportTooltips.Count > 0)
                         {
-                            string failData = Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportNodes, Newtonsoft.Json.Formatting.Indented);
+                            string failData = Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportNodes, Newtonsoft.Json.Formatting.Indented) + "\r\n" + Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportTooltips, Newtonsoft.Json.Formatting.Indented); File.WriteAllText(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"), failData, Encoding.UTF8);
                             File.WriteAllText(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"), failData, Encoding.UTF8);
                             MessageBoxEx.Show(this, "The comparison is complete, but some nodes cannot be parsed.\r\nClick OK to see which nodes cannot be exported. ", "WzCompare", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 #if NET6_0_OR_GREATER

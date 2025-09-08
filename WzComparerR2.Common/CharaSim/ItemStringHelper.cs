@@ -1086,7 +1086,7 @@ namespace WzComparerR2.CharaSim
                 case 123: return "Paladin(5)";
                 case 124: return "Paladin(6)";
                 case 130: return "Spearman";
-                case 131: return "Dragon Knight";
+                case 131: return "Berserker";
                 case 132: return "Dark Knight";
                 case 133: return "Dark Knight(5)";
                 case 134: return "Dark Knight(6)";

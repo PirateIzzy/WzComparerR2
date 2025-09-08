@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -225,8 +226,9 @@ namespace WzComparerR2.CharaSimControl
                     picH += 35;
 
                     var targetText = string.Join(@"\n\n", targetr);
+                    bool hasIllu = targetText.Contains("#illu");
                     var replaced = ReplaceQuestString(targetText);
-                    GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                    GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                     ClearImageTable();
 
                     picH += 11;
@@ -242,26 +244,27 @@ namespace WzComparerR2.CharaSimControl
             var desc = this.Quest.Desc[state];
             if (!string.IsNullOrEmpty(desc))
             {
+                bool hasIllu = desc.Contains("#illu");
                 var replaced = ReplaceQuestString(desc);
                 string tReplaced = "";
                 switch (Translator.DefaultPreferredLayout)
                 {
                     case 1:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
-                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
-                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     case 2:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
-                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
-                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     case 3:
                         tReplaced = Translator.TranslateString(replaced) + "\r\n\r\n";
-                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, tReplaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                     default:
-                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, 29, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
+                        GearGraphics.DrawString(g, replaced, GearGraphics.ItemDetailFont2, questColorTable, questFontTable, this.ImageTable, hasIllu ? (left - 18) : left, 272, ref picH, 18, alignment: Text.TextAlignment.Left, defaultColor: ((SolidBrush)GearGraphics.QuestBrushDefault).Color);
                         break;
                 }
                 ClearImageTable();
@@ -514,7 +517,7 @@ namespace WzComparerR2.CharaSimControl
 
         private string ReplaceQuestString(string text)
         {
-            text = Regex.Replace(text, @$"#(p|o|m|t|a{this.Quest.ID}|i|v|y)\s*(\d{{1,9}}).*?#", match => // id should be less than 1,000,000,000
+            text = Regex.Replace(text, @$"#(p|o|m|t|q|a{this.Quest.ID}|i|v|y)\s*(\d{{1,9}}).*?#", match => // id should be less than 1,000,000,000
             {
                 string tag = match.Groups[1].Value;
                 if (!int.TryParse(match.Groups[2].Value, out int id)) id = -1;
@@ -541,6 +544,10 @@ namespace WzComparerR2.CharaSimControl
                         }
                         return $"#$t{sr?.Name ?? id.ToString()}#";
 
+                    case "q":
+                        StringLinker.StringSkill.TryGetValue(id, out sr);
+                        return $"{sr?.Name ?? id.ToString()}";
+
                     case "i":
                     case "v":
                         StringLinker.StringItem.TryGetValue(id, out sr);
@@ -552,6 +559,16 @@ namespace WzComparerR2.CharaSimControl
                         var ret = $"#@{this.ImageTable.Count}/{Math.Max(32, bmp?.Width ?? 0)}/{Math.Max(32, bmp?.Height ?? 0)}@";
                         this.ImageTable.Add(this.ImageTable.Count.ToString(), bmp);
                         return ret;
+
+                    case "illu":
+                        var bmpIllu = GetIconByPath($@"Etc\illustration.img\{id}\0");
+                        if (bmpIllu != null)
+                        {
+                            var retIllu = $"#@{this.ImageTable.Count}/{bmpIllu?.Width ?? 0}/{bmpIllu?.Height ?? 0}@";
+                            this.ImageTable.Add(this.ImageTable.Count.ToString(), bmpIllu);
+                            return retIllu;
+                        }
+                        else return id.ToString();
 
                     case "y":
                         StringLinker.StringQuest.TryGetValue(id, out sr);
@@ -569,7 +586,7 @@ namespace WzComparerR2.CharaSimControl
                         return id.ToString();
                 }
             });
-            text = Regex.Replace(text, @"#(questorder|j|c|R|x|MD|M|u|fs|fn|f|a|W|o9101069f)(.+?)#", match =>
+            text = Regex.Replace(text, @"#(questorder|j|c|R|x|MD|M|u|fs|fn|fc|f|a|W|o9101069f|DL|h0)(.+?)#", match =>
             {
                 string tag = match.Groups[1].Value;
                 string info = match.Groups[2].Value;
@@ -596,6 +613,9 @@ namespace WzComparerR2.CharaSimControl
 
                     case "u":
                         return "Not Started";
+
+                    case "h0":
+                        return "Player";
 
                     case "o9101069f":
                         Wz_Node stringNodeMF = PluginManager.FindWz($@"String\MobFilter.img\{info}", this.SourceWzFile);
@@ -626,12 +646,16 @@ namespace WzComparerR2.CharaSimControl
                         this.ImageTable.Add(this.ImageTable.Count.ToString(), bmp);
                         return ret;
 
+                    case "fc":
                     case "fs":
                     case "fn":
                         return "";
 
                     case "a":
                         return $"#$^b#$w0# / 0#$$";
+
+                    case "DL":
+                        return ConvertDateWZ2(info);
                 }
                 return info;
             });
@@ -639,12 +663,76 @@ namespace WzComparerR2.CharaSimControl
             // 미사용 태그
             text = text.Replace("#b", ""); // Blue
             text = text.Replace("#k", ""); // Default
+            text = text.Replace("#kk", "");
+            text = text.Replace("#K", "");
             text = text.Replace("#r", ""); // Red
+            text = text.Replace("#g", "");
+            text = text.Replace("#l", "");
             text = text.Replace("#eqp#", "");
             text = text.Replace("#e", "");
+            text = text.Replace("#E", "");
             text = text.Replace("#n", " ");
 
             return text;
+        }
+
+        private string ConvertDateWZ2(string info)
+        {
+            var para = info.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            if (para.Length < 2)
+            {
+                return info;
+            }
+
+            var timeParseFormat = "yyyyMMddHHmm";
+            string timeConvertFormat = null;
+            Wz_Node datelistNode = PluginManager.FindWz($@"Etc\DateListWZ2.img", this.SourceWzFile);
+            Wz_Node datetimeNode = datelistNode?.FindNodeByPath($@"DateList\{para[0]}\{para[1]}") ?? null;
+            var datetime = datetimeNode.GetValueEx<string>(null);
+            if (datetime == null || !DateTime.TryParseExact(datetime, timeParseFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var time))
+            {
+                return info;
+            }
+
+            if (para.Length == 3)
+            {
+                var returnType = para[2];
+                Wz_Node returnTypeNode = datelistNode?.FindNodeByPath($@"returnType\{returnType}") ?? null;
+                timeConvertFormat = returnTypeNode.GetValueEx<string>(null);
+            }
+            if (string.IsNullOrEmpty(timeConvertFormat))
+            {
+                timeConvertFormat = "MM/DD/YYYY HH:mm UTC";
+            }
+
+            var datedict = new Dictionary<string, string>
+            {
+                { "YYYY", "yyyy" },
+                { "YY", "yy" },
+                { "MM", "MM" },
+                { "M", "M" },
+                { "DD", "dd" },
+                { "D", "d" },
+                { "hh", "HH" },
+                { "h", "H" },
+                { "mm", "mm" },
+                { "m", "m" },
+            };
+
+            timeConvertFormat = Regex.Replace(timeConvertFormat, @"\{(.*?)\}|([^{}]+)", match =>
+            {
+                if (match.Value.StartsWith("{") && match.Value.EndsWith("}"))
+                {
+                    string format = match.Groups[1].Value;
+                    return datedict.ContainsKey(format) ? datedict[format] : match.Value;
+                }
+                else
+                {
+                    return $@"'{match.Value}'";
+                }
+            });
+
+            return time.ToString(timeConvertFormat);
         }
 
         private Bitmap GetIconBitmap(int id, Wz_Node itemNode = null, bool raw = false)

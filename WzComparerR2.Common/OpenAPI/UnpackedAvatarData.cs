@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -290,10 +291,10 @@ namespace WzComparerR2.OpenAPI
             switch (this.JobWingTailTypeDetail)
             {
                 case 0:
-                    detail += "(귀)";
+                    detail += "(Ears)";
                     break;
                 case 1:
-                    detail += "(머리 장식)";
+                    detail += "(Horns)";
                     break;
                 case 2:
                     break;
@@ -309,6 +310,26 @@ namespace WzComparerR2.OpenAPI
                     return $"Len(♀,{detail})";
                 case 4:
                     return $"Len(♂,{detail})";
+                default:
+                    return null;
+            }
+        }
+
+        public byte GetEventJob()
+        {
+            return (byte)GetValue("eventJob");
+        }
+
+        public string GetEventJobString()
+        {
+            switch (this.EventJob)
+            {
+                case 1:
+                    return "?";
+                case 2:
+                    return "?";
+                case 3:
+                    return "Tanjiro Kamado";
                 default:
                     return null;
             }
@@ -352,6 +373,11 @@ namespace WzComparerR2.OpenAPI
         public string GetMixFaceColor()
         {
             return GetValue("mixFaceInfo").ToString().PadLeft(3, '0').Substring(0, 1);
+        }
+
+        public int GetShowEffectFlags()
+        {
+            return GetValue("showEffectFlags");
         }
 
         public PrismInfo GetPrismInfo(string type)
@@ -401,12 +427,15 @@ namespace WzComparerR2.OpenAPI
             EarType = GetEarType();
             JobWingTailType = GetJobWingTailType();
             JobWingTailTypeDetail = GetJobWingTailTypeDetail();
+            EventJob = GetEventJob();
             WeaponMotionType = GetWeaponMotionType();
 
             MixHairRatio = GetMixHairRatio();
             MixHairColor = GetMixHairColor();
             MixFaceRatio = GetMixFaceRatio();
             MixFaceColor = GetMixFaceColor();
+
+            ShowEffectFlags = GetShowEffectFlags();
 
             CapPrismInfo = GetPrismInfo("Cap");
             FaceAccPrismInfo = GetPrismInfo("FaceAcc");
@@ -446,12 +475,19 @@ namespace WzComparerR2.OpenAPI
         public byte JobWingTailType { get; set; }
         public byte JobWingTailTypeDetail { get; set; }
         public string JobWingTailTypeString { get { return this.GetJobWingTailTypeString(); } }
+        public byte EventJob { get; set; }
+        public string EventJobString { get { return this.GetEventJobString(); } }
         public byte WeaponMotionType { get; set; }
         public string WeaponMotionTypeString { get { return this.GetWeaponMotionTypeString(); } }
         public string MixHairRatio { get; set; }
         public string MixHairColor { get; set; }
         public string MixFaceRatio { get; set; }
         public string MixFaceColor { get; set; }
+        public int ShowEffectFlags { get; set; }
+        public bool ShowWeaponEffect { get { return (ShowEffectFlags & 1) != 0; } }
+        public bool ShowWeaponJumpEffect { get { return (ShowEffectFlags & (1 << 1)) != 0; } }
+        public bool ShowWeaponSpecialEffect { get { return (ShowEffectFlags & (1 << 2)) != 0; } }
+        public bool ShowCapeEffect { get { return (ShowEffectFlags & (1 << 3)) != 0; } }
         public PrismInfo CapPrismInfo { get; set; }
         public PrismInfo FaceAccPrismInfo { get; set; }
         public PrismInfo EyeAccPrismInfo { get; set; }

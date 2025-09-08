@@ -72,6 +72,8 @@ namespace WzComparerR2.Avatar.UI
             this.chkHairShade = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkHairCover = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkApplyBRM = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowWeaponEffect = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowWeaponJumpEffect = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX5 = new DevComponents.DotNetBar.LabelX();
             this.labelX6 = new DevComponents.DotNetBar.LabelX();
             this.cmbGroupChair = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -281,6 +283,8 @@ namespace WzComparerR2.Avatar.UI
             this.panelDockContainer2.Controls.Add(this.chkHairShade);
             this.panelDockContainer2.Controls.Add(this.chkHairCover);
             this.panelDockContainer2.Controls.Add(this.chkApplyBRM);
+            this.panelDockContainer2.Controls.Add(this.chkShowWeaponEffect);
+            this.panelDockContainer2.Controls.Add(this.chkShowWeaponJumpEffect);
             this.panelDockContainer2.Controls.Add(this.labelX5);
             this.panelDockContainer2.Controls.Add(this.labelX6);
             this.panelDockContainer2.Controls.Add(this.cmbGroupChair);
@@ -304,11 +308,11 @@ namespace WzComparerR2.Avatar.UI
             this.cmbEar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbEar.FormattingEnabled = true;
             this.cmbEar.ItemHeight = 15;
-            this.cmbEar.Location = new System.Drawing.Point(161, 84);
+            this.cmbEar.Location = new System.Drawing.Point(171, 84);
             this.cmbEar.Name = "cmbEar";
             this.cmbEar.Size = new System.Drawing.Size(39, 21);
             this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbEar.TabIndex = 15;
+            this.cmbEar.TabIndex = 14;
             this.cmbEar.SelectedIndexChanged += new System.EventHandler(this.cmbEar_SelectedIndexChanged);
             // 
             // cmbWeaponIdx
@@ -323,7 +327,7 @@ namespace WzComparerR2.Avatar.UI
             this.cmbWeaponIdx.Name = "cmbWeaponIdx";
             this.cmbWeaponIdx.Size = new System.Drawing.Size(40, 21);
             this.cmbWeaponIdx.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbWeaponIdx.TabIndex = 13;
+            this.cmbWeaponIdx.TabIndex = 11;
             this.cmbWeaponIdx.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponIdx_SelectedIndexChanged);
             // 
             // cmbWeaponType
@@ -338,7 +342,7 @@ namespace WzComparerR2.Avatar.UI
             this.cmbWeaponType.Name = "cmbWeaponType";
             this.cmbWeaponType.Size = new System.Drawing.Size(40, 21);
             this.cmbWeaponType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbWeaponType.TabIndex = 12;
+            this.cmbWeaponType.TabIndex = 10;
             this.cmbWeaponType.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponType_SelectedIndexChanged);
             // 
             // labelX4
@@ -589,13 +593,46 @@ namespace WzComparerR2.Avatar.UI
             // 
             // 
             this.chkApplyBRM.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkApplyBRM.Location = new System.Drawing.Point(5, 155);
+            this.chkApplyBRM.Location = new System.Drawing.Point(5, 205);
             this.chkApplyBRM.Name = "chkApplyBRM";
             this.chkApplyBRM.Size = new System.Drawing.Size(172, 18);
             this.chkApplyBRM.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkApplyBRM.TabIndex = 16;
+            this.chkApplyBRM.TabIndex = 17;
             this.chkApplyBRM.Text = "Adjust Player Position (Chair)";
             this.chkApplyBRM.CheckedChanged += new System.EventHandler(this.chkApplyBRM_CheckedChanged);
+            // 
+            // chkShowWeaponEffect
+            // 
+            this.chkShowWeaponEffect.AutoSize = true;
+            this.chkShowWeaponEffect.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowWeaponEffect.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowWeaponEffect.Location = new System.Drawing.Point(5, 130);
+            this.chkShowWeaponEffect.Name = "chkShowWeaponEffect";
+            this.chkShowWeaponEffect.Size = new System.Drawing.Size(76, 20);
+            this.chkShowWeaponEffect.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowWeaponEffect.TabIndex = 12;
+            this.chkShowWeaponEffect.Text = "Weapon Effect";
+            this.chkShowWeaponEffect.CheckedChanged += new System.EventHandler(this.chkShowWeaponEffect_CheckedChanged);
+            // 
+            // chkShowWeaponJumpEffect
+            // 
+            this.chkShowWeaponJumpEffect.AutoSize = true;
+            this.chkShowWeaponJumpEffect.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowWeaponJumpEffect.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowWeaponJumpEffect.Location = new System.Drawing.Point(5, 155);
+            this.chkShowWeaponJumpEffect.Name = "chkShowWeaponJumpEffect";
+            this.chkShowWeaponJumpEffect.Size = new System.Drawing.Size(76, 20);
+            this.chkShowWeaponJumpEffect.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowWeaponJumpEffect.TabIndex = 13;
+            this.chkShowWeaponJumpEffect.Text = "Weapon Jump Effect";
+            this.chkShowWeaponJumpEffect.CheckedChanged += new System.EventHandler(this.chkShowWeaponJumpEffect_CheckedChanged);
+            // 
             // 
             // labelX5
             // 
@@ -620,7 +657,7 @@ namespace WzComparerR2.Avatar.UI
             // 
             // 
             this.labelX6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX6.Location = new System.Drawing.Point(3, 135);
+            this.labelX6.Location = new System.Drawing.Point(3, 185);
             this.labelX6.Name = "labelX6";
             this.labelX6.Size = new System.Drawing.Size(60, 18);
             this.labelX6.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -635,11 +672,11 @@ namespace WzComparerR2.Avatar.UI
             this.cmbGroupChair.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbGroupChair.FormattingEnabled = true;
             this.cmbGroupChair.ItemHeight = 15;
-            this.cmbGroupChair.Location = new System.Drawing.Point(95, 132);
+            this.cmbGroupChair.Location = new System.Drawing.Point(95, 182);
             this.cmbGroupChair.Name = "cmbGroupChair";
             this.cmbGroupChair.Size = new System.Drawing.Size(50, 21);
             this.cmbGroupChair.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbGroupChair.TabIndex = 18;
+            this.cmbGroupChair.TabIndex = 16;
             this.cmbGroupChair.Enabled = false;
             this.cmbGroupChair.SelectedIndexChanged += new System.EventHandler(this.cmbGroupChair_SelectedIndexChanged);
             this.cmbGroupChair.BringToFront();
@@ -905,6 +942,8 @@ namespace WzComparerR2.Avatar.UI
         private AvatarContainer avatarContainer1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHairCover;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkApplyBRM;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowWeaponEffect;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowWeaponJumpEffect;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponIdx;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponType;
         private DevComponents.DotNetBar.LabelX labelX4;

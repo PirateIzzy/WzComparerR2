@@ -559,7 +559,7 @@
             this.Name = "FrmOverlayAniOptions";
             this.Padding = new System.Windows.Forms.Padding(9, 8, 9, 8);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "アニメーションネスト設定";
+            this.Text = "Animation Nest Settings";
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtDelayOffset)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMoveX)).EndInit();
