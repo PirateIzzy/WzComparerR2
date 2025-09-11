@@ -2745,8 +2745,8 @@
             this.chkSkipGodChangseopDuplicatedNodes.Name = "chkSkipGodChangseopDuplicatedNodes";
             this.chkSkipGodChangseopDuplicatedNodes.Size = new System.Drawing.Size(185, 25);
             this.chkSkipGodChangseopDuplicatedNodes.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkSkipGodChangseopDuplicatedNodes.TabIndex = 25;
-            this.chkSkipGodChangseopDuplicatedNodes.Text = "Skip Duplicated Nodes Ends With \"_.img\"";
+            this.chkSkipGodChangseopDuplicatedNodes.TabIndex = 26;
+            this.chkSkipGodChangseopDuplicatedNodes.Text = "Skip Duplicated Nodes\r\n(Ending With \"_.img\")";
             this.chkSkipGodChangseopDuplicatedNodes.Checked = true;
             // 
             // chkOutputRemovedImg

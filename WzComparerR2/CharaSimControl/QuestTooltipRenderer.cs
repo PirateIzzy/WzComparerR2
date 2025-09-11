@@ -677,7 +677,9 @@ namespace WzComparerR2.CharaSimControl
             text = text.Replace("#g", "");
             text = text.Replace("#l", "");
             text = text.Replace("#eqp#", "");
+            text = text.Replace("#es", "#ＥＳ"); // plural suffix for English region
             text = text.Replace("#e", "");
+            text = text.Replace("ＥＳ", "es");
             text = text.Replace("#E", "");
             text = text.Replace("#n", " ");
 
