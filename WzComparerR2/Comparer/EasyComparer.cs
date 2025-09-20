@@ -75,6 +75,7 @@ namespace WzComparerR2.Comparer
         public bool ShowLinkedTamingMob { get; set; }
         public bool SkipKMSContent { get; set; }
         public bool DownloadKMSContentDB { get; set; }
+        public bool SkipGodChangseopDuplicatedNodes { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
@@ -569,6 +570,7 @@ namespace WzComparerR2.Comparer
                     "- Compare " + this.Comparer.PngComparison,
                     this.Comparer.ResolvePngLink ? "- Resolve Link" : null,
                     this.SkipKMSContent ? "- Skip KMS Content" : null,
+                    this.SkipGodChangseopDuplicatedNodes ? "- Skip Duplicated Nodes End With \"_.img\"" : null,
                 }.Where(p => p != null)));
                 sw.WriteLine("</table>");
                 sw.WriteLine("</p>");
@@ -577,6 +579,7 @@ namespace WzComparerR2.Comparer
                 StringBuilder[] sb = { new StringBuilder(), new StringBuilder(), new StringBuilder() };
                 int[] count = new int[6];
                 List<CompareDifference> kmsContent = new List<CompareDifference> { };
+                List<CompareDifference> godChangseopNode = new List<CompareDifference> { };
                 string[] diffStr = { "Modified", "Added", "Removed" };
                 foreach (CompareDifference diff in diffLst)
                 {
@@ -591,6 +594,11 @@ namespace WzComparerR2.Comparer
                                 kmsContent.Add(diff);
                                 continue;
                             }
+                            if (SkipGodChangseopDuplicatedNodes && (isGodChangseopNode(diff.NodeNew) || isGodChangseopNode(diff.NodeOld)))
+                            {
+                                godChangseopNode.Add(diff);
+                                continue;
+                            }
                             detail = string.Format("<a name=\"m_{1}_{2}\" href=\"#a_{1}_{2}\">{0}</a>", diff.NodeNew.FullPathToFile, idx, count[idx]);
                             break;
                         case DifferenceType.Append:
@@ -598,6 +606,11 @@ namespace WzComparerR2.Comparer
                             if (SkipKMSContent && isKMSNode(diff.NodeNew))
                             {
                                 kmsContent.Add(diff);
+                                continue;
+                            }
+                            if (SkipGodChangseopDuplicatedNodes && isGodChangseopNode(diff.NodeNew))
+                            {
+                                godChangseopNode.Add(diff);
                                 continue;
                             }
                             if (this.OutputAddedImg)
@@ -614,6 +627,11 @@ namespace WzComparerR2.Comparer
                             if (SkipKMSContent && isKMSNode(diff.NodeOld))
                             {
                                 kmsContent.Add(diff);
+                                continue;
+                            }
+                            if (SkipGodChangseopDuplicatedNodes && isGodChangseopNode(diff.NodeOld))
+                            {
+                                godChangseopNode.Add(diff);
                                 continue;
                             }
                             if (this.OutputRemovedImg)
@@ -655,6 +673,12 @@ namespace WzComparerR2.Comparer
                     if (kmsContent.Contains(diff))
                     {
                         StateInfo = string.Format("{0}/{1} Modified: {2}", count[0], count[3], "KMS Content");
+                        count[0]++;
+                        continue;
+                    }
+                    if (godChangseopNode.Contains(diff))
+                    {
+                        StateInfo = string.Format("{0}/{1} 変更: {2}", count[0], count[3], "神チャンソプの重複ノード");
                         count[0]++;
                         continue;
                     }
@@ -3382,6 +3406,15 @@ namespace WzComparerR2.Comparer
             }
         }
 
+        private bool isGodChangseopNode(Wz_Node node)
+        {
+            if (node == null)
+                return false;
+            string[] nodePath = node.FullPathToFile.Split('\\');
+            string imgStr = nodePath.LastOrDefault(part => part.EndsWith(".img"));
+            if (string.IsNullOrEmpty(imgStr)) return false;
+            return imgStr.EndsWith("_.img");
+        }
         private bool isKMSSkillID(int skillID)
         {
             switch (skillID / 10000000)

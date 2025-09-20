@@ -4073,6 +4073,7 @@ namespace WzComparerR2
                     comparer.ShowChangeType = chkShowChangeType.Checked;
                     comparer.ShowLinkedTamingMob = chkShowLinkedTamingMob.Checked;
                     comparer.SkipKMSContent = chkSkipKMSContent.Checked;
+                    comparer.SkipGodChangseopDuplicatedNodes = chkSkipGodChangseopDuplicatedNodes.Checked;
                     comparer.Enable22AniStyle = GearGraphics.is22aniStyle;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
@@ -4113,6 +4114,7 @@ namespace WzComparerR2
                                     chkShowLinkedTamingMob.Enabled = false;
                                     chkHashPngFileName.Enabled = false;
                                     chkSkipKMSContent.Enabled = false;
+                                    chkSkipGodChangseopDuplicatedNodes.Enabled = false;
                                     if (chkSkipKMSContent.Checked)
                                     {
                                         switch (MessageBoxEx.Show(this, "Would you like to download database of KMS content?\r\n\r\nIf you select \"No\", only KMS Skills will be skipped. ", "WZ Compare", MessageBoxButtons.YesNo))
@@ -4178,6 +4180,7 @@ namespace WzComparerR2
                         chkShowLinkedTamingMob.Enabled = true;
                         chkHashPngFileName.Enabled = true;
                         chkSkipKMSContent.Enabled = true;
+                        chkSkipGodChangseopDuplicatedNodes.Enabled = true;
                         if (comparer.FailToExportNodes.Count > 0 || comparer.FailToExportTooltips.Count > 0)
                         {
                             string failData = Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportNodes, Newtonsoft.Json.Formatting.Indented) + "\r\n" + Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportTooltips, Newtonsoft.Json.Formatting.Indented); File.WriteAllText(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"), failData, Encoding.UTF8);
