@@ -545,7 +545,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         /// <param Name="Type">表示装备类型GearType。</param>
         /// <returns></returns>
-        public static string GetGearTypeString(GearType type)
+        public static string GetGearTypeString(GearType type, bool isMsea=false)
         {
             switch (type)
             {
@@ -684,7 +684,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.handFan: return "Ritual Fan";
                 case GearType.fanTassel: return "Fan Tassel";
 
-                case GearType.tuner: return "Bladecaster";
+                case GearType.tuner: return isMsea ? "Tuner" : "Bladecaster";
                 case GearType.bracelet: return "Bladebinder";
 
                 case GearType.breathShooter: return "Whispershot";
@@ -872,7 +872,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         /// <param Name="specJob">表示装备属性的reqSpecJob的值。</param>
         /// <returns></returns>
-        public static string GetExtraJobReqString(int specJob)
+        public static string GetExtraJobReqString(int specJob, bool isMsea=false)
         {
             switch (specJob)
             {
@@ -1069,7 +1069,7 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public static string GetJobName(int jobCode)
+        public static string GetJobName(int jobCode, bool isMsea=false)
         {
             switch (jobCode)
             {
@@ -1110,14 +1110,14 @@ namespace WzComparerR2.CharaSim
                 case 301: return "Archer";
                 case 310: return "Hunter";
                 case 311: return "Ranger";
-                case 312: return "Bowmaster";
-                case 313: return "Bowmaster(5)";
-                case 314: return "Bowmaster(6)";
-                case 320: return "Crossbowman";
+                case 312: return isMsea ? "Bow Master" : "Bowmaster";
+                case 313: return isMsea ? "Bow Master(5)" : "Bowmaster(5)";
+                case 314: return isMsea ? "Bow Master(6)" : "Bowmaster(6)";
+                case 320: return isMsea ? "Crossbow Man" : "Crossbowman";
                 case 321: return "Sniper";
-                case 322: return "Marksman";
-                case 323: return "Marksman(5)";
-                case 324: return "Marksman(6)";
+                case 322: return isMsea ? "Crossbow Master" : "Marksman";
+                case 323: return isMsea ? "Crossbow Master(5)" : "Marksman(5)";
+                case 324: return isMsea ? "Crossbow Master(6)" : "Marksman(6)";
                 case 330: return "Ancient Archer";
                 case 331: return "Soulchaser";
                 case 332: return "Pathfinder";
@@ -1129,7 +1129,7 @@ namespace WzComparerR2.CharaSim
                 case 412: return "Night Lord";
                 case 413: return "Night Lord(5)";
                 case 414: return "Night Lord(6)";
-                case 420: return "Thief";
+                case 420: return isMsea ? "Bandit" : "Thief";
                 case 421: return "Chief Bandit";
                 case 422: return "Shadower";
                 case 423: return "Shadower(5)";
@@ -1143,67 +1143,67 @@ namespace WzComparerR2.CharaSim
                 case 436: return "Blade Master(6)";
                 case 500: return "Pirate";
                 case 501: return "Pirate";
-                case 510: return "Brawler";
-                case 511: return "Marauder";
-                case 512: return "Buccaneer";
-                case 513: return "Buccaneer(5)";
-                case 514: return "Buccaneer(6)";
+                case 510: return isMsea ? "Infighter" : "Brawler";
+                case 511: return isMsea ? "Buccaneer" : "Marauder";
+                case 512: return isMsea ? "Viper" : "Buccaneer";
+                case 513: return isMsea ? "Viper(5)" : "Buccaneer(5)";
+                case 514: return isMsea ? "Viper(6)" : "Buccaneer(6)";
                 case 520: return "Gunslinger";
-                case 521: return "Outlaw";
-                case 522: return "Corsair";
-                case 523: return "Corsair(5)";
-                case 524: return "Corsair(6)";
+                case 521: return isMsea ? "Valkyrie" : "Outlaw";
+                case 522: return isMsea ? "Captain" : "Corsair";
+                case 523: return isMsea ? "Captain(5)" : "Corsair(5)";
+                case 524: return isMsea ? "Captain(6)" : "Corsair(6)";
                 case 530: return "Cannoneer";
                 case 531: return "Cannon Trooper";
                 case 532: return "Cannon Master";
                 case 533: return "Cannon Master(5)";
                 case 534: return "Cannon Master(6)";
-                case 508: return "Jett(1)";
-                case 570: return "Jett(2)";
-                case 571: return "Jett(3)";
-                case 572: return "Jett(4)";
+                case 508: return isMsea ? "Zen(1)" : "Jett(1)";
+                case 570: return isMsea ? "Zen(2)" : "Jett(2)";
+                case 571: return isMsea ? "Zen(3)" : "Jett(3)";
+                case 572: return isMsea ? "Zen(4)" : "Jett(4)";
 
                 case 800:
                 case 900: return "Operator";
 
-                case 1000: return "Noblesse";
-                case 1100: return "Dawn Warrior(1)";
-                case 1110: return "Dawn Warrior(2)";
-                case 1111: return "Dawn Warrior(3)";
-                case 1112: return "Dawn Warrior(4)";
-                case 1113: return "Dawn Warrior(5)";
-                case 1114: return "Dawn Warrior(6)";
-                case 1200: return "Blaze Wizard(1)";
-                case 1210: return "Blaze Wizard(2)";
-                case 1211: return "Blaze Wizard(3)";
-                case 1212: return "Blaze Wizard(4)";
-                case 1213: return "Blaze Wizard(5)";
-                case 1214: return "Blaze Wizard(6)";
-                case 1300: return "Wind Archer(1)";
-                case 1310: return "Wind Archer(2)";
-                case 1311: return "Wind Archer(3)";
-                case 1312: return "Wind Archer(4)";
-                case 1313: return "Wind Archer(5)";
-                case 1314: return "Wind Archer(6)";
-                case 1400: return "Night Walker(1)";
-                case 1410: return "Night Walker(2)";
-                case 1411: return "Night Walker(3)";
-                case 1412: return "Night Walker(4)";
-                case 1413: return "Night Walker(5)";
-                case 1414: return "Night Walker(6)";
-                case 1500: return "Thunder Breaker(1)";
-                case 1510: return "Thunder Breaker(2)";
-                case 1511: return "Thunder Breaker(3)";
-                case 1512: return "Thunder Breaker(4)";
-                case 1513: return "Thunder Breaker(5)";
-                case 1514: return "Thunder Breaker(6)";
+                case 1000: return isMsea ? "Nobless" : "Noblesse";
+                case 1100: return isMsea ? "Soul Master(1)" : "Dawn Warrior(1)";
+                case 1110: return isMsea ? "Soul Master(2)" : "Dawn Warrior(2)";
+                case 1111: return isMsea ? "Soul Master(3)" : "Dawn Warrior(3)";
+                case 1112: return isMsea ? "Soul Master(4)" : "Dawn Warrior(4)";
+                case 1113: return isMsea ? "Soul Master(5)" : "Dawn Warrior(5)";
+                case 1114: return isMsea ? "Soul Master(6)" : "Dawn Warrior(6)";
+                case 1200: return isMsea ? "Flame Wizard(1)" : "Blaze Wizard(1)";
+                case 1210: return isMsea ? "Flame Wizard(2)" : "Blaze Wizard(2)";
+                case 1211: return isMsea ? "Flame Wizard(3)" : "Blaze Wizard(3)";
+                case 1212: return isMsea ? "Flame Wizard(4)" : "Blaze Wizard(4)";
+                case 1213: return isMsea ? "Flame Wizard(5)" : "Blaze Wizard(5)";
+                case 1214: return isMsea ? "Flame Wizard(6)" : "Blaze Wizard(6)";
+                case 1300: return isMsea ? "Wind Breaker(1)" : "Wind Archer(1)";
+                case 1310: return isMsea ? "Wind Breaker(2)" : "Wind Archer(2)";
+                case 1311: return isMsea ? "Wind Breaker(3)" : "Wind Archer(3)";
+                case 1312: return isMsea ? "Wind Breaker(4)" : "Wind Archer(4)";
+                case 1313: return isMsea ? "Wind Breaker(5)" : "Wind Archer(5)";
+                case 1314: return isMsea ? "Wind Breaker(6)" : "Wind Archer(6)";
+                case 1400: return isMsea ? "Nightwalker(1)" : "Night Walker(1)";
+                case 1410: return isMsea ? "Nightwalker(2)" : "Night Walker(2)";
+                case 1411: return isMsea ? "Nightwalker(3)" : "Night Walker(3)";
+                case 1412: return isMsea ? "Nightwalker(4)" : "Night Walker(4)";
+                case 1413: return isMsea ? "Nightwalker(5)" : "Night Walker(5)";
+                case 1414: return isMsea ? "Nightwalker(6)" : "Night Walker(6)";
+                case 1500: return isMsea ? "Striker(1)" : "Thunder Breaker(1)";
+                case 1510: return isMsea ? "Striker(2)" : "Thunder Breaker(2)";
+                case 1511: return isMsea ? "Striker(3)" : "Thunder Breaker(3)";
+                case 1512: return isMsea ? "Striker(4)" : "Thunder Breaker(4)";
+                case 1513: return isMsea ? "Striker(5)" : "Thunder Breaker(5)";
+                case 1514: return isMsea ? "Striker(6)" : "Thunder Breaker(6)";
 
                 case 2000: return "Legend";
                 case 2001: return "Evan";
                 case 2002: return "Mercedes";
                 case 2003: return "Phantom";
                 case 2004: return "Luminous";
-                case 2005: return "Shade";
+                case 2005: return isMsea ? "Eunwol" : "Shade";
                 case 2100: return "Aran(1)";
                 case 2110: return "Aran(2)";
                 case 2111: return "Aran(3)";
@@ -1217,7 +1217,7 @@ namespace WzComparerR2.CharaSim
                 case 2213: return "Evan(2)";
                 case 2214:
                 case 2215:
-                case 2216: return "Evan (3)";
+                case 2216: return "Evan(3)";
                 case 2217:
                 case 2218: return "Evan(4)";
                 case 2219: return "Evan(5)";
@@ -1234,12 +1234,12 @@ namespace WzComparerR2.CharaSim
                 case 2412: return "Phantom(4)";
                 case 2413: return "Phantom(5)";
                 case 2414: return "Phantom(6)";
-                case 2500: return "Shade(1)";
-                case 2510: return "Shade(2)";
-                case 2511: return "Shade(3)";
-                case 2512: return "Shade(4)";
-                case 2513: return "Shade(5)";
-                case 2514: return "Shade(6)";
+                case 2500: return isMsea ? "Eunwol(1)" : "Shade(1)";
+                case 2510: return isMsea ? "Eunwol(2)" : "Shade(2)";
+                case 2511: return isMsea ? "Eunwol(3)" : "Shade(3)";
+                case 2512: return isMsea ? "Eunwol(4)" : "Shade(4)";
+                case 2513: return isMsea ? "Eunwol(5)" : "Shade(5)";
+                case 2514: return isMsea ? "Eunwol(6)" : "Shade(6)";
                 case 2700: return "Luminous(1)";
                 case 2710: return "Luminous(2)";
                 case 2711: return "Luminous(3)";
@@ -1319,19 +1319,19 @@ namespace WzComparerR2.CharaSim
                 case 6000: return "Kaiser";
                 case 6001: return "Angelic Buster";
                 case 6002: return "Cadena";
-                case 6003: return "Kain";
+                case 6003: return isMsea ? "Kaine" : "Kain";
                 case 6100: return "Kaiser(1)";
                 case 6110: return "Kaiser(2)";
                 case 6111: return "Kaiser(3)";
                 case 6112: return "Kaiser(4)";
                 case 6113: return "Kaiser(5)";
                 case 6114: return "Kaiser(6)";
-                case 6300: return "Kain(1)";
-                case 6310: return "Kain(2)";
-                case 6311: return "Kain(3)";
-                case 6312: return "Kain(4)";
-                case 6313: return "Kain(5)";
-                case 6314: return "Kain(6)";
+                case 6300: return isMsea ? "Kaine(1)" : "Kain(1)";
+                case 6310: return isMsea ? "Kaine(2)" : "Kain(2)";
+                case 6311: return isMsea ? "Kaine(3)" : "Kain(3)";
+                case 6312: return isMsea ? "Kaine(4)" : "Kain(4)";
+                case 6313: return isMsea ? "Kaine(5)" : "Kain(5)";
+                case 6314: return isMsea ? "Kaine(6)" : "Kain(6)";
                 case 6400: return "Cadena(1)";
                 case 6410: return "Cadena(2)";
                 case 6411: return "Cadena(3)";
@@ -1418,12 +1418,12 @@ namespace WzComparerR2.CharaSim
                 case 16212: return "Lara(4)";
                 case 16213: return "Lara(5)";
                 case 16214: return "Lara(6)";
-                case 16400: return "Hoyoung(1)";
-                case 16410: return "Hoyoung(2)";
-                case 16411: return "Hoyoung(3)";
-                case 16412: return "Hoyoung(4)";
-                case 16413: return "Hoyoung(5)";
-                case 16414: return "Hoyoung(6)";
+                case 16400: return isMsea ? "Ho Young(1)" : "Hoyoung(1)";
+                case 16410: return isMsea ? "Ho Young(2)" : "Hoyoung(2)";
+                case 16411: return isMsea ? "Ho Young(3)" : "Hoyoung(3)";
+                case 16412: return isMsea ? "Ho Young(4)" : "Hoyoung(4)";
+                case 16413: return isMsea ? "Ho Young(5)" : "Hoyoung(5)";
+                case 16414: return isMsea ? "Ho Young(6)" : "Hoyoung(6)";
 
                 case 17000: return "Mo Xuan";
                 case 17001: return "Lynn";
