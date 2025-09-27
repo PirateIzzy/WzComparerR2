@@ -280,7 +280,7 @@ namespace WzComparerR2
         }
 
         [Link]
-        public bool Enable22AniStyle
+        public bool Misc_Enable22AniStyle
         {
             get { return chkEnable22AniStyle.Checked; }
             set { chkEnable22AniStyle.Checked = value; }

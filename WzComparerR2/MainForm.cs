@@ -245,6 +245,7 @@ namespace WzComparerR2
         {
             var Setting = CharaSimConfig.Default;
             this.buttonItemAutoQuickView.Checked = Setting.AutoQuickView;
+            tooltipQuickView.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             tooltipQuickView.PreferredStringCopyMethod = Setting.PreferredStringCopyMethod;
             tooltipQuickView.CopyParsedSkillString = Setting.CopyParsedSkillString;
             tooltipQuickView.SkillRender.ShowProperties = Setting.Skill.ShowProperties;

@@ -592,7 +592,7 @@ namespace WzComparerR2.CharaSimControl
                     iconX + 6 + 68 - cashOrigin.X * 2 - 2,
                     picH + 6 + 68 - cashOrigin.Y * 2 - 2);
             }
-            if (!this.Enable22AniStyle)
+            if (!Enable22AniStyle)
             {
                 g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_new, iconX + 7, picH + 7);
                 g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
