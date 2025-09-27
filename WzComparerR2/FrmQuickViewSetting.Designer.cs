@@ -31,6 +31,7 @@
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX23 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX21 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowMiniMap = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -1022,6 +1023,7 @@
             // superTabControlPanel5
             // 
             this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
+            this.superTabControlPanel5.Controls.Add(this.chkMseaMode);
             this.superTabControlPanel5.Controls.Add(this.chkCopyParsedSkillString);
             this.superTabControlPanel5.Controls.Add(this.labelX4);
             this.superTabControlPanel5.Controls.Add(this.cmbPreferredStringCopyMethod);
@@ -1084,6 +1086,22 @@
             this.chkEnable22AniStyle.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkEnable22AniStyle.TabIndex = 4;
             this.chkEnable22AniStyle.Text = "Enable 2025 UI (incomplete)";
+            // 
+            // chkMseaMode
+            // 
+            this.chkMseaMode.AutoSize = true;
+            this.chkMseaMode.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkMseaMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkMseaMode.Location = new System.Drawing.Point(13, 84);
+            this.chkMseaMode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkMseaMode.Name = "chkMseaMode";
+            this.chkMseaMode.Size = new System.Drawing.Size(145, 16);
+            this.chkMseaMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkMseaMode.TabIndex = 5;
+            this.chkMseaMode.Text = "MSEA Mode (incomplete)";
             // 
             // buttonX2
             // 
@@ -1199,6 +1217,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX21;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
         private DevComponents.DotNetBar.LabelX labelX14;
         private DevComponents.DotNetBar.LabelX labelX15;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMap;

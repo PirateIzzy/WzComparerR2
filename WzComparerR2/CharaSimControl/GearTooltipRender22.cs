@@ -58,6 +58,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowSpeed { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool MaxStar25 { get; set; } = false;
+        public bool MseaMode { get; set; }
         public bool IsCombineProperties { get; set; } = true;
         public bool ShowSoldPrice { get; set; }
         public bool ShowCashPurchasePrice { get; set; }

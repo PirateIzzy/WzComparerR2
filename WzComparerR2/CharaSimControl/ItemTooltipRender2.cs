@@ -51,6 +51,7 @@ namespace WzComparerR2.CharaSimControl
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
         public bool Enable22AniStyle { get; set; }
+        public bool MseaMode { get; set; }
 
         public TooltipRender LinkRecipeInfoRender { get; set; }
         public TooltipRender LinkRecipeGearRender { get; set; }

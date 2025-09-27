@@ -75,6 +75,7 @@ namespace WzComparerR2.Comparer
         public bool ShowLinkedTamingMob { get; set; }
         public bool SkipKMSContent { get; set; }
         public bool DownloadKMSContentDB { get; set; }
+        public bool MseaMode { get; set; }
         public bool SkipGodChangseopDuplicatedNodes { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
@@ -983,7 +984,7 @@ namespace WzComparerR2.Comparer
                     int picH = 0;
                     if (ShowChangeType && nullSkillIdx != 0) GearGraphics.DrawPlainText(g, skillType, skillTypeFont, Color.FromArgb(255, 255, 255), 80, 130, ref picH, 10);
 
-                    string categoryPath = (ItemStringHelper.GetJobName(int.Parse(skillID) / 10000) ?? "Etc");
+                    string categoryPath = (ItemStringHelper.GetJobName(int.Parse(skillID) / 10000, MseaMode) ?? "Etc");
 
                     if (!Directory.Exists(Path.Combine(skillTooltipPath, categoryPath)))
                     {

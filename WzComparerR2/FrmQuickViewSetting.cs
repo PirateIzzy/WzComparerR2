@@ -287,6 +287,13 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Misc_MseaMode
+        {
+            get { return chkMseaMode.Checked; }
+            set { chkMseaMode.Checked = value; }
+        }
+
+        [Link]
         public int Quest_DefaultState
         {
             get { return comboBoxExQuestState.SelectedIndex; }

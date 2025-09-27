@@ -232,6 +232,7 @@ namespace WzComparerR2
             this.chkShowChangeType = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowLinkedTamingMob = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkSkipKMSContent = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkSkipGodChangseopDuplicatedNodes = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -2517,6 +2518,7 @@ namespace WzComparerR2
             this.superTabControlPanel2.Controls.Add(this.chkShowChangeType);
             this.superTabControlPanel2.Controls.Add(this.chkShowLinkedTamingMob);
             this.superTabControlPanel2.Controls.Add(this.chkSkipKMSContent);
+            this.superTabControlPanel2.Controls.Add(this.chkMseaMode);
             this.superTabControlPanel2.Controls.Add(this.chkSkipGodChangseopDuplicatedNodes);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
@@ -2743,6 +2745,21 @@ namespace WzComparerR2
             this.chkSkipKMSContent.TabIndex = 24;
             this.chkSkipKMSContent.Text = "Skip KMS Contents";
             this.chkSkipKMSContent.Checked = false;
+            // 
+            // chkMseaMode
+            // 
+            // 
+            // 
+            // 
+            this.chkMseaMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkMseaMode.Location = new System.Drawing.Point(550, 385);
+            this.chkMseaMode.Name = "chkMseaMode";
+            this.chkMseaMode.Size = new System.Drawing.Size(185, 23);
+            this.chkMseaMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkMseaMode, new DevComponents.DotNetBar.SuperTooltipInfo("MSEA Mode (incomplete)", "", "Use MSEA layout when outputting tooltip.\r\nCurrently, it will only apply when Save Skill Tooltip is enabled, where MSEA class names will be preferred.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 140)));
+            this.chkMseaMode.TabIndex = 25;
+            this.chkMseaMode.Text = "MSEA Mode";
+            this.chkMseaMode.Checked = false;
             // 
             // chkSkipGodChangseopDuplicatedNodes
             // 
@@ -3748,6 +3765,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowChangeType;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowLinkedTamingMob;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipKMSContent;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipGodChangseopDuplicatedNodes;
         private DevComponents.Editors.ComboItem comboItem19;
         private DevComponents.Editors.ComboItem comboItem20;
