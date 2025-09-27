@@ -1,4 +1,7 @@
-﻿namespace WzComparerR2
+using System;
+using System.Windows.Forms;
+
+namespace WzComparerR2
 {
     partial class MainForm
     {
@@ -229,6 +232,8 @@
             this.chkShowChangeType = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowLinkedTamingMob = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkSkipKMSContent = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkSkipGodChangseopDuplicatedNodes = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -291,6 +296,11 @@
             this.comboItem22 = new DevComponents.Editors.ComboItem();
             this.btnRootNode = new DevComponents.DotNetBar.ButtonX();
             this.clbRootNode = new System.Windows.Forms.CheckedListBox();
+            this.btnPreset = new DevComponents.DotNetBar.ButtonX();
+            this.btnMusicChannel = new DevComponents.DotNetBar.ButtonItem();
+            this.btnSkillChangeInfo = new DevComponents.DotNetBar.ButtonItem();
+            this.btnNewItemNews = new DevComponents.DotNetBar.ButtonItem();
+            this.btnMapleWiki = new DevComponents.DotNetBar.ButtonItem();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
@@ -2508,6 +2518,8 @@
             this.superTabControlPanel2.Controls.Add(this.chkShowChangeType);
             this.superTabControlPanel2.Controls.Add(this.chkShowLinkedTamingMob);
             this.superTabControlPanel2.Controls.Add(this.chkSkipKMSContent);
+            this.superTabControlPanel2.Controls.Add(this.chkMseaMode);
+            this.superTabControlPanel2.Controls.Add(this.chkSkipGodChangseopDuplicatedNodes);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2519,6 +2531,7 @@
             this.superTabControlPanel2.Controls.Add(this.btnEasyCompare);
             this.superTabControlPanel2.Controls.Add(this.btnRootNode);
             this.superTabControlPanel2.Controls.Add(this.clbRootNode);
+            this.superTabControlPanel2.Controls.Add(this.btnPreset);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel2.Location = new System.Drawing.Point(0, 0);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
@@ -2732,6 +2745,35 @@
             this.chkSkipKMSContent.TabIndex = 24;
             this.chkSkipKMSContent.Text = "Skip KMS Contents";
             this.chkSkipKMSContent.Checked = false;
+            // 
+            // chkMseaMode
+            // 
+            // 
+            // 
+            // 
+            this.chkMseaMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkMseaMode.Location = new System.Drawing.Point(550, 385);
+            this.chkMseaMode.Name = "chkMseaMode";
+            this.chkMseaMode.Size = new System.Drawing.Size(185, 23);
+            this.chkMseaMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkMseaMode, new DevComponents.DotNetBar.SuperTooltipInfo("MSEA Mode (incomplete)", "", "Use MSEA layout when outputting tooltip.\r\nCurrently, it will only apply when Save Skill Tooltip is enabled, where MSEA class names will be preferred.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 140)));
+            this.chkMseaMode.TabIndex = 25;
+            this.chkMseaMode.Text = "MSEA Mode";
+            this.chkMseaMode.Checked = false;
+            // 
+            // chkSkipGodChangseopDuplicatedNodes
+            // 
+            // 
+            // 
+            // 
+            this.chkSkipGodChangseopDuplicatedNodes.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkSkipGodChangseopDuplicatedNodes.Location = new System.Drawing.Point(550, 412);
+            this.chkSkipGodChangseopDuplicatedNodes.Name = "chkSkipGodChangseopDuplicatedNodes";
+            this.chkSkipGodChangseopDuplicatedNodes.Size = new System.Drawing.Size(185, 25);
+            this.chkSkipGodChangseopDuplicatedNodes.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkSkipGodChangseopDuplicatedNodes.TabIndex = 26;
+            this.chkSkipGodChangseopDuplicatedNodes.Text = "Skip Duplicated Nodes\r\n(Ending With \"_.img\")";
+            this.chkSkipGodChangseopDuplicatedNodes.Checked = true;
             // 
             // chkOutputRemovedImg
             // 
@@ -3371,6 +3413,47 @@
             this.clbRootNode.Size = new System.Drawing.Size(100, 250);
             this.clbRootNode.Visible = false;
             this.clbRootNode.BringToFront();
+            // 
+            // btnPreset
+            // 
+            this.btnPreset.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnPreset.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnPreset.AutoExpandOnClick = true;
+            this.btnPreset.Location = new System.Drawing.Point(207, 3);
+            this.btnPreset.Name = "btnPreset";
+            this.btnPreset.Size = new System.Drawing.Size(100, 30);
+            this.btnPreset.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnPreset.TabIndex = 27;
+            this.btnPreset.Text = "Presets";
+            this.btnPreset.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnMusicChannel,
+            this.btnSkillChangeInfo,
+            this.btnNewItemNews,
+            this.btnMapleWiki});
+            //
+            // btnMusicChannel
+            //
+            this.btnMusicChannel.Name = "btnMusicChannel";
+            this.btnMusicChannel.Text = "Music Channel Owner";
+            this.btnMusicChannel.Click += new System.EventHandler(this.btnMusicChannel_Click);
+            //
+            // btnSkillChangeInfo
+            //
+            this.btnSkillChangeInfo.Name = "btnSkillChangeInfo";
+            this.btnSkillChangeInfo.Text = "Skill Change Info";
+            this.btnSkillChangeInfo.Click += new System.EventHandler(this.btnSkillChangeInfo_Click);
+            //
+            // btnNewItemNews
+            //
+            this.btnNewItemNews.Name = "btnNewItemNews";
+            this.btnNewItemNews.Text = "New Item Discoverer";
+            this.btnNewItemNews.Click += new System.EventHandler(this.btnNewItemNews_Click);
+            //
+            // btnMapleWiki
+            //
+            this.btnMapleWiki.Name = "btnMapleWiki";
+            this.btnMapleWiki.Text = "MapleStory Wiki Contributor";
+            this.btnMapleWiki.Click += new System.EventHandler(this.btnMapleWiki_Click);
             //
             // 
             // toolStripMenuItem7
@@ -3682,6 +3765,8 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowChangeType;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowLinkedTamingMob;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipKMSContent;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipGodChangseopDuplicatedNodes;
         private DevComponents.Editors.ComboItem comboItem19;
         private DevComponents.Editors.ComboItem comboItem20;
         private DevComponents.Editors.ComboItem comboItem21;
@@ -3694,5 +3779,10 @@
         private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
         private DevComponents.DotNetBar.ButtonX btnRootNode;
         private System.Windows.Forms.CheckedListBox clbRootNode;
+        private DevComponents.DotNetBar.ButtonX btnPreset;
+        private DevComponents.DotNetBar.ButtonItem btnMusicChannel;
+        private DevComponents.DotNetBar.ButtonItem btnSkillChangeInfo;
+        private DevComponents.DotNetBar.ButtonItem btnNewItemNews;
+        private DevComponents.DotNetBar.ButtonItem btnMapleWiki;
     }
 }

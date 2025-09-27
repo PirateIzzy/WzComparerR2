@@ -62,8 +62,8 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
         public static readonly Font SetItemPropFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
         public static readonly Font ItemReqLevelFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
-        public static readonly Font EquipMDMoris9Font = new Font("Arial", 11f, GraphicsUnit.Pixel);
-        public static readonly Font EquipMDMoris9FontBold = new Font("Arial", 11f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font EquipMDMoris9Font = new Font("Arial", 12f, GraphicsUnit.Pixel);
+        public static readonly Font EquipMDMoris9FontBold = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
 
         private static PrivateFontCollection _pfc = new PrivateFontCollection();
         public static Font ItemNameFont2 { get; private set; }

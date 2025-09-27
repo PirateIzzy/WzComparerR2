@@ -224,8 +224,8 @@ namespace WzComparerR2.CharaSimControl
                                     }
                                     switch (Gear.GetGender(itemID))
                                     {
-                                        case 0: itemName += " (남)"; break;
-                                        case 1: itemName += " (여)"; break;
+                                        case 0: itemName += " (M)"; break;
+                                        case 1: itemName += " (F)"; break;
                                     }
                                 }
                                 else if (this.StringLinker.StringItem.TryGetValue(itemID, out sr)) //兼容宠物
@@ -235,7 +235,7 @@ namespace WzComparerR2.CharaSimControl
                                     {
                                         if (itemID / 10000 == 500)
                                         {
-                                            typeName = "펫";
+                                            typeName = "Pet";
                                         }
                                         else
                                         {
@@ -252,7 +252,7 @@ namespace WzComparerR2.CharaSimControl
                     }
 
                     itemName = itemName ?? string.Empty;
-                    typeName = typeName ?? "장비";
+                    typeName = typeName ?? "Equip";
 
                     /*
                     var match = Regex.Match(typeName, @"^(\((.*)\)|（(.*)）|\[(.*)\])$");
@@ -307,8 +307,8 @@ namespace WzComparerR2.CharaSimControl
                                             itemName = sr.Name;
                                             switch (Gear.GetGender(itemID))
                                             {
-                                                case 0: itemName += " (남)"; break;
-                                                case 1: itemName += " (여)"; break;
+                                                case 0: itemName += " (M)"; break;
+                                                case 1: itemName += " (F)"; break;
                                             }
                                         }
                                         else if (this.StringLinker.StringItem.TryGetValue(itemID, out sr)) //兼容宠物
@@ -333,8 +333,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 for (int i = 0; i < this.SetItem.CompleteCount; ++i)
                 {
-                    TextRenderer.DrawText(g, "(없음)", GearGraphics.EquipMDMoris9Font, new Point(14, picHeight), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                    GearGraphics.DrawString(g, "미착용", GearGraphics.EquipMDMoris9Font, new Dictionary<string, Color>() { { string.Empty, ((SolidBrush)GearGraphics.Equip22BrushGray).Color } }, 30, 283, ref picHeight, 15, Text.TextAlignment.Right);
+                    TextRenderer.DrawText(g, "(None)", GearGraphics.EquipMDMoris9Font, new Point(14, picHeight), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                    GearGraphics.DrawString(g, "Not equipped", GearGraphics.EquipMDMoris9Font, new Dictionary<string, Color>() { { string.Empty, ((SolidBrush)GearGraphics.Equip22BrushGray).Color } }, 30, 283, ref picHeight, 15, Text.TextAlignment.Right);
                 }
             }
 
@@ -423,13 +423,13 @@ namespace WzComparerR2.CharaSimControl
                     effTitle = $"[ 월드 내 중복 착용 효과 ({effect.Key} / {this.SetItem.CompleteCount}) ]";
                     worldSetEff = true ;
                 }
-                else if (specialPetSetEffectName && this.SetItem.SetItemName.EndsWith(" 세트"))
+                else if (specialPetSetEffectName && this.SetItem.SetItemName.EndsWith(" Set"))
                 {
-                    effTitle = $"{Regex.Replace(this.SetItem.SetItemName, " 세트$", "")} {effect.Key}세트 효과";
+                    effTitle = $"{Regex.Replace(this.SetItem.SetItemName, "Set$", "")} {effect.Key}Set Effect";
                 }
                 else
                 {
-                    effTitle = effect.Key + "세트효과";
+                    effTitle = effect.Key + "Set Effect";
                 }
                 TextRenderer.DrawText(g, effTitle, GearGraphics.EquipMDMoris9Font, new Point(14 - (worldSetEff ? 1 : 0), picHeight), color, TextFormatFlags.NoPadding);
                 if (worldSetEff)
@@ -478,7 +478,7 @@ namespace WzComparerR2.CharaSimControl
                         var ops = (List<SetItemBonusByTime>)prop.Value;
                         foreach (SetItemBonusByTime p in ops)
                         {
-                            GearGraphics.DrawPlainText(g, $"{p.TermStart}小时后", GearGraphics.EquipMDMoris9Font, color, 10, 290, ref picHeight, 15);
+                            GearGraphics.DrawPlainText(g, $"{p.TermStart}h later", GearGraphics.EquipMDMoris9Font, color, 10, 290, ref picHeight, 15);
                             foreach (var bonusProp in p.Props)
                             {
                                 var summary = ItemStringHelper.GetGearPropString(bonusProp.Key, Convert.ToInt32(bonusProp.Value));

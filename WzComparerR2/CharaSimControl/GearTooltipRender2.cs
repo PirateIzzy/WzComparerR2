@@ -54,6 +54,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowMedalTag { get; set; } = true;
         public bool IsCombineProperties { get; set; } = true;
         public bool CompareMode { get; set; } = false;
+        public bool MseaMode { get; set; }
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
         private bool isMsnClient { get; set; }
@@ -488,7 +489,7 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制攻击力变化
             format.Alignment = StringAlignment.Far;
-            TextRenderer.DrawText(g, "Attack Power Increase", GearGraphics.EquipDetailFont, new Point(248 - TextRenderer.MeasureText(g, "Attack Power Increase", GearGraphics.EquipDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picH + 10), ((SolidBrush)GearGraphics.GrayBrush2).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+            TextRenderer.DrawText(g, MseaMode ? "Damage Increase" : "Attack Power Increase", GearGraphics.EquipDetailFont, new Point(248 - TextRenderer.MeasureText(g, MseaMode ? "Damage Increase" : "Attack Power Increase", GearGraphics.EquipDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picH + 10), ((SolidBrush)GearGraphics.GrayBrush2).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_incline_0, 249 - 19, picH + 27); //暂时画个0
 
             //绘制属性需求
@@ -661,25 +662,25 @@ namespace WzComparerR2.CharaSimControl
 
             //装备类型 - blank typeStr are for One-handed Weapon and Two-handed Weapon respectively
             bool isWeapon = Gear.IsWeapon(Gear.type);
-            string typeStr = ItemStringHelper.GetGearTypeString(Gear.type);
+            string typeStr = ItemStringHelper.GetGearTypeString(Gear.type, MseaMode);
             if (!string.IsNullOrEmpty(typeStr) && (int)Gear.type / 10 != 171)
             {
                 if (isWeapon)
                 {
-                    typeStr = "Type: " + typeStr;
+                    typeStr = (MseaMode ? "CATEGORY : " : "Type: ") + typeStr;
                 }
                 else
                 {
-                    typeStr = "Type: " + typeStr;
+                    typeStr = (MseaMode ? "CATEGORY : " : "Type: ") + typeStr;
                 }
 
                 if (!Gear.Cash && (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara))
                 {
-                    typeStr += "";
+                    typeStr += MseaMode ? "(1 Handed)" : "";
                 }
                 else if (!Gear.Cash && Gear.IsDoubleHandWeapon(Gear.type))
                 {
-                    typeStr += "";
+                    typeStr += MseaMode ? "(2 Handed)" : "";
                 }
                 TextRenderer.DrawText(g, typeStr, GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 picH += 15;
@@ -695,7 +696,7 @@ namespace WzComparerR2.CharaSimControl
             if (!Gear.Cash && value > 0)
             {
                 bool isValidSpeed = (2 <= value && value <= 9);
-                string speedStr = string.Format("Attack Speed: {0}{1}{2}",
+                string speedStr = string.Format(MseaMode ? "ATTACK SPEED : {0}{1}{2}" : "Attack Speed: {0}{1}{2}",
                     ItemStringHelper.GetAttackSpeedString(value),
                     isValidSpeed ? $" (Stage {10 - value})" : null,
                     ShowSpeed ? $" ({value})" : null
@@ -859,7 +860,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     { "c", GearGraphics.OrangeBrush3Color }
                 };
-                GearGraphics.DrawString(g, "Remaining Enhancements: " + value + (Gear.Cash ? "" : "\n#c(Available Recoveries: 0)#"), GearGraphics.EquipDetailFont, colorTable, 13, 244, ref picH, 15);
+                GearGraphics.DrawString(g, (MseaMode ? "NUMBER OF UPGRADES AVAILABLE : +" : "Remaining Enhancements: ") + value + (Gear.Cash ? "" : (MseaMode ? "\n#c(Remaining Restoration Count: 0)#" : "\n#c(Available Recoveries: 0)#")), GearGraphics.EquipDetailFont, colorTable, 13, 244, ref picH, 15);
                 hasPart2 = true;
             }
 
@@ -909,9 +910,9 @@ namespace WzComparerR2.CharaSimControl
 
             if (hasTuc && Gear.Hammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
-                TextRenderer.DrawText(g, "Hammers Applied", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+                TextRenderer.DrawText(g, MseaMode ? "* NUMBER OF VICIOUS' HAMMER APPLIED" : "Hammers Applied", GearGraphics.EquipDetailFont, new Point(12, picH), Color.White, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.EquipDetailFont, Brushes.White, 93, picH + 1);
+                g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.EquipDetailFont, Brushes.White, MseaMode ? 216 : 93, picH + 1);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
                 picH += 15;
                 hasPart2 = true;
@@ -1821,21 +1822,21 @@ namespace WzComparerR2.CharaSimControl
         private void DrawJobReq(Graphics g, ref int picH)
         {
             int value;
-            string extraReq = ItemStringHelper.GetExtraJobReqString(Gear.type);
+            string extraReq = ItemStringHelper.GetExtraJobReqString(Gear.type, MseaMode);
             if (extraReq == null && Gear.Props.TryGetValue(GearPropType.reqSpecJob, out value))
             {
-                extraReq = ItemStringHelper.GetExtraJobReqString(value);
+                extraReq = ItemStringHelper.GetExtraJobReqString(value, MseaMode);
             }
             if (extraReq == null && Gear.ReqSpecJobs.Count > 0)
             {
                 int[] specJobsList1 = new[] { 2, 12, 22, 32, 172 };
                 if (new HashSet<int>(specJobsList1).SetEquals(Gear.ReqSpecJobs))
                 {
-                    extraReq = ItemStringHelper.GetExtraJobReqString(specJobsList1);
+                    extraReq = ItemStringHelper.GetExtraJobReqString(specJobsList1, false, MseaMode);
                 }
                 else
                 {
-                    extraReq = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs, isMsnClient);
+                    extraReq = ItemStringHelper.GetExtraJobReqString(Gear.ReqSpecJobs, isMsnClient, MseaMode);
                 }
             }
 
@@ -1843,7 +1844,7 @@ namespace WzComparerR2.CharaSimControl
             int extraReqWidth = 261;
             if (extraReq == null)
             {
-                jobImage = Resource.UIToolTip_img_Item_Equip_Job_normal;
+                jobImage = MseaMode ? Resource.UIToolTip_img_Item_Equip_Job_normal_SEA : Resource.UIToolTip_img_Item_Equip_Job_normal;
             }
             else
             {
@@ -1852,15 +1853,22 @@ namespace WzComparerR2.CharaSimControl
                 using var extraReqFmt = new StringFormat();
                 extraReqFmt.Alignment = StringAlignment.Center;
                 g.MeasureString(extraReq, GearGraphics.ItemDetailFont, new SizeF(extraReqWidth, short.MaxValue), extraReqFmt, out _, out var lines);
-                jobImage = lines == 1 ? Resource.UIToolTip_img_Item_Equip_Job_expand : Resource.UIToolTip_img_Item_Equip_Job_expand2;
+                if (MseaMode)
+                {
+                    jobImage = lines == 1 ? Resource.UIToolTip_img_Item_Equip_Job_expand_SEA : Resource.UIToolTip_img_Item_Equip_Job_expand2_SEA;
+                }
+                else
+                {
+                    jobImage = lines == 1 ? Resource.UIToolTip_img_Item_Equip_Job_expand : Resource.UIToolTip_img_Item_Equip_Job_expand2;
+                }
             }
             //g.DrawImage(jobImage, 10, picH);
             g.DrawImage(jobImage, 12, picH);
 
             int reqJob;
             Gear.Props.TryGetValue(GearPropType.reqJob, out reqJob);
-            int[] origin = new int[] { 16, 7, 58, 7, 97, 7, 137, 7, 168, 10, 200, 10 };//翻译改动
-            int[] origin2 = new int[] { 10, 6, 44, 6, 79, 6, 126, 6, 166, 6, 201, 6 };
+            int[] origin = MseaMode ? new int[] { 10, 6, 53, 6, 94, 6, 135, 6, 176, 6, 202, 6 } : new int[] { 16, 7, 58, 7, 97, 7, 137, 7, 168, 10, 200, 10 };//翻译改动
+            int[] origin2 = MseaMode ? new int[] { 10, 6, 53, 6, 94, 6, 135, 6, 176, 6, 202, 6 } : new int[] { 10, 6, 44, 6, 79, 6, 126, 6, 166, 6, 201, 6 };
             for (int i = 0; i <= 5; i++)
             {
                 bool enable;
@@ -1877,7 +1885,7 @@ namespace WzComparerR2.CharaSimControl
                 if (enable)
                 {
                     enable = this.charStat == null || Character.CheckJobReq(this.charStat.Job, i);
-                    Image jobImage2 = Resource.ResourceManager.GetObject("UIToolTip_img_Item_Equip_Job_" + (enable ? "enable" : "disable") + "_" + i.ToString()) as Image;
+                    Image jobImage2 = Resource.ResourceManager.GetObject("UIToolTip_img_Item_Equip_Job_" + (enable ? "enable" : "disable") + "_" + i.ToString() + (MseaMode ? "_SEA" : "")) as Image;
                     if (jobImage != null)
                     {
                         if (enable)

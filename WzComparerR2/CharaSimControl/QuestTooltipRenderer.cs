@@ -529,8 +529,16 @@ namespace WzComparerR2.CharaSimControl
                         return $"#$p{sr?.Name ?? id.ToString()}#";
 
                     case "o":
-                        StringLinker.StringMob.TryGetValue(id, out sr);
-                        return $"#$o{sr?.Name ?? id.ToString()}#";
+                        if (id >= 100000000)
+                        {
+                            StringLinker.StringMap.TryGetValue(id, out sr);
+                            return $"#$m{sr?.MapName ?? id.ToString()}#";
+                        }
+                        else
+                        {
+                            StringLinker.StringMob.TryGetValue(id, out sr);
+                            return $"#$o{sr?.Name ?? id.ToString()}#";
+                        }
 
                     case "m":
                         StringLinker.StringMap.TryGetValue(id, out sr);
@@ -669,7 +677,9 @@ namespace WzComparerR2.CharaSimControl
             text = text.Replace("#g", "");
             text = text.Replace("#l", "");
             text = text.Replace("#eqp#", "");
+            text = text.Replace("#es", "#ＥＳ"); // plural suffix for English region
             text = text.Replace("#e", "");
+            text = text.Replace("ＥＳ", "es");
             text = text.Replace("#E", "");
             text = text.Replace("#n", " ");
 

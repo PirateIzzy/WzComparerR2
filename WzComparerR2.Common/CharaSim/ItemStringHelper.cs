@@ -166,7 +166,7 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public static string[] GetGearPropString22(GearPropType propType, long value, int signFlag)
+        public static string[] GetGearPropString22(GearPropType propType, long value, int signFlag, bool isMsea = false)
         {
             string[] res = new string[2];
             string sign;
@@ -256,7 +256,7 @@ namespace WzComparerR2.CharaSim
                     res[1] = sign + value + "%";
                     return res;
                 case GearPropType.incMAD:
-                    res[0] = "Magic Attack";
+                    res[0] = "Magic ATT";
                     res[1] = sign + value;
                     return res;
                 case GearPropType.incMADr:
@@ -310,7 +310,7 @@ namespace WzComparerR2.CharaSim
                     return res;
                 case GearPropType.incIMDR:
                 case GearPropType.imdR:
-                    res[0] = "Ignored Enemy DEF";
+                    res[0] = "Enemy DEF Ignored";
                     res[1] = "+" + value + "%";
                     return res;
                 /*
@@ -331,7 +331,7 @@ namespace WzComparerR2.CharaSim
                     res[1] = sign + value;
                     return res;
                 case GearPropType.incAUT:
-                    res[0] = "SAC";
+                    res[0] = isMsea ? "AUT" : "SAC";
                     res[1] = sign + value;
                     return res;
                 case GearPropType.incCHUC:
@@ -340,7 +340,7 @@ namespace WzComparerR2.CharaSim
                     return res;
 
                 case GearPropType.tradeBlock:
-                    res[0] = value == 0 ? null : "#$r교환 불가#";
+                    res[0] = value == 0 ? null : (isMsea ? "#$rUntradeable#" : "#$rUntradable#");
                     return res;
                 case GearPropType.accountSharable:
                     res[0] = value == 0 ? null : "#$r월드 내 나의 캐릭터 간 이동만 가능#";
@@ -352,10 +352,10 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$r중복 소지 불가#";
                     return res;
                 case GearPropType.onlyEquip:
-                    res[0] = value == 0 ? null : "#$r중복 장착 불가#";
+                    res[0] = value == 0 ? null : "#$rCan't Equip Duplicates#";
                     return res;
                 case GearPropType.equipTradeBlock:
-                    res[0] = value == 0 ? null : "#$r장착 시 교환 불가#";
+                    res[0] = value == 0 ? null : "#$rCannot be Traded when equipped#";
                     return res;
                 case GearPropType.notExtend:
                     res[0] = value == 0 ? null : " (연장 불가)";
@@ -376,10 +376,10 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$rCannot be reissued#";
                     return res;
                 case GearPropType.noPrism:
-                    res[0] = value == 0 ? null : "#$rプリズム使用不可#";
+                    res[0] = value == 0 ? null : "#$rCannot use Prism#";
                     return res;
                 case GearPropType.mintable:
-                    res[0] = value == 0 ? null : "#$r민팅 가능#";
+                    res[0] = value == 0 ? null : "#$rMintable#";
                     return res;
                 case GearPropType.tradeAvailable:
                     switch (value)
@@ -388,7 +388,7 @@ namespace WzComparerR2.CharaSim
                             res[0] = "#$g카르마의 가위 또는 실버 카르마의 가위 사용 시 1회 교환 가능#";
                             return res;
                         case 2:
-                            res[0] = "#$g플래티넘 카르마의 가위 사용 시 1회 교환 가능#";
+                            res[0] = "#$gTradable Once with Platium Scissors of Karma#";
                             return res;
                         default: return res;
                     }
@@ -545,7 +545,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         /// <param Name="Type">表示装备类型GearType。</param>
         /// <returns></returns>
-        public static string GetGearTypeString(GearType type)
+        public static string GetGearTypeString(GearType type, bool isMsea = false)
         {
             switch (type)
             {
@@ -586,9 +586,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.shoes: return "Shoes";
                 case GearType.shiningRod: return "Shining Rod";
                 case GearType.soulShooter: return "Soul Shooter";
-                case GearType.ohSword: return "One-handed Sword";
-                case GearType.ohAxe: return "One-handed Axe";
-                case GearType.ohBlunt: return "One-handed Blunt Weapon";
+                case GearType.ohSword: return isMsea ? "One Handed Sword" : "One-handed Sword";
+                case GearType.ohAxe: return isMsea ? "One Handed Axe" : "One-handed Axe";
+                case GearType.ohBlunt: return isMsea ? "One Handed Mace" : "One-handed Blunt Weapon";
                 case GearType.dagger: return "Dagger";
                 case GearType.katara: return "Katara";
                 case GearType.magicArrow: return "Magic Arrow";
@@ -601,11 +601,11 @@ namespace WzComparerR2.CharaSim
                 case GearType.cane: return "Cane";
                 case GearType.wand: return "Wand";
                 case GearType.staff: return "Staff";
-                case GearType.thSword: return "Two-handed Sword";
-                case GearType.thAxe: return "Two-handed Axe";
-                case GearType.thBlunt: return "Two-handed Blunt Weapon";
+                case GearType.thSword: return isMsea ? "Two Handed Sword" : "Two-handed Sword";
+                case GearType.thAxe: return isMsea ? "Two Handed Axe" : "Two-handed Axe";
+                case GearType.thBlunt: return isMsea ? "Two Handed Mace" : "Two-handed Blunt Weapon";
                 case GearType.spear: return "Spear";
-                case GearType.polearm: return "Polearm";
+                case GearType.polearm: return isMsea ? "Pole Arm" : "Polearm";
                 case GearType.bow: return "Bow";
                 case GearType.crossbow: return "Crossbow";
                 case GearType.throwingGlove: return "Claw";
@@ -621,7 +621,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.badge: return "Badge";
                 case GearType.emblem: return "Emblem";
                 case GearType.soulShield: return "Soul Shield";
-                case GearType.demonShield: return "Demon Aegis";
+                case GearType.demonShield: return isMsea ? "Force Shield" : "Demon Aegis";
                 //case GearType.totem: return "Totem";
                 case GearType.petEquip: return "Pet Equipment";
                 case GearType.taming:
@@ -635,59 +635,59 @@ namespace WzComparerR2.CharaSim
                 case GearType.swordZL: return "Long Sword";
                 case GearType.weapon: return "Weapon";
                 case GearType.subWeapon: return "Secondary Weapon";
-                case GearType.heroMedal: return "Medallions";
-                case GearType.rosario: return "Rosary";
+                case GearType.heroMedal: return isMsea ? "Medal" : "Medallions";
+                case GearType.rosario: return isMsea ? "Rosario" : "Rosary";
                 case GearType.chain: return "Iron Chain";
                 case GearType.book1:
                 case GearType.book2:
                 case GearType.book3: return "Magic Book";
-                case GearType.bowMasterFeather: return "Arrow Fletching";
+                case GearType.bowMasterFeather: return isMsea ? "Fletching" : "Arrow Fletching";
                 case GearType.crossBowThimble: return "Bow Thimble";
-                case GearType.shadowerSheath: return "Dagger Scabbard";
-                case GearType.nightLordPoutch: return "Charm";
-                case GearType.viperWristband: return "Wrist Band";
-                case GearType.captainSight: return "Far Sight";
+                case GearType.shadowerSheath: return isMsea ? "Dagger Sheath" : "Dagger Scabbard";
+                case GearType.nightLordPoutch: return isMsea ? "Talisman" : "Charm";
+                case GearType.viperWristband: return isMsea ? "Wristband" : "Wrist Band";
+                case GearType.captainSight: return isMsea ? "Spyglass" : "Far Sight";
                 case GearType.cannonGunPowder:
                 case GearType.cannonGunPowder2: return "Powder Keg";
-                case GearType.aranPendulum: return "Mass";
-                case GearType.evanPaper: return "Document";
+                case GearType.aranPendulum: return isMsea ? "Pendulum" : "Mass";
+                case GearType.evanPaper: return isMsea ? "Grimoire" : "Document";
                 case GearType.battlemageBall: return "Magic Marble";
-                case GearType.wildHunterArrowHead: return "Arrowhead";
+                case GearType.wildHunterArrowHead: return isMsea ? "Arrow Head" : "Arrowhead";
                 case GearType.cygnusGem: return "Jewel";
                 case GearType.controller: return "Controller";
                 case GearType.foxPearl: return "Fox Marble";
                 case GearType.chess: return "Chess Piece";
                 case GearType.powerSource: return "Power Source";
-                case GearType.energySword: return "Whip Blade";
+                case GearType.energySword: return isMsea ? "Energy Sword" : "Whip Blade";
                 case GearType.desperado: return "Desperado";
                 case GearType.memorialStaff: return "Memorial Staff";
-                case GearType.magicStick: return "Beast Tamer Scepter";
+                case GearType.magicStick: return isMsea ? "Magic Stick" : "Beast Tamer Scepter";
                 case GearType.leaf:
                 case GearType.leaf2: return "Leaf";
                 case GearType.boxingClaw: return "Fist";
                 case GearType.kodachi:
-                case GearType.kodachi2: return "Kodachi";
-                case GearType.espLimiter: return "Psy-limiter";
+                case GearType.kodachi2: return isMsea ? "Wakizashi" : "Kodachi";
+                case GearType.espLimiter: return isMsea ? "ESP Limiter" : "Psy-limiter";
 
-                case GearType.gauntletBuster: return "Arm Cannon";
-                case GearType.explosivePill: return "Charge";
+                case GearType.gauntletBuster: return isMsea ? "Revolver Gauntlet" : "Arm Cannon";
+                case GearType.explosivePill: return isMsea ? "Bullets" : "Charge";
 
-                case GearType.chain2: return "Chain";
-                case GearType.magicGauntlet: return "Lucent Gauntlet";
+                case GearType.chain2: return isMsea ? "Energy Chain" : "Chain";
+                case GearType.magicGauntlet: return isMsea ? "Magic Gauntlet" : "Lucent Gauntlet";
                 case GearType.transmitter: return "Warp Forge";
-                case GearType.magicWing: return "Lucent Wings";
-                case GearType.pathOfAbyss: return "Abyssal Path";
+                case GearType.magicWing: return isMsea ? "Magic Wing" : "Lucent Wings";
+                case GearType.pathOfAbyss: return isMsea ? "Abyssal Arm" : "Abyssal Path";
 
                 case GearType.relic: return "Relic";
                 case GearType.ancientBow: return "Ancient Bow";
 
-                case GearType.handFan: return "Ritual Fan";
+                case GearType.handFan: return isMsea ? "Buchae" : "Ritual Fan";
                 case GearType.fanTassel: return "Fan Tassel";
 
-                case GearType.tuner: return "Bladecaster";
-                case GearType.bracelet: return "Bladebinder";
+                case GearType.tuner: return isMsea ? "Tuner" : "Bladecaster";
+                case GearType.bracelet: return isMsea ? "Bracelet" : "Bladebinder";
 
-                case GearType.breathShooter: return "Whispershot";
+                case GearType.breathShooter: return isMsea ? "Breath Shooter" : "Whispershot";
                 case GearType.weaponBelt: return "Weapon Belt";
 
                 case GearType.ornament: return "Ornament";
@@ -699,8 +699,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.boxingSky: return "Brace Band";
 
                 case GearType.arcaneSymbol: return "Arcane Symbol";
-                case GearType.authenticSymbol: return "Sacred Symbol";
-                case GearType.grandAuthenticSymbol: return "Grand Sacred Symbol";
+                case GearType.authenticSymbol: return isMsea ? "Authentic Symbol" : "Sacred Symbol";
+                case GearType.grandAuthenticSymbol: return isMsea ? "Authentic Symbol" : "Grand Sacred Symbol";
 
                 case GearType.jewel: return "宝玉";
 
@@ -753,7 +753,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         /// <param Name="Type">表示装备类型的GearType。</param>
         /// <returns></returns>
-        public static string GetExtraJobReqString(GearType type)
+        public static string GetExtraJobReqString(GearType type, bool isMsea = false)
         {
             switch (type)
             {
@@ -775,26 +775,26 @@ namespace WzComparerR2.CharaSim
                 case GearType.cannonGunPowder:
                 case GearType.cannonGunPowder2: return "Cannoneer only";
                 case GearType.box:
-                case GearType.boxingClaw: return "Jett only";
+                case GearType.boxingClaw: return isMsea ? "Can be equipped by Zen" : "Jett only";
 
                 //1xxx
                 case GearType.cygnusGem: return "Cygnus Knights only";
 
                 //2xxx
-                case GearType.aranPendulum: return GetExtraJobReqString(21);
+                case GearType.aranPendulum: return GetExtraJobReqString(21, isMsea);
                 case GearType.dragonMask:
                 case GearType.dragonPendant:
                 case GearType.dragonWings:
                 case GearType.dragonTail:
-                case GearType.evanPaper: return GetExtraJobReqString(22);
-                case GearType.magicArrow: return GetExtraJobReqString(23);
-                case GearType.card: return GetExtraJobReqString(24);
-                case GearType.foxPearl: return GetExtraJobReqString(25);
+                case GearType.evanPaper: return GetExtraJobReqString(22, isMsea);
+                case GearType.magicArrow: return GetExtraJobReqString(23, isMsea);
+                case GearType.card: return GetExtraJobReqString(24, isMsea);
+                case GearType.foxPearl: return GetExtraJobReqString(25, isMsea);
                 case GearType.orb:
-                case GearType.shiningRod: return GetExtraJobReqString(27);
+                case GearType.shiningRod: return GetExtraJobReqString(27, isMsea);
 
                 //3xxx
-                case GearType.demonShield: return GetExtraJobReqString(31);
+                case GearType.demonShield: return GetExtraJobReqString(31, isMsea);
                 case GearType.desperado: return "Demon Avenger only";
                 case GearType.battlemageBall: return "Battle Mage only";
                 case GearType.wildHunterArrowHead: return "Wild Hunter only";
@@ -806,63 +806,63 @@ namespace WzComparerR2.CharaSim
                 case GearType.mailin: return "Mechanic only";
                 case GearType.controller:
                 case GearType.powerSource:
-                case GearType.energySword: return GetExtraJobReqString(36);
+                case GearType.energySword: return GetExtraJobReqString(36, isMsea);
                 case GearType.gauntletBuster:
-                case GearType.explosivePill: return GetExtraJobReqString(37);
+                case GearType.explosivePill: return GetExtraJobReqString(37, isMsea);
 
                 //4xxx
                 case GearType.katana:
                 case GearType.kodachi:
-                case GearType.kodachi2: return GetExtraJobReqString(41);
+                case GearType.kodachi2: return GetExtraJobReqString(41, isMsea);
                 case GearType.fan: return "Kanna only"; //Haku only?
 
                 //5xxx
                 case GearType.soulShield: return "Mihile only";
 
                 //6xxx
-                case GearType.novaMarrow: return GetExtraJobReqString(61);
+                case GearType.novaMarrow: return GetExtraJobReqString(61, isMsea);
                 case GearType.weaponBelt:
-                case GearType.breathShooter: return GetExtraJobReqString(63);
+                case GearType.breathShooter: return GetExtraJobReqString(63, isMsea);
                 case GearType.chain2:
-                case GearType.transmitter: return GetExtraJobReqString(64);
+                case GearType.transmitter: return GetExtraJobReqString(64, isMsea);
                 case GearType.soulBangle:
-                case GearType.soulShooter: return GetExtraJobReqString(65);
+                case GearType.soulShooter: return GetExtraJobReqString(65, isMsea);
 
                 //10xxx
                 case GearType.swordZB:
-                case GearType.swordZL: return GetExtraJobReqString(101);
+                case GearType.swordZL: return GetExtraJobReqString(101, isMsea);
 
                 case GearType.leaf:
                 case GearType.leaf2:
-                case GearType.memorialStaff: return GetExtraJobReqString(172);
-                case GearType.magicStick: return GetExtraJobReqString(112);
+                case GearType.memorialStaff: return GetExtraJobReqString(172, isMsea);
+                case GearType.magicStick: return GetExtraJobReqString(112, isMsea);
 
                 case GearType.espLimiter:
-                case GearType.chess: return GetExtraJobReqString(142);
+                case GearType.chess: return GetExtraJobReqString(142, isMsea);
 
                 case GearType.magicGauntlet:
-                case GearType.magicWing: return GetExtraJobReqString(152);
+                case GearType.magicWing: return GetExtraJobReqString(152, isMsea);
 
-                case GearType.pathOfAbyss: return GetExtraJobReqString(155);
+                case GearType.pathOfAbyss: return GetExtraJobReqString(155, isMsea);
                 case GearType.handFan:
-                case GearType.fanTassel: return GetExtraJobReqString(164);
+                case GearType.fanTassel: return GetExtraJobReqString(164, isMsea);
 
                 case GearType.tuner:
-                case GearType.bracelet: return GetExtraJobReqString(151);
+                case GearType.bracelet: return GetExtraJobReqString(151, isMsea);
 
                 case GearType.boxingCannon:
-                case GearType.boxingSky: return GetExtraJobReqString(175);
+                case GearType.boxingSky: return GetExtraJobReqString(175, isMsea);
 
-                case GearType.ornament: return GetExtraJobReqString(162);
+                case GearType.ornament: return GetExtraJobReqString(162, isMsea);
 
                 case GearType.chakram:
-                case GearType.hexSeeker: return GetExtraJobReqString(154);
+                case GearType.hexSeeker: return GetExtraJobReqString(154, isMsea);
 
                 case GearType.longSword:
-                case GearType.yeouiGem: return GetExtraJobReqString(161);
+                case GearType.yeouiGem: return GetExtraJobReqString(161, isMsea);
 
                 case GearType.celestialLight:
-                case GearType.compass: return GetExtraJobReqString(182);
+                case GearType.compass: return GetExtraJobReqString(182, isMsea);
                 default: return null;
             }
         }
@@ -872,49 +872,49 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         /// <param Name="specJob">表示装备属性的reqSpecJob的值。</param>
         /// <returns></returns>
-        public static string GetExtraJobReqString(int specJob)
+        public static string GetExtraJobReqString(int specJob, bool isMsea = false)
         {
             switch (specJob)
             {
-                case 21: return "Aran only";
-                case 22: return "Evan only";
-                case 23: return "Mercedes only";
-                case 24: return "Phantom only";
-                case 25: return "Shade only";
-                case 27: return "Luminous only";
-                case 31: return "Demon only";
-                case 36: return "Xenon only";
-                case 37: return "Blaster only";
-                case 41: return "Hayato only";
-                case 42: return "Kanna only";
-                case 51: return "Mihile only";
-                case 61: return "Kaiser only";
-                case 63: return "Kain only";
-                case 64: return "Cadena only";
-                case 65: return "Angelic Buster only";
-                case 101: return "Zero only";
-                case 112: return "Beast Tamer only";
-                case 142: return "Kinesis only";
-                case 151: return "Adele only";
-                case 152: return "Illium only";
-                case 154: return "Khali only";
-                case 155: return "Ark only";
-                case 161: return "Len only";
-                case 162: return "Lara only";
-                case 164: return "Hoyoung only";
-                case 172: return "Lynn only";
-                case 175: return "Mo Xuan only";
-                case 182: return "Sia Astelle only";
+                case 21: return isMsea ? "Can be equipped by Aran" : "Aran only";
+                case 22: return isMsea ? "Can be equipped by Evan" : "Evan only";
+                case 23: return isMsea ? "Can be equipped by Mercedes" : "Mercedes only";
+                case 24: return isMsea ? "Can be equipped by Phantom" : "Phantom only";
+                case 25: return isMsea ? "Can be equipped by Eunwol" : "Shade only";
+                case 27: return isMsea ? "Can be equipped by Luminous" : "Luminous only";
+                case 31: return isMsea ? "Can be equipped by Demon" : "Demon only";
+                case 36: return isMsea ? "Can be equipped by Xenon" : "Xenon only";
+                case 37: return isMsea ? "Can be equipped by Blaster" : "Blaster only";
+                case 41: return isMsea ? "Can be equipped by Hayato" : "Hayato only";
+                case 42: return isMsea ? "Can be equipped by Kanna" : "Kanna only";
+                case 51: return isMsea ? "Can be equipped by Mihile" : "Mihile only";
+                case 61: return isMsea ? "Can be equipped by Kaiser" : "Kaiser only";
+                case 63: return isMsea ? "Can be equipped by Kaine" : "Kain only";
+                case 64: return isMsea ? "Can be equipped by Cadena" : "Cadena only";
+                case 65: return isMsea ? "Can be equipped by Angelic Buster" : "Angelic Buster only";
+                case 101: return isMsea ? "Can be equipped by Zero" : "Zero only";
+                case 112: return isMsea ? "Can be equipped by Beast Tamer" : "Beast Tamer only";
+                case 142: return isMsea ? "Can be equipped by Kinesis" : "Kinesis only";
+                case 151: return isMsea ? "Can be equipped by Adele" : "Adele only";
+                case 152: return isMsea ? "Can be equipped by Illium" : "Illium only";
+                case 154: return isMsea ? "Can be equipped by Khali" : "Khali only";
+                case 155: return isMsea ? "Can be equipped by Ark" : "Ark only";
+                case 161: return isMsea ? "Can be equipped by Len" : "Len only";
+                case 162: return isMsea ? "Can be equipped by Lara" : "Lara only";
+                case 164: return isMsea ? "Can be equipped by Ho Young" : "Hoyoung only";
+                case 172: return isMsea ? "Can be equipped by Lynn" : "Lynn only";
+                case 175: return isMsea ? "Can be equipped by Mo Xuan" : "Mo Xuan only";
+                case 182: return isMsea ? "Can be equipped by Sia Astelle" : "Sia Astelle only";
                 default: return null;
             }
         }
 
-        public static string GetExtraJobReqString(IEnumerable<int> specJobs, bool isMsnMode = false)
+        public static string GetExtraJobReqString(IEnumerable<int> specJobs, bool isMsnMode = false, bool isMsea = false)
         {
-            return string.Join(", ", GetExtraJobReqStringList(specJobs, isMsnMode)) + " only";
+            return string.Format(isMsea ? "Can be equipped by {0}" : "{0} only", string.Join(", ", GetExtraJobReqStringList(specJobs, isMsnMode, isMsea)));
         }
 
-        public static List<string> GetExtraJobReqStringList(IEnumerable<int> specJobs, bool isMsnMode = false)
+        public static List<string> GetExtraJobReqStringList(IEnumerable<int> specJobs, bool isMsnMode = false, bool isMsea = false)
         {
             List<string> extraJobNames = new List<string>();
             if (isMsnMode)
@@ -939,7 +939,7 @@ namespace WzComparerR2.CharaSim
                         case 1: extraJobNames.Add("Cygnus Knight class"); break;
                         case 2: extraJobNames.Add("Hero class"); break;
                         case 3: extraJobNames.Add("Resistance class"); break;
-                        case 4: extraJobNames.Add("Sengoku class"); break;
+                        case 4: extraJobNames.Add(isMsea ? "Akatsuki class" : "Sengoku class"); break;
                         case 6: extraJobNames.Add("Nova class"); break;
                         //case 12: extraJobNames.Add("アニメコラボ職業"); break;
                         case 15: extraJobNames.Add("Flora class"); break;
@@ -956,10 +956,10 @@ namespace WzComparerR2.CharaSim
                     switch (specJob)
                     {
                         case 1: extraJobNames.AddRange(new[] { "Hero", "Paladin" }); break;
-                        case 2: extraJobNames.AddRange(new[] { "Arch Mage (Ice, Lightning)", "Arch Mage (Fire, Poison)", "Bishop" }); break;
+                        case 2: extraJobNames.AddRange(isMsea ? new[] { "Arch Mage", "Bishop" } : new[] { "Arch Mage (Ice, Lightning)", "Arch Mage (Fire, Poison)", "Bishop" }); break;
                         case 4: extraJobNames.Add("Shadower"); break;
-                        case 11: extraJobNames.Add("Dawn Warrior"); break;
-                        case 12: extraJobNames.Add("Blaze Wizard"); break;
+                        case 11: extraJobNames.Add(isMsea ? "Soul Master" : "Dawn Warrior"); break;
+                        case 12: extraJobNames.Add(isMsea ? "Flame Wizard" : "Blaze Wizard"); break;
                         case 22: extraJobNames.Add("Evan"); break;
                         case 32: extraJobNames.Add("Battle Mage"); break;
                         case 172: extraJobNames.Add("Lynn"); break;
@@ -1069,7 +1069,7 @@ namespace WzComparerR2.CharaSim
             }
         }
 
-        public static string GetJobName(int jobCode)
+        public static string GetJobName(int jobCode, bool isMsea = false)
         {
             switch (jobCode)
             {
@@ -1092,7 +1092,7 @@ namespace WzComparerR2.CharaSim
                 case 134: return "Dark Knight(6)";
                 case 200: return "Magician";
                 case 210: return "Wizard (Fire,Poison)";
-                case 211: return "Mage (Fire, Poison)";
+                case 211: return "Mage (Fire,Poison)";
                 case 212: return "Arch Mage (Fire,Poison)";
                 case 213: return "Arch Mage (Fire,Poison)(5)";
                 case 214: return "Arch Mage (Fire,Poison)(6)";
@@ -1113,11 +1113,11 @@ namespace WzComparerR2.CharaSim
                 case 312: return "Bowmaster";
                 case 313: return "Bowmaster(5)";
                 case 314: return "Bowmaster(6)";
-                case 320: return "Crossbowman";
+                case 320: return isMsea ? "Crossbow Man" : "Crossbowman";
                 case 321: return "Sniper";
-                case 322: return "Marksman";
-                case 323: return "Marksman(5)";
-                case 324: return "Marksman(6)";
+                case 322: return isMsea ? "Crossbow Master" : "Marksman";
+                case 323: return isMsea ? "Crossbow Master(5)" : "Marksman(5)";
+                case 324: return isMsea ? "Crossbow Master(6)" : "Marksman(6)";
                 case 330: return "Ancient Archer";
                 case 331: return "Soulchaser";
                 case 332: return "Pathfinder";
@@ -1129,7 +1129,7 @@ namespace WzComparerR2.CharaSim
                 case 412: return "Night Lord";
                 case 413: return "Night Lord(5)";
                 case 414: return "Night Lord(6)";
-                case 420: return "Thief";
+                case 420: return isMsea ? "Bandit" : "Thief";
                 case 421: return "Chief Bandit";
                 case 422: return "Shadower";
                 case 423: return "Shadower(5)";
@@ -1143,67 +1143,67 @@ namespace WzComparerR2.CharaSim
                 case 436: return "Blade Master(6)";
                 case 500: return "Pirate";
                 case 501: return "Pirate";
-                case 510: return "Brawler";
-                case 511: return "Marauder";
-                case 512: return "Buccaneer";
-                case 513: return "Buccaneer(5)";
-                case 514: return "Buccaneer(6)";
+                case 510: return isMsea ? "Infighter" : "Brawler";
+                case 511: return isMsea ? "Buccaneer" : "Marauder";
+                case 512: return isMsea ? "Viper" : "Buccaneer";
+                case 513: return isMsea ? "Viper(5)" : "Buccaneer(5)";
+                case 514: return isMsea ? "Viper(6)" : "Buccaneer(6)";
                 case 520: return "Gunslinger";
-                case 521: return "Outlaw";
-                case 522: return "Corsair";
-                case 523: return "Corsair(5)";
-                case 524: return "Corsair(6)";
+                case 521: return isMsea ? "Valkyrie" : "Outlaw";
+                case 522: return isMsea ? "Captain" : "Corsair";
+                case 523: return isMsea ? "Captain(5)" : "Corsair(5)";
+                case 524: return isMsea ? "Captain(6)" : "Corsair(6)";
                 case 530: return "Cannoneer";
                 case 531: return "Cannon Trooper";
                 case 532: return "Cannon Master";
                 case 533: return "Cannon Master(5)";
                 case 534: return "Cannon Master(6)";
-                case 508: return "Jett(1)";
-                case 570: return "Jett(2)";
-                case 571: return "Jett(3)";
-                case 572: return "Jett(4)";
+                case 508: return isMsea ? "Zen(1)" : "Jett(1)";
+                case 570: return isMsea ? "Zen(2)" : "Jett(2)";
+                case 571: return isMsea ? "Zen(3)" : "Jett(3)";
+                case 572: return isMsea ? "Zen(4)" : "Jett(4)";
 
                 case 800:
                 case 900: return "Operator";
 
-                case 1000: return "Noblesse";
-                case 1100: return "Dawn Warrior(1)";
-                case 1110: return "Dawn Warrior(2)";
-                case 1111: return "Dawn Warrior(3)";
-                case 1112: return "Dawn Warrior(4)";
-                case 1113: return "Dawn Warrior(5)";
-                case 1114: return "Dawn Warrior(6)";
-                case 1200: return "Blaze Wizard(1)";
-                case 1210: return "Blaze Wizard(2)";
-                case 1211: return "Blaze Wizard(3)";
-                case 1212: return "Blaze Wizard(4)";
-                case 1213: return "Blaze Wizard(5)";
-                case 1214: return "Blaze Wizard(6)";
-                case 1300: return "Wind Archer(1)";
-                case 1310: return "Wind Archer(2)";
-                case 1311: return "Wind Archer(3)";
-                case 1312: return "Wind Archer(4)";
-                case 1313: return "Wind Archer(5)";
-                case 1314: return "Wind Archer(6)";
+                case 1000: return isMsea ? "Nobless" : "Noblesse";
+                case 1100: return isMsea ? "Soul Master(1)" : "Dawn Warrior(1)";
+                case 1110: return isMsea ? "Soul Master(2)" : "Dawn Warrior(2)";
+                case 1111: return isMsea ? "Soul Master(3)" : "Dawn Warrior(3)";
+                case 1112: return isMsea ? "Soul Master(4)" : "Dawn Warrior(4)";
+                case 1113: return isMsea ? "Soul Master(5)" : "Dawn Warrior(5)";
+                case 1114: return isMsea ? "Soul Master(6)" : "Dawn Warrior(6)";
+                case 1200: return isMsea ? "Flame Wizard(1)" : "Blaze Wizard(1)";
+                case 1210: return isMsea ? "Flame Wizard(2)" : "Blaze Wizard(2)";
+                case 1211: return isMsea ? "Flame Wizard(3)" : "Blaze Wizard(3)";
+                case 1212: return isMsea ? "Flame Wizard(4)" : "Blaze Wizard(4)";
+                case 1213: return isMsea ? "Flame Wizard(5)" : "Blaze Wizard(5)";
+                case 1214: return isMsea ? "Flame Wizard(6)" : "Blaze Wizard(6)";
+                case 1300: return isMsea ? "Wind Breaker(1)" : "Wind Archer(1)";
+                case 1310: return isMsea ? "Wind Breaker(2)" : "Wind Archer(2)";
+                case 1311: return isMsea ? "Wind Breaker(3)" : "Wind Archer(3)";
+                case 1312: return isMsea ? "Wind Breaker(4)" : "Wind Archer(4)";
+                case 1313: return isMsea ? "Wind Breaker(5)" : "Wind Archer(5)";
+                case 1314: return isMsea ? "Wind Breaker(6)" : "Wind Archer(6)";
                 case 1400: return "Night Walker(1)";
                 case 1410: return "Night Walker(2)";
                 case 1411: return "Night Walker(3)";
                 case 1412: return "Night Walker(4)";
                 case 1413: return "Night Walker(5)";
                 case 1414: return "Night Walker(6)";
-                case 1500: return "Thunder Breaker(1)";
-                case 1510: return "Thunder Breaker(2)";
-                case 1511: return "Thunder Breaker(3)";
-                case 1512: return "Thunder Breaker(4)";
-                case 1513: return "Thunder Breaker(5)";
-                case 1514: return "Thunder Breaker(6)";
+                case 1500: return isMsea ? "Striker(1)" : "Thunder Breaker(1)";
+                case 1510: return isMsea ? "Striker(2)" : "Thunder Breaker(2)";
+                case 1511: return isMsea ? "Striker(3)" : "Thunder Breaker(3)";
+                case 1512: return isMsea ? "Striker(4)" : "Thunder Breaker(4)";
+                case 1513: return isMsea ? "Striker(5)" : "Thunder Breaker(5)";
+                case 1514: return isMsea ? "Striker(6)" : "Thunder Breaker(6)";
 
                 case 2000: return "Legend";
                 case 2001: return "Evan";
                 case 2002: return "Mercedes";
                 case 2003: return "Phantom";
                 case 2004: return "Luminous";
-                case 2005: return "Shade";
+                case 2005: return isMsea ? "Eunwol" : "Shade";
                 case 2100: return "Aran(1)";
                 case 2110: return "Aran(2)";
                 case 2111: return "Aran(3)";
@@ -1217,7 +1217,7 @@ namespace WzComparerR2.CharaSim
                 case 2213: return "Evan(2)";
                 case 2214:
                 case 2215:
-                case 2216: return "Evan (3)";
+                case 2216: return "Evan(3)";
                 case 2217:
                 case 2218: return "Evan(4)";
                 case 2219: return "Evan(5)";
@@ -1234,12 +1234,12 @@ namespace WzComparerR2.CharaSim
                 case 2412: return "Phantom(4)";
                 case 2413: return "Phantom(5)";
                 case 2414: return "Phantom(6)";
-                case 2500: return "Shade(1)";
-                case 2510: return "Shade(2)";
-                case 2511: return "Shade(3)";
-                case 2512: return "Shade(4)";
-                case 2513: return "Shade(5)";
-                case 2514: return "Shade(6)";
+                case 2500: return isMsea ? "Eunwol(1)" : "Shade(1)";
+                case 2510: return isMsea ? "Eunwol(2)" : "Shade(2)";
+                case 2511: return isMsea ? "Eunwol(3)" : "Shade(3)";
+                case 2512: return isMsea ? "Eunwol(4)" : "Shade(4)";
+                case 2513: return isMsea ? "Eunwol(5)" : "Shade(5)";
+                case 2514: return isMsea ? "Eunwol(6)" : "Shade(6)";
                 case 2700: return "Luminous(1)";
                 case 2710: return "Luminous(2)";
                 case 2711: return "Luminous(3)";
@@ -1319,19 +1319,19 @@ namespace WzComparerR2.CharaSim
                 case 6000: return "Kaiser";
                 case 6001: return "Angelic Buster";
                 case 6002: return "Cadena";
-                case 6003: return "Kain";
+                case 6003: return isMsea ? "Kaine" : "Kain";
                 case 6100: return "Kaiser(1)";
                 case 6110: return "Kaiser(2)";
                 case 6111: return "Kaiser(3)";
                 case 6112: return "Kaiser(4)";
                 case 6113: return "Kaiser(5)";
                 case 6114: return "Kaiser(6)";
-                case 6300: return "Kain(1)";
-                case 6310: return "Kain(2)";
-                case 6311: return "Kain(3)";
-                case 6312: return "Kain(4)";
-                case 6313: return "Kain(5)";
-                case 6314: return "Kain(6)";
+                case 6300: return isMsea ? "Kaine(1)" : "Kain(1)";
+                case 6310: return isMsea ? "Kaine(2)" : "Kain(2)";
+                case 6311: return isMsea ? "Kaine(3)" : "Kain(3)";
+                case 6312: return isMsea ? "Kaine(4)" : "Kain(4)";
+                case 6313: return isMsea ? "Kaine(5)" : "Kain(5)";
+                case 6314: return isMsea ? "Kaine(6)" : "Kain(6)";
                 case 6400: return "Cadena(1)";
                 case 6410: return "Cadena(2)";
                 case 6411: return "Cadena(3)";
@@ -1418,12 +1418,12 @@ namespace WzComparerR2.CharaSim
                 case 16212: return "Lara(4)";
                 case 16213: return "Lara(5)";
                 case 16214: return "Lara(6)";
-                case 16400: return "Hoyoung(1)";
-                case 16410: return "Hoyoung(2)";
-                case 16411: return "Hoyoung(3)";
-                case 16412: return "Hoyoung(4)";
-                case 16413: return "Hoyoung(5)";
-                case 16414: return "Hoyoung(6)";
+                case 16400: return isMsea ? "Ho Young(1)" : "Hoyoung(1)";
+                case 16410: return isMsea ? "Ho Young(2)" : "Hoyoung(2)";
+                case 16411: return isMsea ? "Ho Young(3)" : "Hoyoung(3)";
+                case 16412: return isMsea ? "Ho Young(4)" : "Hoyoung(4)";
+                case 16413: return isMsea ? "Ho Young(5)" : "Hoyoung(5)";
+                case 16414: return isMsea ? "Ho Young(6)" : "Hoyoung(6)";
 
                 case 17000: return "Mo Xuan";
                 case 17001: return "Lynn";

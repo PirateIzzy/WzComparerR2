@@ -14,5 +14,12 @@ namespace WzComparerR2.Config
             get { return (bool)this["enable22AniStyle"]; }
             set { this["enable22AniStyle"] = value; }
         }
+
+        [ConfigurationProperty("mseaMode", DefaultValue = false)]
+        public bool MseaMode
+        {
+            get { return (bool)this["mseaMode"]; }
+            set { this["mseaMode"] = value; }
+        }
     }
 }

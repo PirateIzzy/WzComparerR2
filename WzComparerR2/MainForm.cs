@@ -245,6 +245,7 @@ namespace WzComparerR2
         {
             var Setting = CharaSimConfig.Default;
             this.buttonItemAutoQuickView.Checked = Setting.AutoQuickView;
+            tooltipQuickView.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             tooltipQuickView.PreferredStringCopyMethod = Setting.PreferredStringCopyMethod;
             tooltipQuickView.CopyParsedSkillString = Setting.CopyParsedSkillString;
             tooltipQuickView.SkillRender.ShowProperties = Setting.Skill.ShowProperties;
@@ -265,11 +266,13 @@ namespace WzComparerR2
             tooltipQuickView.GearRender.ShowMedalTag = Setting.Gear.ShowMedalTag;
             tooltipQuickView.GearRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.GearRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.GearRender.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.GearRender22.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender22.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender22.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.GearRender22.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.GearRender22.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.GearRender22.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -279,6 +282,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+            tooltipQuickView.ItemRender.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.MapRender.ShowMiniMap = Setting.Map.ShowMiniMap;
             tooltipQuickView.MapRender.ShowObjectID = Setting.Map.ShowMapObjectID;
             tooltipQuickView.MapRender.ShowMobNpcObjectID = Setting.Map.ShowMobNpcObjectID;
@@ -1163,7 +1167,7 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                string[] msFileExtensions = { "*.ms", "*.mn" };
+                string[] msFileExtensions = { ".ms", ".mn" };
                 if (msFileExtensions.Any(ext => string.Equals(Path.GetExtension(wzFilePath), ext, StringComparison.OrdinalIgnoreCase)))
                 {
                     wz.LoadMsFile(wzFilePath);
@@ -1176,9 +1180,9 @@ namespace WzComparerR2
                         string packsDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(wzFilePath)), "Packs");
                         if (Directory.Exists(packsDir))
                         {
-                            foreach (var extFilter in msFileExtensions)
+                            foreach (var ext in msFileExtensions)
                             {
-                                foreach (var msFile in Directory.GetFiles(packsDir, extFilter))
+                                foreach (var msFile in Directory.GetFiles(packsDir, $"*{ext}"))
                                 {
                                     wz.LoadMsFile(msFile);
                                 }
@@ -3505,7 +3509,7 @@ namespace WzComparerR2
                     }
                     else if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\d*\\\d+.img\\skill\\\d+$"))
                     {
-                        Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz);
+                        Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz, PluginManager.FindWz);
                         if (stringLinker == null || !stringLinker.StringSkill.TryGetValue(skill.SkillID, out sr))
                         {
                             sr = new StringResultSkill();
@@ -4073,6 +4077,8 @@ namespace WzComparerR2
                     comparer.ShowChangeType = chkShowChangeType.Checked;
                     comparer.ShowLinkedTamingMob = chkShowLinkedTamingMob.Checked;
                     comparer.SkipKMSContent = chkSkipKMSContent.Checked;
+                    comparer.MseaMode = chkMseaMode.Checked;
+                    comparer.SkipGodChangseopDuplicatedNodes = chkSkipGodChangseopDuplicatedNodes.Checked;
                     comparer.Enable22AniStyle = GearGraphics.is22aniStyle;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
@@ -4093,6 +4099,8 @@ namespace WzComparerR2
                             {
                                 case DialogResult.Yes:
                                     btnEasyCompare.Enabled = false;
+                                    btnPreset.Enabled = false;
+                                    clbRootNode.Enabled = false;
                                     cmbComparePng.Enabled = false;
                                     chkOutputPng.Enabled = false;
                                     chkResolvePngLink.Enabled = false;
@@ -4113,6 +4121,8 @@ namespace WzComparerR2
                                     chkShowLinkedTamingMob.Enabled = false;
                                     chkHashPngFileName.Enabled = false;
                                     chkSkipKMSContent.Enabled = false;
+                                    chkMseaMode.Enabled = false;
+                                    chkSkipGodChangseopDuplicatedNodes.Enabled = false;
                                     if (chkSkipKMSContent.Checked)
                                     {
                                         switch (MessageBoxEx.Show(this, "Would you like to download database of KMS content?\r\n\r\nIf you select \"No\", only KMS Skills will be skipped. ", "WZ Compare", MessageBoxButtons.YesNo))
@@ -4158,6 +4168,8 @@ namespace WzComparerR2
                         labelXComp1.Text = "Comparison completed. Time elapsed: " + sw.Elapsed.ToString();
                         labelXComp2.Text = "";
                         btnEasyCompare.Enabled = true;
+                        btnPreset.Enabled = true;
+                        clbRootNode.Enabled = true;
                         cmbComparePng.Enabled = true;
                         chkOutputPng.Enabled = true;
                         chkResolvePngLink.Enabled = true;
@@ -4178,6 +4190,8 @@ namespace WzComparerR2
                         chkShowLinkedTamingMob.Enabled = true;
                         chkHashPngFileName.Enabled = true;
                         chkSkipKMSContent.Enabled = true;
+                        chkMseaMode.Enabled = true;
+                        chkSkipGodChangseopDuplicatedNodes.Enabled = true;
                         if (comparer.FailToExportNodes.Count > 0 || comparer.FailToExportTooltips.Count > 0)
                         {
                             string failData = Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportNodes, Newtonsoft.Json.Formatting.Indented) + "\r\n" + Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportTooltips, Newtonsoft.Json.Formatting.Indented); File.WriteAllText(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"), failData, Encoding.UTF8);
@@ -4217,14 +4231,114 @@ namespace WzComparerR2
                 labelXComp2.Text = comp.StateDetail;
             }
         }
+
+        private void buttonItemAbout_Click(object sender, EventArgs e)
+        {
+            new FrmAbout().ShowDialog();
+        }
+
         private void btnRootNode_Click(object sender, EventArgs e)
         {
             clbRootNode.Visible = !clbRootNode.Visible;
         }
 
-        private void buttonItemAbout_Click(object sender, EventArgs e)
+        private void btnMusicChannel_Click(object sender, EventArgs e)
         {
-            new FrmAbout().ShowDialog();
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                bool nodeOption = new string[] { "Effect", "Map", "Sound", "String", "UI" }.Contains(clbRootNode.Items[i].ToString());
+                clbRootNode.SetItemChecked(i, nodeOption);
+            }
+            chkOutputPng.Checked = true;
+            chkResolvePngLink.Checked = true;
+            chkOutputAddedImg.Checked = true;
+            chkOutputRemovedImg.Checked = true;
+            chkOutputSkillTooltip.Checked = false;
+            chkOutputEqpTooltip.Checked = false;
+            chkOutputItemTooltip.Checked = false;
+            chkOutputMapTooltip.Checked = true;
+            chkOutputMobTooltip.Checked = false;
+            chkOutputNpcTooltip.Checked = false;
+            chkOutputQuestTooltip.Checked = false;
+            chkOutputAchvTooltip.Checked = false;
+            chkShowObjectID.Checked = true;
+            chkShowChangeType.Checked = true;
+            chkShowLinkedTamingMob.Checked = false;
+            chkSkipKMSContent.Checked = false;
+        }
+
+        private void btnSkillChangeInfo_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                bool nodeOption = new string[] { "Skill", "String" }.Contains(clbRootNode.Items[i].ToString());
+                clbRootNode.SetItemChecked(i, nodeOption);
+            }
+            chkOutputPng.Checked = true;
+            chkResolvePngLink.Checked = true;
+            chkOutputAddedImg.Checked = true;
+            chkOutputRemovedImg.Checked = true;
+            chkOutputSkillTooltip.Checked = true;
+            chkOutputEqpTooltip.Checked = false;
+            chkOutputItemTooltip.Checked = false;
+            chkOutputMapTooltip.Checked = false;
+            chkOutputMobTooltip.Checked = false;
+            chkOutputNpcTooltip.Checked = false;
+            chkOutputQuestTooltip.Checked = false;
+            chkOutputAchvTooltip.Checked = false;
+            chkShowObjectID.Checked = true;
+            chkShowChangeType.Checked = true;
+            chkShowLinkedTamingMob.Checked = false;
+            chkSkipKMSContent.Checked = false;
+        }
+
+        private void btnNewItemNews_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                bool nodeOption = new string[] { "Character", "Effect", "Item", "Map", "String", "UI" }.Contains(clbRootNode.Items[i].ToString());
+                clbRootNode.SetItemChecked(i, nodeOption);
+            }
+            chkOutputPng.Checked = true;
+            chkResolvePngLink.Checked = true;
+            chkOutputAddedImg.Checked = true;
+            chkOutputRemovedImg.Checked = true;
+            chkOutputSkillTooltip.Checked = false;
+            chkOutputEqpTooltip.Checked = true;
+            chkOutputItemTooltip.Checked = true;
+            chkOutputMapTooltip.Checked = true;
+            chkOutputMobTooltip.Checked = false;
+            chkOutputNpcTooltip.Checked = false;
+            chkOutputQuestTooltip.Checked = false;
+            chkOutputAchvTooltip.Checked = false;
+            chkShowObjectID.Checked = true;
+            chkShowChangeType.Checked = true;
+            chkShowLinkedTamingMob.Checked = false;
+            chkSkipKMSContent.Checked = false;
+        }
+
+        private void btnMapleWiki_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                clbRootNode.SetItemChecked(i, true);
+            }
+            chkOutputPng.Checked = true;
+            chkResolvePngLink.Checked = true;
+            chkOutputAddedImg.Checked = true;
+            chkOutputRemovedImg.Checked = true;
+            chkOutputSkillTooltip.Checked = true;
+            chkOutputEqpTooltip.Checked = true;
+            chkOutputItemTooltip.Checked = true;
+            chkOutputMapTooltip.Checked = true;
+            chkOutputMobTooltip.Checked = true;
+            chkOutputNpcTooltip.Checked = true;
+            chkOutputQuestTooltip.Checked = true;
+            chkOutputAchvTooltip.Checked = true;
+            chkShowObjectID.Checked = true;
+            chkShowChangeType.Checked = true;
+            chkShowLinkedTamingMob.Checked = true;
+            chkSkipKMSContent.Checked = false;
         }
 
         private void btnExportSkill_Click(object sender, EventArgs e)
