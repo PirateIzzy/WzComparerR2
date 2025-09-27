@@ -679,7 +679,7 @@ namespace WzComparerR2.Comparer
                     }
                     if (godChangseopNode.Contains(diff))
                     {
-                        StateInfo = string.Format("{0}/{1} 変更: {2}", count[0], count[3], "神チャンソプの重複ノード");
+                        StateInfo = string.Format("{0}/{1} Modified: {2}", count[0], count[3], "Duplicate Node");
                         count[0]++;
                         continue;
                     }

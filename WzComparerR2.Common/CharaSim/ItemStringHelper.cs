@@ -343,13 +343,13 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : (isMsea ? "#$rUntradeable#" : "#$rUntradable#");
                     return res;
                 case GearPropType.accountSharable:
-                    res[0] = value == 0 ? null : "#$r월드 내 나의 캐릭터 간 이동만 가능#";
+                    res[0] = value == 0 ? null : "#$rAccount-bound. Transferable within world.#";
                     return res;
                 case GearPropType.sharableOnce:
-                    res[0] = value == 0 ? null : "#$r월드 내 나의 캐릭터 간 1회 이동 가능 (이동 후 교환불가)#";
+                    res[0] = value == 0 ? null : "#$rTradable to your chars in the same world once.#";
                     return res;
                 case GearPropType.only:
-                    res[0] = value == 0 ? null : "#$r중복 소지 불가#";
+                    res[0] = value == 0 ? null : "#$rOne-of-a-kind Item#";
                     return res;
                 case GearPropType.onlyEquip:
                     res[0] = value == 0 ? null : "#$rCan't Equip Duplicates#";
@@ -364,7 +364,7 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$r1회 교환 가능 (거래 후 월드 내 나의 캐릭터 간 이동만 가능)#";
                     return res;
                 case GearPropType.timeLimited:
-                    res[0] = value == 0 ? null : "유효 기간";
+                    res[0] = value == 0 ? null : "Duration";
                     return res;
                 case GearPropType.abilityTimeLimited:
                     res[0] = value == 0 ? null : "능력치 유효 기간";
@@ -385,7 +385,7 @@ namespace WzComparerR2.CharaSim
                     switch (value)
                     {
                         case 1:
-                            res[0] = "#$g카르마의 가위 또는 실버 카르마의 가위 사용 시 1회 교환 가능#";
+                            res[0] = "#$gTradable Once with Scissors of Karma or Silver Scissors of Karma#";
                             return res;
                         case 2:
                             res[0] = "#$gTradable Once with Platium Scissors of Karma#";
@@ -396,14 +396,14 @@ namespace WzComparerR2.CharaSim
                     switch (value)
                     {
                         case 1:
-                            res[0] = "#$g쉐어 네임 텍을 사용하면 월드 내 나의 캐릭터 간 1회 이동할 수 있습니다.#";
+                            res[0] = "#$gThe Sharing Tag can move an item to another character within the same world, but only once.#";
                             return res;
                         default: return res;
                     }
                 //case GearPropType.noPotential: return value == 0 ? null : "잠재능력 설정 불가";
                 //case GearPropType.fixedPotential: return value == 0 ? null : "잠재능력 재설정 불가";
                 case GearPropType.superiorEqp:
-                    res[0] = value == 0 ? null : "아이템 강화 성공시 더욱 높은 효과를 받을 수 있습니다.";
+                    res[0] = value == 0 ? null : "Allows you to gain even higher stats with successful item enhancement.";
                     return res;
                 //case GearPropType.jokerToSetItem: return value == 0 ? null : "#c3개 이상 착용하고 있는 모든 세트 아이템에 포함되는 럭키 아이템! (단, 2개 이상의 럭키 아이템 착용 시 1개만 효과 적용.)#";
                 //case GearPropType.cantRepair: return value == 0 ? null : "수리 불가";
@@ -429,10 +429,10 @@ namespace WzComparerR2.CharaSim
                     return res;
 
                 case GearPropType.Etuc:
-                    res[0] = $"#$d익셉셔널 : 없음 (최대 {value}회)#";
+                    res[0] = $"#$dExceptional: None (Max {value} time(s))#";
                     return res;
                 case GearPropType.CuttableCount:
-                    res[0] = $" #$r(가위 사용 잔여 횟수：{value} / {value})#";
+                    res[0] = $" #$r(Remaining Scissors: {value} / {value})#";
                     return res;
 
                 case GearPropType.incEXPr:
@@ -634,7 +634,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.swordZB: return "Heavy Sword";
                 case GearType.swordZL: return "Long Sword";
                 case GearType.weapon: return "Weapon";
-                case GearType.subWeapon: return "Secondary Weapon";
+                case GearType.subWeapon: return "Sub Weapon";
                 case GearType.heroMedal: return isMsea ? "Medal" : "Medallions";
                 case GearType.rosario: return isMsea ? "Rosario" : "Rosary";
                 case GearType.chain: return "Iron Chain";
