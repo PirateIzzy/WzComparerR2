@@ -256,7 +256,7 @@ namespace WzComparerR2.CharaSim
                     res[1] = sign + value + "%";
                     return res;
                 case GearPropType.incMAD:
-                    res[0] = "Magic Attack";
+                    res[0] = "Magic ATT";
                     res[1] = sign + value;
                     return res;
                 case GearPropType.incMADr:
@@ -310,7 +310,7 @@ namespace WzComparerR2.CharaSim
                     return res;
                 case GearPropType.incIMDR:
                 case GearPropType.imdR:
-                    res[0] = "Ignored Enemy DEF";
+                    res[0] = "Enemy DEF Ignored";
                     res[1] = "+" + value + "%";
                     return res;
                 /*
@@ -340,7 +340,7 @@ namespace WzComparerR2.CharaSim
                     return res;
 
                 case GearPropType.tradeBlock:
-                    res[0] = value == 0 ? null : "#$r교환 불가#";
+                    res[0] = value == 0 ? null : (isMsea ? "#$rUntradeable#" : "#$rUntradable#");
                     return res;
                 case GearPropType.accountSharable:
                     res[0] = value == 0 ? null : "#$r월드 내 나의 캐릭터 간 이동만 가능#";
@@ -352,10 +352,10 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$r중복 소지 불가#";
                     return res;
                 case GearPropType.onlyEquip:
-                    res[0] = value == 0 ? null : "#$r중복 장착 불가#";
+                    res[0] = value == 0 ? null : "#$rCan't Equip Duplicates#";
                     return res;
                 case GearPropType.equipTradeBlock:
-                    res[0] = value == 0 ? null : "#$r장착 시 교환 불가#";
+                    res[0] = value == 0 ? null : "#$rCannot be Traded when equipped#";
                     return res;
                 case GearPropType.notExtend:
                     res[0] = value == 0 ? null : " (연장 불가)";
@@ -376,10 +376,10 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$rCannot be reissued#";
                     return res;
                 case GearPropType.noPrism:
-                    res[0] = value == 0 ? null : "#$rプリズム使用不可#";
+                    res[0] = value == 0 ? null : "#$rCannot use Prism#";
                     return res;
                 case GearPropType.mintable:
-                    res[0] = value == 0 ? null : "#$r민팅 가능#";
+                    res[0] = value == 0 ? null : "#$rMintable#";
                     return res;
                 case GearPropType.tradeAvailable:
                     switch (value)
@@ -388,7 +388,7 @@ namespace WzComparerR2.CharaSim
                             res[0] = "#$g카르마의 가위 또는 실버 카르마의 가위 사용 시 1회 교환 가능#";
                             return res;
                         case 2:
-                            res[0] = "#$g플래티넘 카르마의 가위 사용 시 1회 교환 가능#";
+                            res[0] = "#$gTradable Once with Platium Scissors of Karma#";
                             return res;
                         default: return res;
                     }

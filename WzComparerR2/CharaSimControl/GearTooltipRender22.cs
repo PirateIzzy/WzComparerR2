@@ -206,6 +206,7 @@ namespace WzComparerR2.CharaSimControl
                 { "$s", ((SolidBrush)GearGraphics.Equip22BrushScroll).Color },
                 { "$g", ((SolidBrush)GearGraphics.Equip22BrushGray).Color },
                 { "$d", ((SolidBrush)GearGraphics.Equip22BrushDarkGray).Color },
+                { "$z", ((SolidBrush)GearGraphics.GreenBrush2).Color },
             };
             var itemPotentialColorTable = new Dictionary<string, Color>()
             {
@@ -253,14 +254,14 @@ namespace WzComparerR2.CharaSimControl
                 case 1: gearName += " (Female)"; break;
             }
 
-            TextRenderer.DrawText(g, gearName, GearGraphics.ItemNameFont2,
+            TextRenderer.DrawText(g, gearName, GearGraphics.ItemNameFont,
                 new Point(width, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
             picH += 20;
 
             // 스페셜 아이템
             if (Gear.GetBooleanValue(GearPropType.specialGrade))
             {
-                TextRenderer.DrawText(g, "스페셜 아이템", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.White, TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "Special Item", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.White, TextFormatFlags.HorizontalCenter);
                 picH += 16;
             }
             else if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
@@ -268,13 +269,13 @@ namespace WzComparerR2.CharaSimControl
                 switch (value)
                 {
                     case 1:
-                        TextRenderer.DrawText(g, "스페셜Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Special Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 2:
-                        TextRenderer.DrawText(g, "레드Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Red Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 3:
-                        TextRenderer.DrawText(g, "블랙Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Black Label", GearGraphics.EquipMDMoris9Font, new Point(width, picH), ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color, TextFormatFlags.HorizontalCenter);
                         break;
                 }
                 picH += 16;
@@ -307,7 +308,7 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (Gear.Props.TryGetValue(GearPropType.magicLayerWz2, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "裏地", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(82, 180, 189), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "Magic Layer", GearGraphics.EquipMDMoris9Font, new Point(width, picH), Color.FromArgb(82, 180, 189), TextFormatFlags.HorizontalCenter);
                 picH += 16;
             }
 
@@ -439,7 +440,7 @@ namespace WzComparerR2.CharaSimControl
             */
 
             // 전투력 증가량
-            TextRenderer.DrawText(g, "전투력 증가량", GearGraphics.EquipMDMoris9Font, new Point(309 - TextRenderer.MeasureText(g, "전투력 증가량", GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picH + 12), ((SolidBrush)GearGraphics.Equip22BrushDarkGray).Color, TextFormatFlags.NoPadding);
+            TextRenderer.DrawText(g, "Combat Power Increase", GearGraphics.EquipMDMoris9Font, new Point(309 - TextRenderer.MeasureText(g, "Combat Power Increase", GearGraphics.EquipMDMoris9Font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picH + 12), ((SolidBrush)GearGraphics.Equip22BrushDarkGray).Color, TextFormatFlags.NoPadding);
             g.DrawImage(Resource.UIToolTipNew_img_Item_Equip_imgFont_atkPow_plus_0, 293, picH + 38); //暂时画个
             picH += 78;
 
@@ -473,10 +474,10 @@ namespace WzComparerR2.CharaSimControl
                 switch (reqJob)
                 {
                     case -1:
-                        reqJobString = "초보자";
+                        reqJobString = "Beginner";
                         break;
                     case 0:
-                        reqJobString = "공용";
+                        reqJobString = "Shared";
                         break;
                     default:
                         for (int i = 0; i < 5; i++)
@@ -486,19 +487,19 @@ namespace WzComparerR2.CharaSimControl
                                 switch (i)
                                 {
                                     case 0:
-                                        reqJobList.Add("전사");
+                                        reqJobList.Add("Warrior");
                                         break;
                                     case 1:
-                                        reqJobList.Add("마법사");
+                                        reqJobList.Add("Magician");
                                         break;
                                     case 2:
-                                        reqJobList.Add("궁수");
+                                        reqJobList.Add("Bowman");
                                         break;
                                     case 3:
-                                        reqJobList.Add("도적");
+                                        reqJobList.Add("Thief");
                                         break;
                                     case 4:
-                                        reqJobList.Add("해적");
+                                        reqJobList.Add("Pirate");
                                         break;
                                 }
                             }
@@ -511,8 +512,8 @@ namespace WzComparerR2.CharaSimControl
                     reqJobString = string.Join(", ", reqJobList);
                 }
             }
-            TextRenderer.DrawText(g, "착용 직업", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-            GearGraphics.DrawString(g, (string.IsNullOrEmpty(reqJobString) ? "공용" : reqJobString).Replace("착용", "").Replace("가능", "").Trim(), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16);
+            TextRenderer.DrawText(g, "Required Job", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+            GearGraphics.DrawString(g, (string.IsNullOrEmpty(reqJobString) ? "Shared" : reqJobString).Replace("Can be equipped by ", "").Replace(" only", "").Trim(), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16);
 
             // 요구 레벨
             this.Gear.Props.TryGetValue(GearPropType.reqLevel, out value2);
@@ -524,7 +525,7 @@ namespace WzComparerR2.CharaSimControl
             bool moveX = false;
             if (finalReqLevel > 0)
             {
-                TextRenderer.DrawText(g, "요구 레벨", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Required Level", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 if (reduceReq > 0)
                 {
                     GearGraphics.DrawString(g, $"Lv. {finalReqLevel} #$g({value2} #$b- {reduceReq}#)#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 244, ref picH, 16);
@@ -539,8 +540,8 @@ namespace WzComparerR2.CharaSimControl
             // 착용 성별
             if (gender < 2)
             {
-                TextRenderer.DrawText(g, "착용 성별", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 232: 15, picH - (moveX ? 16 : 0)), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                TextRenderer.DrawText(g, gender == 0 ? "남" : "여", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 300: 100, picH - (moveX ? 16 : 0)), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Required Gender", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 232: 15, picH - (moveX ? 16 : 0)), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, gender == 0 ? "Male" : "Felame", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 300: 100, picH - (moveX ? 16 : 0)), Color.White, TextFormatFlags.NoPadding);
                 if (!moveX) picH += 16;
             }
 
@@ -625,15 +626,15 @@ namespace WzComparerR2.CharaSimControl
                 List<string> randomParts = new List<string>();
                 if (costume?.Nodes["face"]?.Nodes["1"] != null)
                 {
-                    randomParts.Add("성형");
+                    randomParts.Add("Face");
                 }
                 if (costume?.Nodes["hair"]?.Nodes["1"] != null)
                 {
-                    randomParts.Add("헤어");
+                    randomParts.Add("Hair");
                 }
                 if (costume?.Nodes["skin"]?.Nodes["1"] != null)
                 {
-                    randomParts.Add("피부");
+                    randomParts.Add("Skin");
                 }
                 if (randomParts.Count > 0)
                 {
@@ -730,7 +731,7 @@ namespace WzComparerR2.CharaSimControl
                     hasOptionPart = true;
 
                     picH += 4;
-                    TextRenderer.DrawText(g, "등급 : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, "Appearance : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
                     picH += 12;
                 }
             }
@@ -806,12 +807,12 @@ namespace WzComparerR2.CharaSimControl
                     hasThirdContents = true;
                     hasOptionPart = true;
 
-                    TextRenderer.DrawText(g, "사용 가능 스킬", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, "Usable Skill", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                     GearGraphics.DrawString(g, $"#$g{text}#".Replace("#c", ""), GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16, alignment: Text.TextAlignment.Left);
                 }
             }
 
-            // 성장 레벨
+            // Growth Level
             //绘制装备升级
             if (Gear.Props.TryGetValue(GearPropType.level, out value) && !Gear.FixLevel)
             {
@@ -821,7 +822,7 @@ namespace WzComparerR2.CharaSimControl
                 bool max = (Gear.Levels != null && value >= Gear.Levels.Count);
                 string expString = Gear.Levels != null && Gear.Levels.First().Point != 0 ? ": 0/" + Gear.Levels.First().Point : ": 0%";
                 string text = $"#$gLv : {(max ? "MAX" : value.ToString())}  EXP {(max ? ": MAX" : expString)}#";
-                TextRenderer.DrawText(g, "성장 레벨", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Growth Level", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16, alignment: Text.TextAlignment.Left);
             }
             else if ((GearType)Gear.type == GearType.arcaneSymbol)
@@ -830,7 +831,7 @@ namespace WzComparerR2.CharaSimControl
                 hasOptionPart = true;
 
                 string text = $"#$gLv : 1  EXP : 1 / 12 ( 8% )#";
-                TextRenderer.DrawText(g, "성장 레벨", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Growth Level", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16, alignment: Text.TextAlignment.Left);
             }
             else if ((GearType)Gear.type == GearType.authenticSymbol)
@@ -839,7 +840,7 @@ namespace WzComparerR2.CharaSimControl
                 hasOptionPart = true;
 
                 string text = $"#$gLv : 1  EXP : 1 / 29 ( 3% )#";
-                TextRenderer.DrawText(g, "성장 레벨", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Growth Level", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16, alignment: Text.TextAlignment.Left);
             }
             else if ((GearType)Gear.type == GearType.grandAuthenticSymbol)
@@ -848,7 +849,7 @@ namespace WzComparerR2.CharaSimControl
                 hasOptionPart = true;
 
                 string text = $"#$gLv : 1  EXP : 1 / 29 ( 3% )#";
-                TextRenderer.DrawText(g, "성장 레벨", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Growth Level", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16, alignment: Text.TextAlignment.Left);
             }
 
@@ -865,8 +866,8 @@ namespace WzComparerR2.CharaSimControl
                     hasThirdContents = true;
                     hasOptionPart = true;
 
-                    TextRenderer.DrawText(g, "공격 속도", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                    GearGraphics.DrawString(g, $"#$g{10 - value}단계#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 305, ref picH, 16, alignment: Text.TextAlignment.Left);
+                    TextRenderer.DrawText(g, "Attack Speed", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                    GearGraphics.DrawString(g, $"#$gStage {10 - value}#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 305, ref picH, 16, alignment: Text.TextAlignment.Left);
                 }
             }
             // 등급
@@ -887,7 +888,7 @@ namespace WzComparerR2.CharaSimControl
                 hasThirdContents = true;
                 hasOptionPart = true;
 
-                TextRenderer.DrawText(g, "내구도 : 100%", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushLegendary).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Durability : 100%", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.Equip22BrushLegendary).Color, TextFormatFlags.NoPadding);
                 picH += 16;
             }
 
@@ -897,15 +898,15 @@ namespace WzComparerR2.CharaSimControl
                 string skillName = null;
                 switch (Gear.type)
                 {
-                    case GearType.shovel: skillName = "약초채집"; break;
-                    case GearType.pickaxe: skillName = "채광"; break;
+                    case GearType.shovel: skillName = "Mining"; break;
+                    case GearType.pickaxe: skillName = "Herbalism"; break;
                 }
                 if (Gear.Props.TryGetValue(GearPropType.gatherTool_incSkillLevel, out value) && value > 0)
                 {
                     hasThirdContents = true;
                     hasOptionPart = true;
 
-                    TextRenderer.DrawText(g, skillName + " 스킬레벨 : +" + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, skillName + " Skill Level : +" + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
                     picH += 16;
                 }
                 if (Gear.Props.TryGetValue(GearPropType.gatherTool_incSpeed, out value) && value > 0)
@@ -929,7 +930,7 @@ namespace WzComparerR2.CharaSimControl
                     hasThirdContents = true;
                     hasOptionPart = true;
 
-                    TextRenderer.DrawText(g, skillName + " 스킬레벨 " + value + "이상 사용가능", GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, skillName + " Skill Level " + value + "이상 사용가능", GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
                     picH += 16;
                 }
             }
@@ -978,7 +979,7 @@ namespace WzComparerR2.CharaSimControl
             // 그랜드 어센틱심볼 기본 옵션
             if ((GearType)Gear.type == GearType.grandAuthenticSymbol)
             {
-                foreach (var prop in new[] { "경험치 획득량:+10%:", "메소 획득량:+5%:", "아이템 드롭률:+5%:" })
+                foreach (var prop in new[] { "Additional EXP:+10%:", "메소 획득량:+5%:", "아이템 드롭률:+5%:" })
                 {
                     if (DrawProps(g, prop.Split(':'), 5, picH, equip22ColorTable))
                     {
@@ -1063,6 +1064,13 @@ namespace WzComparerR2.CharaSimControl
                 }*/
             }
             // 반지스킬
+            if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
+            {
+                hasThirdContents = true;
+
+                TextRenderer.DrawText(g, "Damage Cap", GearGraphics.EquipMDMoris9Font, new Point(15, picH), ((SolidBrush)GearGraphics.GreenBrush2).Color, TextFormatFlags.NoPadding);
+                GearGraphics.DrawString(g, $"#$z{value.ToString("N0")}#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 280, ref picH, 16, alignment: Text.TextAlignment.Left);
+            }
             int ringOpt, ringOptLv;
             if (Gear.Props.TryGetValue(GearPropType.ringOptionSkill, out ringOpt)
                 && Gear.Props.TryGetValue(GearPropType.ringOptionSkillLv, out ringOptLv))
@@ -1316,14 +1324,14 @@ namespace WzComparerR2.CharaSimControl
 
                 var cantEnhanceList = new List<string>();
                 if (enhance_starForce == 0)
-                    cantEnhanceList.Add("스타포스");
+                    cantEnhanceList.Add("Star Force");
                 if (enhance_scroll == 0)
-                    cantEnhanceList.Add("주문서");
+                    cantEnhanceList.Add("Scroll");
                 if (enhance_bonusStat == 0)
-                    cantEnhanceList.Add("추가옵션");
+                    cantEnhanceList.Add("Bonus Stats");
                 if (cantEnhanceList.Count > 0)
                 {
-                    GearGraphics.DrawString(g, $"{string.Join(", ", cantEnhanceList)} 강화 불가", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
+                    GearGraphics.DrawString(g, $"{string.Join(", ", cantEnhanceList)} Can't Enhance", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
                 }
 
                 switch (enhance_starForce)
@@ -1347,7 +1355,7 @@ namespace WzComparerR2.CharaSimControl
                         //text = $"#$d주문서 강화 : 강화 불가#";
                         break;
                     case 1:
-                        text = $"#$d주문서 강화 없음 (잔여 {tuc}회, 복구 가능 0회)#";
+                        text = $"#$dScroll Enhancement None ({tuc} Remaining, 0 Restore(s) Available)#";
                         break;
                     case 2:
                         text = $"주문서 강화 {Gear.ScrollUp}회 (잔여 {tuc}회, 복구 가능 0회)";
@@ -1370,7 +1378,7 @@ namespace WzComparerR2.CharaSimControl
                     GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
                 */
 
-                GearGraphics.DrawString(g, "#$dNPC/채집키를 통해 강화 정보 상세 확인 가능#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
+                GearGraphics.DrawString(g, "#$dCheck the enhancement details by using the Interact/Harvest key.#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
                 picH += 4;
 
 
@@ -1384,12 +1392,12 @@ namespace WzComparerR2.CharaSimControl
                 switch (enhance_potential)
                 {
                     case 0:
-                        text = $"#${GetPotentialColorTag(GearGrade.C)}잠재능력 : 강화 불가#";
+                        text = $"#${GetPotentialColorTag(GearGrade.C)}Potential : 강화 불가#";
                         g.DrawImage(GetPotentialGradeIcon(GearGrade.C), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
                     case 1:
-                        text = $"#${GetPotentialColorTag(Gear.Grade)}잠재능력 : {GetPotentialString((int)Gear.Grade)}#{(fixedPotential ? " (추가 강화 불가)": "")}";
+                        text = $"#${GetPotentialColorTag(Gear.Grade)}Potential : {GetPotentialString((int)Gear.Grade)}#{(fixedPotential ? " (추가 강화 불가)": "")}";
                         g.DrawImage(GetPotentialGradeIcon(Gear.Grade), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
 
@@ -1418,12 +1426,12 @@ namespace WzComparerR2.CharaSimControl
                         }
                         break;
                     case 10:
-                        text = $"#${GetPotentialColorTag(GearGrade.S)}잠재능력 : {GetPotentialString((int)GearGrade.S)}#";
+                        text = $"#${GetPotentialColorTag(GearGrade.S)}Potential : {GetPotentialString((int)GearGrade.S)}#";
                         g.DrawImage(GetPotentialGradeIcon(GearGrade.S), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
                     case 11:
-                        text = $"#${GetPotentialColorTag(GearGrade.C)}잠재능력 : 제네시스 무기 옵션 상향 전승#";
+                        text = $"#${GetPotentialColorTag(GearGrade.C)}Potential : 제네시스 무기 옵션 상향 전승#";
                         g.DrawImage(GetPotentialGradeIcon(GearGrade.C), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
@@ -1432,12 +1440,12 @@ namespace WzComparerR2.CharaSimControl
                 switch (enhance_addiPotential)
                 {
                     case 0:
-                        text = $"#${GetPotentialColorTag(GearGrade.C)}에디셔널 잠재능력 : 강화 불가#";
+                        text = $"#${GetPotentialColorTag(GearGrade.C)}Bonus Potential : 강화 불가#";
                         g.DrawImage(GetPotentialGradeIcon(GearGrade.C), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
                     case 1:
-                        text = $"#${GetPotentialColorTag(Gear.Grade)}에디셔널 잠재능력 : {GetPotentialString((int)Gear.Grade)}#";
+                        text = $"#${GetPotentialColorTag(Gear.Grade)}Bonus Potential : {GetPotentialString((int)Gear.Grade)}#";
                         g.DrawImage(GetPotentialGradeIcon(Gear.Grade), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
 
@@ -1465,12 +1473,12 @@ namespace WzComparerR2.CharaSimControl
                         }
                         break;
                     case 10:
-                        text = $"#${GetPotentialColorTag(GearGrade.A)}에디셔널 잠재능력 : {GetPotentialString((int)GearGrade.A)}#";
+                        text = $"#${GetPotentialColorTag(GearGrade.A)}Bonus Potential : {GetPotentialString((int)GearGrade.A)}#";
                         g.DrawImage(GetPotentialGradeIcon(GearGrade.A), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
                     case 11:
-                        text = $"#${GetPotentialColorTag(GearGrade.C)}에디셔널 잠재능력 : 제네시스 무기 옵션 상향 전승#";
+                        text = $"#${GetPotentialColorTag(GearGrade.C)}Bonus Potential : 제네시스 무기 옵션 상향 전승#";
                         g.DrawImage(GetPotentialGradeIcon(GearGrade.C), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
@@ -1481,7 +1489,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 hasThirdContents = true;
 
-                GearGraphics.DrawString(g, $"#$d주문서 강화 없음# (잔여 {tuc}회, 복구 가능 0회)", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
+                GearGraphics.DrawString(g, $"#$dScroll Enhancement None# ({tuc} Remaining, 0 Restore(s) Available)", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16);
                 picH += 4;
             }
 
@@ -1504,7 +1512,7 @@ namespace WzComparerR2.CharaSimControl
                 thirdLineNeeded = false;
 
                 g.DrawImage(Resource.UIToolTipNew_img_Item_Equip_textIcon_soulWeapon_normal, 15, picH - 2);
-                TextRenderer.DrawText(g, "소울 : 소울 웨폰으로 변환 필요", GearGraphics.EquipMDMoris9Font, new Point(29, picH), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Soul : Requires Soul Weapon Conversion", GearGraphics.EquipMDMoris9Font, new Point(29, picH), Color.White, TextFormatFlags.NoPadding);
                 picH += 20;
             }
 
@@ -2020,15 +2028,15 @@ namespace WzComparerR2.CharaSimControl
             switch(grade)
             {
                 case 0:
-                    return "없음";
+                    return "None";
                 case 1:
-                    return "레어";
+                    return "Rare";
                 case 2:
-                    return "에픽";
+                    return "Epic";
                 case 3:
-                    return "유니크";
+                    return "Unique";
                 case 4:
-                    return "레전드리";
+                    return "Legendary";
                 default:
                     return "-";
             }
@@ -2083,14 +2091,14 @@ namespace WzComparerR2.CharaSimControl
 
             if (Gear.IsWeapon(Gear.type) || Gear.IsCashWeapon(Gear.type))
             {
-                categories.Add("무기");
+                categories.Add("Weapon");
                 if (!Gear.Cash && (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara))
                 {
-                    categories.Add("한손");
+                    categories.Add("One-handed");
                 }
                 else if (!Gear.Cash && Gear.IsDoubleHandWeapon(Gear.type))
                 {
-                    categories.Add("두손");
+                    categories.Add("Two-handed");
                 }
             }
             else if (Gear.IsSubWeapon(Gear.type) || Gear.type == GearType.shield)
@@ -2138,7 +2146,7 @@ namespace WzComparerR2.CharaSimControl
 
                 g.DrawImage(res["category_w"].Image, sp - ew - length - ww, picH);
                 g.FillRectangle(res["category_c"], sp - ew - length, picH, length, ch);
-                TextRenderer.DrawText(g, categories[i], font, new Point(sp - ew - length, picH + 2), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, categories[i], font, new Point(sp - ew - length, picH - 1), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
                 g.DrawImage(res["category_e"].Image, sp - ew, picH);
 
                 sp -= (3 + ew + length + ww);
