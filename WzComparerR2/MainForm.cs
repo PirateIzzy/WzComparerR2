@@ -992,6 +992,37 @@ namespace WzComparerR2
             }
         }
 
+        private void buttonCaptureAni_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0) return;
+
+            FrmCaptureAniOptions FrmAniCaptureOptions = new FrmCaptureAniOptions(this.pictureBoxEx1.MaxLength);
+            CaptureAniOptions options = new CaptureAniOptions();
+
+            if (FrmAniCaptureOptions.ShowDialog() == DialogResult.OK)
+            {
+                options = FrmAniCaptureOptions.GetValues();
+            }
+            else
+            {
+                return;
+            }
+
+            var clonedAniItem = this.pictureBoxEx1.Items.Select(aniItem => (AnimationItem)aniItem.Clone());
+            var aniItemTime = this.pictureBoxEx1.ItemTimes;
+            FrameAnimationData frameData = this.pictureBoxEx1.CaptureAnimation(clonedAniItem, aniItemTime, options.CaptureTime);
+
+            if (frameData != null && frameData.Frames.Count == 1)
+            {
+                this.OnSavePngFile(frameData.Frames[0], captureTime: options.CaptureTime.ToString());
+                this.pictureBoxEx1.DisposeAnimationItem(new FrameAnimator(frameData));
+            }
+            else
+            {
+                labelItemStatus.Text = "Failed to save image";
+            }
+        }
+
         private void OnSaveImage(bool options)
         {
             if (this.pictureBoxEx1.Items.Count <= 0)
@@ -1015,7 +1046,7 @@ namespace WzComparerR2
             }
         }
 
-        private void OnSavePngFile(Frame frame)
+        private void OnSavePngFile(Frame frame, string captureTime = "")
         {
             if (frame.Png != null)
             {
@@ -1046,10 +1077,10 @@ namespace WzComparerR2
                 }
                 labelItemStatus.Text = "Image saved: " + pngFileName;
             }
-            else if (pictureBoxEx1.ShowOverlayAni && frame.Texture != null) // 애니메이션 Nest
+            else if ((pictureBoxEx1.ShowOverlayAni || !string.IsNullOrEmpty(captureTime)) && frame.Texture != null) // 애니메이션 중첩
             {
                 var config = ImageHandlerConfig.Default;
-                string pngFileName = pictureBoxEx1.PictureName + ".png";
+                string pngFileName = string.IsNullOrEmpty(captureTime) ? pictureBoxEx1.PictureName + ".png" : $"{pictureBoxEx1.PictureName}_{captureTime}.png";
 
                 if (config.AutoSaveEnabled)
                 {

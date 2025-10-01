@@ -293,6 +293,7 @@ namespace WzComparerR2
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
+            this.buttonCaptureAni = new DevComponents.DotNetBar.ButtonItem();
             this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
             this.comboItem22 = new DevComponents.Editors.ComboItem();
             this.btnRootNode = new DevComponents.DotNetBar.ButtonX();
@@ -2071,7 +2072,8 @@ namespace WzComparerR2
             this.itemContainer27.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonItemAutoSave,
             this.buttonItemAutoSaveFolder,
-            this.buttonItemSaveWithOptions});
+            this.buttonItemSaveWithOptions,
+            this.buttonCaptureAni});
             // 
             // 
             // 
@@ -2111,6 +2113,12 @@ namespace WzComparerR2
             this.buttonItemSaveWithOptions.Name = "buttonItemSaveWithOptions";
             this.buttonItemSaveWithOptions.Text = "Custom Save";
             this.buttonItemSaveWithOptions.Click += new System.EventHandler(this.buttonItemSaveWithOptions_Click);
+            // 
+            // buttonCaptureAni
+            // 
+            this.buttonCaptureAni.Name = "buttonCaptureAni";
+            this.buttonCaptureAni.Text = "Save Single Animation Frame";
+            this.buttonCaptureAni.Click += new System.EventHandler(this.buttonCaptureAni_Click);
             // 
             // buttonItemGif
             // 
@@ -3758,6 +3766,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
         private DevComponents.DotNetBar.ButtonItem btnItemOpenImg;
         private DevComponents.DotNetBar.ButtonItem buttonItemSaveWithOptions;
+        private DevComponents.DotNetBar.ButtonItem buttonCaptureAni;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
