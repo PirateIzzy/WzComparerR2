@@ -1924,6 +1924,11 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnCustomPreset_Click(object sender, EventArgs e)
         {
+            if (PluginManager.FindWz(Wz_Type.Base) == null)
+            {
+                ToastNotification.Show(this, $"Error: Please load Base.wz.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
             string avatarPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Images");
             if (LoadAvatarForm.Instance == null)
             {
@@ -1938,15 +1943,16 @@ namespace WzComparerR2.Avatar.UI
             {
                 System.IO.Directory.CreateDirectory(avatarPath);
             }
-            string[] files = Directory.GetFiles(avatarPath);
-            LoadAvatarForm._files.AddRange(files);
+
+            LoadAvatarForm.presetDict = Translator.loadDict(Path.Combine(avatarPath, "config.json"));
+            LoadAvatarForm._files = LoadAvatarForm.presetDict.Keys.Select(key => Path.Combine(avatarPath, key + ".png")).ToList();
             LoadAvatarForm.LoadImages();
         }
 
-        public void SavePreset(string pendingCode)
+        public void SavePreset(string pendingCode, string md5)
         {
             if (string.IsNullOrEmpty(pendingCode)) return;
-            string avatarPresetPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Images", pendingCode.Replace("*", "×") + ".png");
+            string avatarPresetPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Images", md5 + ".png");
             this.GetSelectedBodyFrame(out int bodyFrame, out _);
             this.GetSelectedEmotionFrame(out int emoFrame, out _);
             this.GetSelectedTamingFrame(out int tamingFrame, out _);
