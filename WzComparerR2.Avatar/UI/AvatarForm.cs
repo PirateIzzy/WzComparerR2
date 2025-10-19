@@ -589,13 +589,20 @@ namespace WzComparerR2.Avatar.UI
                     {
                         partsID[i] += "+" + part.MixColor + "*" + part.MixOpacity;
                     }
-                    if (part.PrismData.IsValid(PrismDataCollection.PrismDataType.Default))
+
+                    bool prismValid = part.PrismData.IsValid(PrismDataCollection.PrismDataType.Default);
+                    bool prism2Valid = part.PrismData.IsValid(PrismDataCollection.PrismDataType.WeaponEffect);
+                    if (prismValid)
                     {
                         var prismData = part.PrismData.Get(PrismDataCollection.PrismDataType.Default);
                         partsID[i] += $"+{prismData.Type}h{prismData.Hue}s{prismData.Saturation}v{prismData.Brightness}";
                     }
-                    if (part.PrismData.IsValid(PrismDataCollection.PrismDataType.WeaponEffect))
+                    if (prism2Valid)
                     {
+                        if (!prismValid)
+                        {
+                            partsID[i] += $"+0h0s100v100";
+                        }
                         var prismData = part.PrismData.Get(PrismDataCollection.PrismDataType.WeaponEffect);
                         partsID[i] += $"+{prismData.Type}h{prismData.Hue}s{prismData.Saturation}v{prismData.Brightness}";
                     }
@@ -1250,7 +1257,7 @@ namespace WzComparerR2.Avatar.UI
                     if (part.PrismData.IsValid(PrismDataCollection.PrismDataType.Default))
                     {
                         var prismData = part.PrismData.Get(PrismDataCollection.PrismDataType.Default);
-                        text += string.Format("\r\n{0}\r\Hue {1}, Saturation {2}, Brightness {3}\r\n{4}+{5}h{6}s{7}v{8}",
+                        text += string.Format("\r\n{0}\r\nHue {1}, Saturation {2}, Brightness {3}\r\n{4}+{5}h{6}s{7}v{8}",
                             prismData.GetColorType(),
                             prismData.Hue,
                             $"{(prismData.Saturation > 100 ? "+" : "")}{prismData.Saturation - 100}",
@@ -1264,7 +1271,7 @@ namespace WzComparerR2.Avatar.UI
                     if (part.PrismData.IsValid(PrismDataCollection.PrismDataType.WeaponEffect))
                     {
                         var prismData2 = part.PrismData.Get(PrismDataCollection.PrismDataType.WeaponEffect);
-                        text += string.Format("\r\Weapon Effect: {0}\r\nHue {1}, Saturation {2}, Brightness {3}\r\n{4}+{5}h{6}s{7}v{8}",
+                        text += string.Format("\r\nWeapon Effect: {0}\r\nHue {1}, Saturation {2}, Brightness {3}\r\n{4}+{5}h{6}s{7}v{8}",
                         prismData2.GetColorType(),
                         prismData2.Hue,
                         $"{(prismData2.Saturation > 100 ? "+" : "")}{prismData2.Saturation - 100}",
@@ -2423,13 +2430,28 @@ namespace WzComparerR2.Avatar.UI
         }
 
 #if NET6_0_OR_GREATER
-        private string GetPrismCode(OpenAPI.PrismInfo prism)
+        private string GetPrismCode(OpenAPI.PrismInfo prism, bool alwaysReturnCode = false)
         {
             if (prism.Valid)
             {
-                return $"+{prism.ColorType}h{prism.Hue}s{prism.Saturation}v{prism.Brightness}";
+                if (prism.Brightness > 0 && prism.Saturation > 0 && prism.Hue >= 0)
+                {
+                    return $"+{prism.ColorType}h{prism.Hue}s{prism.Saturation}v{prism.Brightness}";
+                }
+                else
+                {
+                    return $"+0h0s100v100";
+                }
             }
             return "";
+        }
+
+        private string GetPrismCode(OpenAPI.PrismInfoCollection prisms)
+        {
+            var ret = "";
+            ret += GetPrismCode(prisms.Prism1, true);
+            ret += GetPrismCode(prisms.Prism2);
+            return ret;
         }
 #endif
 
