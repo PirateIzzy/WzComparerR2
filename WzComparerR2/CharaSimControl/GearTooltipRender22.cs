@@ -942,7 +942,7 @@ namespace WzComparerR2.CharaSimControl
                 hasOptionPart = true;
 
                 DateTime time = DateTime.Now.AddDays(7d);
-                var text = $"#$e{ItemStringHelper.GetGearPropString22(GearPropType.abilityTimeLimited, value)[0]} : {time.ToString("yyyy년 M월 d일 HH시 mm분")}" +
+                var text = $"#$e{ItemStringHelper.GetGearPropString22(GearPropType.abilityTimeLimited, value)[0]}: {time.ToString("M/d/yyyy HH:mm")} UTC" +
                     $"{ItemStringHelper.GetGearPropString22(GearPropType.notExtend, value)[0]}#";
 
                 GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 310, ref picH, 16);
@@ -1100,7 +1100,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (Gear.Sample.Bitmap != null || willDrawMedalTag || willDrawChatBalloon || willDrawNameTag)
             {
-                picH -= 6;
+                // picH -= 2;
                 hasThirdContents = true;
                 hasDescPart = true;
 
@@ -1125,7 +1125,6 @@ namespace WzComparerR2.CharaSimControl
                     GearGraphics.DrawNameTag(g, medalResNode, sr.Name.Replace("Medal of Honor", ""), bitmap.Width - 10, ref picH);
                     picH += 4;
                 }
-                picH += 2;
             }
             // 장비 설명
             if (!string.IsNullOrEmpty(sr.Desc))
@@ -1169,7 +1168,7 @@ namespace WzComparerR2.CharaSimControl
                 hasThirdContents = true;
                 hasDescPart = true;
 
-                GearGraphics.DrawString(g, "You cannot use the Pet Equipment Stat Transfer Scroll on this item.", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
+                GearGraphics.DrawString(g, "You cannot use the Pet Equipment Stat\nTransfer Scroll on this item.", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
             }
             // 캐시 이펙트
             if (Gear.Cash && Gear.type != GearType.pickaxe && !Gear.IsCashWeapon(Gear.type) && Gear.type != GearType.shovel && PluginBase.PluginManager.FindWz(string.Format("Effect/ItemEff.img/{0}/effect", Gear.ItemID)) != null)
@@ -1813,7 +1812,7 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.timeLimited, out value) && value != 0)
             {
                 DateTime time = DateTime.Now.AddDays(7d);
-                var text = $"#$r{ItemStringHelper.GetGearPropString22(GearPropType.timeLimited, value)[0]}: {time.ToString("M/d/yyyy HH:mm")}" +
+                var text = $"#$r{ItemStringHelper.GetGearPropString22(GearPropType.timeLimited, value)[0]}: {time.ToString("M/d/yyyy HH:mm")} UTC" +
                     $"{ItemStringHelper.GetGearPropString22(GearPropType.notExtend, value)[0]}#";
                 tags.Add(text);
             }
@@ -2111,11 +2110,11 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (Gear.IsArmor(Gear.type))
             {
-                categories.Add("방어구");
+                categories.Add("Armor");
             }
             else if (Gear.IsAccessory(Gear.type))
             {
-                categories.Add("Armor");
+                categories.Add("Accessory");
             }
             else if (Gear.IsMechanicGear(Gear.type))
             {

@@ -358,7 +358,7 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$rCannot be Traded when equipped#";
                     return res;
                 case GearPropType.notExtend:
-                    res[0] = value == 0 ? null : " (연장 불가)";
+                    res[0] = value == 0 ? null : " (Can't Extend)";
                     return res;
                 case GearPropType.accountSharableAfterExchange:
                     res[0] = value == 0 ? null : "#$r1회 교환 가능 (거래 후 월드 내 나의 캐릭터 간 이동만 가능)#";
@@ -367,7 +367,7 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "Duration";
                     return res;
                 case GearPropType.abilityTimeLimited:
-                    res[0] = value == 0 ? null : "능력치 유효 기간";
+                    res[0] = value == 0 ? null : "Stats Duration";
                     return res;
                 case GearPropType.noLookChange:
                     res[0] = value == 0 ? null : "#$rCannot use Medal Fusion Anvil#";
