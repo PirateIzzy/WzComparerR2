@@ -45,7 +45,7 @@ namespace WzComparerR2.CharaSim
         /// <param Name="propType">表示装备属性枚举GearPropType。</param>
         /// <param Name="Value">表示propType属性所对应的值。</param>
         /// <returns></returns>
-        public static string GetGearPropString(GearPropType propType, long value, int signFlag)
+        public static string GetGearPropString(GearPropType propType, long value, int signFlag, bool isMsea = false)
         {
 
             string sign;
@@ -81,12 +81,12 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMMP: return "MaxMP : " + sign + value;
                 case GearPropType.incMMPr: return "MaxMP : " + sign + value + "%";
                 case GearPropType.incMDF: return "MaxDF : " + sign + value;
-                case GearPropType.incPAD: return "Attack Power: " + sign + value;
-                case GearPropType.incPADr: return "Attack Power: " + sign + value + "%";
-                case GearPropType.incMAD: return "Magic Attack: " + sign + value;
-                case GearPropType.incMADr: return "Magic Attack: " + sign + value + "%";
-                case GearPropType.incPDD: return "Defense: " + sign + value;
-                case GearPropType.incPDDr: return "Defense: " + sign + value + "%";
+                case GearPropType.incPAD: return (isMsea ? "WEAPON ATTACK : " : "Attack Power: ") + sign + value;
+                case GearPropType.incPADr: return (isMsea ? "WEAPON ATTACK : " : "Attack Power: ") + sign + value + "%";
+                case GearPropType.incMAD: return (isMsea ? "MAGIC ATTACK : " : "Magic Attack: ") + sign + value;
+                case GearPropType.incMADr: return (isMsea ? "MAGIC ATTACK : " : "Magic Attack: ") + sign + value + "%";
+                case GearPropType.incPDD: return (isMsea ? "DEF" : "Defense: ") + sign + value;
+                case GearPropType.incPDDr: return (isMsea ? "DEF" : "Defense: ") + sign + value + "%";
                 //case GearPropType.incMDD: return "MAGIC DEF. : " + sign + value;
                 //case GearPropType.incMDDr: return "MAGIC DEF. : " + sign + value + "%";
                 //case GearPropType.incACC: return "ACCURACY : " + sign + value;
@@ -105,9 +105,9 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPQEXPr: return "Party Quest EXP: +" + value + "%";
                 case GearPropType.incEXPr: return "Party EXP: +" + value + "%";
                 case GearPropType.incBDR:
-                case GearPropType.bdR: return "Boss Damage: +" + value + "%";
+                case GearPropType.bdR: return (isMsea ? "When attacking bosses, damage +" : "Boss Damage: +") + value + "%";
                 case GearPropType.incIMDR:
-                case GearPropType.imdR: return "Ignored Enemy DEF: +" + value + "%";
+                case GearPropType.imdR: return (isMsea ? "Ignore Monster Defense: +" : "Ignored Enemy DEF: +") + value + "%";
                 case GearPropType.limitBreak: return "Damage Cap: " + value.ToString("N0");
                 case GearPropType.reduceReq: return "Required Level: -" + value;
                 case GearPropType.nbdR: return "Damage Against Normal Monsters: +" + value + "%"; //KMST 1069
@@ -158,10 +158,10 @@ namespace WzComparerR2.CharaSim
                 //case GearPropType.incACC_incEVA: return "ACC/AVO :" + sign + value;
 
                 case GearPropType.incARC: return "ARC : " + sign + value;
-                case GearPropType.incAUT: return "SAC : " + sign + value;
+                case GearPropType.incAUT: return (isMsea ? "AUT : " : "SAC : ") + sign + value;
 
                 case GearPropType.Etuc: return "Exceptional Enhancement is possible.  (Max" + "\ntime(s):  " + value + ")";
-                case GearPropType.CuttableCount: return "Scissors Usages Available : " + value;
+                case GearPropType.CuttableCount: return (isMsea ? "Scissors Count: " : "Scissors Usages Available : ") + value;
                 default: return null;
             }
         }
@@ -579,7 +579,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.machineArms: return "Mechanic Arm";
                 case GearType.machineLegs: return "Mechanic Leg";
                 case GearType.machineBody: return "Mechanic Frame";
-                case GearType.machineTransistors: return "Mechanic Transistor";
+                case GearType.machineTransistors: return isMsea ? "Transistor" : "Mechanic Transistor";
                 case GearType.pants: return "Bottom";
                 case GearType.ring: return "Ring";
                 case GearType.shield: return "Shield";

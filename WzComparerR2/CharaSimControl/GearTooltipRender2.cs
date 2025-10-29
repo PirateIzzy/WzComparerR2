@@ -489,7 +489,7 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制攻击力变化
             format.Alignment = StringAlignment.Far;
-            TextRenderer.DrawText(g, MseaMode ? "Damage Increase" : "Attack Power Increase", GearGraphics.EquipDetailFont, new Point(248 - TextRenderer.MeasureText(g, MseaMode ? "Damage Increase" : "Attack Power Increase", GearGraphics.EquipDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picH + 10), ((SolidBrush)GearGraphics.GrayBrush2).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+            TextRenderer.DrawText(g, MseaMode ? "Damage increase" : "Attack Power Increase", GearGraphics.EquipDetailFont, new Point(248 - TextRenderer.MeasureText(g, MseaMode ? "Damage Increase" : "Attack Power Increase", GearGraphics.EquipDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picH + 10), ((SolidBrush)GearGraphics.GrayBrush2).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_incline_0, 249 - 19, picH + 27); //暂时画个0
 
             //绘制属性需求
@@ -890,7 +890,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Gear.Props.TryGetValue(GearPropType.CuttableCount, out value) && value > 0) //可使用剪刀
             {
-                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.CuttableCount, value), GearGraphics.EquipDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.CuttableCount, value, 2, MseaMode), GearGraphics.EquipDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 15;
                 hasPart2 = true;
             }
@@ -989,7 +989,7 @@ namespace WzComparerR2.CharaSimControl
                     //int addVal = (int)Math.Floor(kv.Value * dLevel);
                     //这里有一个计算上的错误 换方式执行
                     int addVal = (int)Math.Floor(new decimal(kv.Value) * dLevel);
-                    string text = ItemStringHelper.GetGearPropString(kv.Key, addVal, 1);
+                    string text = ItemStringHelper.GetGearPropString(kv.Key, addVal, 1, MseaMode);
                     text += string.Format(" ({0:f1} x {1})", kv.Value, dLevel);
                     TextRenderer.DrawText(g, text, GearGraphics.EquipDetailFont, new Point(12, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                     picH += 20;
@@ -1102,7 +1102,7 @@ namespace WzComparerR2.CharaSimControl
                 if (Gear.Props.TryGetValue(type, out value) && value != 0)
                 {
                     //desc.Add(" " + ItemStringHelper.GetGearPropString(type, value)); (Korean edit code)
-                    desc.Add(ItemStringHelper.GetGearPropString(type, value));
+                    desc.Add(ItemStringHelper.GetGearPropString(type, value, 0, MseaMode));
                 }
             }
 
