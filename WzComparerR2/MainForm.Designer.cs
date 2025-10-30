@@ -120,6 +120,7 @@ namespace WzComparerR2
             this.buttonItemSearchString = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemSelectStringWz = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemClearStringWz = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemIgnoreArticles = new DevComponents.DotNetBar.ButtonItem();
             this.ribbonBar1 = new DevComponents.DotNetBar.RibbonBar();
             this.itemContainer14 = new DevComponents.DotNetBar.ItemContainer();
             this.itemContainer15 = new DevComponents.DotNetBar.ItemContainer();
@@ -292,6 +293,7 @@ namespace WzComparerR2
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
+            this.buttonCaptureAni = new DevComponents.DotNetBar.ButtonItem();
             this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
             this.comboItem22 = new DevComponents.Editors.ComboItem();
             this.btnRootNode = new DevComponents.DotNetBar.ButtonX();
@@ -1279,6 +1281,7 @@ namespace WzComparerR2
             // 
             this.buttonItemSearchString.Name = "buttonItemSearchString";
             this.buttonItemSearchString.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemIgnoreArticles,
             this.buttonItemSelectStringWz,
             this.buttonItemClearStringWz});
             this.buttonItemSearchString.Text = "Find";
@@ -1295,6 +1298,14 @@ namespace WzComparerR2
             this.buttonItemClearStringWz.Name = "buttonItemClearStringWz";
             this.buttonItemClearStringWz.Text = "Clear StringLinker";
             this.buttonItemClearStringWz.Click += new System.EventHandler(this.buttonItemClearStringWz_Click);
+            // 
+            // buttonItemIgnoreArticles
+            // 
+            this.buttonItemIgnoreArticles.AutoCheckOnClick = true;
+            this.buttonItemIgnoreArticles.Name = "buttonItemIgnoreArticles";
+            this.buttonItemIgnoreArticles.Text = "Ignore Articles (a, an, the) in Search Result";
+            this.buttonItemIgnoreArticles.Tooltip = "This feature is only designed for searching in English. If you're searching in a non-English language, please disable it.";
+            this.buttonItemIgnoreArticles.Click += new System.EventHandler(this.buttonItemIgnoreArticles_Click);
             // 
             // ribbonBar1
             // 
@@ -2061,7 +2072,8 @@ namespace WzComparerR2
             this.itemContainer27.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonItemAutoSave,
             this.buttonItemAutoSaveFolder,
-            this.buttonItemSaveWithOptions});
+            this.buttonItemSaveWithOptions,
+            this.buttonCaptureAni});
             // 
             // 
             // 
@@ -2101,6 +2113,12 @@ namespace WzComparerR2
             this.buttonItemSaveWithOptions.Name = "buttonItemSaveWithOptions";
             this.buttonItemSaveWithOptions.Text = "Custom Save";
             this.buttonItemSaveWithOptions.Click += new System.EventHandler(this.buttonItemSaveWithOptions_Click);
+            // 
+            // buttonCaptureAni
+            // 
+            this.buttonCaptureAni.Name = "buttonCaptureAni";
+            this.buttonCaptureAni.Text = "Save Single Animation Frame";
+            this.buttonCaptureAni.Click += new System.EventHandler(this.buttonCaptureAni_Click);
             // 
             // buttonItemGif
             // 
@@ -3621,6 +3639,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.LabelItem labelItem2;
         private DevComponents.DotNetBar.TextBoxItem textBoxItemSearchString;
         private DevComponents.DotNetBar.ButtonItem buttonItemClearStringWz;
+        private DevComponents.DotNetBar.ButtonItem buttonItemIgnoreArticles;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.ColumnHeader columnHeader8;
@@ -3747,6 +3766,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
         private DevComponents.DotNetBar.ButtonItem btnItemOpenImg;
         private DevComponents.DotNetBar.ButtonItem buttonItemSaveWithOptions;
+        private DevComponents.DotNetBar.ButtonItem buttonCaptureAni;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;

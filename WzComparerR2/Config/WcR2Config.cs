@@ -290,5 +290,12 @@ namespace WzComparerR2.Config
             get { return (ConfigItem<string>)this["nexonOpenAPIKey"]; }
             set { this["nexonOpenAPIKey"] = value; }
         }
+
+        [ConfigurationProperty("ignoreArticles")]
+        public ConfigItem<bool> IgnoreArticles
+        {
+            get { return (ConfigItem<bool>)this["ignoreArticles"]; }
+            set { this["ignoreArticles"] = value; }
+        }
     }
 }

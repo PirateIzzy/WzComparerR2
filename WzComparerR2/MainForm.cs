@@ -233,7 +233,7 @@ namespace WzComparerR2
             labelItemAutoSaveFolder.Text = ImageHandlerConfig.Default.AutoSavePictureFolder;
             buttonItemAutoSave.Checked = ImageHandlerConfig.Default.AutoSaveEnabled;
             comboBoxItemLanguage.SelectedIndex = Clamp(CharaSimConfig.Default.SelectedFontIndex, 0, comboBoxItemLanguage.Items.Count);
-
+            buttonItemIgnoreArticles.Checked = WcR2Config.Default.IgnoreArticles;
 
             //更新界面颜色
             styleManager1.ManagerStyle = WcR2Config.Default.MainStyle;
@@ -992,6 +992,37 @@ namespace WzComparerR2
             }
         }
 
+        private void buttonCaptureAni_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0) return;
+
+            FrmCaptureAniOptions FrmAniCaptureOptions = new FrmCaptureAniOptions(this.pictureBoxEx1.MaxLength);
+            CaptureAniOptions options = new CaptureAniOptions();
+
+            if (FrmAniCaptureOptions.ShowDialog() == DialogResult.OK)
+            {
+                options = FrmAniCaptureOptions.GetValues();
+            }
+            else
+            {
+                return;
+            }
+
+            var clonedAniItem = this.pictureBoxEx1.Items.Select(aniItem => (AnimationItem)aniItem.Clone());
+            var aniItemTime = this.pictureBoxEx1.ItemTimes;
+            FrameAnimationData frameData = this.pictureBoxEx1.CaptureAnimation(clonedAniItem, aniItemTime, options.CaptureTime);
+
+            if (frameData != null && frameData.Frames.Count == 1)
+            {
+                this.OnSavePngFile(frameData.Frames[0], captureTime: options.CaptureTime.ToString());
+                this.pictureBoxEx1.DisposeAnimationItem(new FrameAnimator(frameData));
+            }
+            else
+            {
+                labelItemStatus.Text = "Failed to save image";
+            }
+        }
+
         private void OnSaveImage(bool options)
         {
             if (this.pictureBoxEx1.Items.Count <= 0)
@@ -1015,7 +1046,7 @@ namespace WzComparerR2
             }
         }
 
-        private void OnSavePngFile(Frame frame)
+        private void OnSavePngFile(Frame frame, string captureTime = "")
         {
             if (frame.Png != null)
             {
@@ -1046,10 +1077,10 @@ namespace WzComparerR2
                 }
                 labelItemStatus.Text = "Image saved: " + pngFileName;
             }
-            else if (pictureBoxEx1.ShowOverlayAni && frame.Texture != null) // 애니메이션 Nest
+            else if ((pictureBoxEx1.ShowOverlayAni || !string.IsNullOrEmpty(captureTime)) && frame.Texture != null) // 애니메이션 중첩
             {
                 var config = ImageHandlerConfig.Default;
-                string pngFileName = pictureBoxEx1.PictureName + ".png";
+                string pngFileName = string.IsNullOrEmpty(captureTime) ? pictureBoxEx1.PictureName + ".png" : $"{pictureBoxEx1.PictureName}_{captureTime}.png";
 
                 if (config.AutoSaveEnabled)
                 {
@@ -2702,7 +2733,7 @@ namespace WzComparerR2
             try
             {
                 listViewExString.Items.Clear();
-                IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, checkBoxItemRegex2.Checked);
+                IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, checkBoxItemRegex2.Checked, buttonItemIgnoreArticles.Checked);
                 foreach (KeyValuePair<int, StringResult> kv in results)
                 {
                     string[] item = new string[] { kv.Key.ToString(), kv.Value.Name, kv.Value.Desc, kv.Value.FullPath };
@@ -2794,13 +2825,27 @@ namespace WzComparerR2
             return null;
         }
 
-        private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
+        private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex, bool ignoreArticles)
         {
-            string[] match = key.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] match = (key).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] articles = { "a", "an", "the" };
+            if (ignoreArticles)
+            {
+                match = match.Where(word => !articles.Contains(word.ToLower())).ToArray();
+            }
             Regex re = null;
             if (isRegex)
             {
-                re = new Regex(key, RegexOptions.IgnoreCase);
+                if (ignoreArticles)
+                {
+                    string pattern = string.Join(@"\s+(?:a|an|the)?\s*", match.Select(Regex.Escape));
+                    pattern = $@"\b{pattern}\b";
+                    re = new Regex(pattern, RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    re = new Regex(key, RegexOptions.IgnoreCase);
+                }
             }
 
             foreach (Dictionary<int, StringResult> dict in dicts)
@@ -2823,7 +2868,7 @@ namespace WzComparerR2
                     {
                         string id = kv.Key.ToString();
                         bool r = true;
-                        foreach (string str in match)
+                        foreach (string str in (match.ToArray()))
                         {
                             if (!(id.Contains(str) || (!string.IsNullOrEmpty(kv.Value.Name) && kv.Value.Name.Contains(str))))
                             {
@@ -2877,6 +2922,13 @@ namespace WzComparerR2
         {
             stringLinker.Clear();
             labelItemStatus.Text = "StringLinker has been cleared.";
+        }
+
+        private void buttonItemIgnoreArticles_Click(object sender, EventArgs e)
+        {
+            ConfigManager.Reload();
+            WcR2Config.Default.IgnoreArticles = buttonItemIgnoreArticles.Checked;
+            ConfigManager.Save();
         }
 
         private void buttonItemPatcher_Click(object sender, EventArgs e)
