@@ -899,7 +899,7 @@ namespace WzComparerR2.CharaSim
                 case 152: return isMsea ? "Can be equipped by Illium" : "Illium only";
                 case 154: return isMsea ? "Can be equipped by Khali" : "Khali only";
                 case 155: return isMsea ? "Can be equipped by Ark" : "Ark only";
-                case 161: return isMsea ? "Can be equipped by Len" : "Len only";
+                case 161: return isMsea ? "Can be equipped by Len" : "Ren only";
                 case 162: return isMsea ? "Can be equipped by Lara" : "Lara only";
                 case 164: return isMsea ? "Can be equipped by Ho Young" : "Hoyoung only";
                 case 172: return isMsea ? "Can be equipped by Lynn" : "Lynn only";
