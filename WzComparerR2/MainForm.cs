@@ -4560,7 +4560,7 @@ namespace WzComparerR2
                                     {
                                         Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
                                     }
-                                    string imageName = Path.Combine(exportedFolder, categoryPath, "スキル_" + j.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                    string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + j.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
                                     if (File.Exists(imageName)) File.Delete(imageName);
                                     resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
                                     resultImage.Dispose();
@@ -4601,7 +4601,7 @@ namespace WzComparerR2
                                             {
                                                 Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
                                             }
-                                            string imageName = Path.Combine(exportedFolder, categoryPath, "スキル_" + skillNode.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                            string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + skillNode.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
                                             if (File.Exists(imageName)) File.Delete(imageName);
                                             resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
                                             resultImage.Dispose();
