@@ -1362,6 +1362,9 @@ namespace WzComparerR2.CharaSim
                 case 12005:
                 case 12100: return "Tanjiro Kamado";
 
+                case 12006:
+                case 12200: return "Saitama";
+
                 case 13000: return "Pink Bean";
                 case 13001: return "Yetihood";
                 case 13100: return "Pink Bean";
