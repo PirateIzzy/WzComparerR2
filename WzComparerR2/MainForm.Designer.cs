@@ -298,6 +298,7 @@ namespace WzComparerR2
             this.comboItem22 = new DevComponents.Editors.ComboItem();
             this.btnRootNode = new DevComponents.DotNetBar.ButtonX();
             this.clbRootNode = new System.Windows.Forms.CheckedListBox();
+            this.btnSkillTooltipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnPreset = new DevComponents.DotNetBar.ButtonX();
             this.btnMusicChannel = new DevComponents.DotNetBar.ButtonItem();
             this.btnSkillChangeInfo = new DevComponents.DotNetBar.ButtonItem();
@@ -2915,6 +2916,7 @@ namespace WzComparerR2
             // 
             // superTabControlPanel3
             // 
+            this.superTabControlPanel3.Controls.Add(this.btnSkillTooltipExport);
             this.superTabControlPanel3.Controls.Add(this.btnExportSkillOption);
             this.superTabControlPanel3.Controls.Add(this.btnExportSkill);
             this.superTabControlPanel3.Controls.Add(this.labelX2);
@@ -2924,6 +2926,18 @@ namespace WzComparerR2
             this.superTabControlPanel3.Size = new System.Drawing.Size(530, 228);
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
+            // 
+            // btnSkillTooltipExport
+            // 
+            this.btnSkillTooltipExport.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnSkillTooltipExport.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnSkillTooltipExport.Location = new System.Drawing.Point(228, 6);
+            this.btnSkillTooltipExport.Name = "btnSkillTooltipExport";
+            this.btnSkillTooltipExport.Size = new System.Drawing.Size(111, 23);
+            this.btnSkillTooltipExport.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnSkillTooltipExport.TabIndex = 2;
+            this.btnSkillTooltipExport.Text = "Export Skill Tooltip";
+            this.btnSkillTooltipExport.Click += new System.EventHandler(this.btnSkillTooltipExport_Click);
             // 
             // btnExportSkillOption
             // 
@@ -3799,6 +3813,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
         private DevComponents.DotNetBar.ButtonX btnRootNode;
         private System.Windows.Forms.CheckedListBox clbRootNode;
+        private DevComponents.DotNetBar.ButtonX btnSkillTooltipExport;
         private DevComponents.DotNetBar.ButtonX btnPreset;
         private DevComponents.DotNetBar.ButtonItem btnMusicChannel;
         private DevComponents.DotNetBar.ButtonItem btnSkillChangeInfo;

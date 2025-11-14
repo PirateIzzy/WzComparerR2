@@ -899,7 +899,7 @@ namespace WzComparerR2.CharaSim
                 case 152: return isMsea ? "Can be equipped by Illium" : "Illium only";
                 case 154: return isMsea ? "Can be equipped by Khali" : "Khali only";
                 case 155: return isMsea ? "Can be equipped by Ark" : "Ark only";
-                case 161: return isMsea ? "Can be equipped by Len" : "Len only";
+                case 161: return isMsea ? "Can be equipped by Len" : "Ren only";
                 case 162: return isMsea ? "Can be equipped by Lara" : "Lara only";
                 case 164: return isMsea ? "Can be equipped by Ho Young" : "Hoyoung only";
                 case 172: return isMsea ? "Can be equipped by Lynn" : "Lynn only";
@@ -1362,6 +1362,9 @@ namespace WzComparerR2.CharaSim
                 case 12005:
                 case 12100: return "Tanjiro Kamado";
 
+                case 12006:
+                case 12200: return "Saitama";
+
                 case 13000: return "Pink Bean";
                 case 13001: return "Yetihood";
                 case 13100: return "Pink Bean";
@@ -1406,12 +1409,12 @@ namespace WzComparerR2.CharaSim
 
                 case 16000: return "Anima Thief";
                 case 16001: return "Lara";
-                case 16002: return "Len";
-                case 16100: return "Len(1)";
-                case 16110: return "Len(2)";
-                case 16111: return "Len(3)";
-                case 16112: return "Len(4)";
-                case 16114: return "Len(6)";
+                case 16002: return isMsea ? "Len" : "Ren";
+                case 16100: return isMsea ? "Len(1)" : "Ren(1)";
+                case 16110: return isMsea ? "Len(2)" : "Ren(2)";
+                case 16111: return isMsea ? "Len(3)" : "Ren(3)";
+                case 16112: return isMsea ? "Len(4)" : "Ren(4)";
+                case 16114: return isMsea ? "Len(6)" : "Ren(6)";
                 case 16200: return "Lara(1)";
                 case 16210: return "Lara(2)";
                 case 16211: return "Lara(3)";
@@ -1471,6 +1474,65 @@ namespace WzComparerR2.CharaSim
                 case 50007: return "6th (HEXA Stat)";
             }
             return null;
+        }
+
+        public static string GetFifthJobName(int skillCode, List<int> jobId, bool isMsea = false)
+        {
+            string jobName = "";
+            switch (jobId.Count)
+            {
+                case 0:
+                    jobName = GetJobName(skillCode / 10000, isMsea);
+                    break;
+                case 1:
+                    if (jobId[0] == 0)
+                    {
+                        jobName = GetJobName(skillCode / 10000, isMsea);
+                    }
+                    else
+                    {
+                        jobName = GetJobName(jobId[0], isMsea);
+                        jobName = jobName.Contains("(4") ? jobName.Replace("(4", "(5") : jobName + "(5)";
+                    }
+                    break;
+                default:
+                    bool isSameFaction = true;
+                    int faction = jobId[0] / 1000;
+                    if (faction == 5) faction = 1;
+                    foreach (int id in jobId.Skip(1))
+                    {
+                        if (id == 0) continue;
+                        isSameFaction = isSameFaction && (id / 1000 == faction);
+                    }
+                    if (isSameFaction)
+                    {
+                        switch (faction)
+                        {
+                            case 0: jobName = isMsea ? "5th (Adventurer)" : "5th (Explorer)"; break;
+                            case 1:
+                            case 5: jobName = "5th (Cygnus Knights)"; break;
+                            case 2: jobName = "5th (Heroes)"; break;
+                            case 3: jobName = "5th (Resistance)"; break;
+                            case 4: jobName = isMsea ? "5th (Akatsuki)" : "5th (Sengoku)"; break;
+                            case 6: jobName = "5th (Nova)"; break;
+                            case 10: jobName = "5th (Transcendent)"; break;
+                            case 11: jobName = "5th (Dawnveil)"; break;
+                            // case 12: jobName = "5th (Anime Collaboration)"; break;
+                            case 13: jobName = "5th (Monster)"; break;
+                            case 14: jobName = "5th (Friends World)"; break;
+                            case 15: jobName = "5th (Flora)"; break;
+                            case 16: jobName = "5th (Anima)"; break;
+                            case 17: jobName = "5th (Jianghu)"; break;
+                            case 18: jobName = "5th (Shine)"; break;
+                        }
+                    }
+                    else
+                    {
+                        jobName = GetJobName(skillCode / 10000);
+                    }
+                    break;
+            }
+            return jobName;
         }
 
         /* Not required for GMS

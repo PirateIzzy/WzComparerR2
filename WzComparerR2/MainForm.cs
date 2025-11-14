@@ -4448,6 +4448,185 @@ namespace WzComparerR2
             }
         }
 
+        private async void btnSkillTooltipExport_Click(object sender, EventArgs e)
+        {
+            if (PluginManager.FindWz(Wz_Type.Base) == null)
+            {
+                ToastNotification.Show(this, $"Error: Please open Base.wz.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+            if (openedWz.Count > 1)
+            {
+                ToastNotification.Show(this, $"Error: Please only open one Base.wz before using this feature.", null, 4000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+            var Setting = CharaSimConfig.Default;
+            bool isMsea = Setting.Misc.MseaMode;
+            using (FrmSkillTooltipExport frm = new FrmSkillTooltipExport(isMsea))
+            {
+                frm.skillNode = PluginManager.FindWz(Wz_Type.Skill);
+                if (frm.ShowDialog() == DialogResult.OK)
+                {
+                    List<int> selectedJob = frm.SelectedJobCodes;
+                    string exportedFolder = frm.ExportFolderPath;
+                    labelX2.Text = "Exporting";
+                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    try
+                    {
+                        sw.Start();
+                        btnSkillTooltipExport.Enabled = false;
+                        await Task.Run(() =>
+                        {
+                            if (!this.stringLinker.HasValues)
+                                this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+
+                            // Initialize VCore Dictionary
+                            Dictionary<int, List<int>> FifthJobSkillToJobID = new Dictionary<int, List<int>>();
+                            Wz_Node vCoreData = PluginManager.FindWz("Etc\\VCore.img\\CoreData", PluginManager.FindWz(Wz_Type.Base).GetNodeWzFile());
+                            if (vCoreData != null)
+                            {
+                                foreach (Wz_Node data in vCoreData.Nodes)
+                                {
+                                    Wz_Node connectSkill = data.FindNodeByPath("connectSkill").ResolveUol();
+                                    Wz_Node jobIDValue = data.FindNodeByPath("job").ResolveUol();
+                                    List<int> applicableJobID = new List<int>();
+                                    foreach (Wz_Node jobID in jobIDValue.Nodes)
+                                    {
+                                        applicableJobID.Add(jobID.GetValueEx<int>(0));
+                                    }
+                                    if (connectSkill == null)
+                                    {
+                                        int skillIDValue = data.FindNodeByPath("spCoreOption\\effect\\skill_id").ResolveUol().GetValueEx<int>(0);
+                                        if (!FifthJobSkillToJobID.ContainsKey(skillIDValue)) FifthJobSkillToJobID.Add(skillIDValue, [0]);
+                                    }
+                                    else
+                                    {
+                                        foreach (Wz_Node skillID in connectSkill.Nodes)
+                                        {
+                                            int skillIDValue = skillID.GetValueEx<int>(0);
+                                            if (skillIDValue > 0 && !FifthJobSkillToJobID.ContainsKey(skillIDValue))
+                                            {
+                                                FifthJobSkillToJobID.Add(skillIDValue, applicableJobID);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            SkillTooltipRender2 tooltip = new SkillTooltipRender2();
+                            tooltip.StringLinker = this.stringLinker;
+                            tooltip.ShowObjectID = Setting.Skill.ShowID;
+                            tooltip.ShowDelay = Setting.Skill.ShowDelay;
+                            tooltip.IgnoreEvalError = Setting.Skill.IgnoreEvalError;
+                            tooltip.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
+                            foreach (var i in selectedJob)
+                            {
+                                var jobImg = PluginManager.FindWz($"Skill\\{i:D3}.img\\skill", PluginManager.FindWz(Wz_Type.Base).GetNodeWzFile());
+                                if (jobImg == null)
+                                {
+                                    continue;
+                                }
+                                foreach (var j in jobImg.Nodes)
+                                {
+                                    StringResult sr;
+                                    string skillName;
+                                    if (tooltip.StringLinker == null || !tooltip.StringLinker.StringSkill.TryGetValue(int.Parse(j.Text), out sr))
+                                    {
+                                        sr = new StringResultSkill();
+                                        sr.Name = "Unknown Skill";
+                                    }
+                                    skillName = sr.Name;
+                                    labelX2.Text = string.Format("Exporting：{0} - {1}", j.Text, skillName);
+                                    Skill skill = Skill.CreateFromNode(j, PluginManager.FindWz, PluginManager.FindWz);
+                                    if (skill != null)
+                                    {
+                                        skill.Level = skill.MaxLevel;
+                                        tooltip.Skill = skill;
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                    Bitmap resultImage = tooltip.Render();
+                                    string categoryPath = "";
+                                    if (FifthJobSkillToJobID.ContainsKey(int.Parse(j.Text)))
+                                    {
+                                        categoryPath = ItemStringHelper.GetFifthJobName(int.Parse(j.Text), FifthJobSkillToJobID[int.Parse(j.Text)], isMsea);
+                                    }
+                                    else
+                                    {
+                                        categoryPath = ItemStringHelper.GetJobName(i, isMsea) ?? "Other";
+                                    }
+                                    if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
+                                    {
+                                        Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
+                                    }
+                                    string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + j.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                    if (File.Exists(imageName)) File.Delete(imageName);
+                                    resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                                    resultImage.Dispose();
+                                }
+                                if (FifthJobSkillToJobID.Count > 0)
+                                {
+                                    foreach (var kvp in FifthJobSkillToJobID)
+                                    {
+                                        if (kvp.Value.Contains(i))
+                                        {
+                                            var skillNode = PluginManager.FindWz($"Skill\\{kvp.Key / 10000}.img\\skill\\{kvp.Key}", PluginManager.FindWz(Wz_Type.Base).GetNodeWzFile());
+                                            if (skillNode == null)
+                                            {
+                                                continue;
+                                            }
+                                            StringResult sr;
+                                            string skillName;
+                                            if (tooltip.StringLinker == null || !tooltip.StringLinker.StringSkill.TryGetValue(int.Parse(skillNode.Text), out sr))
+                                            {
+                                                sr = new StringResultSkill();
+                                                sr.Name = "Unknown Skill";
+                                            }
+                                            skillName = sr.Name;
+                                            labelX2.Text = string.Format("Exporting：{0} - {1}", skillNode.Text, skillName);
+                                            Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz, PluginManager.FindWz);
+                                            if (skill != null)
+                                            {
+                                                skill.Level = skill.MaxLevel;
+                                                tooltip.Skill = skill;
+                                            }
+                                            else
+                                            {
+                                                continue;
+                                            }
+                                            Bitmap resultImage = tooltip.Render();
+                                            string categoryPath = ItemStringHelper.GetFifthJobName(kvp.Key, kvp.Value, isMsea) ?? "Other";
+                                            if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
+                                            {
+                                                Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
+                                            }
+                                            string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + skillNode.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                            if (File.Exists(imageName)) File.Delete(imageName);
+                                            resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                                            resultImage.Dispose();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBoxEx.Show(ex.ToString(), "Error");
+                    }
+                    finally
+                    {
+                        sw.Stop();
+                        btnSkillTooltipExport.Enabled = true;
+                        labelX2.Text = "Export finished. Time elapsed: " + sw.Elapsed.ToString();
+                    }
+                    labelItemStatus.Text = "Exported to: " + exportedFolder;
+
+                }
+            }
+        }
+
         private void btnExportSkillOption_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
