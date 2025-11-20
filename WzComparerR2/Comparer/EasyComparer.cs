@@ -78,7 +78,7 @@ namespace WzComparerR2.Comparer
         public bool DownloadKMSContentDB { get; set; }
         public bool MseaMode { get; set; }
         public bool SkipGodChangseopDuplicatedNodes { get; set; }
-        // public bool EnableAssembleTooltip { get; set; }
+        public bool EnableAssembleTooltip { get; set; }
         public bool ShowDamageSkin { get; set; }
         public bool UseMiniSizeDamageSkin { get; set; }
         public bool AlwaysUseMseaFormatDamageSkin { get; set; }
@@ -805,7 +805,14 @@ namespace WzComparerR2.Comparer
                 {
                     Directory.CreateDirectory(itemTooltipPath);
                 }
-                SaveItemTooltip(itemTooltipPath);
+                if (this.EnableAssembleTooltip)
+                {
+                    SaveItemTooltip3(itemTooltipPath);
+                }
+                else
+                {
+                    SaveItemTooltip(itemTooltipPath);
+                }
             }
             if (OutputGearTooltip && type.ToString() == "String" && OutputGearTooltipIDs != null)
             {
@@ -1327,7 +1334,203 @@ namespace WzComparerR2.Comparer
             DiffItemTags.Clear();
         }
 
-        // ModifiedされたGearツールチップ出力
+        private void SaveItemTooltip3(string itemTooltipPath)
+        {
+            ItemTooltipRender3[] itemRenderNewOld = new ItemTooltipRender3[2];
+            int count = 0;
+            int allCount = OutputItemTooltipIDs.Count;
+            var itemTypeFont = new Font("Arial", 10f, GraphicsUnit.Pixel);
+
+            for (int i = 0; i < 2; i++) // 0: New, 1: Old
+            {
+                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
+                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
+                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
+                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
+
+                itemRenderNewOld[i] = new ItemTooltipRender3();
+                itemRenderNewOld[i].StringLinker = new StringLinker();
+                itemRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                itemRenderNewOld[i].ShowObjectID = this.ShowObjectID;
+                itemRenderNewOld[i].ShowLinkedTamingMob = this.ShowLinkedTamingMob;
+                itemRenderNewOld[i].ShowDamageSkinID = this.ShowObjectID;
+                itemRenderNewOld[i].ShowDamageSkin = this.ShowDamageSkin;
+                itemRenderNewOld[i].UseMiniSizeDamageSkin = this.UseMiniSizeDamageSkin;
+                itemRenderNewOld[i].AlwaysUseMseaFormatDamageSkin = this.AlwaysUseMseaFormatDamageSkin;
+                itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
+                itemRenderNewOld[i].CompareMode = true;
+            }
+
+            foreach (var itemID in OutputItemTooltipIDs)
+            {
+                try
+                {
+
+                    StateInfo = string.Format("{0}/{1} Item: {2}", ++count, allCount, itemID);
+                    StateDetail = "Outputting item changes as tooltip images...";
+                    bool[] isItemNull = new bool[2] { false, false };
+                    string itemType = "";
+                    string itemNodePath = null;
+                    string categoryPath = "";
+
+                    if (!int.TryParse(itemID, out _)) continue;
+                    if (SkipKMSContent && KMSContentID["Item"].Contains((Int32.Parse(itemID)))) continue;
+
+                    if (itemID.StartsWith("03015")) // 判断开头是否是03015
+                    {
+                        itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 100, itemID);
+                        categoryPath = "Chair";
+                    }
+                    else if (itemID.StartsWith("0301")) // 判断开头是否是0301
+                    {
+                        itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 1000, itemID);
+                        categoryPath = "Chair";
+                    }
+                    else if (itemID.StartsWith("500")) // 判断开头是否是0500
+                    {
+                        itemNodePath = String.Format(@"Item\Pet\{0:D}.img", itemID);
+                        categoryPath = "Pet";
+                    }
+                    else if (itemID.StartsWith("02")) // 判断第1位是否是02
+                    {
+                        itemNodePath = String.Format(@"Item\Consume\0{0:D}.img\{1:D}", int.Parse(itemID) / 10000, itemID);
+                        categoryPath = "Consumable";
+                    }
+                    else if (itemID.StartsWith("03")) // 判断第1位是否是03
+                    {
+                        itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 10000, itemID);
+                        categoryPath = "OtherSetup";
+                    }
+                    else if (itemID.StartsWith("04")) // 判断第1位是否是04
+                    {
+                        itemNodePath = String.Format(@"Item\Etc\0{0:D}.img\{1:D}", int.Parse(itemID) / 10000, itemID);
+                        categoryPath = "Etc";
+                    }
+                    else if (itemID.StartsWith("05")) // 判断第1位是否是02
+                    {
+                        itemNodePath = String.Format(@"Item\Cash\0{0:D}.img\{1:D}", int.Parse(itemID) / 10000, itemID);
+                        categoryPath = "Cash";
+                    }
+
+                    StringResult sr;
+                    string ItemName;
+                    if (itemRenderNewOld[1].StringLinker == null || !itemRenderNewOld[1].StringLinker.StringItem.TryGetValue(int.Parse(itemID), out sr))
+                    {
+                        sr = new StringResult();
+                        sr.Name = "Unknown Item";
+                    }
+                    ItemName = sr.Name;
+                    if (itemRenderNewOld[0].StringLinker == null || !itemRenderNewOld[0].StringLinker.StringItem.TryGetValue(int.Parse(itemID), out sr))
+                    {
+                        sr = new StringResult();
+                        sr.Name = "Unknown Item";
+                    }
+                    if (ItemName != sr.Name && ItemName != "Unknown Item" && sr.Name != "Unknown Item")
+                    {
+                        ItemName += "_" + sr.Name;
+                    }
+                    else if (ItemName == "Unknown Item")
+                    {
+                        ItemName = sr.Name;
+                    }
+                    if (String.IsNullOrEmpty(ItemName)) ItemName = "Unknown Item";
+                    ItemName = RemoveInvalidFileNameChars(ItemName);
+                    int nullItemIdx = 0;
+
+                    // Modified前後のツールチップ画像の作成
+                    for (int i = 0; i < 2; i++) // 0: New, 1: Old
+                    {
+                        Item item = Item.CreateFromNode(PluginManager.FindWz(itemNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+
+                        if (item != null)
+                        {
+                            itemRenderNewOld[i].Item = item;
+                        }
+                        else
+                        {
+                            isItemNull[i] = true;
+                            nullItemIdx = i + 1;
+                        }
+                    }
+
+                    // ツールチップ画像を合わせる
+                    Bitmap resultImage = null;
+                    Graphics g = null;
+
+                    switch (nullItemIdx)
+                    {
+                        case 0: // change
+                            itemType = "Modified";
+
+                            Bitmap ImageNew = itemRenderNewOld[0].Render();
+                            Bitmap ImageOld = itemRenderNewOld[1].Render();
+                            if (GetBitmapHash(ImageNew) == GetBitmapHash(ImageOld)) continue;
+                            if (ShowChangeType)
+                            {
+                                int picHchange = 13;
+                                Graphics[] gNewOld = new Graphics[] { Graphics.FromImage(ImageNew), Graphics.FromImage(ImageOld) };
+                                GearGraphics.DrawPlainText(gNewOld[1], "Before", itemTypeFont, Color.FromArgb(255, 255, 255), 80, 130, ref picHchange, 10);
+                                picHchange = 13;
+                                GearGraphics.DrawPlainText(gNewOld[0], "After", itemTypeFont, Color.FromArgb(255, 255, 255), 80, 130, ref picHchange, 10);
+                            }
+                            resultImage = new Bitmap(ImageNew.Width + ImageOld.Width, Math.Max(ImageNew.Height, ImageOld.Height));
+                            g = Graphics.FromImage(resultImage);
+
+                            g.DrawImage(ImageOld, 0, 0);
+                            g.DrawImage(ImageNew, ImageOld.Width, 0);
+                            break;
+
+                        case 1: // delete
+                            itemType = "Removed";
+                            if (isItemNull[1]) continue;
+                            resultImage = itemRenderNewOld[1].Render();
+                            g = Graphics.FromImage(resultImage);
+                            break;
+
+                        case 2: // add
+                            itemType = "Added";
+                            if (isItemNull[0]) continue;
+                            resultImage = itemRenderNewOld[0].Render();
+                            g = Graphics.FromImage(resultImage);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    if (resultImage == null || g == null)
+                    {
+                        continue;
+                    }
+
+                    if (!Directory.Exists(Path.Combine(itemTooltipPath, categoryPath)))
+                    {
+                        Directory.CreateDirectory(Path.Combine(itemTooltipPath, categoryPath));
+                    }
+
+                    var itemTypeTextInfo = g.MeasureString(itemType, GearGraphics.ItemDetailFont);
+                    int picH = 0;
+                    if (ShowChangeType && nullItemIdx != 0) GearGraphics.DrawPlainText(g, itemType, itemTypeFont, Color.FromArgb(255, 255, 255), 80, (int)Math.Ceiling(itemTypeTextInfo.Width) + 80, ref picH, 10);
+
+                    string imageName = Path.Combine(itemTooltipPath, categoryPath, "Item_" + itemID + "_" + ItemName + "_" + itemType + ".png");
+                    if (!File.Exists(imageName))
+                    {
+                        resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                    resultImage.Dispose();
+                    g.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    FailToExportTooltips.Add("Item Tooltip: " + itemID, ex.Message);
+                }
+            }
+            OutputItemTooltipIDs.Clear();
+            DiffItemTags.Clear();
+        }
+
+
+        // 変更された装備ツールチップ出力
         private void SaveGearTooltip(string gearTooltipPath)
         {
             GearTooltipRender2[] gearRenderNewOld = new GearTooltipRender2[2];

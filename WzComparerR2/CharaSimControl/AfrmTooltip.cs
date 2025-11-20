@@ -35,6 +35,7 @@ namespace WzComparerR2.CharaSimControl
             this.GearRender = new GearTooltipRender2();
             this.GearRender22 = new GearTooltipRender22();
             this.ItemRender = new ItemTooltipRender2();
+            this.ItemRender3 = new ItemTooltipRender3();
             this.SkillRender = new SkillTooltipRender2();
             this.RecipeRender = new RecipeTooltipRender();
             this.MapRender = new MapTooltipRenderer();
@@ -57,6 +58,7 @@ namespace WzComparerR2.CharaSimControl
         private bool showID;
 
         public bool Enable22AniStyle { get; set; }
+        public bool EnableAssembleTooltip { get; set; }
 
         private Bitmap AvatarBitmap;
         private Bitmap SampleBitmap;
@@ -78,6 +80,7 @@ namespace WzComparerR2.CharaSimControl
         public GearTooltipRender2 GearRender { get; private set; }
         public GearTooltipRender22 GearRender22 { get; private set; }
         public ItemTooltipRender2 ItemRender { get; private set; }
+        public ItemTooltipRender3 ItemRender3 { get; private set; }
         public SkillTooltipRender2 SkillRender { get; private set; }
         public RecipeTooltipRender RecipeRender { get; private set; }
         public MapTooltipRenderer MapRender { get; private set; }
@@ -113,7 +116,7 @@ namespace WzComparerR2.CharaSimControl
                 this.GearRender22.ShowObjectID = value;
                 this.MapRender.ShowObjectID = value;
                 this.ItemRender.ShowObjectID = value;
-                // this.ItemRender3.ShowObjectID = value;
+                this.ItemRender3.ShowObjectID = value;
                 this.QuestRender.ShowObjectID = value;
                 this.SkillRender.ShowObjectID = value;
                 this.RecipeRender.ShowObjectID = value;
@@ -166,9 +169,17 @@ namespace WzComparerR2.CharaSimControl
             TooltipRender renderer;
             if (item is Item)
             {
-                renderer = ItemRender;
-                ItemRender.Item = this.item as Item;
-                ItemRender.Enable22AniStyle = this.Enable22AniStyle;
+                if (EnableAssembleTooltip)
+                {
+                    renderer = ItemRender3;
+                    ItemRender3.Item = this.item as Item;
+                }
+                else
+                {
+                    renderer = ItemRender;
+                    ItemRender.Item = this.item as Item;
+                    ItemRender.Enable22AniStyle = this.Enable22AniStyle;
+                }
             }
             else if (item is Gear)
             {

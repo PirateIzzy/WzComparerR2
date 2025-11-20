@@ -208,12 +208,12 @@ namespace WzComparerR2
             set { comboBoxEx4.SelectedIndex = value; }
         }
 
-        /*[Link]
+        [Link]
         public bool Item_UseAssembleUI
         {
             get { return chkUseAssembleUI.Checked; }
             set { chkUseAssembleUI.Checked = value; }
-        }*/
+        }
 
         [Link]
         public bool DamageSkin_ShowDamageSkinID
@@ -400,11 +400,11 @@ namespace WzComparerR2
 
         private void chkEnable22AniStyle_CheckedChanged(object sender, EventArgs e)
         {
-            /* this.chkUseAssembleUI.Enabled = chkEnable22AniStyle.Checked;
+            this.chkUseAssembleUI.Enabled = chkEnable22AniStyle.Checked;
             if (!chkEnable22AniStyle.Checked)
             {
                 this.chkUseAssembleUI.Checked = false;
-            } */
+            }
         }
 
         private void ChkQAS_CheckedChanged(object sender, EventArgs e)

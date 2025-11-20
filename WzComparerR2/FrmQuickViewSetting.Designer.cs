@@ -114,6 +114,7 @@
             this.labelXQSHint = new DevComponents.DotNetBar.LabelX();
             this.chkShowQuestObjectID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkQAS = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkUseAssembleUI = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
@@ -518,6 +519,7 @@
             // 
             // superTabControlPanel3
             // 
+            this.superTabControlPanel3.Controls.Add(this.chkUseAssembleUI);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX23);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX12);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX9);
@@ -535,6 +537,21 @@
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
             this.superTabControlPanel3.Visible = false;
+            // 
+            // chkUseAssembleUI
+            // 
+            this.chkUseAssembleUI.AutoSize = true;
+            this.chkUseAssembleUI.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkUseAssembleUI.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkUseAssembleUI.Location = new System.Drawing.Point(13, 228);
+            this.chkUseAssembleUI.Name = "chkUseAssembleUI";
+            this.chkUseAssembleUI.Size = new System.Drawing.Size(126, 16);
+            this.chkUseAssembleUI.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkUseAssembleUI.TabIndex = 5;
+            this.chkUseAssembleUI.Text = "Use 2025 Item UI";
             // 
             // checkBoxX23
             // 
@@ -1372,5 +1389,6 @@
         private DevComponents.DotNetBar.LabelX labelXQSHint;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowQuestObjectID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkQAS;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkUseAssembleUI;
     }
 }
