@@ -44,7 +44,7 @@ namespace WzComparerR2
             { "Arch Mage (Fire,Poison)", new int[] { 200, 210, 211, 212, 214 } },
             { "Arch Mage (Ice,Lightning)", new int[] { 200, 220, 221, 222, 224 } },
             { "Bishop", new int[] { 200, 230, 231, 232, 234 } },
-            { "Bowmaster", new int[] { 300, 310, 311, 312, 314 } },
+            { "Bow Master", new int[] { 300, 310, 311, 312, 314 } },
             { "Marksman", new int[] { 300, 320, 321, 322, 324 } },
             { "Pathfinder", new int[] { 301, 330, 331, 332, 334 } },
             { "Night Lord", new int[] { 400, 410, 411, 412, 414 } },

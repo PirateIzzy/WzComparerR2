@@ -710,8 +710,184 @@ namespace WzComparerR2.CharaSim
                 // case GearType.keir: return "Keir";
                 // case GearType.gram: return "Gram";
 
-                case GearType.longSword: return "장검";
-                case GearType.yeouiGem: return "여의보주";
+                case GearType.longSword: return "Sword";
+                case GearType.yeouiGem: return "Imugi Gem";
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取gearType所对应的字符串。
+        /// </summary>
+        /// <param Name="Type">表示装备类型GearType。</param>
+        /// <returns></returns>
+        public static string GetGearTypeString22(GearType type, bool isMsea = false)
+        {
+            switch (type)
+            {
+                //case GearType.body: return "Avatar (Body)";
+                case GearType.head: return "Avatar (Head)";
+                case GearType.head_n: return "Head";
+                case GearType.face:
+                case GearType.face2:
+                case GearType.face_n: return "Face";
+                case GearType.hair:
+                case GearType.hair2:
+                case GearType.hair3:
+                case GearType.hair_n: return "Hair";
+                case GearType.faceAccessory: return "Face Acc";
+                case GearType.eyeAccessory: return "Eye Acc";
+                case GearType.earrings: return "Earrings";
+                case GearType.pendant: return "Pendant";
+                case GearType.belt: return "Belt";
+                case GearType.medal: return "Medal";
+                case GearType.shoulderPad: return "Shoulder";
+                case GearType.cap: return "Hat";
+                case GearType.cape: return "Cape";
+                case GearType.coat: return "Top";
+                case GearType.dragonMask: return "Dragon Hat";
+                case GearType.dragonPendant: return "Dragon Pendant";
+                case GearType.dragonWings: return "Wing Accessory";
+                case GearType.dragonTail: return "ail Accessory";
+                case GearType.glove: return "Gloves";
+                case GearType.longcoat: return "Outfit";
+                case GearType.machineEngine: return "Engine";
+                case GearType.machineArms: return "Arm";
+                case GearType.machineLegs: return "Leg";
+                case GearType.machineBody: return "Frame";
+                case GearType.machineTransistors: return "Transistor";
+                case GearType.pants: return "Bottom";
+                case GearType.ring: return "Ring";
+                case GearType.shield: return "Shield";
+                case GearType.shoes: return "Shoes";
+                case GearType.shiningRod: return "Shining Rod";
+                case GearType.soulShooter: return "Soul Shooter";
+                case GearType.ohSword: return isMsea ? "One Handed Sword" : "One-handed Sword";
+                case GearType.ohAxe: return isMsea ? "One Handed Axe" : "One-handed Axe";
+                case GearType.ohBlunt: return isMsea ? "One Handed Mace" : "One-handed Blunt Weapon";
+                case GearType.dagger: return "Dagger";
+                case GearType.katara: return "Katara";
+                case GearType.magicArrow: return "Magic Arrow";
+                case GearType.card: return "Card";
+                case GearType.box: return "Core";
+                case GearType.orb: return "Orb";
+                case GearType.novaMarrow: return "Dragon Essence";
+                case GearType.soulBangle: return "Soul Ring";
+                case GearType.mailin: return "Magnum";
+                case GearType.cane: return "Cane";
+                case GearType.wand: return "Wand";
+                case GearType.staff: return "Staff";
+                case GearType.thSword: return isMsea ? "Two Handed Sword" : "Two-handed Sword";
+                case GearType.thAxe: return isMsea ? "Two Handed Axe" : "Two-handed Axe";
+                case GearType.thBlunt: return isMsea ? "Two Handed Mace" : "Two-handed Blunt Weapon";
+                case GearType.spear: return "Spear";
+                case GearType.polearm: return isMsea ? "Pole Arm" : "Polearm";
+                case GearType.bow: return "Bow";
+                case GearType.crossbow: return "Crossbow";
+                case GearType.throwingGlove: return "Claw";
+                case GearType.knuckle: return "Knuckle";
+                case GearType.gun: return "Gun";
+                case GearType.android: return "Android";
+                case GearType.machineHeart: return "Mech Heart";
+                case GearType.pickaxe: return "Mining Tool";
+                case GearType.shovel: return "Herbalism Tool";
+                case GearType.pocket: return "Pocket Item";
+                case GearType.dualBow: return "Dual Bowguns";
+                case GearType.handCannon: return "Hand Cannon";
+                case GearType.badge: return "Badge";
+                case GearType.emblem: return "Emblem";
+                case GearType.soulShield: return "Soul Shield";
+                case GearType.demonShield: return isMsea ? "Force Shield" : "Demon Aegis";
+                case GearType.totem: return "Totem";
+                case GearType.petEquip: return "Pet Equipment";
+                case GearType.taming:
+                case GearType.taming2:
+                case GearType.taming3:
+                case GearType.tamingChair: return "Tamed Monster";
+                case GearType.saddle: return "Saddle";
+                case GearType.katana: return "Katana";
+                case GearType.fan: return "Fan";
+                case GearType.swordZB: return "Heavy Sword";
+                case GearType.swordZL: return "Long Sword";
+                case GearType.weapon: return "Weapon";
+                case GearType.subWeapon: return "Sub Weapon";
+                case GearType.heroMedal: return isMsea ? "Medal" : "Medallions";
+                case GearType.rosario: return isMsea ? "Rosario" : "Rosary";
+                case GearType.chain: return "Iron Chain";
+                case GearType.book1:
+                case GearType.book2:
+                case GearType.book3: return "Magic Book";
+                case GearType.bowMasterFeather: return isMsea ? "Fletching" : "Arrow Fletching";
+                case GearType.crossBowThimble: return "Bow Thimble";
+                case GearType.shadowerSheath: return isMsea ? "Dagger Sheath" : "Dagger Scabbard";
+                case GearType.nightLordPoutch: return isMsea ? "Talisman" : "Charm";
+                case GearType.viperWristband: return isMsea ? "Wristband" : "Wrist Band";
+                case GearType.captainSight: return isMsea ? "Spyglass" : "Far Sight";
+                case GearType.cannonGunPowder:
+                case GearType.cannonGunPowder2: return "Powder Keg";
+                case GearType.aranPendulum: return isMsea ? "Pendulum" : "Mass";
+                case GearType.evanPaper: return isMsea ? "Grimoire" : "Document";
+                case GearType.battlemageBall: return "Magic Marble";
+                case GearType.wildHunterArrowHead: return isMsea ? "Arrow Head" : "Arrowhead";
+                case GearType.cygnusGem: return "Jewel";
+                case GearType.controller: return "Controller";
+                case GearType.foxPearl: return "Fox Marble";
+                case GearType.chess: return "Chess Piece";
+                case GearType.powerSource: return "Power Source";
+                case GearType.energySword: return isMsea ? "Energy Sword" : "Whip Blade";
+                case GearType.desperado: return "Desperado";
+                case GearType.memorialStaff: return "Memorial Staff";
+                case GearType.magicStick: return isMsea ? "Magic Stick" : "Beast Tamer Scepter";
+                case GearType.leaf:
+                case GearType.leaf2: return "Leaf";
+                case GearType.boxingClaw: return "Fist";
+                case GearType.kodachi:
+                case GearType.kodachi2: return isMsea ? "Wakizashi" : "Kodachi";
+                case GearType.espLimiter: return isMsea ? "ESP Limiter" : "Psy-limiter";
+
+                case GearType.gauntletBuster: return isMsea ? "Revolver Gauntlet" : "Arm Cannon";
+                case GearType.explosivePill: return isMsea ? "Bullets" : "Charge";
+
+                case GearType.chain2: return isMsea ? "Energy Chain" : "Chain";
+                case GearType.magicGauntlet: return isMsea ? "Magic Gauntlet" : "Lucent Gauntlet";
+                case GearType.transmitter: return "Warp Forge";
+                case GearType.magicWing: return isMsea ? "Magic Wing" : "Lucent Wings";
+                case GearType.pathOfAbyss: return isMsea ? "Abyssal Arm" : "Abyssal Path";
+
+                case GearType.relic: return "Relic";
+                case GearType.ancientBow: return "Ancient Bow";
+
+                case GearType.handFan: return isMsea ? "Buchae" : "Ritual Fan";
+                case GearType.fanTassel: return "Fan Tassel";
+
+                case GearType.tuner: return isMsea ? "Tuner" : "Bladecaster";
+                case GearType.bracelet: return isMsea ? "Bracelet" : "Bladebinder";
+
+                case GearType.breathShooter: return isMsea ? "Breath Shooter" : "Whispershot";
+                case GearType.weaponBelt: return "Weapon Belt";
+
+                case GearType.ornament: return "Ornament";
+
+                case GearType.chakram: return "Chakram";
+                case GearType.hexSeeker: return "Hex Seeker";
+
+                case GearType.boxingCannon: return "Martial Brace";
+                case GearType.boxingSky: return "Brace Band";
+
+                case GearType.arcaneSymbol: return "Arcane Symbol";
+                case GearType.authenticSymbol: return isMsea ? "Authentic Symbol" : "Sacred Symbol";
+                case GearType.grandAuthenticSymbol: return isMsea ? "Authentic Symbol" : "Grand Sacred Symbol";
+
+                case GearType.jewel: return "宝玉";
+
+                case GearType.celestialLight: return "Celestial Light";
+                case GearType.compass: return "Compass";
+
+                // case GearType.keir: return "Keir";
+                // case GearType.gram: return "Gram";
+
+                case GearType.longSword: return "Sword";
+                case GearType.yeouiGem: return "Imugi Gem";
                 default: return null;
             }
         }
@@ -746,6 +922,16 @@ namespace WzComparerR2.CharaSim
         public static string GetSetItemGearTypeString(GearType type)
         {
             return GetGearTypeString(type);
+        }
+
+        /// <summary>
+        /// 获取套装装备类型的字符串。
+        /// </summary>
+        /// <param Name="Type">表示套装装备类型的GearType。</param>
+        /// <returns></returns>
+        public static string GetSetItemGearTypeString22(GearType type)
+        {
+            return GetGearTypeString22(type);
         }
 
         /// <summary>
@@ -1110,9 +1296,9 @@ namespace WzComparerR2.CharaSim
                 case 301: return "Archer";
                 case 310: return "Hunter";
                 case 311: return "Ranger";
-                case 312: return "Bowmaster";
-                case 313: return "Bowmaster(5)";
-                case 314: return "Bowmaster(6)";
+                case 312: return isMsea ? "Bowmaster" : "Bow Master";
+                case 313: return isMsea ? "Bowmaster(5)" : "Bow Master(5)";
+                case 314: return isMsea ? "Bowmaster(6)" : "Bow Master(6)";
                 case 320: return isMsea ? "Crossbow Man" : "Crossbowman";
                 case 321: return "Sniper";
                 case 322: return isMsea ? "Crossbow Master" : "Marksman";

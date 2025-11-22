@@ -220,7 +220,7 @@ namespace WzComparerR2.CharaSimControl
                                     itemName = sr.Name;
                                     if (typeName == null)
                                     {
-                                        typeName = ItemStringHelper.GetSetItemGearTypeString(Gear.GetGearType(itemID));
+                                        typeName = ItemStringHelper.GetSetItemGearTypeString22(Gear.GetGearType(itemID));
                                     }
                                     switch (Gear.GetGender(itemID))
                                     {

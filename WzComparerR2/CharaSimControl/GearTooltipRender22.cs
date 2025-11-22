@@ -250,8 +250,8 @@ namespace WzComparerR2.CharaSimControl
             int gender = Gear.GetGender(Gear.ItemID);
             switch (gender)
             {
-                case 0: gearName += " (Male)"; break;
-                case 1: gearName += " (Female)"; break;
+                case 0: gearName += " (M)"; break;
+                case 1: gearName += " (F)"; break;
             }
 
             TextRenderer.DrawText(g, gearName, GearGraphics.ItemNameFont,
@@ -540,8 +540,8 @@ namespace WzComparerR2.CharaSimControl
             // 착용 성별
             if (gender < 2)
             {
-                TextRenderer.DrawText(g, "Required Gender", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 232: 15, picH - (moveX ? 16 : 0)), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                TextRenderer.DrawText(g, gender == 0 ? "Male" : "Felame", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 300: 100, picH - (moveX ? 16 : 0)), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Gender", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 232: 15, picH - (moveX ? 16 : 0)), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, gender == 0 ? "M" : "F", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 300: 100, picH - (moveX ? 16 : 0)), Color.White, TextFormatFlags.NoPadding);
                 if (!moveX) picH += 16;
             }
 
@@ -2125,7 +2125,7 @@ namespace WzComparerR2.CharaSimControl
                 categories.Add("Dragon Equipment");
             }
 
-            var text = ItemStringHelper.GetGearTypeString(Gear.type);
+            var text = ItemStringHelper.GetGearTypeString22(Gear.type);
             if (!string.IsNullOrEmpty(text))
             {
                 categories.Add(text);

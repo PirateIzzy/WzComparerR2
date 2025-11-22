@@ -108,7 +108,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         android = 166,
         /// <summary>
-        /// Mechanical Heartz 167
+        /// Mechanical Heart 167
         /// </summary>
         machineHeart = 167,
         /// <summary>
