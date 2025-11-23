@@ -11,6 +11,7 @@ using SharpDX.XAudio2;
 using System.Threading.Tasks;
 using System.Threading;
 using WzComparerR2.Properties;
+using System.IO;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -21,7 +22,7 @@ namespace WzComparerR2.CharaSimControl
             this.menu = new ContextMenuStrip();
             this.menu.Items.Add(new ToolStripMenuItem("Copy Tooltip Image to Clipboard", null, tsmiCopy_Click));
             this.menu.Items.Add(new ToolStripMenuItem("Save Tooltip Image", null, tsmiSave_Click));
-            this.menu.Items.Add(new ToolStripMenuItem("Save Avatar Image", null, tsmiAvatarSave_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Save Sample Image", null, tsmiSampleAssetSave_Click));
             this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Copy String to Clipboard", null, tsmiCopyText_Click));
             this.menu.Items.Add(new ToolStripMenuItem("Copy Translated String to Clipboard", null, tsmiCopyTranslate_Click));
@@ -58,6 +59,10 @@ namespace WzComparerR2.CharaSimControl
         public bool Enable22AniStyle { get; set; }
 
         private Bitmap AvatarBitmap;
+        private Bitmap SampleBitmap;
+        private Bitmap DamageSkinSampleNonCriticalBitmap;
+        private Bitmap DamageSkinSampleCriticalBitmap;
+        private Bitmap DamageSkinExtraBitmap;
         private FrmWaiting WaitingForm = new FrmWaiting();
         private static readonly SemaphoreSlim TranslateSemaphore = new SemaphoreSlim(1, 1);
 
@@ -297,7 +302,17 @@ namespace WzComparerR2.CharaSimControl
             {
                 this.Bitmap = renderer.Render();
             }
-            if (item is Item) AvatarBitmap = (this.TargetItem as Item).AvatarBitmap;
+            if (item is Item)
+            {
+                AvatarBitmap = (this.TargetItem as Item).AvatarBitmap;
+                SampleBitmap = (this.TargetItem as Item).Sample.Bitmap;
+                if ((this.TargetItem as Item).DamageSkinID != null)
+                {
+                    DamageSkinSampleNonCriticalBitmap = (this.TargetItem as Item).DamageSkinSampleNonCriticalBitmap;
+                    DamageSkinSampleCriticalBitmap = (this.TargetItem as Item).DamageSkinSampleCriticalBitmap;
+                    DamageSkinExtraBitmap = (this.TargetItem as Item).DamageSkinExtraBitmap;
+                }
+            }
             if (item is Gear) AvatarBitmap = (this.TargetItem as Gear).AndroidBitmap;
             if (item is Npc) AvatarBitmap = (this.TargetItem as Npc).AvatarBitmap;
         }
@@ -596,9 +611,29 @@ namespace WzComparerR2.CharaSimControl
             }
         }
 
-        void tsmiAvatarSave_Click(object sender, EventArgs e)
+        void tsmiSampleAssetSave_Click(object sender, EventArgs e)
         {
-            if (this.AvatarBitmap != null && this.item != null)
+            if (this.DamageSkinSampleNonCriticalBitmap != null && this.DamageSkinSampleCriticalBitmap != null && this.item != null)
+            {
+                using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+                {
+                    dlg.Description = "Please select a directory to save Damage Skin Samples.";
+                    string fileName1 = this.ImageFileName.Replace("item", "DamageSkinSample");
+                    string fileName2 = this.ImageFileName.Replace("item", "DamageSkinCriticalSample");
+                    string fileName3 = this.ImageFileName.Replace("item", "DamageSkinExtraEffectSample");
+
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        this.DamageSkinSampleNonCriticalBitmap.Save(Path.Combine(dlg.SelectedPath, fileName1), System.Drawing.Imaging.ImageFormat.Png);
+                        this.DamageSkinSampleCriticalBitmap.Save(Path.Combine(dlg.SelectedPath, fileName2), System.Drawing.Imaging.ImageFormat.Png);
+                        if (this.DamageSkinExtraBitmap != null)
+                        {
+                            this.DamageSkinExtraBitmap.Save(Path.Combine(dlg.SelectedPath, fileName3), System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                }
+            }
+            else if (this.AvatarBitmap != null && this.item != null)
             {
                 using (SaveFileDialog dlg = new SaveFileDialog())
                 {
@@ -608,6 +643,19 @@ namespace WzComparerR2.CharaSimControl
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
                         this.AvatarBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                }
+            }
+            else if (this.SampleBitmap != null && this.item != null)
+            {
+                using (SaveFileDialog dlg = new SaveFileDialog())
+                {
+                    dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
+                    dlg.FileName = this.ImageFileName.Replace("eqp", "sample").Replace("item", "sample");
+
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        this.SampleBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
                     }
                 }
             }

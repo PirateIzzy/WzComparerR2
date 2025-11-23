@@ -78,6 +78,11 @@ namespace WzComparerR2.Comparer
         public bool DownloadKMSContentDB { get; set; }
         public bool MseaMode { get; set; }
         public bool SkipGodChangseopDuplicatedNodes { get; set; }
+        // public bool EnableAssembleTooltip { get; set; }
+        public bool ShowDamageSkin { get; set; }
+        public bool UseMiniSizeDamageSkin { get; set; }
+        public bool AlwaysUseMseaFormatDamageSkin { get; set; }
+        public long DamageSkinNumber { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
@@ -1146,6 +1151,11 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 itemRenderNewOld[i].Enable22AniStyle = this.Enable22AniStyle;
                 itemRenderNewOld[i].ShowLinkedTamingMob = this.ShowLinkedTamingMob;
+                itemRenderNewOld[i].ShowDamageSkinID = this.ShowObjectID;
+                itemRenderNewOld[i].ShowDamageSkin = this.ShowDamageSkin;
+                itemRenderNewOld[i].UseMiniSizeDamageSkin = this.UseMiniSizeDamageSkin;
+                itemRenderNewOld[i].AlwaysUseMseaFormatDamageSkin = this.AlwaysUseMseaFormatDamageSkin;
+                itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
                 itemRenderNewOld[i].CompareMode = true;
             }
 
