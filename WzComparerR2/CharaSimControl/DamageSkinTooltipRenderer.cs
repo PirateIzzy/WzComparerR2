@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Resource = CharaSimResource.Resource;
 using WzComparerR2.AvatarCommon;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
@@ -266,6 +267,12 @@ namespace WzComparerR2.CharaSimControl
                                 (useMiniSize ? this.damageSkin.MiniUnit["4"].Bitmap.Height :
                                 this.damageSkin.BigUnit["4"].Bitmap.Height));
                         }
+                        else if (character == "T")
+                        {
+                            totalWidth += Resource.Unit_T.Width;
+                            totalWidth += unitSpacing;
+                            maxHeight = Math.Max(maxHeight, Resource.Unit_T.Height);
+                        }
                         break;
 
 
@@ -286,10 +293,22 @@ namespace WzComparerR2.CharaSimControl
                                 (useMiniSize ? this.damageSkin.MiniUnit["5"].Bitmap.Height :
                                 this.damageSkin.BigUnit["5"].Bitmap.Height));
                         }
+                        else if (character == "兆" || character == "조")
+                        {
+                            totalWidth += Resource.Unit_E12.Width;
+                            totalWidth += unitSpacing;
+                            maxHeight = Math.Max(maxHeight, Resource.Unit_E12.Height);
+                        }
+                        else if (character == "Q")
+                        {
+                            totalWidth += Resource.Unit_Q.Width;
+                            totalWidth += unitSpacing;
+                            maxHeight = Math.Max(maxHeight, Resource.Unit_Q.Height);
+                        }
                         break;
 
                     case "京":
-                    case "교":
+                    case "경":
                         if (this.damageSkin.BigUnit.ContainsKey("6"))
                         {
                             totalWidth += isCritical ?
@@ -303,6 +322,12 @@ namespace WzComparerR2.CharaSimControl
                                 this.damageSkin.BigCriticalUnit["6"].Bitmap.Height) :
                                 (useMiniSize ? this.damageSkin.MiniUnit["6"].Bitmap.Height :
                                 this.damageSkin.BigUnit["6"].Bitmap.Height));
+                        }
+                        else if (character == "京" || character == "경")
+                        {
+                            totalWidth += Resource.Unit_E16.Width;
+                            totalWidth += unitSpacing;
+                            maxHeight = Math.Max(maxHeight, Resource.Unit_E12.Height);
                         }
                         break;
                 }
@@ -419,6 +444,12 @@ namespace WzComparerR2.CharaSimControl
                                 g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
                                 offsetX += charBitmap.Width + unitSpacing;
                             }
+                            else if (character == "T")
+                            {
+                                charBitmap = Resource.Unit_T;
+                                g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
+                                offsetX += charBitmap.Width + unitSpacing;
+                            }
                             break;
 
 
@@ -435,10 +466,22 @@ namespace WzComparerR2.CharaSimControl
                                 g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
                                 offsetX += charBitmap.Width + unitSpacing;
                             }
+                            else if (character == "兆" || character == "조")
+                            {
+                                charBitmap = Resource.Unit_E12;
+                                g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
+                                offsetX += charBitmap.Width + unitSpacing;
+                            }
+                            else if (character == "Q")
+                            {
+                                charBitmap = Resource.Unit_Q;
+                                g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
+                                offsetX += charBitmap.Width + unitSpacing;
+                            }
                             break;
 
                         case "京":
-                        case "교":
+                        case "경":
                             if (this.damageSkin.BigUnit.ContainsKey("6"))
                             {
                                 charBitmap = isCritical ?
@@ -446,6 +489,12 @@ namespace WzComparerR2.CharaSimControl
                                     this.damageSkin.BigCriticalUnit["6"].Bitmap) :
                                     (useMiniSize ? this.damageSkin.MiniUnit["6"].Bitmap :
                                     this.damageSkin.BigUnit["6"].Bitmap);
+                                g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
+                                offsetX += charBitmap.Width + unitSpacing;
+                            }
+                            else if (character == "京" || character == "경")
+                            {
+                                charBitmap = Resource.Unit_E16;
                                 g.DrawImage(charBitmap, offsetX, maxHeight - charBitmap.Height);
                                 offsetX += charBitmap.Width + unitSpacing;
                             }
