@@ -55,7 +55,7 @@ namespace WzComparerR2
             loadUIState();
         }
 
-        List<Wz_Structure> openedWz;
+        public List<Wz_Structure> openedWz;
         StringLinker stringLinker;
         HistoryList<Node> historyNodeList;
         bool historySelecting;
@@ -283,6 +283,25 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.ItemRender.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
             tooltipQuickView.ItemRender.MseaMode = Setting.Misc.MseaMode;
+            tooltipQuickView.ItemRender.ShowDamageSkin = Setting.DamageSkin.ShowDamageSkin;
+            tooltipQuickView.ItemRender.ShowDamageSkinID = Setting.DamageSkin.ShowDamageSkinID;
+            tooltipQuickView.ItemRender.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
+            tooltipQuickView.ItemRender.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
+            tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
+            tooltipQuickView.ItemRender3.ShowObjectID = Setting.Item.ShowID;
+            tooltipQuickView.ItemRender3.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
+            tooltipQuickView.ItemRender3.LinkRecipeItem = Setting.Item.LinkRecipeItem;
+            tooltipQuickView.ItemRender3.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
+            tooltipQuickView.ItemRender3.ShowNickTag = Setting.Item.ShowNickTag;
+            tooltipQuickView.ItemRender3.ShowLinkedTamingMob = Setting.Item.ShowLinkedTamingMob;
+            tooltipQuickView.ItemRender3.CosmeticHairColor = Setting.Item.CosmeticHairColor;
+            tooltipQuickView.ItemRender3.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.ItemRender3.ShowDamageSkin = Setting.DamageSkin.ShowDamageSkin;
+            tooltipQuickView.ItemRender3.ShowDamageSkinID = Setting.DamageSkin.ShowDamageSkinID;
+            tooltipQuickView.ItemRender3.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
+            tooltipQuickView.ItemRender3.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
+            tooltipQuickView.ItemRender3.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
+            tooltipQuickView.EnableAssembleTooltip = Setting.Item.UseAssembleUI;
             tooltipQuickView.MapRender.ShowMiniMap = Setting.Map.ShowMiniMap;
             tooltipQuickView.MapRender.ShowObjectID = Setting.Map.ShowMapObjectID;
             tooltipQuickView.MapRender.ShowMobNpcObjectID = Setting.Map.ShowMobNpcObjectID;
@@ -1247,6 +1266,7 @@ namespace WzComparerR2
             catch (FileNotFoundException)
             {
                 MessageBoxEx.Show("File not found.", "Error");
+                WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
             }
             catch (Exception ex)
             {
@@ -2942,7 +2962,7 @@ namespace WzComparerR2
                     return;
                 }
             }
-            FrmPatcher patcher = new FrmPatcher();
+            FrmPatcher patcher = new FrmPatcher(this);
             var config = WcR2Config.Default;
             var defaultEnc = config?.WzEncoding?.Value ?? 0;
             if (defaultEnc != 0)
@@ -4132,6 +4152,11 @@ namespace WzComparerR2
                     comparer.MseaMode = chkMseaMode.Checked;
                     comparer.SkipGodChangseopDuplicatedNodes = chkSkipGodChangseopDuplicatedNodes.Checked;
                     comparer.Enable22AniStyle = GearGraphics.is22aniStyle;
+                    comparer.EnableAssembleTooltip = CharaSimConfig.Default.Item.UseAssembleUI;
+                    comparer.ShowDamageSkin = CharaSimConfig.Default.DamageSkin.ShowDamageSkin;
+                    comparer.UseMiniSizeDamageSkin = CharaSimConfig.Default.DamageSkin.UseMiniSize;
+                    comparer.AlwaysUseMseaFormatDamageSkin = CharaSimConfig.Default.DamageSkin.AlwaysUseMseaFormat;
+                    comparer.DamageSkinNumber = CharaSimConfig.Default.DamageSkin.DamageSkinNumber;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try

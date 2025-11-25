@@ -15,9 +15,9 @@ using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.CharaSimControl
 {
-    public class ItemTooltipRender2 : TooltipRender
+    public class ItemTooltipRender3 : TooltipRender
     {
-        public ItemTooltipRender2()
+        public ItemTooltipRender3()
         {
         }
 
@@ -46,20 +46,19 @@ namespace WzComparerR2.CharaSimControl
         public bool LinkRecipeItem { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowNickTag { get; set; }
-        public bool ShowLinkedTamingMob { get; set; }
         public bool CompareMode { get; set; } = false;
-        public int CosmeticHairColor { get; set; }
-        public int CosmeticFaceColor { get; set; }
-        public bool Enable22AniStyle { get; set; }
-        public bool MseaMode { get; set; }
+        public bool ShowSoldPrice { get; set; }
+        public bool ShowCashPurchasePrice { get; set; }
+        public bool ShowLinkedTamingMob { get; set; }
         public bool ShowDamageSkin { get; set; }
         public bool ShowDamageSkinID { get; set; }
         public bool UseMiniSizeDamageSkin { get; set; }
         public bool AlwaysUseMseaFormatDamageSkin { get; set; }
         public long DamageSkinNumber { get; set; }
-        public CashPackage CashPackage { get; set; }
+        public int CosmeticHairColor { get; set; }
+        public int CosmeticFaceColor { get; set; }
         private bool WillDrawNickTag { get; set; }
-        private Wz_Node NickResNode {  get; set; }
+        private Wz_Node NickResNode { get; set; }
         private Bitmap ItemSample { get; set; }
 
         public TooltipRender LinkRecipeInfoRender { get; set; }
@@ -69,6 +68,8 @@ namespace WzComparerR2.CharaSimControl
         public TooltipRender SetItemRender { get; set; }
         public TooltipRender CashPackageRender { get; set; }
         private AvatarCanvasManager avatar { get; set; }
+        private bool isMsnClient;
+        private string titleLanguage = "";
 
         public override Bitmap Render()
         {
@@ -76,9 +77,11 @@ namespace WzComparerR2.CharaSimControl
             {
                 return null;
             }
+            InitSampleResources();
             //绘制道具
             int picHeight;
-            Bitmap itemBmp = RenderItem(out picHeight);
+            List<int> splitterH;
+            Bitmap itemBmp = RenderItem(out picHeight, out splitterH);
             List<Bitmap> recipeInfoBmps = new();
             List<Bitmap> recipeItemBmps = new();
             Bitmap setItemBmp = null;
@@ -91,8 +94,8 @@ namespace WzComparerR2.CharaSimControl
 
             if (this.item.ItemID / 10000 == 910)
             {
-                Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Special\{0:D4}.img\{1}", this.item.ItemID / 10000, this.item.ItemID));
-                Wz_Node cashPackageNode = PluginBase.PluginManager.FindWz(string.Format(@"Etc\CashPackage.img\{0}", this.item.ItemID));
+                Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Special\{0:D4}.img\{1}", this.item.ItemID / 10000, this.item.ItemID), this.SourceWzFile);
+                Wz_Node cashPackageNode = PluginBase.PluginManager.FindWz(string.Format(@"Etc\CashPackage.img\{0}", this.item.ItemID), this.SourceWzFile);
                 CashPackage cashPackage = CashPackage.CreateFromNode(itemNode, cashPackageNode, PluginBase.PluginManager.FindWz);
                 return RenderCashPackage(cashPackage);
             }
@@ -102,7 +105,7 @@ namespace WzComparerR2.CharaSimControl
                 int itemIDClass = itemID / 1000000;
                 if (itemIDClass == 1) //通过ID寻找装备
                 {
-                    Wz_Node charaWz = PluginManager.FindWz(Wz_Type.Character);
+                    Wz_Node charaWz = PluginManager.FindWz(Wz_Type.Character, this.SourceWzFile);
                     if (charaWz != null)
                     {
                         string imgName = itemID.ToString("d8") + ".img";
@@ -118,7 +121,7 @@ namespace WzComparerR2.CharaSimControl
                                     long tuc, tucCnt;
                                     if (Item.Props.TryGetValue(ItemPropType.addTooltip_tuc, out tuc) && Item.Props.TryGetValue(ItemPropType.addTooltip_tucCnt, out tucCnt))
                                     {
-                                        Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item);
+                                        Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, this.SourceWzFile);
                                         if (itemWz != null)
                                         {
                                             string imgClass = (tuc / 10000).ToString("d4") + ".img\\" + tuc.ToString("d8") + "\\info";
@@ -144,7 +147,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 else if (itemIDClass >= 2 && itemIDClass <= 5) //通过ID寻找道具
                 {
-                    Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item);
+                    Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, this.SourceWzFile);
                     if (itemWz != null)
                     {
                         string imgClass = (itemID / 10000).ToString("d4") + ".img\\" + itemID.ToString("d8");
@@ -172,10 +175,10 @@ namespace WzComparerR2.CharaSimControl
             {
                 foreach (int recipeID in this.item.Recipes)
                 {
-                    long recipeSkillID = recipeID / 10000;
+                    int recipeSkillID = recipeID / 10000;
                     Recipe recipe = null;
                     //寻找配方
-                    Wz_Node recipeNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\Recipe_{0}.img\{1}", recipeSkillID, recipeID));
+                    Wz_Node recipeNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\Recipe_{0}.img\{1}", recipeSkillID, recipeID), this.SourceWzFile);
                     if (recipeNode != null)
                     {
                         recipe = Recipe.CreateFromNode(recipeNode);
@@ -242,7 +245,6 @@ namespace WzComparerR2.CharaSimControl
 
             }
 
-
             //计算布局
             Size totalSize = new Size(itemBmp.Width, picHeight);
             Point recipeInfoOrigin = Point.Empty;
@@ -298,10 +300,20 @@ namespace WzComparerR2.CharaSimControl
             {
                 //绘制背景区域
                 GearGraphics.DrawNewTooltipBack(g, 0, 0, itemBmp.Width, picHeight);
+
+                if (splitterH != null && splitterH.Count > 0)
+                {
+                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                    var margin = 6;
+                    foreach (var y in splitterH)
+                    {
+                        DrawDotline(g, margin, itemBmp.Width - margin, y);
+                    }
+                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+                }
+
                 //复制图像
                 g.DrawImage(itemBmp, 0, 0, new Rectangle(0, 0, itemBmp.Width, picHeight), GraphicsUnit.Pixel);
-                //左上角
-                if (!Enable22AniStyle) g.DrawImage(Resource.UIToolTip_img_Item_Frame2_cover, 3, 3);
 
                 if (this.ShowObjectID)
                 {
@@ -361,16 +373,23 @@ namespace WzComparerR2.CharaSimControl
             return tooltip;
         }
 
-        private Bitmap RenderItem(out int picH)
+        private Bitmap RenderItem(out int picH, out List<int> splitterH)
         {
+            isMsnClient = StringLinker.StringEqp.TryGetValue(1006514, out _);
             bool isTranslateRequired = Translator.IsTranslateEnabled;
-            Bitmap tooltip = new Bitmap(290, DefaultPicHeight);
-            Graphics g = Graphics.FromImage(tooltip);
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
+            var item22ColorTable = new Dictionary<string, Color>()
+            {
+                { "c", ((SolidBrush)GearGraphics.Equip22BrushEmphasis).Color },
+                { "$r", ((SolidBrush)GearGraphics.Equip22BrushRed).Color },
+                { "$g", ((SolidBrush)GearGraphics.Equip22BrushLegendary).Color },
+            };
+            splitterH = new List<int>();
+            picH = 0;
+            const int LineHeight = 18;
             long value;
             int intvalue;
 
-            picH = 10;
             //物品标题
             StringResult sr;
             if (StringLinker == null || !StringLinker.StringItem.TryGetValue(item.ItemID, out sr))
@@ -384,6 +403,17 @@ namespace WzComparerR2.CharaSimControl
             {
                 itemName += " (" + nameAdd + ")";
             }
+            if (Translator.DefaultDesiredCurrency != "none")
+            {
+                if (Translator.DefaultDetectCurrency == "auto")
+                {
+                    titleLanguage = Translator.GetLanguage(itemName);
+                }
+                else
+                {
+                    titleLanguage = Translator.ConvertCurrencyToLang(Translator.DefaultDetectCurrency);
+                }
+            }
             if (isTranslateRequired)
             {
                 string translatedItemName = Translator.MergeString(itemName, Translator.TranslateString(itemName, true), 0, false, true);
@@ -396,53 +426,58 @@ namespace WzComparerR2.CharaSimControl
                     itemName = translatedItemName;
                 }
             }
-            //SizeF titleSize = TextRenderer.MeasureText(g, sr.Name.Replace(Environment.NewLine, ""), GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
-            SizeF titleSize = TextRenderer.MeasureText(g, itemName, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
-            titleSize.Width += 9 * 2;//9 was 12
-            if (titleSize.Width > 290)
+
+            // calculate image width
+            const int DefaultWidth = 300;
+            int tooltipWidth = DefaultWidth;
+
+            if (int.TryParse(sr["fixWidth"], out int fixWidth) && fixWidth > 0)
             {
-                //重构大小
-                g.Dispose();
-                tooltip.Dispose();
-
-                tooltip = new Bitmap((int)Math.Ceiling(titleSize.Width), DefaultPicHeight);
-                g = Graphics.FromImage(tooltip);
-                picH = 21;
+                tooltipWidth = fixWidth;
             }
-            if (sr["fixWidth"] != null)
             {
-                //重构大小
-                g.Dispose();
-                tooltip.Dispose();
+                using (Bitmap dummyImg = new Bitmap(1, 1))
+                using (Graphics tempG = Graphics.FromImage(dummyImg))
+                {
+                    SizeF titleSize = TextRenderer.MeasureText(tempG, itemName, GearGraphics.ItemNameFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
+                    titleSize.Width += 12.5F;
+                    if (titleSize.Width > tooltipWidth)
+                    {
+                        tooltipWidth = (int)Math.Ceiling(titleSize.Width);
+                    }
 
-                tooltip = new Bitmap(Int32.Parse(sr["fixWidth"]), DefaultPicHeight);
-                g = Graphics.FromImage(tooltip);
-                picH = 10;
+                    if (CompareMode && tooltipWidth - titleSize.Width < 32)
+                    {
+                        picH += 14;
+                    }
+                }
             }
 
-            //绘制标题
-            bool hasPart2 = false;
-            g.DrawImage(Resource.ToolTip_Equip_Dot_0, 9, picH + 5);//GMS Version blue dot in ITEMS
-            format.Alignment = StringAlignment.Near;
-            TextRenderer.DrawText(g, itemName, GearGraphics.ItemNameFont2, new Point(tooltip.Width / 21, picH), Color.White, TextFormatFlags.Left | TextFormatFlags.NoPrefix);
-            //TextRenderer.DrawText(g, sr.Name.Replace(Environment.NewLine, ""), GearGraphics.ItemNameFont2, new Point(tooltip.Width / 21, picH), Color.White, TextFormatFlags.Left | TextFormatFlags.NoPrefix);
-            picH += 21;//default value is 21
+            Bitmap tooltip = new Bitmap(tooltipWidth, DefaultPicHeight);
+            Graphics g = Graphics.FromImage(tooltip);
+            picH += 10;
 
+            // 이름
+            format.Alignment = StringAlignment.Center;
+            TextRenderer.DrawText(g, itemName, GearGraphics.ItemNameFont, new Point(tooltip.Width + 2, picH), Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix);
+            picH += 20;
+
+            // 라벨
             if (Item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
             {
                 switch (value)
                 {
                     case 1:
-                        TextRenderer.DrawText(g, "Wonder Black", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Wonder Black", GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 4:
-                        TextRenderer.DrawText(g, "Sweet Luna", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), GearGraphics.itemPinkColor, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Sweet Luna", GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), GearGraphics.itemPinkColor, TextFormatFlags.HorizontalCenter);
                         break;
                     case 5:
-                        TextRenderer.DrawText(g, "Dream Luna", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Dream Luna", GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
                         break;
                     case 6:
-                        TextRenderer.DrawText(g, "Petite Luna", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), GearGraphics.itemPurpleColor, TextFormatFlags.HorizontalCenter);
+                        TextRenderer.DrawText(g, "Petite Luna", GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), GearGraphics.itemPurpleColor, TextFormatFlags.HorizontalCenter);
                         break;
                     default:
                         picH -= 15;
@@ -452,47 +487,26 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (Item.Props.TryGetValue(ItemPropType.BTSLabel, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "BTS Label", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), Color.FromArgb(187, 102, 238), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "BTS Label", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), Color.FromArgb(187, 102, 238), TextFormatFlags.HorizontalCenter);
                 picH += 15;
             }
             else if (Item.Props.TryGetValue(ItemPropType.BLACKPINKLabel, out value) && value > 0)
             {
-                TextRenderer.DrawText(g, "BLACKPINK Label", GearGraphics.EquipDetailFont, new Point(tooltip.Width, picH), Color.FromArgb(255, 136, 170), TextFormatFlags.HorizontalCenter);
+                TextRenderer.DrawText(g, "BLACKPINK Label", GearGraphics.EquipDetailFont, new Point(tooltip.Width + 2, picH), Color.FromArgb(255, 136, 170), TextFormatFlags.HorizontalCenter);
                 picH += 15;
             }
 
-            //额外特性
-            var attrList = GetItemAttributeString();
+            // 상단 속성
+            var attrList = GetItemTopAttributeString();
             if (attrList.Count > 0)
             {
-                var font = GearGraphics.ItemDetailFont;
-                string attrStr = null;
-                for (int i = 0; i < attrList.Count; i++)
+                foreach (var attr in attrList)
                 {
-                    var newStr = (attrStr != null ? (attrStr + ", ") : null) + attrList[i];
-                    if (TextRenderer.MeasureText(g, newStr, font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width > tooltip.Width - 7 || (attrList[i].Contains('\n') && attrStr != null))
-                    {
-                        TextRenderer.DrawText(g, attrStr, GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
-                        picH += 20;
-                        attrStr = attrList[i];
-                    }
-                    else
-                    {
-                        attrStr = newStr;
-                    }
+                    GearGraphics.DrawString(g, $"#$r{attr}#", GearGraphics.ItemDetailFont, item22ColorTable, 0, tooltip.Width, ref picH, LineHeight, alignment: Text.TextAlignment.Center);
                 }
-                if (!string.IsNullOrEmpty(attrStr))
-                {
-                    foreach (string attrLine in attrStr.Split('\n'))
-                    {
-                        TextRenderer.DrawText(g, attrLine, GearGraphics.ItemDetailFont, new Point(tooltip.Width, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
-                        picH += 20;
-                    }
-                    picH -= 3;
-                }
-                hasPart2 = true;
             }
 
+            // 유효 기간
             string expireTime = null;
             if (item.TimeLimited)
             {
@@ -518,74 +532,48 @@ namespace WzComparerR2.CharaSimControl
                     expireTime += string.Format("\nUsable Until: {1}/{2}/{0} {3:D2}:{4:D2} UTC", Convert.ToInt32(item.EndUseDate.Substring(0, 4)), Convert.ToInt32(item.EndUseDate.Substring(4, 2)), Convert.ToInt32(item.EndUseDate.Substring(6, 2)), Convert.ToInt32(item.EndUseDate.Substring(8, 2)), Convert.ToInt32(item.EndUseDate.Substring(10, 2)));
                 }
             }
-            else if ((item.Props.TryGetValue(ItemPropType.permanent, out value) && value != 0) || (item.ItemID / 10000 == 500 && item.Props.TryGetValue(ItemPropType.life, out value) && value == 0))
+            else if ((item.Props.TryGetValue(ItemPropType.permanent, out value) && value != 0) || (item.IsPet && item.Props.TryGetValue(ItemPropType.life, out value) && value == 0))
             {
-                picH -= 3;
                 if (value == 0)
                 {
                     value = 1;
                 }
                 expireTime = ItemStringHelper.GetItemPropString(ItemPropType.permanent, value);
             }
-            else if (item.ItemID / 10000 == 500 && item.Props.TryGetValue(ItemPropType.limitedLife, out value) && value > 0)
+            else if (item.IsPet && item.Props.TryGetValue(ItemPropType.limitedLife, out value) && value > 0)
             {
-                picH -= 3;
                 expireTime = string.Format("DAYS OF MAGIC: {0}hrs. {1}min.", value / 3600, (value % 3600) / 60);
             }
-            else if (item.ItemID / 10000 == 500 && item.Props.TryGetValue(ItemPropType.life, out value) && value > 0)
+            else if (item.IsPet && item.Props.TryGetValue(ItemPropType.life, out value) && value > 0)
             {
-                picH -= 3;
                 DateTime time = DateTime.Now.AddDays(value);
                 expireTime = "Water of Life Dries Up: " + time.ToString(@"M\/d\/yyyy HH\:mm") + " UTC";
             }
             if (!string.IsNullOrEmpty(expireTime))
             {
-                if (attrList.Count > 0)
-                {
-                    picH += 3;
-                }
-                //picH += 3;
-                //TextRenderer.DrawText(g, expireTime, GearGraphics.EquipDetailFont, new Point(tooltip.Width / 25, picH), Color.White, TextFormatFlags.Left);
-                //picH += 16;
-                //hasPart2 = true;
-                foreach (string expireTimeLine in expireTime.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    g.DrawImage(Resource.ToolTip_Equip_Dot_1, 9, picH + 6);//GMS Version, default value is 9, + X?
-                    TextRenderer.DrawText(g, expireTimeLine, GearGraphics.EquipDetailFont, new Point(tooltip.Width / 25, picH), Color.White, TextFormatFlags.Left);
-                    picH += 16;
-                }
-                if (expireTime.Contains('\n'))
-                {
-                    picH += 4;
-                }
-                hasPart2 = true;
+                GearGraphics.DrawString(g, expireTime, GearGraphics.ItemDetailFont, item22ColorTable, 0, tooltip.Width, ref picH, LineHeight, alignment: Text.TextAlignment.Center);
             }
 
-            if (hasPart2)
+            // 생명의 물
+            if (item.Props.TryGetValue(ItemPropType.noRevive, out value) && value > 0)
             {
-                picH += 4;
+                GearGraphics.DrawString(g, "#$rCannot be revived#", GearGraphics.ItemDetailFont, item22ColorTable, 0, tooltip.Width, ref picH, LineHeight, alignment: Text.TextAlignment.Center);
             }
+            splitterH.Add(picH - 1);
 
-            //绘制图标
-            picH += 1;
+            // ----------------------------------------------------------------------
+            // 아이템 아이콘 이미지
+            picH += 7;
             int iconY = picH;
-            int iconX = 14;
-            if (this.Enable22AniStyle)
-            {
-                g.DrawImage(Resource.UIToolTipNew_img_Item_Common_ItemIcon_base, iconX, picH);
-            }
-            else
-            {
-                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, iconX, picH);
-            }
+            int iconX = 15;
+            g.DrawImage(Resource.UIToolTipNew_img_Item_Common_ItemIcon_base, iconX, picH);
             if (item.Icon.Bitmap != null)
             {
                 g.DrawImage(GearGraphics.EnlargeBitmap(item.Icon.Bitmap),
                 iconX + 6 + (1 - item.Icon.Origin.X) * 2,
                 picH + 6 + (33 - item.Icon.Origin.Y) * 2);
-                //picH + 8 + (33 - item.Icon.Bitmap.Height) * 2);
             }
-            if (item.Cash && !(item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0))
+            if (item.Cash)
             {
                 Bitmap cashImg = null;
                 Point cashOrigin = new Point(12, 12);
@@ -614,232 +602,92 @@ namespace WzComparerR2.CharaSimControl
                     iconX + 6 + 68 - cashOrigin.X * 2 - 2,
                     picH + 6 + 68 - cashOrigin.Y * 2 - 2);
             }
-            if (!Enable22AniStyle)
-            {
-                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_new, iconX + 7, picH + 7);
-                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
-            }
 
+            int descLeft = 105;
+            int descRight = tooltip.Width - 26;
+            picH += 3;
+
+            // 要求レベル
             value = 0;
-            if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) && value > 0)
+            if (item.Recipes.Count > 0)
             {
-                picH += 4;//default value is 4
-                g.DrawImage(Resource.ToolTip_Equip_Can_reqLEV, 100, picH);
-                GearGraphics.DrawGearDetailNumber(g, 150, picH, value.ToString(), true);
-                picH += 15;
+                long reqSkill, reqSkillLevel;
+                if (!item.Specs.TryGetValue(ItemSpecType.reqSkill, out reqSkill))
+                {
+                    reqSkill = item.Recipes[0] / 10000 * 10000;
+                }
+
+                if (!item.Specs.TryGetValue(ItemSpecType.reqSkillLevel, out reqSkillLevel))
+                {
+                    reqSkillLevel = 1;
+                }
+
+                //技能标题
+                if (StringLinker == null || !StringLinker.StringSkill.TryGetValue((int)reqSkill, out var sr2))
+                {
+                    sr2 = new StringResult();
+                    sr2.Name = "(null)";
+                }
+                GearGraphics.DrawString(g, $"- Required Level {sr2.Name} Lv.{reqSkillLevel}", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                picH += 3;
             }
-            else
+            else if (item.Props.TryGetValue(ItemPropType.reqLevel, out value) && value > 0)
             {
+                GearGraphics.DrawString(g, $"- Required : Lv.{value}", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
                 picH += 3;
             }
 
-            int right = tooltip.Width - 30;
+            // 펫 스탯
+            if (item.IsPet)
+            {
+                GearGraphics.DrawString(g, "#$gLevel: 1\nFullness: 100\nCloseness: 0#", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                picH += 3;
+            }
 
+            // 아이템 설명
             string desc = null;
-            if (item.Level > 0)
-            {
-                desc += $"[LV.{item.Level}] ";
-            }
             desc += sr.Desc;
-            if (item.ItemID / 10000 == 500)
+            if (item.IsPet)
             {
-                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
-                {
-                    if (item.Props.TryGetValue(ItemPropType.setItemID, out long setID))
-                    {
-                        SetItem setItem;
-                        if ((!CompareMode && CharaSimLoader.LoadedSetItems.TryGetValue((int)setID, out setItem))
-                            || (CompareMode && (setItem = CharaSimLoader.LoadSetItem((int)setID, this.SourceWzFile)) != null))
-                        {
-                            string wonderGradeString = null;
-                            string setItemName = setItem.SetItemName;
-                            string setSkillName = "";
-                            switch (value)
-                            {
-                                case 1:
-                                    wonderGradeString = "Wonder Black";
-                                    foreach (KeyValuePair<GearPropType, object> prop in setItem.Effects.Values.SelectMany(f => f.PropsV5))
-                                    {
-                                        if (prop.Key == GearPropType.activeSkill)
-                                        {
-                                            SetItemActiveSkill p = ((List<SetItemActiveSkill>)prop.Value)[0];
-                                            StringResult sr2;
-                                            if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(p.SkillID, out sr2))
-                                            {
-                                                sr2 = new StringResult();
-                                                sr2.Name = p.SkillID.ToString();
-                                            }
-                                            setSkillName = Regex.Replace(sr2.Name, " Lv.\\d", "");
-                                            break;
-                                        }
-                                    }
-                                    break;
-                                case 4:
-                                    wonderGradeString = "Sweet Luna";
-                                    setSkillName = "Sweet Luna";
-                                    break;
-                                case 5:
-                                    wonderGradeString = "Dream Luna";
-                                    setSkillName = "Dream Luna";
-                                    break;
-                            }
-                            if (wonderGradeString != null)
-                            {
-                                desc += $"\nEquipping #c{wonderGradeString}# rank #c{setItemName}# pet gives the #c{setSkillName}# set effect. (Up to 3 levels.)\nSet effects can be enhanced up to 3 times depending on the type of #c{setItemName}# pet you have equipped.";
-                            }
-                        }
-                    }
-                }
-                desc += "\n#cSkill: Meso Magnet";
-                if (item.Props.TryGetValue(ItemPropType.pickupItem, out value) && value > 0)
-                {
-                    desc += ", Item Pouch";
-                }
-                if (item.Props.TryGetValue(ItemPropType.longRange, out value) && value > 0)
-                {
-                    desc += ", Expanded Auto Move";
-                }
-                if (item.Props.TryGetValue(ItemPropType.sweepForDrop, out value) && value > 0)
-                {
-                    desc += ", Auto Move";
-                }
-                if (item.Props.TryGetValue(ItemPropType.pickupAll, out value) && value > 0)
-                {
-                    desc += ", Expired Pickup Skill";
-                }
-                if (item.Props.TryGetValue(ItemPropType.consumeHP, out value) && value > 0)
-                {
-                    desc += ", Auto HP Potion Pouch";
-                }
-                if (item.Props.TryGetValue(ItemPropType.consumeMP, out value) && value > 0)
-                {
-                    desc += ", Auto MP Potion Pouch";
-                }
-                if (item.Props.TryGetValue(ItemPropType.autoBuff, out value) && value > 0)
-                {
-                    desc += ", Auto Buff";
-                }
-                if (item.Props.TryGetValue(ItemPropType.giantPet, out value) && value > 0)
-                {
-                    desc += ", Fatten Up";
-                }
-                if (item.Props.TryGetValue(ItemPropType.consumeCure, out value) && value > 0)
-                {
-                    desc += ", Take All Cure Potion";
-                }
-                desc += "#";
-            }
-            desc = ReplaceDescTags(desc);
-
-            if (!string.IsNullOrEmpty(desc))
-            {
-                if (isTranslateRequired)
-                {
-                    string mergedDesc = Translator.MergeString(desc, Translator.TranslateString(desc), 2);
-                    GearGraphics.DrawString(g, mergedDesc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                }
-                else
-                {
-                    GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                }
+                desc += GetPetDesc();
             }
             if (!string.IsNullOrEmpty(sr.AutoDesc))
             {
+                desc += sr.AutoDesc;
+            }
+            if (!string.IsNullOrEmpty(desc))
+            {
+                desc = ReplaceDescTags(desc);
                 if (isTranslateRequired)
                 {
-                    string mergedAutoDesc = Translator.MergeString(sr.AutoDesc, Translator.TranslateString(sr.AutoDesc), 2);
-                    GearGraphics.DrawString(g, mergedAutoDesc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                    string translatedDesc = Translator.TranslateString(desc);
+                    switch (Translator.DefaultPreferredLayout)
+                    {
+                        case 1:
+                            GearGraphics.DrawString(g, translatedDesc, GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                            picH += 16;
+                            GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                            break;
+                        case 2:
+                            GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight); 
+                            picH += 16;
+                            GearGraphics.DrawString(g, translatedDesc, GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                            break;
+                        case 3:
+                            GearGraphics.DrawString(g, translatedDesc, GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                            break;
+                    }
+                    
                 }
                 else
                 {
-                    GearGraphics.DrawString(g, sr.AutoDesc, GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                    GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
                 }
-            }
-            if (item.Props.TryGetValue(ItemPropType.tradeAvailable, out value) && value > 0)
-            {
-                string attr = ItemStringHelper.GetItemPropString(ItemPropType.tradeAvailable, value);
-                if (!string.IsNullOrEmpty(attr))
-                    GearGraphics.DrawString(g, "#c" + attr + "#", GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
-            }
-            if (item.Props.TryGetValue(ItemPropType.pointCost, out value) && value > 0)
-            {
-                picH += 16;
-                GearGraphics.DrawString(g, "- " + value + " Point(s)", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }
-            if (item.Specs.TryGetValue(ItemSpecType.recipeValidDay, out value) && value > 0)
-            {
-                GearGraphics.DrawString(g, "(Use within: " + value + " days )", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }
-            if (item.Specs.TryGetValue(ItemSpecType.recipeUseCount, out value) && value > 0)
-            {
-                GearGraphics.DrawString(g, "(Craftable: " + value + " time(s))", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }
-            if (item.ItemID / 1000 == 5533)
-            {
-                GearGraphics.DrawString(g, "\n#cBy double-clicking on it, you can preview the items inside the box, in order, every 3 seconds. Some random boxes can't be previewed.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }
-            if (item.Cash)
-            {
-                if (item.Props.TryGetValue(ItemPropType.noMoveToLocker, out value) && value > 0)
-                {
-                    GearGraphics.DrawString(g, "\n#cThis item cannot be moved to the Cash inventory.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                }
-                else if (item.Props.TryGetValue(ItemPropType.onlyCash, out value) && value > 0)
-                {
-                    GearGraphics.DrawString(g, "\n#cCan only be purchased with NX.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                }
-                else if ((!item.Props.TryGetValue(ItemPropType.tradeBlock, out value) || value == 0))
-                {
-                    /* GMS - Enable when GMS uses this line.
-                    if (!(item.ItemID / 10000 == 501 || item.ItemID / 10000 == 502 || item.ItemID / 10000 == 516 || item.ItemID / 1000 == 5157 || item.ItemID / 1000 == 5158))
-                    {
-                        GearGraphics.DrawString(g, "\n#cThis item cannot be traded once it has been used.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                    }*/
-                }
-            }
-            /*if (item.Props.TryGetValue(ItemPropType.flatRate, out value) && value > 0)
-            {
-                GearGraphics.DrawString(g, "\n#c기간 정액제 아이템입니다.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }*/
-            if (item.Props.TryGetValue(ItemPropType.noScroll, out value) && value > 0)
-            {
-                GearGraphics.DrawString(g, "#cYou cannot use the Pet Skill Scroll or Pet Name tag at this time.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-            }
-            if (item.Props.TryGetValue(ItemPropType.noRevive, out value) && value > 0)
-            {
-                GearGraphics.DrawString(g, "#cYou cannot use the Water of Life.#", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                
+                picH += 3;
             }
 
-            if (item.ItemID / 10000 == 500)
-            {
-                Wz_Node petDialog = PluginManager.FindWz("String\\PetDialog.img\\" + item.ItemID);
-                Dictionary<string, int> commandLev = new Dictionary<string, int>();
-                foreach (Wz_Node commandNode in PluginManager.FindWz("Item\\Pet\\" + item.ItemID + ".img\\interact").Nodes)
-                {
-                    foreach (string command in petDialog?.Nodes[commandNode.Nodes["command"].GetValue<string>()].GetValueEx<string>(null)?.Split('|') ?? Enumerable.Empty<string>())
-                    {
-                        int l0;
-                        if (!commandLev.TryGetValue(command, out l0))
-                        {
-                            commandLev.Add(command, commandNode.Nodes["l0"].GetValue<int>());
-                        }
-                        else
-                        {
-                            commandLev[command] = Math.Min(l0, commandNode.Nodes["l0"].GetValue<int>());
-                        }
-                    }
-                }
-
-                GearGraphics.DrawString(g, "[Usable Command]", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                foreach (int l0 in commandLev.Values.OrderBy(i => i).Distinct())
-                {
-                    GearGraphics.DrawString(g, "Lv. " + l0 + "+: " + string.Join(", ", commandLev.Where(i => i.Value == l0).Select(i => i.Key).OrderBy(s => s)), GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                }
-                GearGraphics.DrawString(g, "Tip: You can control what your\n\r pet says once it reaches Lv. 15.", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
-                GearGraphics.DrawString(g, "#cEx) /Pet [what to say]#", GearGraphics.ItemDetailFont, new Dictionary<string, Color>() { { "c", ((SolidBrush)GearGraphics.OrangeBrush4).Color } }, 100, right, ref picH, 16);
-
-            }
-
+            // 성향
             string incline = null;
             ItemPropType[] inclineTypes = new ItemPropType[]{
                     ItemPropType.charismaEXP,
@@ -856,84 +704,68 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (item.Props.TryGetValue(inclineTypes[i], out value) && value > 0)
                 {
-                    incline += ", " + value + inclineString[i];
+                    incline += $", {inclineString[i]} +{value}";
                 }
             }
-
             if (!string.IsNullOrEmpty(incline))
             {
-                GearGraphics.DrawString(g, "#cGrants " + incline.Substring(2) + " EXP when first equipped\n(up to the daily maximum).", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                GearGraphics.DrawString(g, "#cGrants " + incline.Substring(2) + " EXP when first equipped\n(up to the daily maximum).", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                picH += 3;
             }
 
-            picH += 3;
-
-            Wz_Node nickResNode = null;
-            bool willDrawNickTag = this.ShowNickTag
-                && this.Item.Props.TryGetValue(ItemPropType.nickTag, out value)
-                && this.TryGetNickResource(value, out nickResNode);
-            string descLeftAlign = sr["desc_leftalign"];
-            long minLev = 0, maxLev = 0;
-            bool willDrawExp = item.Props.TryGetValue(ItemPropType.exp_minLev, out minLev) && item.Props.TryGetValue(ItemPropType.exp_maxLev, out maxLev);
-
-            if (!string.IsNullOrEmpty(descLeftAlign) || item.CoreSpecs.Count > 0 || item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || item.ShowCosmetic || willDrawNickTag || willDrawExp)
+            // 레시피
+            if (item.Specs.TryGetValue(ItemSpecType.recipeUseCount, out value) && value > 0)
             {
-                if (picH < iconY + 84)
-                {
-                    picH = iconY + 84;
-                }
-                if (!string.IsNullOrEmpty(descLeftAlign))
-                {
-                    picH += 12;
-                    if (isTranslateRequired)
-                    {
-                        string mergedDescLeftAlign = Translator.MergeString(descLeftAlign, Translator.TranslateString(descLeftAlign), 2);
-                        GearGraphics.DrawString(g, mergedDescLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
-                    }
-                    else
-                    {
-                        GearGraphics.DrawString(g, descLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
-                    }
-                }
-                if (item.CoreSpecs.Count > 0)
-                {
-                    g.DrawLine(Pens.White, 6, picH - 1, tooltip.Width - 7, picH - 1);
-                    picH += 9;
-                    foreach (KeyValuePair<ItemCoreSpecType, Wz_Node> p in item.CoreSpecs)
-                    {
-                        string coreSpec;
-                        intvalue = 0;
-                        switch (p.Key)
-                        {
-                            case ItemCoreSpecType.Ctrl_addMob:
-                                StringResult srMob;
-                                if (StringLinker == null || !StringLinker.StringMob.TryGetValue(Convert.ToInt32(p.Value.Nodes["mobID"].Value), out srMob))
-                                {
-                                    srMob = new StringResult();
-                                    srMob.Name = "(null)";
-                                }
-                                foreach (Wz_Node addMobNode in p.Value.Nodes)
-                                {
-                                    if (int.TryParse(addMobNode.Text, out intvalue))
-                                    {
-                                        break;
-                                    }
-                                }
-                                coreSpec = ItemStringHelper.GetItemCoreSpecString(ItemCoreSpecType.Ctrl_addMob, intvalue, srMob.Name);
-                                break;
+                GearGraphics.DrawString(g, "(Craftable: " + value + " time(s))", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                picH += 3;
+            }
+            else if (item.Specs.TryGetValue(ItemSpecType.recipeValidDay, out value) && value > 0)
+            {
+                GearGraphics.DrawString(g, "(Use within: " + value + " days )", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                picH += 3;
+            }
 
-                            default:
-                                try
-                                {
-                                    coreSpec = ItemStringHelper.GetItemCoreSpecString(p.Key, Convert.ToInt32(p.Value.Value), Convert.ToString(p.Value.Nodes["desc"]?.Value));
-                                }
-                                finally
-                                {
-                                }
-                                break;
+            // 기간 정액제 아이템
+            /*if (item.Props.TryGetValue(ItemPropType.flatRate, out value) && value > 0)
+            {
+                GearGraphics.DrawString(g, "#c期間定額アイテム#", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                picH += 3;
+            }*/
+
+            // 펫 명령어
+            if (item.IsPet)
+            {
+                Wz_Node petDialog = PluginManager.FindWz("String\\PetDialog.img\\" + item.ItemID, this.SourceWzFile);
+                Dictionary<string, int> commandLev = new Dictionary<string, int>();
+                foreach (Wz_Node commandNode in PluginManager.FindWz("Item\\Pet\\" + item.ItemID + ".img\\interact", this.SourceWzFile).Nodes)
+                {
+                    foreach (string command in petDialog?.Nodes[commandNode.Nodes["command"].GetValue<string>()].GetValueEx<string>(null)?.Split('|') ?? Enumerable.Empty<string>())
+                    {
+                        int l0;
+                        if (!commandLev.TryGetValue(command, out l0))
+                        {
+                            commandLev.Add(command, commandNode.Nodes["l0"].GetValue<int>());
                         }
-                        GearGraphics.DrawString(g, "* " + coreSpec, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
+                        else
+                        {
+                            commandLev[command] = Math.Min(l0, commandNode.Nodes["l0"].GetValue<int>());
+                        }
                     }
                 }
+
+                GearGraphics.DrawString(g, "#c[Usable Command]#", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                foreach (int l0 in commandLev.Values.OrderBy(i => i).Distinct())
+                {
+                    GearGraphics.DrawString(g, $"#cLv. {10} +: {string.Join(", ", commandLev.Where(i => i.Value == l0).Select(i => i.Key).OrderBy(s => s))}#", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                }
+                GearGraphics.DrawString(g, "#cTip: You can control what your\n\r pet says once it reaches Lv. 15.#", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+                GearGraphics.DrawString(g, "#cEx) /Pet [what to say]#", GearGraphics.ItemDetailFont, item22ColorTable, descLeft, descRight, ref picH, LineHeight);
+            }
+
+            // 미리보기
+            if (item.Sample.Bitmap != null || item.DamageSkinID != null || item.SamplePath != null || item.ShowCosmetic || this.WillDrawNickTag)
+            {
+                picH = Math.Max(picH + 7, iconY + 87);
                 if (item.Sample.Bitmap != null)
                 {
                     g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
@@ -949,9 +781,11 @@ namespace WzComparerR2.CharaSimControl
                         g.DrawImage(sample.Bitmap, (tooltip.Width - sample.Bitmap.Width) / 2, picH);
                         picH += sample.Bitmap.Height;
                         picH += 2;
+
+                        this.ItemSample = new Bitmap(sample.Bitmap);
                     }
                 }
-                if (this.item.Specs.TryGetValue(ItemSpecType.cosmetic, out value) && value > 0)
+                else if (this.item.Specs.TryGetValue(ItemSpecType.cosmetic, out value) && value > 0)
                 {
                     if (this.avatar == null)
                     {
@@ -962,7 +796,7 @@ namespace WzComparerR2.CharaSimControl
 
                     if (value < 1000)
                     {
-                        this.avatar.AddBodyFromSkin3((int)value);
+                        this.avatar.AddBodyFromSkin4((int)value);
                     }
                     else
                     {
@@ -975,22 +809,24 @@ namespace WzComparerR2.CharaSimControl
                     var frame = this.avatar.GetBitmapOrigin();
                     if (frame.Bitmap != null)
                     {
-                        picH += 9;
+                        picH -= 2;
                         g.DrawImage(frame.Bitmap, tooltip.Width / 2 - frame.Origin.X, picH);
-                        item.AvatarBitmap = frame.Bitmap;
                         picH += frame.Bitmap.Height;
-                        picH += 2;
+                        picH += 6;
+
+                        if (this.ItemSample != null) this.ItemSample.Dispose();
+                        this.ItemSample = new Bitmap(frame.Bitmap);
                     }
 
                     this.avatar.ClearCanvas();
                 }
-                if (item.SamplePath != null)
+                else if (item.SamplePath != null)
                 {
-                    Wz_Node sampleNode = PluginManager.FindWz(item.SamplePath);
+                    Wz_Node sampleNode = PluginManager.FindWz(item.SamplePath, this.SourceWzFile);
                     // Workaround for KMST 1.2.1184
                     if (sampleNode == null && item.SamplePath.Contains("ChatEmoticon.img"))
                     {
-                        sampleNode = PluginManager.FindWz(item.SamplePath.Replace("ChatEmoticon.img/", "ChatEmoticon.img/Emoticon/"));
+                        sampleNode = PluginManager.FindWz(item.SamplePath.Replace("ChatEmoticon.img/", "ChatEmoticon.img/Emoticon/"), this.SourceWzFile);
                     }
 
                     if (sampleNode != null)
@@ -998,7 +834,7 @@ namespace WzComparerR2.CharaSimControl
                         if (sampleNode?.Text == "effect")
                         {
                             Wz_Node effectNode = sampleNode.Nodes["0"];
-                            BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz);
+                            BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz, this.SourceWzFile);
                             g.DrawImage(effect.Bitmap, 38 + (85 - effect.Bitmap.Width - 1) / 2, picH - 8 + (62 - effect.Bitmap.Height - 1) / 2);
                             picH += 73;
                         }
@@ -1013,7 +849,7 @@ namespace WzComparerR2.CharaSimControl
                                     break;
                                 }
 
-                                BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz);
+                                BitmapOrigin effect = BitmapOrigin.CreateFromNode(effectNode, PluginManager.FindWz, this.SourceWzFile);
                                 if (sampleW + 87 >= tooltip.Width)
                                 {
                                     picH += 62;
@@ -1025,111 +861,174 @@ namespace WzComparerR2.CharaSimControl
                             picH += 62;
                         }
                     }
-                    picH += 62;
                 }
-                if (nickResNode != null)
+                else if (this.NickResNode != null)
                 {
                     //获取称号名称
-                    string nickName;
-                    string nickWithQR = sr["nickWithQR"];
-                    if (nickWithQR != null)
-                    {
-                        string qrDefault = sr["qrDefault"] ?? string.Empty;
-                        nickName = Regex.Replace(nickWithQR, "#qr.*?#", qrDefault);
-                    }
-                    else
-                    {
-                        nickName = sr.Name;
-                    }
-                    GearGraphics.DrawNameTag(g, nickResNode, nickName, tooltip.Width, ref picH);
-                    picH += 4; // value is either 4 or 14 (it was 14 in previous iteration)
-                }
-                if (minLev > 0 && maxLev > 0)
-                {
-                    long totalExp = 0;
-
-                    for (int i = (int)minLev; i < (int)maxLev; i++)
-                        totalExp += Character.ExpToNextLevel(i);
-
-                    g.DrawLine(Pens.White, 6, picH, tooltip.Width - 7, picH);
-                    picH += 8;
-
-                    TextRenderer.DrawText(g, "Total EXP: " + totalExp, GearGraphics.ItemDetailFont2, new Point(10, picH), ((SolidBrush)GearGraphics.OrangeBrush4).Color, TextFormatFlags.NoPadding);
-                    picH += 16;
-
-                    TextRenderer.DrawText(g, "Remaining EXP: " + totalExp, GearGraphics.ItemDetailFont2, new Point(10, picH), Color.Red, TextFormatFlags.NoPadding);
-                    picH += 16;
-
-                    string cantAccountSharable = null;
-                    Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item);
-                    if (itemWz != null)
-                    {
-                        string imgClass = (item.ItemID / 10000).ToString("d4") + ".img\\" + item.ItemID.ToString("d8");
-                        foreach (Wz_Node node0 in itemWz.Nodes)
-                        {
-                            Wz_Node imgNode = node0.FindNodeByPath(imgClass, true);
-                            if (imgNode != null)
-                            {
-                                cantAccountSharable = imgNode.FindNodeByPath("info\\cantAccountSharable\\tooltip").GetValueEx<string>(null);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (cantAccountSharable != null)
-                    {
-                        TextRenderer.DrawText(g, cantAccountSharable, GearGraphics.ItemDetailFont2, new Point(10, picH), ((SolidBrush)GearGraphics.SetItemNameBrush).Color, TextFormatFlags.NoPadding);
-                        picH += 16;
-                        picH += 16;
-                    }
+                    // string nickName = GearGraphics.GetNameTagString(sr);
+                    // GearGraphics.DrawNameTag(g, this.NickResNode, nickName, tooltip.Width, ref picH);
+                    picH += 6;
                 }
             }
 
-
-            //绘制配方需求
-            if (item.Recipes.Count > 0)
+            // ----------------------------------------------------------------------
+            // 하단 속성
+            var attrList2 = GetItemBottomAttributeString(sr, isTranslateRequired);
+            if (attrList2.Count > 0)
             {
-                long reqSkill, reqSkillLevel;
-                if (!item.Specs.TryGetValue(ItemSpecType.reqSkill, out reqSkill))
-                {
-                    reqSkill = item.Recipes[0] / 10000 * 10000;
-                }
-
-                if (!item.Specs.TryGetValue(ItemSpecType.reqSkillLevel, out reqSkillLevel))
-                {
-                    reqSkillLevel = 1;
-                }
-
-                picH = Math.Max(picH, iconY + 107);
-                g.DrawLine(Pens.White, 6, picH, 283, picH);//分割线
+                picH = Math.Max(picH, iconY + 88);
+                splitterH.Add(picH - 1);
                 picH += 10;
-                TextRenderer.DrawText(g, "<Requirements>", GearGraphics.ItemDetailFont, new Point(8, picH), ((SolidBrush)GearGraphics.SetItemNameBrush).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-                picH += 17;
 
-                //技能标题
-                if (StringLinker == null || !StringLinker.StringSkill.TryGetValue((int)reqSkill, out sr))
+                foreach (var attr in attrList2)
                 {
-                    sr = new StringResult();
-                    sr.Name = "- (null)";
+                    GearGraphics.DrawString(g, attr, GearGraphics.ItemDetailFont, item22ColorTable, 15, descRight, ref picH, LineHeight, alignment: Text.TextAlignment.Left);
                 }
-                TextRenderer.DrawText(g, string.Format("- {0} Lv {1}", sr.Name, reqSkillLevel), GearGraphics.ItemDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.SetItemNameBrush).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-                picH += 16;
-                picH += 6;
             }
 
-            picH = Math.Max(iconY + 103, picH + 15);
+            picH = Math.Max(iconY + 92, picH + 2);
             return tooltip;
         }
 
-        private List<string> GetItemAttributeString()
+        private string GetPetDesc()
+        {
+            string desc = null;
+
+            long value;
+            if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+            {
+                if (item.Props.TryGetValue(ItemPropType.setItemID, out long setID))
+                {
+                    SetItem setItem;
+                    if ((!CompareMode && CharaSimLoader.LoadedSetItems.TryGetValue((int)setID, out setItem))
+                        || (CompareMode && (setItem = CharaSimLoader.LoadSetItem((int)setID, this.SourceWzFile)) != null))
+                    {
+                        string wonderGradeString = null;
+                        string setItemName = setItem.SetItemName;
+                        string setSkillName = "";
+                        switch (value)
+                        {
+                            case 1:
+                                wonderGradeString = "Wonder Black";
+                                foreach (KeyValuePair<GearPropType, object> prop in setItem.Effects.Values.SelectMany(f => f.PropsV5))
+                                {
+                                    if (prop.Key == GearPropType.activeSkill)
+                                    {
+                                        SetItemActiveSkill p = ((List<SetItemActiveSkill>)prop.Value)[0];
+                                        StringResult sr2;
+                                        if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(p.SkillID, out sr2))
+                                        {
+                                            sr2 = new StringResult();
+                                            sr2.Name = p.SkillID.ToString();
+                                        }
+                                        setSkillName = Regex.Replace(sr2.Name, " Lv.\\d", "");
+                                        break;
+                                    }
+                                }
+                                break;
+                            case 4:
+                                wonderGradeString = "Sweet Luna";
+                                setSkillName = "Sweet Luna";
+                                break;
+                            case 5:
+                                wonderGradeString = "Dream Luna";
+                                setSkillName = "Dream Luna";
+                                break;
+                        }
+                        if (wonderGradeString != null)
+                        {
+                            desc += $"\n#cEquip a {wonderGradeString}#rank #c{setItemName}#pet to obtain a #c{setSkillName}#set effect (maximum of 3 levels).\nThe set effect can be strengthened up to 3 times depending on the type of #c{setItemName}#pet equipped.";
+                        }
+                    }
+                }
+            }
+
+            return desc;
+        }
+
+        private string GetCoreSpecString()
+        {
+            string coreSpec = null;
+            if (item.CoreSpecs.Count > 0)
+            {
+                foreach (KeyValuePair<ItemCoreSpecType, Wz_Node> p in item.CoreSpecs)
+                {
+                    int intvalue = 0;
+                    switch (p.Key)
+                    {
+                        case ItemCoreSpecType.Ctrl_addMob:
+                            StringResult srMob;
+                            if (StringLinker == null || !StringLinker.StringMob.TryGetValue(Convert.ToInt32(p.Value.Nodes["mobID"].Value), out srMob))
+                            {
+                                srMob = new StringResult();
+                                srMob.Name = "(null)";
+                            }
+                            foreach (Wz_Node addMobNode in p.Value.Nodes)
+                            {
+                                if (int.TryParse(addMobNode.Text, out intvalue))
+                                {
+                                    break;
+                                }
+                            }
+                            coreSpec = ItemStringHelper.GetItemCoreSpecString(ItemCoreSpecType.Ctrl_addMob, intvalue, srMob.Name);
+                            break;
+
+                        default:
+                            try
+                            {
+                                coreSpec = ItemStringHelper.GetItemCoreSpecString(p.Key, Convert.ToInt32(p.Value.Value), Convert.ToString(p.Value.Nodes["desc"]?.Value));
+                            }
+                            finally
+                            {
+                            }
+                            break;
+                    }
+                }
+            }
+            return coreSpec;
+        }
+
+        private string GetCantAccountSharableString()
+        {
+            string ret = null;
+            if (item.Props.TryGetValue(ItemPropType.exp_minLev, out long minLev) && minLev > 0 && item.Props.TryGetValue(ItemPropType.exp_maxLev, out long maxLev) && maxLev > 0)
+            {
+                long totalExp = 0;
+
+                for (int i = (int)minLev; i < (int)maxLev; i++)
+                    totalExp += Character.ExpToNextLevel(i);
+
+                ret += $"#$rTotal EXP : {totalExp}#\n#$rRenaming EXP : {totalExp}#";
+
+                string cantAccountSharable = null;
+                Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, this.SourceWzFile);
+                if (itemWz != null)
+                {
+                    string imgClass = (item.ItemID / 10000).ToString("d4") + ".img\\" + item.ItemID.ToString("d8");
+                    foreach (Wz_Node node0 in itemWz.Nodes)
+                    {
+                        Wz_Node imgNode = node0.FindNodeByPath(imgClass, true);
+                        if (imgNode != null)
+                        {
+                            cantAccountSharable = imgNode.FindNodeByPath("info\\cantAccountSharable\\tooltip").GetValueEx<string>(null);
+                            break;
+                        }
+                    }
+                }
+
+                if (cantAccountSharable != null)
+                {
+                    ret += $"\n#$r{cantAccountSharable}";
+                }
+            }
+            return ret;
+        }
+
+        private List<string> GetItemTopAttributeString()
         {
             long value, value2;
             List<string> tags = new List<string>();
 
-            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.only, value));
-            }
             if (item.Props.TryGetValue(ItemPropType.quest, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.quest, value));
@@ -1173,7 +1072,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.multiPet, value));
             }
-            else if (item.ItemID / 10000 == 500)
+            else if (item.IsPet)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.multiPet, 0));
             }
@@ -1188,6 +1087,171 @@ namespace WzComparerR2.CharaSimControl
 
             return tags;
         }
+
+        private List<string> GetItemBottomAttributeString(StringResult sr, bool isTranslateRequired = false)
+        {
+            long value;
+            List<string> tags = new List<string>();
+
+            // desc_leftalign
+            string descLeftAlign = sr["desc_leftalign"];
+            if (!string.IsNullOrEmpty(descLeftAlign))
+            {
+                tags.Add(descLeftAlign);
+                if (isTranslateRequired)
+                {
+                    tags.Add(Translator.TranslateString(descLeftAlign));
+                }
+            }
+
+            // 펫
+            if (item.IsPet)
+            {
+                var count = 1;
+                ItemPropType[] petSkills = [ItemPropType.pickupItem, ItemPropType.longRange, ItemPropType.sweepForDrop, ItemPropType.pickupAll, ItemPropType.consumeHP, ItemPropType.consumeMP,
+                    ItemPropType.autoBuff, ItemPropType.giantPet, ItemPropType.consumeCure];
+                List<string> petSkillNames = new List<string> { isMsnClient ? "NESO Magnet" : "Meso Magnet" };
+                foreach (var petSkill in petSkills)
+                {
+                    if (item.Props.TryGetValue(petSkill, out value) && value > 0)
+                    {
+                        count++;
+                        switch (petSkill)
+                        {
+                            case ItemPropType.pickupItem: petSkillNames.Add("Item Pouch"); break;
+                            case ItemPropType.longRange: petSkillNames.Add("Expanded Auto Move"); break;
+                            case ItemPropType.sweepForDrop: petSkillNames.Add("Auto Move"); break;
+                            case ItemPropType.pickupAll: petSkillNames.Add("Expired Pickup Skill"); break;
+                            case ItemPropType.consumeHP: petSkillNames.Add("Auto HP Potion Pouch"); break;
+                            case ItemPropType.consumeMP: petSkillNames.Add("Auto MP Potion Pouch"); break;
+                            case ItemPropType.autoBuff: petSkillNames.Add("Auto Buff"); break;
+                            case ItemPropType.giantPet: petSkillNames.Add("Fatten Up"); break;
+                            case ItemPropType.consumeCure: petSkillNames.Add("Take All Cure Potion"); break;
+                        }
+                    }
+                }
+                tags.Add($"#c{count} skill(s) are available: {string.Join(", ", petSkillNames)}#");
+
+                if (item.Props.TryGetValue(ItemPropType.noScroll, out value) && value > 0)
+                {
+                    tags.Add("#$rYou cannot use the Pet Skill Scroll or Pet Name tag at this time.#");
+                }
+            }
+
+            // pointCost
+            if (item.Props.TryGetValue(ItemPropType.pointCost, out value) && value > 0)
+            {
+                tags.Add($"#c{value} Point#");
+            }
+
+            // corespec
+            string coreSpec = GetCoreSpecString();
+            if (!string.IsNullOrEmpty(coreSpec))
+            {
+                tags.Add(coreSpec);
+            }
+
+            // howToUse
+            if (item.ItemID / 10000 == 313 || item.ItemID / 10000 == 370 || item.ItemID / 10000 == 501)
+            {
+                tags.Add("#cCan turned ON/OFF by double-click#");
+            }
+
+            // only
+            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
+            {
+                tags.Add($"#$r{ItemStringHelper.GetItemPropString(ItemPropType.only, value)}#");
+            }
+
+            // cantAccountSharable
+            string cantAccountSharable = GetCantAccountSharableString();
+            if (!string.IsNullOrEmpty(cantAccountSharable))
+            {
+                tags.Add(cantAccountSharable);
+            }
+
+            // cashTradeInfo
+            if (item.Cash)
+            {
+                if (item.Props.TryGetValue(ItemPropType.noMoveToLocker, out value) && value > 0)
+                {
+                    tags.Add("#$rThis item cannot be moved to the Cash inventory.#");
+                }
+                if (item.Props.TryGetValue(ItemPropType.onlyCash, out value) && value > 0)
+                {
+                    tags.Add("#$rCan only be purchased with NX.#");
+                }
+                if (item.Props.TryGetValue(ItemPropType.cashTradeBlock, out value) && value > 0)
+                {
+                    tags.Add("#$rNEXONポイントで購入しても他人と交換不可#");
+                }
+                else if ((!item.Props.TryGetValue(ItemPropType.tradeBlock, out value) || value == 0))
+                {
+                    if (item.ItemID / 1000 == 5533)
+                    {
+                        tags.Add("#cDouble-click to preview the items in the box, which cycle through every 3 seconds. #\\n#$rYou can use it by double-clicking it in the Cash Library. Boxes cannot be traded. \\nIf you purchase it with NX, you can trade the rewards you get from the box with others only once before use.\r\n#");
+                    }
+                    else if (!(item.ItemID / 10000 == 501 || item.ItemID / 10000 == 502 || item.ItemID / 10000 == 516))
+                    {
+                        tags.Add("#$rTradable with others once before use when purchasing with NX.#");
+                    }
+                }
+            }
+
+            // karma
+            if (item.Props.TryGetValue(ItemPropType.tradeAvailable, out value) && value > 0)
+            {
+                switch (value)
+                {
+                    case 1: tags.Add("#cUse the Scissors of Karma to enable this item to be traded one time.#"); break;
+                    case 2: tags.Add("#cUse the Platinum Scissors of Karma to\n\renable this item to be traded one time.#"); break;
+                }
+            }
+
+            return tags;
+        }
+
+        private void DrawDotline(Graphics g, int x1, int x2, int y)
+        {
+            var picCenter = Resource.UIToolTipNew_img_Skill_Frame_dotline_c;
+            using (var brush = new TextureBrush(picCenter))
+            {
+                brush.TranslateTransform(x1, y);
+                g.FillRectangle(brush, new Rectangle(x1, y, x2 - x1, picCenter.Height));
+            }
+        }
+
+        private Bitmap RenderLinkRecipeInfo(Recipe recipe)
+        {
+            TooltipRender renderer = this.LinkRecipeInfoRender;
+            if (renderer == null)
+            {
+                RecipeTooltipRender defaultRenderer = new RecipeTooltipRender();
+                defaultRenderer.StringLinker = this.StringLinker;
+                defaultRenderer.ShowObjectID = false;
+                defaultRenderer.Enable22AniStyle = true;
+                renderer = defaultRenderer;
+            }
+
+            renderer.TargetItem = recipe;
+            return renderer.Render();
+        }
+
+        private Bitmap RenderLinkRecipeGear(Gear gear)
+        {
+            TooltipRender renderer = this.LinkRecipeGearRender;
+            if (renderer == null)
+            {
+                GearTooltipRender22 defaultRenderer = new GearTooltipRender22();
+                defaultRenderer.StringLinker = this.StringLinker;
+                defaultRenderer.ShowObjectID = false;
+                renderer = defaultRenderer;
+            }
+
+            renderer.TargetItem = gear;
+            return renderer.Render();
+        }
+
         private Bitmap RenderDamageSkin(DamageSkin damageSkin)
         {
             TooltipRender renderer = this.LinkDamageSkinRender;
@@ -1209,56 +1273,14 @@ namespace WzComparerR2.CharaSimControl
             return renderer.Render();
         }
 
-        private Bitmap RenderLinkRecipeInfo(Recipe recipe)
-        {
-            TooltipRender renderer = this.LinkRecipeInfoRender;
-            if (renderer == null)
-            {
-                RecipeTooltipRender defaultRenderer = new RecipeTooltipRender();
-                defaultRenderer.StringLinker = this.StringLinker;
-                defaultRenderer.ShowObjectID = false;
-                defaultRenderer.Enable22AniStyle = this.Enable22AniStyle;
-                renderer = defaultRenderer;
-            }
-
-            renderer.TargetItem = recipe;
-            return renderer.Render();
-        }
-
-        private Bitmap RenderLinkRecipeGear(Gear gear)
-        {
-            TooltipRender renderer = this.LinkRecipeGearRender;
-            if (renderer == null)
-            {
-                if (this.Enable22AniStyle)
-                {
-                    GearTooltipRender22 defaultRenderer = new GearTooltipRender22();
-                    defaultRenderer.StringLinker = this.StringLinker;
-                    defaultRenderer.ShowObjectID = false;
-                    renderer = defaultRenderer;
-                }
-                else
-                {
-                    GearTooltipRender2 defaultRenderer = new GearTooltipRender2();
-                    defaultRenderer.StringLinker = this.StringLinker;
-                    defaultRenderer.ShowObjectID = false;
-                    renderer = defaultRenderer;
-                }
-            }
-
-            renderer.TargetItem = gear;
-            return renderer.Render();
-        }
-
         private Bitmap RenderLinkRecipeItem(Item item)
         {
             TooltipRender renderer = this.LinkRecipeItemRender;
             if (renderer == null)
             {
-                ItemTooltipRender2 defaultRenderer = new ItemTooltipRender2();
+                ItemTooltipRender3 defaultRenderer = new ItemTooltipRender3();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
-                defaultRenderer.Enable22AniStyle = this.Enable22AniStyle;
                 renderer = defaultRenderer;
             }
 
@@ -1271,13 +1293,9 @@ namespace WzComparerR2.CharaSimControl
             TooltipRender renderer = this.SetItemRender;
             if (renderer == null)
             {
-                var defaultRenderer = new SetItemTooltipRender();
+                var defaultRenderer = new SetItemTooltipRender22();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
-                if (this.Enable22AniStyle)
-                {
-                    defaultRenderer.Enable22AniStyle = true;
-                }
                 renderer = defaultRenderer;
             }
 
@@ -1293,6 +1311,7 @@ namespace WzComparerR2.CharaSimControl
                 var defaultRenderer = new CashPackageTooltipRender();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = this.ShowObjectID;
+                // defaultRenderer.Enable22AniStyle = true;
                 renderer = defaultRenderer;
             }
 
@@ -1402,7 +1421,7 @@ namespace WzComparerR2.CharaSimControl
 
         private bool TryGetNickResource(long nickTag, out Wz_Node resNode)
         {
-            resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/nick/" + nickTag);
+            resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/nick/" + nickTag, this.SourceWzFile);
             return resNode != null;
         }
 
@@ -1418,7 +1437,7 @@ namespace WzComparerR2.CharaSimControl
                     sr = new StringResult();
                     sr.Name = "(null)";
                 }
-                name = $"#c{sr.Name}{(gender == 0 ? "(Male)" : (gender == 1 ? "(Female)" : ""))}#";
+                name = Translator.IsKoreanStringPresent(sr.Name) ? $"#c{sr.Name}{(gender == 0 ? "(남)" : (gender == 1 ? "(여)" : ""))}#" : $"#c{sr.Name}{(gender == 0 ? "(♂)" : (gender == 1 ? "(♀)" : ""))}#";
 
                 int last = (name.LastOrDefault(c => c >= '가' && c <= '힣') - '가') % 28;
                 name += ((last == 0 || last == 8 ? "" : "으") + "로");
@@ -1430,8 +1449,70 @@ namespace WzComparerR2.CharaSimControl
 
                 text = text.Replace("#cosmetic_EULO#", name);
             }
-            
+
             return text;
+        }
+
+        private void InitSampleResources()
+        {
+            Wz_Node _nickResNode = null;
+
+            this.NickResNode = null;
+            if (this.ItemSample != null)
+            {
+                this.ItemSample.Dispose();
+            }
+
+            long value;
+            this.WillDrawNickTag = this.Item.Props.TryGetValue(ItemPropType.nickTag, out value)
+                && this.TryGetNickResource(value, out _nickResNode);
+
+            this.NickResNode = _nickResNode;
+        }
+
+        public bool HasSamples()
+        {
+            return this.Item.Sample.Bitmap != null || this.NickResNode != null || this.ItemSample != null;
+        }
+
+        public Bitmap GetSampleBitmap()
+        {
+            if (this.WillDrawNickTag)
+            {
+                Rectangle rect = new Rectangle();
+                int block = 300;
+                using Bitmap tempBitmap = new Bitmap(block, block);
+                using Graphics tempG = Graphics.FromImage(tempBitmap);
+                tempG.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+
+                int h = block / 2;
+
+                StringResult sr;
+                if (StringLinker == null || !StringLinker.StringItem.TryGetValue(item.ItemID, out sr))
+                {
+                    sr = new StringResult();
+                    sr.Name = "(null)";
+                }
+
+                /* string nickName = GearGraphics.GetNameTagString(sr);
+                GearGraphics.DrawNameTag(tempG, this.NickResNode, nickName, tempBitmap.Width, out rect, ref h); */
+
+                Bitmap resBitmap = new Bitmap(rect.Width, rect.Height);
+                using Graphics g = Graphics.FromImage(resBitmap);
+                g.DrawImage(tempBitmap, 0, 0, rect, GraphicsUnit.Pixel);
+
+                return resBitmap;
+            }
+            else if (this.Item.Sample.Bitmap != null)
+            {
+                return new Bitmap(this.Item.Sample.Bitmap);
+            }
+            else if (this.ItemSample != null)
+            {
+                return new Bitmap(this.ItemSample);
+            }
+
+            return null;
         }
     }
 }

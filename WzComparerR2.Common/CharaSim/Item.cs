@@ -34,6 +34,9 @@ namespace WzComparerR2.CharaSim
         public List<int> AddTooltips { get; internal set; } // Additional Tooltips
         public List<int> Recipes { get; private set; }
         public Bitmap AvatarBitmap { get; set; }
+        public Bitmap DamageSkinSampleNonCriticalBitmap { get; set; }
+        public Bitmap DamageSkinSampleCriticalBitmap { get; set; }
+        public Bitmap DamageSkinExtraBitmap { get; set; }
         public bool Cash
         {
             get { return GetBooleanValue(ItemPropType.cash); }
@@ -71,6 +74,10 @@ namespace WzComparerR2.CharaSim
         public bool GetBooleanValue(ItemPropType type)
         {
             return this.Props.TryGetValue(type, out long value) && value != 0;
+        }
+        public bool IsPet
+        {
+            get { return this.type == ItemType.Pet; }
         }
 
         public static Item CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
@@ -273,6 +280,15 @@ namespace WzComparerR2.CharaSim
                             break;
                     }
                 }
+            }
+            
+            if (item.Icon.Bitmap == null)
+            {
+                item.Icon = new BitmapOrigin(item.IconRaw.Bitmap, item.IconRaw.Origin);
+            }
+            else if (item.IconRaw.Bitmap == null)
+            {
+                item.IconRaw = new BitmapOrigin(item.Icon.Bitmap, item.Icon.Origin);
             }
 
             // MSEA v241 chair
