@@ -2086,69 +2086,79 @@ namespace WzComparerR2.CharaSimControl
 
         private void DrawCategory(Graphics g, int picH)
         {
-            List<string> categories = new List<string>();
+            var max_rows = 2;
+            var line_height = 17;
+            List<List<string>> all_categories = new List<List<string>>();
+            for (int i = 0; i < max_rows; i++)
+            {
+                all_categories.Add(new List<string>());
+            }
 
             if (Gear.IsWeapon(Gear.type) || Gear.IsCashWeapon(Gear.type))
             {
-                categories.Add("Weapon");
+                all_categories[0].Add("Weapon");
                 if (!Gear.Cash && (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara))
                 {
-                    categories.Add("One-handed");
+                    all_categories[0].Add("One-handed");
                 }
                 else if (!Gear.Cash && Gear.IsDoubleHandWeapon(Gear.type))
                 {
-                    categories.Add("Two-handed");
+                    all_categories[0].Add("Two-handed");
                 }
             }
             else if (Gear.IsSubWeapon(Gear.type) || Gear.type == GearType.shield)
             {
-                categories.Add("Sub Weapon");
+                all_categories[0].Add("Sub Weapon");
             }
             else if (Gear.IsEmblem(Gear.type))
             {
-                categories.Add("Emblem / Power Source");
+                all_categories[0].Add("Emblem / Power Source");
             }
             else if (Gear.IsArmor(Gear.type))
             {
-                categories.Add("Armor");
+                all_categories[0].Add("Armor");
             }
             else if (Gear.IsAccessory(Gear.type))
             {
-                categories.Add("Accessory");
+                all_categories[0].Add("Accessory");
             }
             else if (Gear.IsMechanicGear(Gear.type))
             {
-                categories.Add("Mechanic Equipment");
+                all_categories[0].Add("Mechanic Equipment");
             }
             else if (Gear.IsDragonGear(Gear.type))
             {
-                categories.Add("Dragon Equipment");
+                all_categories[0].Add("Dragon Equipment");
             }
 
-            var text = ItemStringHelper.GetGearTypeString22(Gear.type);
+            var text = ItemStringHelper.GetGearTypeString(Gear.type);
             if (!string.IsNullOrEmpty(text))
             {
-                categories.Add(text);
+                all_categories[1].Add(text);
             }
 
-            if (categories.Count <= 0) return;
-
+            if (all_categories[0].Count + all_categories[1].Count <= 0) return;
+            if (all_categories[1].Count > 0) picH -= line_height; // has second row
             var font = GearGraphics.EquipMDMoris9Font;
             var ww = res["category_w"].Image.Width;
             var ew = res["category_e"].Image.Width;
             var ch = res["category_c"].Image.Height;
-            var sp = 309;
 
-            for (int i = categories.Count - 1; i >= 0; i--)
+            foreach (var categories in all_categories)
             {
-                var length = TextRenderer.MeasureText(g, categories[i], font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width;
+                var sp = 309;
+                for (int i = categories.Count - 1; i >= 0; i--)
+                {
+                    var length = TextRenderer.MeasureText(g, categories[i], font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width;
 
-                g.DrawImage(res["category_w"].Image, sp - ew - length - ww, picH);
-                g.FillRectangle(res["category_c"], sp - ew - length, picH, length, ch);
-                TextRenderer.DrawText(g, categories[i], font, new Point(sp - ew - length, picH - 1), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                g.DrawImage(res["category_e"].Image, sp - ew, picH);
+                    g.DrawImage(res["category_w"].Image, sp - ew - length - ww, picH);
+                    g.FillRectangle(res["category_c"], sp - ew - length, picH, length, ch);
+                    TextRenderer.DrawText(g, categories[i], font, new Point(sp - ew - length, picH), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                    g.DrawImage(res["category_e"].Image, sp - ew, picH);
 
-                sp -= (3 + ew + length + ww);
+                    sp -= (3 + ew + length + ww);
+                }
+                picH += line_height;
             }
         }
 
