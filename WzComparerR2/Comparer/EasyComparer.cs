@@ -83,6 +83,8 @@ namespace WzComparerR2.Comparer
         public bool UseMiniSizeDamageSkin { get; set; }
         public bool AlwaysUseMseaFormatDamageSkin { get; set; }
         public long DamageSkinNumber { get; set; }
+        public bool AllowFamiliarOutOfBounds { get; set; }
+        public bool UseCTFamiliarUI { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
@@ -1163,6 +1165,8 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].ShowDamageSkin = this.ShowDamageSkin;
                 itemRenderNewOld[i].UseMiniSizeDamageSkin = this.UseMiniSizeDamageSkin;
                 itemRenderNewOld[i].AlwaysUseMseaFormatDamageSkin = this.AlwaysUseMseaFormatDamageSkin;
+                itemRenderNewOld[i].AllowFamiliarOutOfBounds = this.AllowFamiliarOutOfBounds;
+                itemRenderNewOld[i].UseCTFamiliarRender = this.UseCTFamiliarUI;
                 itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
                 itemRenderNewOld[i].CompareMode = true;
 
@@ -1258,7 +1262,7 @@ namespace WzComparerR2.Comparer
                         {
                             itemRenderNewOld[i].Item = item;
                             isDamageSkin = (item.DamageSkinID != null);
-                            // isFamiliar = (item.FamiliarID != null);
+                            isFamiliar = (item.FamiliarID != null);
 
                             if (isDamageSkin)
                             {
@@ -1446,6 +1450,8 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].ShowDamageSkin = this.ShowDamageSkin;
                 itemRenderNewOld[i].UseMiniSizeDamageSkin = this.UseMiniSizeDamageSkin;
                 itemRenderNewOld[i].AlwaysUseMseaFormatDamageSkin = this.AlwaysUseMseaFormatDamageSkin;
+                itemRenderNewOld[i].AllowFamiliarOutOfBounds = this.AllowFamiliarOutOfBounds;
+                itemRenderNewOld[i].UseCTFamiliarRender = this.UseCTFamiliarUI;
                 itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
                 itemRenderNewOld[i].CompareMode = true;
 
@@ -1541,7 +1547,7 @@ namespace WzComparerR2.Comparer
                         {
                             itemRenderNewOld[i].Item = item;
                             isDamageSkin = (item.DamageSkinID != null);
-                            // isFamiliar = (item.FamiliarID != null);
+                            isFamiliar = (item.FamiliarID != null);
 
                             if (isDamageSkin)
                             {

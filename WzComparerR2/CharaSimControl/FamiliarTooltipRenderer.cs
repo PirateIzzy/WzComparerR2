@@ -1,0 +1,205 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using Resource = CharaSimResource.Resource;
+using WzComparerR2.AvatarCommon;
+using WzComparerR2.CharaSim;
+using WzComparerR2.Common;
+using WzComparerR2.PluginBase;
+using WzComparerR2.WzLib;
+using static WzComparerR2.CharaSimControl.RenderHelper;
+
+namespace WzComparerR2.CharaSimControl
+{
+    public class FamiliarTooltipRenderer : TooltipRender
+    {
+        // This class is for CMS/TMS version Familiar UI only.
+        // For GMS/JMS version, check FamiliarTooltipRenderer2.
+        public FamiliarTooltipRenderer()
+        {
+        }
+
+        private Familiar familiar;
+
+        public Familiar Familiar
+        {
+            get { return familiar; }
+            set { familiar = value; }
+        }
+
+        public override object TargetItem
+        {
+            get { return this.familiar; }
+            set { this.familiar = value as Familiar; }
+        }
+
+        public int? ItemID { get; set; }
+        public bool AllowOutOfBounds { get; set; }
+
+        public override Bitmap Render()
+        {
+            if (this.familiar == null)
+            {
+                return null;
+            }
+
+            Bitmap baseTooltip = Resource.UIFamiliar_img_familiarCard_backgrnd;
+
+            // Get Mob image and name
+            Mob mob = Mob.CreateFromNode(PluginManager.FindWz($@"Mob\{familiar.MobID.ToString().PadLeft(7, '0')}.img", this.SourceWzFile), PluginManager.FindWz);
+            Point alignOrigin = new Point(161, 200);
+            Point mobOrigin = new Point(0, 0);
+            int mobXoffset = 0;
+            int mobYoffset = 0;
+            int tDelta = 0;
+            int bDelta = 0;
+            int lDelta = 0;
+            int rDelta = 0;
+            if (familiar.FamiliarCover.Bitmap != null)
+            {
+                mobOrigin = familiar.FamiliarCover.Origin;
+            }
+            else
+            {
+                mobOrigin = mob.Default.Origin;
+            }
+            Bitmap mobImg = Crop(familiar.FamiliarCover.Bitmap ?? mob.Default.Bitmap, alignOrigin, mobOrigin, out mobXoffset, out mobYoffset, out tDelta, out bDelta, out lDelta, out rDelta);
+
+            Bitmap tooltip = new Bitmap(baseTooltip.Width + lDelta + rDelta, baseTooltip.Height + tDelta + bDelta);
+
+            using (Graphics g = Graphics.FromImage(tooltip))
+            {
+                g.Clear(Color.Transparent);
+                g.DrawImage(baseTooltip, lDelta, tDelta, new Rectangle(0, 0, baseTooltip.Width, baseTooltip.Height), GraphicsUnit.Pixel);
+
+                // Draw Familiar Card basic background
+                g.DrawImage(Resource.UIFamiliar_img_familiarCard_base, 45 + lDelta, 37 + tDelta, new Rectangle(0, 0, Resource.UIFamiliar_img_familiarCard_base.Width, Resource.UIFamiliar_img_familiarCard_base.Height), GraphicsUnit.Pixel);
+                g.DrawImage(Resource.UIFamiliar_img_familiarCard_name, 31 + lDelta, 222 + tDelta, new Rectangle(0, 0, Resource.UIFamiliar_img_familiarCard_name.Width, Resource.UIFamiliar_img_familiarCard_name.Height), GraphicsUnit.Pixel);
+
+                g.DrawImage(mobImg, mobXoffset + lDelta, mobYoffset + tDelta, new Rectangle(0, 0, mobImg.Width, mobImg.Height), GraphicsUnit.Pixel);
+
+                g.DrawImage(Resource.UIFamiliar_img_jewel_backgrnd, 25 + lDelta, 21 + tDelta, new Rectangle(0, 0, Resource.UIFamiliar_img_jewel_backgrnd.Width, Resource.UIFamiliar_img_jewel_backgrnd.Height), GraphicsUnit.Pixel);
+                g.DrawImage(Resource.UIFamiliar_img_jewel_normal_5, 30 + lDelta, 27 + tDelta, new Rectangle(0, 0, Resource.UIFamiliar_img_jewel_normal_5.Width, Resource.UIFamiliar_img_jewel_normal_5.Height), GraphicsUnit.Pixel);
+
+                // Pre-Drawing
+                List<TextBlock> titleBlocks = new List<TextBlock>();
+                string mobName = GetMobName(mob.ID);
+                var block = PrepareText(g, mobName ?? "(null)", GearGraphics.EquipMDMoris9FontBold, Brushes.White, 0, 0);
+                titleBlocks.Add(block);
+
+                Rectangle titleRect = Measure(titleBlocks);
+
+                int titleXoffset = Resource.UIFamiliar_img_familiarCard_name.Width >= Resource.UIFamiliar_img_familiarCard_name.Width ? (Resource.UIFamiliar_img_familiarCard_name.Width - titleRect.Width) / 2 : 0;
+                int titleYoffset = (Resource.UIFamiliar_img_familiarCard_name.Height - titleRect.Height) / 2;
+
+                foreach (var item in titleBlocks)
+                {
+                    DrawText(g, item, new Point(31 + lDelta + titleXoffset, 222 + tDelta + titleYoffset));
+                }
+
+
+                // Layout
+                if (this.ShowObjectID)
+                {
+                    GearGraphics.DrawGearDetailNumber(g, 24 + lDelta, 24 + tDelta, this.ItemID != null ? $"{((int)this.ItemID).ToString("d8")}" : $"{this.familiar.FamiliarID.ToString()}", true);
+                }
+            }
+            return tooltip;
+        }
+        private string GetMobName(int mobID)
+        {
+            bool isTranslateRequired = Translator.IsTranslateEnabled;
+            StringResult sr;
+            if (this.StringLinker == null || !this.StringLinker.StringMob.TryGetValue(mobID, out sr))
+            {
+                return null;
+            }
+            if (isTranslateRequired)
+            {
+                return Translator.MergeString(sr.Name, Translator.TranslateString(sr.Name, true), 1, false, true);
+            }
+            else
+            {
+                return sr.Name;
+            }
+        }
+
+        private Bitmap Crop(Bitmap sourceBmp, Point alignOrigin, Point mobOrigin, out int xOffset, out int yOffset, out int tDelta, out int bDelta, out int lDelta, out int rDelta)
+        {
+            tDelta = 0;
+            bDelta = 0;
+            lDelta = 0;
+            rDelta = 0;
+            xOffset = 0;
+            yOffset = 0;
+
+            if (sourceBmp == null)
+            {
+                return null;
+            }
+
+            xOffset = alignOrigin.X - mobOrigin.X;
+            yOffset = alignOrigin.Y - mobOrigin.Y;
+
+            if (this.AllowOutOfBounds)
+            {
+                lDelta = mobOrigin.X > alignOrigin.X ? mobOrigin.X - alignOrigin.X : 0;
+                rDelta = sourceBmp.Width - mobOrigin.X > 154 ? sourceBmp.Width - mobOrigin.X - 154 : 0;
+                tDelta = mobOrigin.Y > alignOrigin.Y ? mobOrigin.Y - alignOrigin.Y : 0;
+                bDelta = sourceBmp.Height - mobOrigin.Y > 228 ? sourceBmp.Height - mobOrigin.Y - 228 : 0;
+                return sourceBmp;
+            }
+
+            int rectangXoffset = 0;
+            int rectangYoffset = 0;
+            int rectangWidth = 0;
+            int rectangHeight = 0;
+
+            if (mobOrigin.X > 108) // Define Left Border
+            {
+                rectangXoffset = mobOrigin.X - 108;
+                rectangWidth += 108;
+            }
+            else
+            {
+                rectangWidth += mobOrigin.X;
+            }
+
+            if (sourceBmp.Width - mobOrigin.X > 104) // Define Right Border
+            {
+                rectangWidth += 104;
+            }
+            else
+            {
+                rectangWidth += sourceBmp.Width - mobOrigin.X;
+            }
+
+            if (mobOrigin.Y > 154) // Define Top Border
+            {
+                rectangYoffset = mobOrigin.Y - 154;
+                rectangHeight += 154;
+            }
+            else
+            {
+                rectangHeight += mobOrigin.Y;
+            }
+
+            if (sourceBmp.Height - mobOrigin.Y > 18)
+            {
+                rectangHeight += 18;
+            }
+            else
+            {
+                rectangHeight += sourceBmp.Height - mobOrigin.Y;
+            }
+
+            xOffset = rectangXoffset == 0 ? xOffset : 53;
+            yOffset = rectangYoffset == 0 ? yOffset : 46;
+
+            return sourceBmp.Clone(new Rectangle(rectangXoffset, rectangYoffset, rectangWidth, rectangHeight), sourceBmp.PixelFormat);
+        }
+    }
+}
