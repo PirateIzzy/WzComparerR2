@@ -251,6 +251,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     renderer = FamiliarRender2;
                     FamiliarRender2.Familiar = this.item as Familiar;
+                    FamiliarRender2.UseAssembleUI = EnableAssembleTooltip;
                 }
             }
             else if (item is Skill)
