@@ -114,35 +114,17 @@ namespace WzComparerR2.CharaSim
             int reqLevel;
             this.Props.TryGetValue(GearPropType.reqLevel, out reqLevel);
             int[] data = null;
-            if (isPostNEXTClient)
+            foreach (int[] item in starData)
             {
-                foreach (int[] item in starDataPostNEXT)
+                if (reqLevel >= item[0])
                 {
-                    if (reqLevel >= item[0])
-                    {
-                        data = item;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    data = item;
+                }
+                else
+                {
+                    break;
                 }
             }
-            else
-            {
-                foreach (int[] item in starData)
-                {
-                    if (reqLevel >= item[0])
-                    {
-                        data = item;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
             if (data == null)
             {
                 return 0;
@@ -152,15 +134,6 @@ namespace WzComparerR2.CharaSim
         }
 
         private static readonly int[][] starData = new int[][] {
-            new[]{ 0, 5, 3 },
-            new[]{ 95, 8, 5 },
-            new[]{ 108, 10, 8 },
-            new[]{ 118, 15, 10 },
-            new[]{ 128, 20, 12 },
-            new[]{ 138, 25, 15 },
-        };
-
-        private static readonly int[][] starDataPostNEXT = new int[][] {
             new[]{ 0, 5, 3 },
             new[]{ 95, 8, 5 },
             new[]{ 108, 10, 8 },
@@ -1215,6 +1188,20 @@ namespace WzComparerR2.CharaSim
             {
                 gear.Props[GearPropType.CuttableCount] = cuttableCountOverride.Value;
             }
+
+            /*
+
+            //检查道具默认的剪刀次数
+            string TUC_Blacklist_GL_Path = "Etc\\TUC_Blacklist_GL.img";
+            var tucCountIncreaseGL = findNode?.Invoke(TUC_Blacklist_GL_Path);
+            //var tucCountIncrease = findNode?.Invoke(@$"Etc\TUC_Blacklist_GL.img\ItemList\{gear.ItemID}")?.GetValueEx<int>();
+            //this.GetBooleanValue(GearPropType.onlyUpgrade)
+            if (tucCountIncreaseGL != null)
+            {
+                gear.Props[GearPropType.tuc] += 1;
+            }
+
+            */
 
             //备份标准属性
             gear.StandardProps = new Dictionary<GearPropType, int>(gear.Props);

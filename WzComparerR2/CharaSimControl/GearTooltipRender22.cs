@@ -221,11 +221,7 @@ namespace WzComparerR2.CharaSimControl
             picH = 10;
 
             // 스타포스 별
-            int maxStar = Math.Max(Gear.GetMaxStar(), Gear.Star);
-            if (maxStar == 30 && this.MaxStar25)
-            {
-                maxStar -= 5;
-            }
+            int maxStar = Math.Max(Gear.GetMaxStar(isPostNEXTClient), Gear.Star);
             if (maxStar >= 25 && Gear.IsGenesisWeapon)
             {
                 maxStar = 22;
@@ -1879,14 +1875,14 @@ namespace WzComparerR2.CharaSimControl
                         if (!string.IsNullOrEmpty(kv.Value.Info))
                         {
                             var itemGroup = kv.Value.Info;
-                            var delStr = "Can't Equip Duplicates";
+                            var delStr = "s cannot be stacked.";
                             if (kv.Value.Info.Contains(delStr))
                             {
                                 itemGroup = itemGroup.Replace(delStr, "");
                             }
                             else
                             {
-                                itemGroup += "류 아이템";
+                                itemGroup += " Type Item";
                             }
                             exclusiveEquip = $"#$rCan't Equip Duplicate# ({itemGroup}) #$rItems#";
                         }
