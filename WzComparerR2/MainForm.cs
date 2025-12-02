@@ -288,6 +288,8 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
             tooltipQuickView.ItemRender.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
             tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
+            tooltipQuickView.ItemRender.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
+            tooltipQuickView.ItemRender.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
             tooltipQuickView.ItemRender3.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender3.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender3.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -301,6 +303,11 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender3.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
             tooltipQuickView.ItemRender3.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
             tooltipQuickView.ItemRender3.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
+            tooltipQuickView.ItemRender3.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
+            tooltipQuickView.ItemRender3.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
+            tooltipQuickView.UseCTFamiliarUI = Setting.Familiar.UseCTFamiliarUI;
+            tooltipQuickView.FamiliarRender.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
+            tooltipQuickView.FamiliarRender2.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.EnableAssembleTooltip = Setting.Item.UseAssembleUI;
             tooltipQuickView.MapRender.ShowMiniMap = Setting.Map.ShowMiniMap;
             tooltipQuickView.MapRender.ShowObjectID = Setting.Map.ShowMapObjectID;
@@ -3507,17 +3514,35 @@ namespace WzComparerR2
                     CharaSimLoader.LoadSetItemsIfEmpty();
                     CharaSimLoader.LoadExclusiveEquipsIfEmpty();
                     CharaSimLoader.LoadCommoditiesIfEmpty();
-                    var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
-                    obj = gear;
-                    if (stringLinker == null || !stringLinker.StringEqp.TryGetValue(gear.ItemID, out sr))
+                    if (characterNodePath.Contains("Familiar"))
                     {
-                        sr = new StringResult();
-                        sr.Name = "Unknown Equip";
+                        var familiar = Familiar.CreateFromNode(image.Node, PluginManager.FindWz);
+                        obj = familiar;
+                        if (stringLinker == null || !stringLinker.StringMob.TryGetValue(familiar.MobID, out sr))
+                        {
+                            sr = new StringResult();
+                            sr.Name = "Unknown Familiar";
+                        }
+                        if (familiar != null)
+                        {
+                            fileName = "familiar_" + familiar.FamiliarID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png";
+                            tooltipQuickView.NodeID = familiar.FamiliarID;
+                        }
                     }
-                    if (gear != null)
+                    else
                     {
-                        fileName = "eqp_" + gear.ItemID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png";
-                        tooltipQuickView.NodeID = gear.ItemID;
+                        var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
+                        obj = gear;
+                        if (stringLinker == null || !stringLinker.StringEqp.TryGetValue(gear.ItemID, out sr))
+                        {
+                            sr = new StringResult();
+                            sr.Name = "Unknown Equip";
+                        }
+                        if (gear != null)
+                        {
+                            fileName = "eqp_" + gear.ItemID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png";
+                            tooltipQuickView.NodeID = gear.ItemID;
+                        }
                     }
                     break;
                 case Wz_Type.Item:
@@ -4157,6 +4182,8 @@ namespace WzComparerR2
                     comparer.UseMiniSizeDamageSkin = CharaSimConfig.Default.DamageSkin.UseMiniSize;
                     comparer.AlwaysUseMseaFormatDamageSkin = CharaSimConfig.Default.DamageSkin.AlwaysUseMseaFormat;
                     comparer.DamageSkinNumber = CharaSimConfig.Default.DamageSkin.DamageSkinNumber;
+                    comparer.AllowFamiliarOutOfBounds = CharaSimConfig.Default.Familiar.AllowOutOfBounds;
+                    comparer.UseCTFamiliarUI = CharaSimConfig.Default.Familiar.UseCTFamiliarUI;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try

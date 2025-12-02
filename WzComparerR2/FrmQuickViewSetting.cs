@@ -251,6 +251,20 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Familiar_AllowOutOfBounds
+        {
+             get { return chkAllowFamiliarOutOfBounds.Checked; }
+            set { chkAllowFamiliarOutOfBounds.Checked = value; }
+        }
+
+        [Link]
+        public bool Familiar_UseCTFamiliarUI
+        {
+            get { return chkUseCTFamiliarUI.Checked; }
+            set { chkUseCTFamiliarUI.Checked = value; }
+        }
+
+        [Link]
         public bool Map_ShowMiniMap
         {
             get { return chkShowMiniMap.Checked; }

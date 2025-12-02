@@ -46,6 +46,8 @@ namespace WzComparerR2.CharaSimControl
             this.SetItemRender = new SetItemTooltipRender();
             this.SetItemRender22 = new SetItemTooltipRender22();
             this.AchievementRender = new AchievementTooltipRenderer();
+            this.FamiliarRender = new FamiliarTooltipRenderer(); // used in CMS/TMS
+            this.FamiliarRender2 = new FamiliarTooltipRenderer2(); // used in GMS/JMS
             this.SizeChanged += AfrmTooltip_SizeChanged;
 
             this.MouseClick += AfrmTooltip_MouseClick;
@@ -59,6 +61,7 @@ namespace WzComparerR2.CharaSimControl
 
         public bool Enable22AniStyle { get; set; }
         public bool EnableAssembleTooltip { get; set; }
+        public bool UseCTFamiliarUI { get; set; }
 
         private Bitmap AvatarBitmap;
         private Bitmap SampleBitmap;
@@ -91,6 +94,8 @@ namespace WzComparerR2.CharaSimControl
         public SetItemTooltipRender SetItemRender { get; private set; }
         public SetItemTooltipRender22 SetItemRender22 { get; private set; }
         public AchievementTooltipRenderer AchievementRender { get; private set; }
+        public FamiliarTooltipRenderer FamiliarRender { get; private set; }
+        public FamiliarTooltipRenderer2 FamiliarRender2 { get; private set; }
 
         public string ImageFileName { get; set; }
         public string NodeName { get; set; }
@@ -121,6 +126,8 @@ namespace WzComparerR2.CharaSimControl
                 this.SkillRender.ShowObjectID = value;
                 this.RecipeRender.ShowObjectID = value;
                 this.AchievementRender.ShowObjectID = value;
+                this.FamiliarRender.ShowObjectID = value;
+                this.FamiliarRender2.ShowObjectID = value;
             }
         }
 
@@ -231,6 +238,19 @@ namespace WzComparerR2.CharaSimControl
                     //g.AdditionalOptions[0] = Potential.LoadFromWz(32086, 10);
                     //g.AdditionalOptions[1] = Potential.LoadFromWz(32086, 10);
                     //g.AdditionalOptions[2] = Potential.LoadFromWz(32086, 10);
+                }
+            }
+            else if (item is Familiar)
+            {
+                if (this.UseCTFamiliarUI)
+                {
+                    renderer = FamiliarRender;
+                    FamiliarRender.Familiar = this.item as Familiar;
+                }
+                else
+                {
+                    renderer = FamiliarRender2;
+                    FamiliarRender2.Familiar = this.item as Familiar;
                 }
             }
             else if (item is Skill)
