@@ -54,6 +54,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowDamageSkinID { get; set; }
         public bool UseMiniSizeDamageSkin { get; set; }
         public bool AlwaysUseMseaFormatDamageSkin { get; set; }
+        public bool DisplayUnitOnSingleLine { get; set; }
         public bool AllowFamiliarOutOfBounds { get; set; }
         public bool UseCTFamiliarRender { get; set; }
         public long DamageSkinNumber { get; set; }
@@ -1274,12 +1275,17 @@ namespace WzComparerR2.CharaSimControl
                 defaultRenderer.ShowObjectID = this.ShowDamageSkinID;
                 defaultRenderer.UseMiniSize = this.UseMiniSizeDamageSkin;
                 defaultRenderer.AlwaysUseMseaFormat = this.AlwaysUseMseaFormatDamageSkin;
+                defaultRenderer.DisplayUnitOnSingleLine = this.DisplayUnitOnSingleLine;
                 defaultRenderer.DamageSkinNumber = this.DamageSkinNumber;
                 renderer = defaultRenderer;
                 defaultRenderer.DamageSkin = damageSkin;
                 item.DamageSkinSampleNonCriticalBitmap = defaultRenderer.GetCustomSample(this.DamageSkinNumber, this.UseMiniSizeDamageSkin, false);
                 item.DamageSkinSampleCriticalBitmap = defaultRenderer.GetCustomSample(this.DamageSkinNumber, this.UseMiniSizeDamageSkin, true);
                 item.DamageSkinExtraBitmap = defaultRenderer.GetExtraEffect();
+                if (this.DisplayUnitOnSingleLine)
+                {
+                    item.DamageSkinUnitBitmap = defaultRenderer.GetUnit();
+                }
             }
             renderer.TargetItem = damageSkin;
             return renderer.Render();
@@ -1295,6 +1301,7 @@ namespace WzComparerR2.CharaSimControl
                 defaultRenderer.ShowObjectID = this.ShowObjectID;
                 defaultRenderer.AllowOutOfBounds = this.AllowFamiliarOutOfBounds;
                 defaultRenderer.ItemID = this.item.ItemID;
+                defaultRenderer.FamiliarTier = this.item.Grade;
                 renderer = defaultRenderer;
             }
             renderer.TargetItem = familiar;
@@ -1311,6 +1318,7 @@ namespace WzComparerR2.CharaSimControl
                 defaultRenderer.ShowObjectID = this.ShowObjectID;
                 defaultRenderer.AllowOutOfBounds = this.AllowFamiliarOutOfBounds;
                 defaultRenderer.ItemID = this.item.ItemID;
+                defaultRenderer.FamiliarTier = this.item.Grade;
                 defaultRenderer.UseAssembleUI = true;
                 renderer = defaultRenderer;
             }

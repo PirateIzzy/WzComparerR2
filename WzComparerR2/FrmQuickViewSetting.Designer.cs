@@ -88,6 +88,7 @@
             this.chkShowDamageSkin = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkUseMiniSize = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkAlwaysUseMseaFormat = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkDisplayUnitOnSingleLine = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkAllowFamiliarOutOfBounds = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkUseCTFamiliarUI = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.lblDamageSkinNumber = new DevComponents.DotNetBar.LabelX();
@@ -1059,6 +1060,7 @@
             // 
             this.superTabControlPanel8.Controls.Add(this.txtDamageSkinNumber);
             this.superTabControlPanel8.Controls.Add(this.lblDamageSkinNumber);
+            this.superTabControlPanel8.Controls.Add(this.chkDisplayUnitOnSingleLine);
             this.superTabControlPanel8.Controls.Add(this.chkAlwaysUseMseaFormat);
             this.superTabControlPanel8.Controls.Add(this.chkUseMiniSize);
             this.superTabControlPanel8.Controls.Add(this.chkShowDamageSkin);
@@ -1085,13 +1087,13 @@
             // 
             this.txtDamageSkinNumber.Border.Class = "TextBoxBorder";
             this.txtDamageSkinNumber.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.txtDamageSkinNumber.Location = new System.Drawing.Point(86, 106);
+            this.txtDamageSkinNumber.Location = new System.Drawing.Point(86, 130);
             this.txtDamageSkinNumber.Name = "txtDamageSkinNumber";
             this.txtDamageSkinNumber.Size = new System.Drawing.Size(144, 23);
             this.txtDamageSkinNumber.WatermarkText = "1234567890";
             this.txtDamageSkinNumber.MaxLength = 18;
             this.txtDamageSkinNumber.TextChanged += new System.EventHandler(this.txtDamageSkinNumber_TextChanged);
-            this.txtDamageSkinNumber.TabIndex = 6;
+            this.txtDamageSkinNumber.TabIndex = 7;
             // 
             // lblDamageSkinNumber
             // 
@@ -1101,11 +1103,26 @@
             // 
             // 
             this.lblDamageSkinNumber.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.lblDamageSkinNumber.Location = new System.Drawing.Point(13, 107);
+            this.lblDamageSkinNumber.Location = new System.Drawing.Point(13, 129);
             this.lblDamageSkinNumber.Name = "lblDamageSkinNumber";
             this.lblDamageSkinNumber.Size = new System.Drawing.Size(87, 16);
-            this.lblDamageSkinNumber.TabIndex = 5;
+            this.lblDamageSkinNumber.TabIndex = 6;
             this.lblDamageSkinNumber.Text = "Damage No. ";
+            // 
+            // chkDisplayUnitOnSingleLine
+            // 
+            this.chkDisplayUnitOnSingleLine.AutoSize = true;
+            this.chkDisplayUnitOnSingleLine.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkDisplayUnitOnSingleLine.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkDisplayUnitOnSingleLine.Location = new System.Drawing.Point(13, 108);
+            this.chkDisplayUnitOnSingleLine.Name = "chkDisplayUnitOnSingleLine";
+            this.chkDisplayUnitOnSingleLine.Size = new System.Drawing.Size(133, 16);
+            this.chkDisplayUnitOnSingleLine.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkDisplayUnitOnSingleLine.TabIndex = 5;
+            this.chkDisplayUnitOnSingleLine.Text = "Display Units on a Single Line";
             // 
             // chkAlwaysUseMseaFormat
             // 
@@ -1426,6 +1443,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkin;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkUseMiniSize;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAlwaysUseMseaFormat;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkDisplayUnitOnSingleLine;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAllowFamiliarOutOfBounds;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkUseCTFamiliarUI;
         private DevComponents.DotNetBar.LabelX lblDamageSkinNumber;
