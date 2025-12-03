@@ -35,7 +35,7 @@ namespace WzComparerR2.CharaSimControl
             this.GearRender = new GearTooltipRender2();
             this.GearRender22 = new GearTooltipRender22();
             this.ItemRender = new ItemTooltipRender2();
-            this.ItemRender3 = new ItemTooltipRender3();
+            this.ItemRender22 = new ItemTooltipRender22();
             this.SkillRender = new SkillTooltipRender2();
             this.RecipeRender = new RecipeTooltipRender();
             this.MapRender = new MapTooltipRenderer();
@@ -84,7 +84,7 @@ namespace WzComparerR2.CharaSimControl
         public GearTooltipRender2 GearRender { get; private set; }
         public GearTooltipRender22 GearRender22 { get; private set; }
         public ItemTooltipRender2 ItemRender { get; private set; }
-        public ItemTooltipRender3 ItemRender3 { get; private set; }
+        public ItemTooltipRender22 ItemRender22 { get; private set; }
         public SkillTooltipRender2 SkillRender { get; private set; }
         public RecipeTooltipRender RecipeRender { get; private set; }
         public MapTooltipRenderer MapRender { get; private set; }
@@ -122,7 +122,7 @@ namespace WzComparerR2.CharaSimControl
                 this.GearRender22.ShowObjectID = value;
                 this.MapRender.ShowObjectID = value;
                 this.ItemRender.ShowObjectID = value;
-                this.ItemRender3.ShowObjectID = value;
+                this.ItemRender22.ShowObjectID = value;
                 this.QuestRender.ShowObjectID = value;
                 this.SkillRender.ShowObjectID = value;
                 this.RecipeRender.ShowObjectID = value;
@@ -179,8 +179,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (EnableAssembleTooltip)
                 {
-                    renderer = ItemRender3;
-                    ItemRender3.Item = this.item as Item;
+                    renderer = ItemRender22;
+                    ItemRender22.Item = this.item as Item;
                 }
                 else
                 {
@@ -647,54 +647,57 @@ namespace WzComparerR2.CharaSimControl
 
         void tsmiSampleAssetSave_Click(object sender, EventArgs e)
         {
-            if (this.DamageSkinSampleNonCriticalBitmap != null && this.DamageSkinSampleCriticalBitmap != null && this.item != null)
+            if (this.item != null)
             {
-                using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+                if (this.DamageSkinSampleNonCriticalBitmap != null && this.DamageSkinSampleCriticalBitmap != null && this.item is Item)
                 {
-                    dlg.Description = "Please select a directory to save Damage Skin Samples.";
-                    string fileName1 = this.ImageFileName.Replace("item", "DamageSkinSample");
-                    string fileName2 = this.ImageFileName.Replace("item", "DamageSkinCriticalSample");
-                    string fileName3 = this.ImageFileName.Replace("item", "DamageSkinExtraEffectSample");
-                    string fileName4 = this.ImageFileName.Replace("item", "DamageSkinUnitSample");
-
-                    if (dlg.ShowDialog() == DialogResult.OK)
+                    using (FolderBrowserDialog dlg = new FolderBrowserDialog())
                     {
-                        this.DamageSkinSampleNonCriticalBitmap.Save(Path.Combine(dlg.SelectedPath, fileName1), System.Drawing.Imaging.ImageFormat.Png);
-                        this.DamageSkinSampleCriticalBitmap.Save(Path.Combine(dlg.SelectedPath, fileName2), System.Drawing.Imaging.ImageFormat.Png);
-                        if (this.DamageSkinExtraBitmap != null)
+                        dlg.Description = "Please select a directory to save Damage Skin Samples.";
+                        string fileName1 = this.ImageFileName.Replace("item", "DamageSkinSample");
+                        string fileName2 = this.ImageFileName.Replace("item", "DamageSkinCriticalSample");
+                        string fileName3 = this.ImageFileName.Replace("item", "DamageSkinExtraEffectSample");
+                        string fileName4 = this.ImageFileName.Replace("item", "DamageSkinUnitSample");
+
+                        if (dlg.ShowDialog() == DialogResult.OK)
                         {
-                            this.DamageSkinExtraBitmap.Save(Path.Combine(dlg.SelectedPath, fileName3), System.Drawing.Imaging.ImageFormat.Png);
-                        }
-                        if (this.DamageSkinUnitBitmap != null)
-                        {
-                            this.DamageSkinUnitBitmap.Save(Path.Combine(dlg.SelectedPath, fileName4), System.Drawing.Imaging.ImageFormat.Png);
+                            this.DamageSkinSampleNonCriticalBitmap.Save(Path.Combine(dlg.SelectedPath, fileName1), System.Drawing.Imaging.ImageFormat.Png);
+                            this.DamageSkinSampleCriticalBitmap.Save(Path.Combine(dlg.SelectedPath, fileName2), System.Drawing.Imaging.ImageFormat.Png);
+                            if (this.DamageSkinExtraBitmap != null)
+                            {
+                                this.DamageSkinExtraBitmap.Save(Path.Combine(dlg.SelectedPath, fileName3), System.Drawing.Imaging.ImageFormat.Png);
+                            }
+                            if (this.DamageSkinUnitBitmap != null)
+                            {
+                                this.DamageSkinUnitBitmap.Save(Path.Combine(dlg.SelectedPath, fileName4), System.Drawing.Imaging.ImageFormat.Png);
+                            }
                         }
                     }
                 }
-            }
-            else if (this.AvatarBitmap != null && this.item != null)
-            {
-                using (SaveFileDialog dlg = new SaveFileDialog())
+                else if (this.AvatarBitmap != null && this.item is Gear)
                 {
-                    dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
-                    dlg.FileName = this.ImageFileName.Replace("eqp", "avatar");
-
-                    if (dlg.ShowDialog() == DialogResult.OK)
+                    using (SaveFileDialog dlg = new SaveFileDialog())
                     {
-                        this.AvatarBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
+                        dlg.FileName = this.ImageFileName.Replace("eqp", "avatar");
+
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                        {
+                            this.AvatarBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        }
                     }
                 }
-            }
-            else if (this.SampleBitmap != null && this.item != null)
-            {
-                using (SaveFileDialog dlg = new SaveFileDialog())
+                else if (this.SampleBitmap != null)
                 {
-                    dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
-                    dlg.FileName = this.ImageFileName.Replace("eqp", "sample").Replace("item", "sample");
-
-                    if (dlg.ShowDialog() == DialogResult.OK)
+                    using (SaveFileDialog dlg = new SaveFileDialog())
                     {
-                        this.SampleBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
+                        dlg.FileName = this.ImageFileName.Replace("eqp", "sample").Replace("item", "sample");
+
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                        {
+                            this.SampleBitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        }
                     }
                 }
             }

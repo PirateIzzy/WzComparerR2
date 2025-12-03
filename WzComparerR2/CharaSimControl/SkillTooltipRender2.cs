@@ -685,8 +685,8 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (Skill.Ascent && !Skill.Invisible)
             {
-                string ascentSkillDesc = "어센트 스킬은 보스 전투에서 재사용 대기시간 없이 정해진 횟수만큼 사용 가능하며, 최대 HP가 가장 높은 보스 몬스터가 있을 때만 사용 가능합니다.\r\n직접 공격 적중 시 발동되는 추가 공격 및 효과가 발동하지 않습니다.\r\n어센트 스킬은 최대 HP가 높은 보스 몬스터를 우선 공격하며 공격 반사, 공격 무시 상태의 적에게도 피해를 입힐 수 있습니다.\r\n어센트 스킬의 10레벨, 20레벨, 30레벨의 몬스터 방어율 무시, 보스 몬스터 공격 시 데미지 증가 효과는 기본 효과에 합적용됩니다.\r\n\n아래의 효과로 인해 변동되는 능력치는 어센트 스킬의 데미지에 영향을 주지 않습니다.\r\n- 장비 : 모자\n- 장비 : 반지\n- 조건부로 발동하는 패시브 스킬 효과\n- 액티브 스킬 사용 효과\n- 몬스터의 속성\n- 몬스터의 패턴, 디버프\n- 지속 시간이 30분 미만인 소비, 캐시 아이템";
-                string ascentSkillH = "보스 전투에서 3회 사용 가능\n그 외 필드에서 사용 시 재사용 대기시간 240초";
+                string ascentSkillDesc = "Ascent skills can be used without a cooldown a set number of times during boss battles. However, they can only be used when a boss enemy with the highest max HP is present.\nHitting an enemy with an Ascent skill will not activate additional attacks or combat effects.\nAscent skills target bosses with the highest max HP first, and are unaffected by attack ignore and attack reflection effects.\nThe Ignore Defense and Boss Damage Increase effects from the Lv. 10, Lv. 20, and Lv. 30 Ascent skills are added to increases from basic effects.\n\nThe damage of Ascent skills is unaffected by stat changes from the following sources:\n- Equipment: Hat\n- Equipment: Ring\n- Conditional passive skill effects\n- Effects from active skills\n- Enemy attributes\n- Enemy attack patterns and debuffs\n- Usable and Cash items with less than 30 min. duration";
+                string ascentSkillH = "Can be used in a boss battle 3 times\nHas a cooldown of 240 sec. when used in other areas";
                 GearGraphics.DrawNewTooltipBack(g, 0, 0, bitmap.Width, 360);
                 GearGraphics.DrawPlainText(g, ascentSkillDesc, GearGraphics.ItemDetailFont, Color.FromArgb(175, 173, 255), region.LevelDescLeft, region.TextRight, ref picH, 16);
                 picH += 16;

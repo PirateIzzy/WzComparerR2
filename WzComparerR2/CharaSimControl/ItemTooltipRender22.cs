@@ -15,9 +15,9 @@ using WzComparerR2.AvatarCommon;
 
 namespace WzComparerR2.CharaSimControl
 {
-    public class ItemTooltipRender3 : TooltipRender
+    public class ItemTooltipRender22 : TooltipRender
     {
-        public ItemTooltipRender3()
+        public ItemTooltipRender22()
         {
         }
 
@@ -1332,7 +1332,7 @@ namespace WzComparerR2.CharaSimControl
             TooltipRender renderer = this.LinkRecipeItemRender;
             if (renderer == null)
             {
-                ItemTooltipRender3 defaultRenderer = new ItemTooltipRender3();
+                ItemTooltipRender22 defaultRenderer = new ItemTooltipRender22();
                 defaultRenderer.StringLinker = this.StringLinker;
                 defaultRenderer.ShowObjectID = false;
                 renderer = defaultRenderer;

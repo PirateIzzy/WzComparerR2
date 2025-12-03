@@ -810,7 +810,7 @@ namespace WzComparerR2.Comparer
                 }
                 if (this.EnableAssembleTooltip)
                 {
-                    SaveItemTooltip3(itemTooltipPath);
+                    SaveItemTooltip22(itemTooltipPath);
                 }
                 else
                 {
@@ -906,6 +906,7 @@ namespace WzComparerR2.Comparer
                         foreach (var action in action_node?.Nodes ?? new Wz_Node.WzNodeCollection(null))
                         {
                             var action_str = action.GetValueEx<string>(null);
+                            if (string.IsNullOrEmpty(action_str)) continue;
                             if (ChangedActions.ContainsKey(action_str))
                             {
                                 ChangedActions[action_str].Add(skill_id);
@@ -1447,9 +1448,9 @@ namespace WzComparerR2.Comparer
             DiffItemTags.Clear();
         }
 
-        private void SaveItemTooltip3(string itemTooltipPath)
+        private void SaveItemTooltip22(string itemTooltipPath)
         {
-            ItemTooltipRender3[] itemRenderNewOld = new ItemTooltipRender3[2];
+            ItemTooltipRender22[] itemRenderNewOld = new ItemTooltipRender22[2];
             DamageSkinTooltipRenderer[] damageSkinRenderNewOld = new DamageSkinTooltipRenderer[2];
             int count = 0;
             int allCount = OutputItemTooltipIDs.Count;
@@ -1462,7 +1463,7 @@ namespace WzComparerR2.Comparer
                 this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
                 this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
 
-                itemRenderNewOld[i] = new ItemTooltipRender3();
+                itemRenderNewOld[i] = new ItemTooltipRender22();
                 itemRenderNewOld[i].StringLinker = new StringLinker();
                 itemRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
                 itemRenderNewOld[i].ShowObjectID = this.ShowObjectID;

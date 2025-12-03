@@ -611,7 +611,7 @@ namespace WzComparerR2.CharaSimControl
                         Math.Min(appearance.Bitmap.Width, appearance.Origin.X + 50) - Math.Max(appearance.Origin.X - 50, 0),
                         Math.Min(appearance.Origin.Y, 100));
 
-                    g.DrawImage(appearance.Bitmap, 90 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
+                    g.DrawImage(appearance.Bitmap, 135 - Math.Min(appearance.Origin.X, 50), picH + Math.Max(80 - appearance.Origin.Y, 0), imgrect, GraphicsUnit.Pixel);
 
                     picH += 102;
                 }
@@ -634,7 +634,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (randomParts.Count > 0)
                 {
-                    GearGraphics.DrawString(g, $"#c{string.Join(", ", randomParts)} 이미지는 예시 중 하나로 최초 장착 시 외형이 결정되는 안드로이드이다.#", GearGraphics.EquipMDMoris9Font, null, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
+                    GearGraphics.DrawString(g, $"#c{string.Join(", ", randomParts)} The image is an example. The android's appearance is determined upon equipping it for the first time.#", GearGraphics.EquipMDMoris9Font, null, 15, 305, ref picH, 16, strictlyAlignLeft: 1);
                 }
             }
             //Regular Cosmetic
@@ -727,7 +727,7 @@ namespace WzComparerR2.CharaSimControl
                     hasOptionPart = true;
 
                     picH += 4;
-                    TextRenderer.DrawText(g, "Appearance : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, "Rank: " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
                     picH += 12;
                 }
             }
