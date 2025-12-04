@@ -514,9 +514,9 @@ namespace WzComparerR2.CharaSimControl
 
                 BitmapOrigin appearance;
                 int morphID = android?.Nodes["info"]?.Nodes["morphID"]?.GetValueEx<int>(0) ?? 0;
-                if (Gear.ToolTIpPreview.Bitmap != null)
+                if (Gear.ToolTipPreview.Bitmap != null)
                 {
-                    appearance = Gear.ToolTIpPreview;
+                    appearance = Gear.ToolTipPreview;
                     Gear.AndroidBitmap = appearance.Bitmap;
                     g.DrawImage(appearance.Bitmap, (bitmap.Width - appearance.Bitmap.Width) / 2 + 13, picH);
                     picH += appearance.Bitmap.Height;

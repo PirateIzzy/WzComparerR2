@@ -42,7 +42,7 @@ namespace WzComparerR2.CharaSim
         public int PlatinumHammer { get; set; }
         public bool CanPotential { get; internal set; }
         public string EpicHs { get; internal set; }
-        public BitmapOrigin ToolTIpPreview { get; set; }
+        public BitmapOrigin ToolTipPreview { get; set; }
         public Bitmap AndroidBitmap { get; set; }
         public string LabelGradeTooltip { get; internal set; }
 
@@ -874,7 +874,7 @@ namespace WzComparerR2.CharaSim
                         case "toolTipPreview":
                             if (subNode.Value is Wz_Uol || subNode.Value is Wz_Png)
                             {
-                                gear.ToolTIpPreview = BitmapOrigin.CreateFromNode(subNode, findNode);
+                                gear.ToolTipPreview = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
                             break;
 
