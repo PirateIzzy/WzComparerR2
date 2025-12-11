@@ -886,8 +886,8 @@ namespace WzComparerR2.CharaSim
                 // case GearType.keir: return "Keir";
                 // case GearType.gram: return "Gram";
 
-                case GearType.longSword: return "Sword";
-                case GearType.yeouiGem: return "Imugi Gem";
+                case GearType.longSword: return isMsea ? "Longsword" : "Sword";
+                case GearType.yeouiGem: return isMsea ? "Sacred Orb" : "Imugi Gem";
                 default: return null;
             }
         }
