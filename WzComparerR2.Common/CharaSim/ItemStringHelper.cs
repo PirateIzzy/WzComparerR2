@@ -146,7 +146,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.colorvar: return value == 0 ? null : "#cThis item can be dyed using a Dye.#";
                 case GearPropType.cantRepair: return value == 0 ? null : "Cannot be repaired";
                 case GearPropType.noLookChange: return value == 0 ? null : "Cannot use Medal Fusion Anvil";
-                case GearPropType.reissueBan: return value == 0 ? null : "Cannot be reissued";
+                case GearPropType.reissueBan: return value == 0 ? null : "Cannot be re-issued";
 
                 case GearPropType.incAllStat_incMHP25: return "All Stats: " + sign + value + ", MaxHP : " + sign + (value * 25);// check once Lv 250 set comes out in GMS
                 case GearPropType.incAllStat_incMHP50_incMMP50: return "All Stats: " + sign + value + ", MaxHP / MaxMP : " + sign + (value * 50);
@@ -373,7 +373,7 @@ namespace WzComparerR2.CharaSim
                     res[0] = value == 0 ? null : "#$rCannot use Medal Fusion Anvil#";
                     return res;
                 case GearPropType.reissueBan:
-                    res[0] = value == 0 ? null : "#$rCannot be reissued#";
+                    res[0] = value == 0 ? null : "#$rCannot be re-issued#";
                     return res;
                 case GearPropType.noPrism:
                     res[0] = value == 0 ? null : "#$rCannot use Prism#";
