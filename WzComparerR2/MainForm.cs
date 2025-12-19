@@ -524,6 +524,9 @@ namespace WzComparerR2
                 this.listViewExString.GridLines = false;
                 this.pictureBoxEx1.BackColor = System.Drawing.Color.FromArgb(-13816528);
                 this.pictureBoxEx1.PictureBoxInfoText = Microsoft.Xna.Framework.Color.LightGray;
+                this.chkEnableDarkMode.Checked = true;
+                this.clbRootNode.BackColor = System.Drawing.Color.FromArgb(-13816528);
+                this.clbRootNode.ForeColor = System.Drawing.Color.LightGray;
             }
             else
             {
@@ -538,6 +541,9 @@ namespace WzComparerR2
                 this.listViewExString.GridLines = true;
                 this.pictureBoxEx1.BackColor = System.Drawing.Color.White;
                 this.pictureBoxEx1.PictureBoxInfoText = Microsoft.Xna.Framework.Color.Black;
+                this.chkEnableDarkMode.Checked = false;
+                this.clbRootNode.BackColor = System.Drawing.Color.White;
+                this.clbRootNode.ForeColor = System.Drawing.Color.Black;
             }
         }
 
@@ -4559,7 +4565,7 @@ namespace WzComparerR2
             }
             var Setting = CharaSimConfig.Default;
             bool isMsea = Setting.Misc.MseaMode;
-            using (FrmSkillTooltipExport frm = new FrmSkillTooltipExport(isMsea))
+            using (FrmSkillTooltipExport frm = new FrmSkillTooltipExport(styleManager1.ManagerStyle == eStyle.VisualStudio2012Dark, isMsea))
             {
                 frm.skillNode = PluginManager.FindWz(Wz_Type.Skill);
                 if (frm.ShowDialog() == DialogResult.OK)
