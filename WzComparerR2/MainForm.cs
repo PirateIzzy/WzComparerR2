@@ -3734,6 +3734,18 @@ namespace WzComparerR2
                     {
                         tooltipQuickView.NodeName = quest.Name;
                         tooltipQuickView.Desc = string.Join("\r\n", quest.Desc);
+                        if (quest.Desc.Count() == 3)
+                        {
+                            tooltipQuickView.QuestAvailable = quest.Desc[0];
+                            tooltipQuickView.QuestProgress = quest.Desc[1];
+                            tooltipQuickView.QuestComplete = quest.Desc[2];
+                        }
+                        else
+                        {
+                            tooltipQuickView.QuestAvailable = "";
+                            tooltipQuickView.QuestProgress = "";
+                            tooltipQuickView.QuestComplete = "";
+                        }
                         tooltipQuickView.Pdesc = quest.DemandBase;
                         tooltipQuickView.Hdesc = quest.DemandSummary;
                         tooltipQuickView.AutoDesc = quest.PlaceSummary;
