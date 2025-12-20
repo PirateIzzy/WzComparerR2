@@ -1841,6 +1841,12 @@ namespace WzComparerR2.CharaSimControl
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.colorvar, value));
             }
 
+            // 재발급 불가
+            if (Gear.Props.TryGetValue(GearPropType.reissueBan, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.reissueBan, value, 0)[0]);
+            }
+
             // 모루
             if (Gear.Props.TryGetValue(GearPropType.noLookChange, out value) && value != 0)
             {
@@ -1849,12 +1855,6 @@ namespace WzComparerR2.CharaSimControl
             if ((Gear.ItemID / 10000 >= 161 && Gear.ItemID / 10000 <= 165) || (Gear.ItemID / 10000 >= 194 && Gear.ItemID / 10000 <= 197))
             {
                 tags.Add("#$rCannot use Fusion Anvil#");
-            }
-
-            // 재발급 불가
-            if (Gear.Props.TryGetValue(GearPropType.reissueBan, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.reissueBan, value, 0)[0]);
             }
 
             // 중복 소지/장착

@@ -296,12 +296,8 @@ namespace WzComparerR2.CharaSim
                     res[0] = "Critical Damage";
                     res[1] = sign + value + "%";
                     return res;
-                case GearPropType.knockback:
-                    res[0] = "Knockback Chance: " + value + " % ";
-                    return res;
                 case GearPropType.incPQEXPr:
-                    res[0] = "Party Quest EXP";
-                    res[1] = "+" + value + "%";
+                    res[0] = "Party Quest EXP: " + value + "%";
                     return res;
                 case GearPropType.incBDR:
                 case GearPropType.bdR:
@@ -369,11 +365,11 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.abilityTimeLimited:
                     res[0] = value == 0 ? null : "Stats Duration";
                     return res;
-                case GearPropType.noLookChange:
-                    res[0] = value == 0 ? null : "#$rCannot use Medal Fusion Anvil#";
-                    return res;
                 case GearPropType.reissueBan:
                     res[0] = value == 0 ? null : "#$rCannot be re-issued#";
+                    return res;
+                case GearPropType.noLookChange:
+                    res[0] = value == 0 ? null : "#$rCannot use Medal Fusion Anvil#";
                     return res;
                 case GearPropType.noPrism:
                     res[0] = value == 0 ? null : "#$rCannot use Prism#";
