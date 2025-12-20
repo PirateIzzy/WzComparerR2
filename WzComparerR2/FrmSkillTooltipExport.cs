@@ -11,10 +11,14 @@ namespace WzComparerR2
 {
     public partial class FrmSkillTooltipExport : DevComponents.DotNetBar.Office2007Form
     {
-
-        public FrmSkillTooltipExport(bool isMsea = false)
+        public FrmSkillTooltipExport(bool isDarkMode, bool isMsea = false)
         {
             InitializeComponent();
+            if (isDarkMode)
+            {
+                this.clbJobName.BackColor = System.Drawing.Color.FromArgb(-13816528);
+                this.clbJobName.ForeColor = System.Drawing.Color.LightGray;
+            }
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 9f);
