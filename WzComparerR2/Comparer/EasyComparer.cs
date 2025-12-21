@@ -151,7 +151,7 @@ namespace WzComparerR2.Comparer
                     StateInfo = "Initialize V Skill Information...";
                     for (int i = 0; i < 2; i++)
                     {
-                        Wz_Node vCoreData = PluginManager.FindWz("Etc\\VCore.img\\CoreData", WzFileNewOld[i]);
+                        Wz_Node vCoreData = PluginManager.FindWz("Etc\\VcoreNew.img\\vSkill\\CoreData", WzFileNewOld[i]) ?? PluginManager.FindWz("Etc\\VCore.img\\CoreData", WzFileNewOld[i]);
                         if (vCoreData == null) break;
 
                         foreach (Wz_Node data in vCoreData.Nodes)
