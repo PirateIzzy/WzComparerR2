@@ -2625,6 +2625,7 @@ namespace WzComparerR2.Comparer
                 npcRenderNewOld[i].StringLinker = new StringLinker();
                 npcRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
                 npcRenderNewOld[i].ShowObjectID = this.ShowObjectID;
+                npcRenderNewOld[i].ShowAllIllustAtOnce = true;
             }
 
             foreach (var npcID in OutputNpcTooltipIDs)
