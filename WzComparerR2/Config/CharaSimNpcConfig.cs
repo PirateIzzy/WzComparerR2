@@ -14,5 +14,12 @@ namespace WzComparerR2.Config
             get { return (bool)this["showID"]; }
             set { this["showID"] = value; }
         }
+
+        [ConfigurationProperty("showAllIllustAtOnce", DefaultValue = true)]
+        public bool ShowAllIllustAtOnce
+        {
+            get { return (bool)this["showAllIllustAtOnce"]; }
+            set { this["showAllIllustAtOnce"] = value; }
+        }
     }
 }

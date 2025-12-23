@@ -742,6 +742,27 @@ namespace WzComparerR2.CharaSimControl
                         }
                     }
                 }
+                else if (this.item is Npc)
+                {
+                    if ((this.TargetItem as Npc).Illustration2Bitmaps.Count == 0)
+                    {
+                        return;
+                    }
+                    using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+                    {
+                        dlg.Description = "Please select a directory to save NPC Portraits.";
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                        {
+                            int idx = 1;
+                            foreach (var ib in (this.TargetItem as Npc).Illustration2Bitmaps)
+                            {
+                                string fileName = $"NPC Portrait {NodeID} {NodeName} ({idx}).png";
+                                ib.Save(Path.Combine(dlg.SelectedPath, fileName), System.Drawing.Imaging.ImageFormat.Png);
+                                idx++;
+                            }
+                        }
+                    }
+                }
                 else if (this.SampleBitmap != null)
                 {
                     using (SaveFileDialog dlg = new SaveFileDialog())
@@ -873,7 +894,7 @@ namespace WzComparerR2.CharaSimControl
                         return $"#$o{sr?.Name ?? "9101069"}#";
 
                     case "M":
-                        return "モンスター";
+                        return "Monster";
 
                     case "MD":
                         Wz_Node stringNode = PluginManager.FindWz($@"String\mirrorDungeon.img\{info}\name");

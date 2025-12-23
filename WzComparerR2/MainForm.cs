@@ -319,7 +319,7 @@ namespace WzComparerR2
             tooltipQuickView.MapRender.ShowMiniMapMob = Setting.Map.ShowMiniMapMob;
             tooltipQuickView.MapRender.ShowMiniMapNpc = Setting.Map.ShowMiniMapNpc;
             tooltipQuickView.MapRender.ShowMiniMapPortal = Setting.Map.ShowMiniMapPortal;
-
+            tooltipQuickView.NpcRender.ShowAllIllustAtOnce = Setting.Npc.ShowAllIllustAtOnce;
             tooltipQuickView.QuestRender.ShowObjectID = Setting.Quest.ShowID;
             tooltipQuickView.QuestRender.DefaultState = Setting.Quest.DefaultState;
             tooltipQuickView.QuestRender.ShowAllStates = Setting.Quest.ShowAllStates;
@@ -1543,6 +1543,20 @@ namespace WzComparerR2
                 }
             }
 
+            if (selectedNode.FullPathToFile.Contains("Sound"))
+            {
+                this.advTree1.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.toolStripMenuItem5,
+                this.tsmi1ExportSound});
+            }
+            else if (this.advTree1.ContextMenuStrip.Items.Contains(this.tsmi1ExportSound))
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    this.advTree1.ContextMenuStrip.Items.RemoveAt(this.advTree1.ContextMenuStrip.Items.Count - 1);
+                }
+            }
+
             listViewExWzDetail.BeginUpdate();
             listViewExWzDetail.Items.Clear();
 
@@ -2453,6 +2467,121 @@ namespace WzComparerR2
             else
             {
                 MessageBoxEx.Show("StringLinker update failed.", "Error");
+            }
+        }
+
+        private async void tsmi1ExportSound_Click(object sender, EventArgs e)
+        {
+            Wz_Node soundNode = advTree1.SelectedNode?.AsWzNode();
+            if (soundNode != null && soundNode.Value is Wz_Image)
+            {
+                FolderBrowserDialog dlg = new FolderBrowserDialog();
+                dlg.Description = "Select the destination folder you want to save to.";
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+                string exportedFolder = Path.Combine(dlg.SelectedPath, soundNode.FullPathToFile);
+                if (!Directory.Exists(exportedFolder))
+                {
+                    Directory.CreateDirectory(exportedFolder);
+                }
+                FrmWaiting WaitingForm = new FrmWaiting();
+                WaitingForm.UpdateMessage("Exporting...");
+                WaitingForm.Show(this);
+                await Task.Run(() =>
+                {
+                    BatchExportSound(soundNode.GetValue<Wz_Image>().Node, exportedFolder, WaitingForm);
+                });
+                WaitingForm.Close();
+                labelItemStatus.Text = "Exported: " + exportedFolder;
+            }
+            else
+            {
+                using (FrmSoundExport frm = new FrmSoundExport(styleManager1.ManagerStyle == eStyle.VisualStudio2012Dark))
+                {
+                    foreach (var img in soundNode.Nodes)
+                    {
+                        frm.AddSoundEntry(img.Text);
+                    }
+                    if (frm.ShowDialog() == DialogResult.OK)
+                    {
+                        string exportedFolder = Path.Combine(frm.ExportFolderPath, soundNode.FullPathToFile);
+                        if (!Directory.Exists(exportedFolder))
+                        {
+                            Directory.CreateDirectory(exportedFolder);
+                        }
+                        FrmWaiting WaitingForm = new FrmWaiting();
+                        WaitingForm.UpdateMessage("Exporting...");
+                        WaitingForm.Show(this);
+                        await Task.Run(() =>
+                        {
+                            foreach (var img in soundNode.Nodes)
+                            {
+                                if (!frm.SelectedSoundCodes.Contains(img.Text))
+                                {
+                                    continue;
+                                }
+                                Wz_Image image = img.GetValue<Wz_Image>();
+                                if (image.TryExtract())
+                                {
+                                    if (!Directory.Exists(Path.Combine(exportedFolder, img.Text)))
+                                    {
+                                        Directory.CreateDirectory(Path.Combine(exportedFolder, img.Text));
+                                    }
+                                    BatchExportSound(image.Node, Path.Combine(exportedFolder, img.Text), WaitingForm);
+                                }
+                            }
+                        });
+                        WaitingForm.Close();
+                        labelItemStatus.Text = "Exported: " + exportedFolder;
+                    }
+                }
+            }
+        }
+
+        private void BatchExportSound(Wz_Node node, string path, FrmWaiting waiting)
+        {
+            foreach (Wz_Node child in node.Nodes)
+            {
+                if (child.Value is Wz_Sound sound)
+                {
+                    string soundName = child.Text;
+                    waiting.UpdateMessage($"Exporting: {soundName}");
+                    byte[] soundData = sound.ExtractSound();
+                    if (soundData == null || soundData.Length <= 0)
+                    {
+                        continue;
+                    }
+                    switch (sound.SoundType)
+                    {
+                        case Wz_SoundType.Mp3: soundName += ".mp3"; break;
+                        case Wz_SoundType.Pcm: soundName += ".wav"; break;
+                    }
+
+                    FileStream fs = null;
+                    try
+                    {
+                        fs = new FileStream(Path.Combine(path, RemoveInvalidFileNameChars(soundName)), FileMode.Create, FileAccess.Write);
+                        fs.Write(soundData, 0, soundData.Length);
+                    }
+                    catch
+                    {
+                    }
+                    finally
+                    {
+                        fs?.Close();
+                    }
+                }
+                else if (child.Value == null && child.Nodes.Count > 0)
+                {
+                    string subDirPath = Path.Combine(path, RemoveInvalidFileNameChars(child.Text));
+                    if (!Directory.Exists(subDirPath))
+                    {
+                        Directory.CreateDirectory(subDirPath);
+                    }
+                    BatchExportSound(child, subDirPath, waiting);
+                }
             }
         }
         #endregion
@@ -3707,7 +3836,7 @@ namespace WzComparerR2
                 case Wz_Type.Npc:
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
-                    var npc = Npc.CreateFromNode(image.Node, PluginManager.FindWz);
+                    var npc = Npc.CreateFromNode(image.Node, PluginManager.FindWz, getSpineDefaultFunc: this.pictureBoxEx1.GetSpineDefault);
                     obj = npc;
                     if (stringLinker == null || !stringLinker.StringNpc.TryGetValue(npc.ID, out sr))
                     {
@@ -3956,6 +4085,26 @@ namespace WzComparerR2
                     case Keys.OemMinus:
                     case Keys.Subtract:
                         quest.State -= 1;
+                        frm.Refresh();
+                        return;
+                }
+            }
+
+
+            Npc npc = frm.TargetItem as Npc;
+            if (npc != null)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Oemplus:
+                    case Keys.Add:
+                        npc.IllustIndex += 1;
+                        frm.Refresh();
+                        return;
+
+                    case Keys.OemMinus:
+                    case Keys.Subtract:
+                        npc.IllustIndex -= 1;
                         frm.Refresh();
                         return;
                 }
@@ -4585,7 +4734,7 @@ namespace WzComparerR2
 
                             // Initialize VCore Dictionary
                             Dictionary<int, List<int>> FifthJobSkillToJobID = new Dictionary<int, List<int>>();
-                            Wz_Node vCoreData = PluginManager.FindWz("Etc\\VCore.img\\CoreData", PluginManager.FindWz(Wz_Type.Base).GetNodeWzFile());
+                            Wz_Node vCoreData = PluginManager.FindWz("Etc\\VcoreNew.img\\vSkill\\CoreData") ?? PluginManager.FindWz("Etc\\VCore.img\\CoreData");
                             if (vCoreData != null)
                             {
                                 foreach (Wz_Node data in vCoreData.Nodes)
@@ -4623,7 +4772,7 @@ namespace WzComparerR2
                             tooltip.Enable22AniStyle = Setting.Misc.Enable22AniStyle;
                             foreach (var i in selectedJob)
                             {
-                                var jobImg = PluginManager.FindWz($"Skill\\{i:D3}.img\\skill", PluginManager.FindWz(Wz_Type.Base).GetNodeWzFile());
+                                var jobImg = PluginManager.FindWz($"Skill\\{i:D3}.img\\skill");
                                 if (jobImg == null)
                                 {
                                     continue;
@@ -4674,7 +4823,7 @@ namespace WzComparerR2
                                     {
                                         if (kvp.Value.Contains(i))
                                         {
-                                            var skillNode = PluginManager.FindWz($"Skill\\{kvp.Key / 10000}.img\\skill\\{kvp.Key}", PluginManager.FindWz(Wz_Type.Base).GetNodeWzFile());
+                                            var skillNode = PluginManager.FindWz($"Skill\\{kvp.Key / 10000}.img\\skill\\{kvp.Key}");
                                             if (skillNode == null)
                                             {
                                                 continue;

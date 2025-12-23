@@ -265,6 +265,7 @@ namespace WzComparerR2
             this.tsmi1Export = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmi1DumpAsXml = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmi1UpdateStringLinker = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmi1ExportSound = new System.Windows.Forms.ToolStripMenuItem();
             this.nodeConnector1 = new DevComponents.AdvTree.NodeConnector();
             this.elementStyle1 = new DevComponents.DotNetBar.ElementStyle();
             this.listViewExString = new DevComponents.DotNetBar.Controls.ListViewEx();
@@ -3171,6 +3172,13 @@ namespace WzComparerR2
             this.tsmi1UpdateStringLinker.Size = new System.Drawing.Size(154, 22);
             this.tsmi1UpdateStringLinker.Text = "Update StringLinker";
             this.tsmi1UpdateStringLinker.Click += new System.EventHandler(this.tsmi1UpdateStringLinker_Click); 
+            //
+            // tsmi1ExportSound
+            // 
+            this.tsmi1ExportSound.Name = "tsmi1ExportSound";
+            this.tsmi1ExportSound.Size = new System.Drawing.Size(154, 22);
+            this.tsmi1ExportSound.Text = "Export Sound";
+            this.tsmi1ExportSound.Click += new System.EventHandler(this.tsmi1ExportSound_Click);
             // 
             // elementStyle1
             // 
@@ -3775,6 +3783,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ButtonItem buttonItemUpdate;
         private System.Windows.Forms.ToolStripMenuItem tsmi1DumpAsXml;
         private System.Windows.Forms.ToolStripMenuItem tsmi1UpdateStringLinker;
+        private System.Windows.Forms.ToolStripMenuItem tsmi1ExportSound;
         private DevComponents.Editors.ComboItem comboItem18;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;

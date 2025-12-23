@@ -32,6 +32,7 @@
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowAllIllustAtOnce = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX23 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX21 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowMiniMap = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -1235,6 +1236,7 @@
             // 
             // superTabControlPanel5
             // 
+            this.superTabControlPanel5.Controls.Add(this.chkShowAllIllustAtOnce);
             this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
             this.superTabControlPanel5.Controls.Add(this.chkMseaMode);
             this.superTabControlPanel5.Controls.Add(this.chkCopyParsedSkillString);
@@ -1316,6 +1318,21 @@
             this.chkMseaMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkMseaMode.TabIndex = 5;
             this.chkMseaMode.Text = "MSEA Mode (incomplete)";
+            // 
+            // chkShowAllIllustAtOnce
+            // 
+            this.chkShowAllIllustAtOnce.AutoSize = true;
+            this.chkShowAllIllustAtOnce.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowAllIllustAtOnce.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowAllIllustAtOnce.Location = new System.Drawing.Point(13, 108);
+            this.chkShowAllIllustAtOnce.Name = "chkShowAllIllustAtOnce";
+            this.chkShowAllIllustAtOnce.Size = new System.Drawing.Size(145, 16);
+            this.chkShowAllIllustAtOnce.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowAllIllustAtOnce.TabIndex = 5;
+            this.chkShowAllIllustAtOnce.Text = "Show All NPC Portraits";
             // 
             // buttonX2
             // 
@@ -1439,6 +1456,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowAllIllustAtOnce;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkinID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkin;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkUseMiniSize;
@@ -1460,7 +1478,6 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx3;
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx4;
         private DevComponents.DotNetBar.LabelX labelX4;
-
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbPreferredStringCopyMethod;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkCopyParsedSkillString;
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxExQuestState;
