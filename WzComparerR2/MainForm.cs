@@ -319,6 +319,9 @@ namespace WzComparerR2
             tooltipQuickView.MapRender.ShowMiniMapMob = Setting.Map.ShowMiniMapMob;
             tooltipQuickView.MapRender.ShowMiniMapNpc = Setting.Map.ShowMiniMapNpc;
             tooltipQuickView.MapRender.ShowMiniMapPortal = Setting.Map.ShowMiniMapPortal;
+            tooltipQuickView.MobRender.MaxWidth = Screen.PrimaryScreen.Bounds.Width;
+            tooltipQuickView.MobRender.ShowAllSubMobAtOnce = Setting.Mob.ShowAllSubMobAtOnce;
+            tooltipQuickView.MobRender.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.NpcRender.ShowAllIllustAtOnce = Setting.Npc.ShowAllIllustAtOnce;
             tooltipQuickView.QuestRender.ShowObjectID = Setting.Quest.ShowID;
             tooltipQuickView.QuestRender.DefaultState = Setting.Quest.DefaultState;
@@ -2171,6 +2174,17 @@ namespace WzComparerR2
                 case "Mob.img":
                     wzPath.Add("Mob");
                     wzPath.Add(id.PadLeft(7, '0') + ".img");
+                    addPath();
+                    //Add special mobs
+                    foreach (var i in new string[] { "AbyssExpeditionMob", "MExplorerMob", "QuestCountGroup", "RoguelikeMob" })
+                    {
+                        wzPath.Clear();
+                        wzPath.AddRange(new string[] { "Mob", i, id.PadLeft(7, '0') + ".img" });
+                        addPath();
+                    }
+                    //Redmoon
+                    wzPath.Clear();
+                    wzPath.AddRange(new string[] { "Mob", "RoguelikeMob", "Redmoon", id.PadLeft(7, '0') + ".img" });
                     addPath();
                     break;
 
@@ -4105,6 +4119,25 @@ namespace WzComparerR2
                     case Keys.OemMinus:
                     case Keys.Subtract:
                         npc.IllustIndex -= 1;
+                        frm.Refresh();
+                        return;
+                }
+            }
+
+            Mob mob = frm.TargetItem as Mob;
+            if (mob != null)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Oemplus:
+                    case Keys.Add:
+                        mob.MobGroupIndex += 1;
+                        frm.Refresh();
+                        return;
+
+                    case Keys.OemMinus:
+                    case Keys.Subtract:
+                        mob.MobGroupIndex -= 1;
                         frm.Refresh();
                         return;
                 }
