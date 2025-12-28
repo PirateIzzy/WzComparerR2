@@ -1240,12 +1240,12 @@ namespace WzComparerR2
                 dlg.Filter = "MapleStory Data File(Base.wz, *.wz, *.ms, *.mn)|*.wz;*.ms;*.mn";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    openWz(dlg.FileName);
+                    Task.Run(() => openWz(dlg.FileName));
                 }
             }
         }
 
-        private void openWz(string wzFilePath)
+        private async void openWz(string wzFilePath)
         {
             foreach (Wz_Structure wzs in openedWz)
             {
@@ -1261,9 +1261,17 @@ namespace WzComparerR2
 
             Wz_Structure wz = new Wz_Structure();
             QueryPerformance.Start();
+            labelItemStatus.Text = $"Loading: {wzFilePath}";
             advTree1.BeginUpdate();
             try
             {
+                btnItemOpenWz.Enabled = false;
+                btnItemOpenImg.Enabled = false;
+                buttonItemClose.Enabled = false;
+                buttonItemCloseAll.Enabled = false;
+                buttonItemSearchWz.Enabled = false;
+                buttonItemSearchString.Enabled = false;
+                galleryContainerRecent.Enabled = false;
                 string[] msFileExtensions = { ".ms", ".mn" };
                 if (msFileExtensions.Any(ext => string.Equals(Path.GetExtension(wzFilePath), ext, StringComparison.OrdinalIgnoreCase)))
                 {
@@ -1301,8 +1309,12 @@ namespace WzComparerR2
                 advTree1.Nodes.Add(node);
                 this.openedWz.Add(wz);
                 OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
+                if (!this.stringLinker.HasValues)
+                {
+                    this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+                }
                 QueryPerformance.End();
-                labelItemStatus.Text = "Read WZ File. Time elapsed: " + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + " ms, " + wz.img_number + " images";
+                labelItemStatus.Text = (this.stringLinker.HasValues ? "Read WZ File. Time elapsed: " : "Read WZ File, but String Table is not initialized. Time elapsed: ") + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms, " + wz.img_number + " IMG";
 
                 ConfigManager.Reload();
                 WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
@@ -1317,11 +1329,18 @@ namespace WzComparerR2
             }
             catch (Exception ex)
             {
-                MessageBoxEx.Show(ex.ToString(), "Error");
+                MessageBoxEx.Show(this, ex.ToString(), "Error");
                 wz.Clear();
             }
             finally
             {
+                btnItemOpenWz.Enabled = true;
+                btnItemOpenImg.Enabled = true;
+                buttonItemClose.Enabled = true;
+                buttonItemCloseAll.Enabled = true;
+                buttonItemSearchWz.Enabled = true;
+                buttonItemSearchString.Enabled = true;
+                galleryContainerRecent.Enabled = true;
                 advTree1.EndUpdate();
             }
         }
@@ -1334,12 +1353,12 @@ namespace WzComparerR2
                 dlg.Filter = "*.img|*.img|*.wz|*.wz";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    openImg(dlg.FileName);
+                    Task.Run(() => openImg(dlg.FileName));
                 }
             }
         }
 
-        private void openImg(string imgFileName)
+        private async void openImg(string imgFileName)
         {
             foreach (Wz_Structure wzs in openedWz)
             {
@@ -1355,9 +1374,17 @@ namespace WzComparerR2
 
             Wz_Structure wz = new Wz_Structure();
             var sw = Stopwatch.StartNew();
+            labelItemStatus.Text = $"Loading: {imgFileName}";
             advTree1.BeginUpdate();
             try
             {
+                btnItemOpenWz.Enabled = false;
+                btnItemOpenImg.Enabled = false;
+                buttonItemClose.Enabled = false;
+                buttonItemCloseAll.Enabled = false;
+                buttonItemSearchWz.Enabled = false;
+                buttonItemSearchString.Enabled = false;
+                galleryContainerRecent.Enabled = false;
                 wz.LoadImg(imgFileName);
 
                 Node node = createNode(wz.WzNode);
@@ -1380,6 +1407,13 @@ namespace WzComparerR2
             }
             finally
             {
+                btnItemOpenWz.Enabled = true;
+                btnItemOpenImg.Enabled = true;
+                buttonItemClose.Enabled = true;
+                buttonItemCloseAll.Enabled = true;
+                buttonItemSearchWz.Enabled = true;
+                buttonItemSearchString.Enabled = true;
+                galleryContainerRecent.Enabled = true;
                 advTree1.EndUpdate();
             }
         }
@@ -1484,7 +1518,7 @@ namespace WzComparerR2
             string path;
             if (btnItem == null || (path = btnItem.Tag as string) == null)
                 return;
-            openWz(path);
+            Task.Run(() => openWz(path));
         }
         #endregion
 
@@ -1518,7 +1552,7 @@ namespace WzComparerR2
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 foreach (string file in files)
                 {
-                    openWz(file);
+                    Task.Run(() => openWz(file));
                 }
             }
         }
