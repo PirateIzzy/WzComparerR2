@@ -177,7 +177,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (this.Quest.RecommendExcept && !this.Quest.LvLimit)
                 {
-                    TextRenderer.DrawText(g, $"Recommended Lv: {this.Quest.Lvmin}", GearGraphics.ItemDetailFont2, new Point(left, 90), ((SolidBrush)GearGraphics.QuestBrushDefault).Color, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, $"Recommended Lv: {this.Quest.Lvmin} or above", GearGraphics.ItemDetailFont2, new Point(left, 90), ((SolidBrush)GearGraphics.QuestBrushDefault).Color, TextFormatFlags.NoPadding);
                 }
                 else
                 {

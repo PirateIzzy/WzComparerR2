@@ -3929,6 +3929,14 @@ namespace WzComparerR2
                             tooltipQuickView.QuestProgress = "";
                             tooltipQuickView.QuestComplete = "";
                         }
+                        if (quest.Category.Count() == 2)
+                        {
+                            tooltipQuickView.QuestCategory = "" + quest.Category[0] + "-" + quest.Category[1];
+                        }
+                        else
+                        {
+                            tooltipQuickView.QuestCategory = "0-0";
+                        }
                         tooltipQuickView.Pdesc = quest.DemandBase;
                         tooltipQuickView.Hdesc = quest.DemandSummary;
                         tooltipQuickView.AutoDesc = quest.PlaceSummary;
