@@ -33,6 +33,7 @@
             this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowAllIllustAtOnce = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowAllSubMobAtOnce = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX23 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX21 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowMiniMap = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -1236,6 +1237,7 @@
             // 
             // superTabControlPanel5
             // 
+            this.superTabControlPanel5.Controls.Add(this.chkShowAllSubMobAtOnce);
             this.superTabControlPanel5.Controls.Add(this.chkShowAllIllustAtOnce);
             this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
             this.superTabControlPanel5.Controls.Add(this.chkMseaMode);
@@ -1331,8 +1333,23 @@
             this.chkShowAllIllustAtOnce.Name = "chkShowAllIllustAtOnce";
             this.chkShowAllIllustAtOnce.Size = new System.Drawing.Size(145, 16);
             this.chkShowAllIllustAtOnce.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkShowAllIllustAtOnce.TabIndex = 5;
+            this.chkShowAllIllustAtOnce.TabIndex = 6;
             this.chkShowAllIllustAtOnce.Text = "Show All NPC Portraits";
+            // 
+            // chkShowAllSubMobAtOnce
+            // 
+            this.chkShowAllSubMobAtOnce.AutoSize = true;
+            this.chkShowAllSubMobAtOnce.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowAllSubMobAtOnce.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowAllSubMobAtOnce.Location = new System.Drawing.Point(13, 132);
+            this.chkShowAllSubMobAtOnce.Name = "chkShowAllSubMobAtOnce";
+            this.chkShowAllSubMobAtOnce.Size = new System.Drawing.Size(145, 16);
+            this.chkShowAllSubMobAtOnce.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowAllSubMobAtOnce.TabIndex = 7;
+            this.chkShowAllSubMobAtOnce.Text = "Show All Sub Mob in Quest Group";
             // 
             // buttonX2
             // 
@@ -1456,6 +1473,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowAllSubMobAtOnce;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowAllIllustAtOnce;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkinID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkin;

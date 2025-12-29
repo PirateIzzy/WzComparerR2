@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
+using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.AvatarCommon;
 using static WzComparerR2.CharaSimControl.RenderHelper;
@@ -27,6 +28,9 @@ namespace WzComparerR2.CharaSimControl
         }
 
         public Mob MobInfo { get; set; }
+        public int MaxWidth { get; set; }
+        public bool ShowAllSubMobAtOnce { get; set; }
+        public bool MseaMode {get; set;}
         private AvatarCanvasManager avatar { get; set; }
 
         public override Bitmap Render()
@@ -37,6 +41,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             Bitmap bmp = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
+            Bitmap subMobBmpTooltip = null;
             Graphics g = Graphics.FromImage(bmp);
             bool isTranslateRequired = Translator.IsTranslateEnabled;
 
@@ -59,201 +64,325 @@ namespace WzComparerR2.CharaSimControl
             picY = 0;
 
             StringBuilder sbExt = new StringBuilder();
-            if (MobInfo.Boss && MobInfo.PartyBonusMob)
+            if (MobInfo.IsQuestCountGroupMob)
             {
-                sbExt.Append("[Mini-Boss] ");
-            }
-            if (MobInfo.Boss && !MobInfo.PartyBonusMob)
-            {
-                sbExt.Append("[Boss] ");
-            }
-            if (MobInfo.Undead)
-            {
-                sbExt.Append("[Undead] ");
-            }
-            if (MobInfo.FirstAttack)
-            {
-                sbExt.Append("[Auto-Aggressive] ");
-            }
-            if (!MobInfo.BodyAttack)
-            {
-                sbExt.Append("[No Touch Damage] ");
-            }
-            if (MobInfo.DamagedByMob)
-            {
-                sbExt.Append("[Vulnerable to Monsters] ");
-            }
-            if (MobInfo.ChangeableMob)
-            {
-                sbExt.Append("[Level Scaled] ");
-            }
-            if (MobInfo.AllyMob)
-            {
-                sbExt.Append("[Friendly] ");
-            }
-            if (MobInfo.Invincible)
-            {
-                sbExt.Append("[Invincible] ");
-            }
-            if (MobInfo.NotAttack)
-            {
-                sbExt.Append("[Non-Aggressive] ");//Monster can not attack or damage you. But you can damage it.
-            }
-            if (MobInfo.FixedDamage > 0)
-            {
-                sbExt.Append("[Fixed Damage: " + MobInfo.FixedDamage.ToString("N0") + "] ");
-            }
-            if (MobInfo.FixedBodyAttackDamageR > 0)
-            {
-                sbExt.Append("[Fixed Touch Damage: " + MobInfo.FixedBodyAttackDamageR + "%] ");
-            }
-            if (MobInfo.IgnoreDamage)
-            {
-                sbExt.Append("[Ignores Damage] ");
-            }
-            if (MobInfo.IgnoreMoveImpact)
-            {
-                sbExt.Append("[Immune to Rush] ");
-            }
-            if (MobInfo.IgnoreMovable)
-            {
-                sbExt.Append("[Immune to Stun/Bind] ");
-            }
-            if (MobInfo.NoDebuff)
-            {
-                sbExt.Append("[Immune to Debuffs] ");
-            }
-            if (MobInfo.OnlyNormalAttack)
-            {
-                sbExt.Append("[Damaged by Basic Attacks only] ");
-            }
-            if (MobInfo.OnlyHittedByCommonAttack)
-            {
-                sbExt.Append("[Hit by Basic Attacks only] ");
-            }
-
-            if (sbExt.Length > 1)
-            {
-                sbExt.Remove(sbExt.Length - 1, 1);
-                propBlocks.Add(PrepareText(g, sbExt.ToString(), GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
-                picY += 16;
-            }
-
-            if (MobInfo.RemoveAfter > 0)
-            {
-                propBlocks.Add(PrepareText(g, "[Disappears after " + MobInfo.RemoveAfter + " seconds]", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
-                picY += 16;
-            }
-
-            propBlocks.Add(PrepareText(g, "Type: " + GetMobCategoryName(MobInfo.Category), GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
-            propBlocks.Add(PrepareText(g, "Level: " + MobInfo.Level, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string hpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxHP) ? this.AddCommaSeparators(MobInfo.FinalMaxHP) : MobInfo.MaxHP.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
-            propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string mpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? this.AddCommaSeparators(MobInfo.FinalMaxMP) : MobInfo.MaxMP.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
-            propBlocks.Add(PrepareText(g, "MP: " + mpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            if (MobInfo.HPRecovery > 0)
-            {
-                propBlocks.Add(PrepareText(g, "HP Recovery: " + MobInfo.HPRecovery.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.MPRecovery > 0)
-            {
-                propBlocks.Add(PrepareText(g, "MP Recovery: " + MobInfo.MPRecovery.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            propBlocks.Add(PrepareText(g, "Physical Damage: " + MobInfo.PADamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Magic Damage: " + MobInfo.MADamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            //propBlocks.Add(PrepareText(g, "Physical Defense: " + MobInfo.PDDamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            //propBlocks.Add(PrepareText(g, "Magic Defense: " + MobInfo.MDDamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Physical DEF Rate: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Magic DEF Rate: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            //propBlocks.Add(PrepareText(g, "Accuracy: " + MobInfo.Acc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16)); //no longer used
-            //propBlocks.Add(PrepareText(g, "Avoidability: " + MobInfo.Eva, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16)); //no longer used
-            propBlocks.Add(PrepareText(g, "Knockback: " + MobInfo.Pushed.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "EXP: " + MobInfo.Exp.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            if (MobInfo.CharismaEXP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Ambition EXP: " + MobInfo.CharismaEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.SenseEXP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Empathy EXP: " + MobInfo.SenseEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.InsightEXP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Insight EXP: " + MobInfo.InsightEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.WillEXP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Willpower EXP: " + MobInfo.WillEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.CraftEXP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Diligence EXP: " + MobInfo.CraftEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.CharmEXP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Charm EXP: " + MobInfo.CharmEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo.WP > 0)
-            {
-                propBlocks.Add(PrepareText(g, "Weapon Points (for Zero): " + MobInfo.WP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            //propBlocks.Add(PrepareText(g, GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            if (GetElemAttrString(MobInfo.ElemAttr) != "")
-            {
-                propBlocks.Add(PrepareText(g, "Elements: " + GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            }
-            if (MobInfo?.ID != null)
-            {
-                var locNode = PluginBase.PluginManager.FindWz("Etc\\MobLocation.img\\" + MobInfo.ID.ToString());
-                if (locNode != null)
+                if (MobInfo.LvOptimum)
                 {
-                    propBlocks.Add(PrepareText(g, "Location:", GearGraphics.ItemDetailFont, GearGraphics.LocationBrush, 0, picY += 30));
-                    foreach (var locMapNode in locNode.Nodes)
+                    sbExt.Append($"[Quest Mob Set: Within 20 above or below your character's Level] ");
+                }
+                else if (MobInfo.ChangeableMob)
+                {
+                    sbExt.Append($"[Quest Mob Set: Special] ");
+                }
+                else if (MobInfo.Filters != 0)
+                {
+                    switch (MobInfo.Filters)
                     {
-                        int mapID = locMapNode.GetValueEx<int>(-1);
-                        string mapName = null;
-                        if (mapID >= 0)
+                        case -10: sbExt.Append(MseaMode ? $"[Quest Mob Set: Arcane Force/Authentic Force Region Monsters] ": $"[Quest Mob Set: Arcane Power/Sacred Power Region Monsters] "); break;
+                        default: sbExt.Append($"[Quest Mob Set: Special] "); break;
+                    }
+                }
+                else
+                {
+                    sbExt.Append($"[Quest Mob Set: {MobInfo.QuestCountGroupMobID.Count} Monsters] ");
+                }
+                if (sbExt.Length > 1)
+                {
+                    sbExt.Remove(sbExt.Length - 1, 1);
+                    propBlocks.Add(PrepareText(g, sbExt.ToString(), GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                    picY += 16;
+                }
+                if (!ShowAllSubMobAtOnce && !MobInfo.LvOptimum && !MobInfo.ChangeableMob && !(MobInfo.Filters != 0))
+                {
+                    propBlocks.Add(PrepareText(g, "Press [-] / [+] to switch Monsters.", GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
+                }
+                Bitmap[] subMobBmps = new Bitmap[MobInfo.QuestCountGroupMobID.Count];
+                MobTooltipRenderer subRenderer = new MobTooltipRenderer();
+                subRenderer.StringLinker = this.StringLinker;
+                subRenderer.ShowObjectID = this.ShowObjectID;
+                for (int i = 0; i < MobInfo.QuestCountGroupMobID.Count; i++)
+                {
+                    try
+                    {
+                        Mob subMobInfo = Mob.CreateFromNode(PluginManager.FindWz(string.Format(@"Mob\{0:D7}.img", MobInfo.QuestCountGroupMobID[i]), this.SourceWzFile), PluginManager.FindWz);
+                        subRenderer.MobInfo = subMobInfo;
+                        subMobBmps[i] = subRenderer.Render();
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+                if (ShowAllSubMobAtOnce)
+                {
+                    Size fullBitmapSize = new Size(0, 0);
+                    int maxHeightPerLine = 0;
+                    int currentItem = 0;
+                    int currentWidth = 0;
+                    foreach (Bitmap i in subMobBmps)
+                    {
+                        if (i != null)
                         {
-                            mapName = GetMapName(mapID);
+                            currentWidth += i.Width;
+                            maxHeightPerLine = Math.Max(maxHeightPerLine, i.Height);
+                            if (currentWidth > this.MaxWidth)
+                            {
+                                currentWidth -= i.Width;
+                                fullBitmapSize.Width = Math.Max(fullBitmapSize.Width, currentWidth);
+                                fullBitmapSize.Height += maxHeightPerLine;
+                                currentWidth = 0;
+                                maxHeightPerLine = 0;
+                            }
+                            currentItem++;
+                            if (currentItem == subMobBmps.Count())
+                            {
+                                fullBitmapSize.Width = Math.Max(fullBitmapSize.Width, currentWidth);
+                                fullBitmapSize.Height += maxHeightPerLine;
+                                maxHeightPerLine = 0;
+                                currentItem = 0;
+                            }
                         }
-                        string mobLoc = string.Format("{0}({1})", mapName ?? "null", mapID);
-
-                        propBlocks.Add(PrepareText(g, mobLoc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                    }
+                    maxHeightPerLine = 0;
+                    currentItem = 1;
+                    subMobBmpTooltip = new Bitmap(fullBitmapSize.Width, fullBitmapSize.Height);
+                    using (Graphics subG = Graphics.FromImage(subMobBmpTooltip))
+                    {
+                        int subH = 0;
+                        int subW = 0;
+                        foreach (Bitmap i in subMobBmps)
+                        {
+                            if (i != null)
+                            {
+                                if (subW + i.Width > this.MaxWidth)
+                                {
+                                    subH += maxHeightPerLine;
+                                    subW = 0;
+                                    maxHeightPerLine = 0;
+                                }
+                                using (Graphics subG2 = Graphics.FromImage(i))
+                                {
+                                    GearGraphics.DrawGearDetailNumber(subG2, 3, 3, currentItem.ToString(), true);
+                                }
+                                subG.DrawImage(i, subW, subH, new Rectangle(0, 0, i.Width, i.Height), GraphicsUnit.Pixel);
+                                subW += i.Width;
+                                maxHeightPerLine = Math.Max(maxHeightPerLine, i.Height);
+                                currentItem++;
+                            }
+                        }
+                    }
+                }
+                else if (subMobBmps.Count() > 0)
+                {
+                    if (subMobBmps[MobInfo.MobGroupIndex] != null)
+                    {
+                        using (Graphics subG = Graphics.FromImage(subMobBmps[MobInfo.MobGroupIndex]))
+                        {
+                            var labelFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
+                            int picH = 2;
+                            GearGraphics.DrawPlainText(subG, $"{MobInfo.MobGroupIndex + 1} / {subMobBmps.Count()}", labelFont, Color.FromArgb(255, 255, 255), 2, 130, ref picH, 13);
+                        }
+                        subMobBmpTooltip = subMobBmps[MobInfo.MobGroupIndex];
                     }
                 }
             }
-
-            picY += 28;
-
-            if (MobInfo.Revive.Count > 0)
+            else
             {
-                Dictionary<int, int> reviveCounts = new Dictionary<int, int>();
-                foreach (var reviveID in MobInfo.Revive)
+                if (MobInfo.Boss && MobInfo.PartyBonusMob)
                 {
-                    int count = 0;
-                    reviveCounts.TryGetValue(reviveID, out count);
-                    reviveCounts[reviveID] = count + 1;
+                    sbExt.Append("[Mini-Boss] ");
+                }
+                if (MobInfo.Boss && !MobInfo.PartyBonusMob)
+                {
+                    sbExt.Append("[Boss] ");
+                }
+                if (MobInfo.Undead)
+                {
+                    sbExt.Append("[Undead] ");
+                }
+                if (MobInfo.FirstAttack)
+                {
+                    sbExt.Append("[Auto-Aggressive] ");
+                }
+                if (!MobInfo.BodyAttack)
+                {
+                    sbExt.Append("[No Touch Damage] ");
+                }
+                if (MobInfo.DamagedByMob)
+                {
+                    sbExt.Append("[Vulnerable to Monsters] ");
+                }
+                if (MobInfo.ChangeableMob)
+                {
+                    sbExt.Append("[Level Scaled] ");
+                }
+                if (MobInfo.AllyMob)
+                {
+                    sbExt.Append("[Friendly] ");
+                }
+                if (MobInfo.Invincible)
+                {
+                    sbExt.Append("[Invincible] ");
+                }
+                if (MobInfo.NotAttack)
+                {
+                    sbExt.Append("[Non-Aggressive] ");//Monster can not attack or damage you. But you can damage it.
+                }
+                if (MobInfo.FixedDamage > 0)
+                {
+                    sbExt.Append("[Fixed Damage: " + MobInfo.FixedDamage.ToString("N0") + "] ");
+                }
+                if (MobInfo.FixedBodyAttackDamageR > 0)
+                {
+                    sbExt.Append("[Fixed Touch Damage: " + MobInfo.FixedBodyAttackDamageR + "%] ");
+                }
+                if (MobInfo.IgnoreDamage)
+                {
+                    sbExt.Append("[Ignores Damage] ");
+                }
+                if (MobInfo.IgnoreMoveImpact)
+                {
+                    sbExt.Append("[Immune to Rush] ");
+                }
+                if (MobInfo.IgnoreMovable)
+                {
+                    sbExt.Append("[Immune to Stun/Bind] ");
+                }
+                if (MobInfo.NoDebuff)
+                {
+                    sbExt.Append("[Immune to Debuffs] ");
+                }
+                if (MobInfo.OnlyNormalAttack)
+                {
+                    sbExt.Append("[Damaged by Basic Attacks only] ");
+                }
+                if (MobInfo.OnlyHittedByCommonAttack)
+                {
+                    sbExt.Append("[Hit by Basic Attacks only] ");
                 }
 
-                StringBuilder sb = new StringBuilder();
-                //sb.Append("Summons after death: ");
-                sb.Append("Revives into: ");
-                int rowCount = 0;
-                foreach (var kv in reviveCounts)
+                if (sbExt.Length > 1)
                 {
-                    if (rowCount++ > 0)
+                    sbExt.Remove(sbExt.Length - 1, 1);
+                    propBlocks.Add(PrepareText(g, sbExt.ToString(), GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                    picY += 16;
+                }
+
+                if (MobInfo.RemoveAfter > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "[Disappears after " + MobInfo.RemoveAfter + " seconds]", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                    picY += 16;
+                }
+
+                propBlocks.Add(PrepareText(g, "Type: " + GetMobCategoryName(MobInfo.Category), GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
+                propBlocks.Add(PrepareText(g, "Level: " + MobInfo.Level, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                string hpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxHP) ? this.AddCommaSeparators(MobInfo.FinalMaxHP) : MobInfo.MaxHP.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
+                propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                string mpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? this.AddCommaSeparators(MobInfo.FinalMaxMP) : MobInfo.MaxMP.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
+                propBlocks.Add(PrepareText(g, "MP: " + mpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                if (MobInfo.HPRecovery > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "HP Recovery: " + MobInfo.HPRecovery.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.MPRecovery > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "MP Recovery: " + MobInfo.MPRecovery.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                propBlocks.Add(PrepareText(g, "Physical Damage: " + MobInfo.PADamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                propBlocks.Add(PrepareText(g, "Magic Damage: " + MobInfo.MADamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                //propBlocks.Add(PrepareText(g, "Physical Defense: " + MobInfo.PDDamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                //propBlocks.Add(PrepareText(g, "Magic Defense: " + MobInfo.MDDamage.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                propBlocks.Add(PrepareText(g, "Physical DEF Rate: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                propBlocks.Add(PrepareText(g, "Magic DEF Rate: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                //propBlocks.Add(PrepareText(g, "Accuracy: " + MobInfo.Acc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16)); //no longer used
+                //propBlocks.Add(PrepareText(g, "Avoidability: " + MobInfo.Eva, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16)); //no longer used
+                propBlocks.Add(PrepareText(g, "Knockback: " + MobInfo.Pushed.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                propBlocks.Add(PrepareText(g, "EXP: " + MobInfo.Exp.ToString("N0", System.Globalization.CultureInfo.InvariantCulture), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                if (MobInfo.CharismaEXP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Ambition EXP: " + MobInfo.CharismaEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.SenseEXP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Empathy EXP: " + MobInfo.SenseEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.InsightEXP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Insight EXP: " + MobInfo.InsightEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.WillEXP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Willpower EXP: " + MobInfo.WillEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.CraftEXP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Diligence EXP: " + MobInfo.CraftEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.CharmEXP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Charm EXP: " + MobInfo.CharmEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo.WP > 0)
+                {
+                    propBlocks.Add(PrepareText(g, "Weapon Points (for Zero): " + MobInfo.WP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                //propBlocks.Add(PrepareText(g, GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                if (GetElemAttrString(MobInfo.ElemAttr) != "")
+                {
+                    propBlocks.Add(PrepareText(g, "Elements: " + GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                }
+                if (MobInfo?.ID != null)
+                {
+                    var locNode = PluginBase.PluginManager.FindWz("Etc\\MobLocation.img\\" + MobInfo.ID.ToString());
+                    if (locNode != null)
                     {
-                        sb.AppendLine().Append("       ");
-                    }
-                    string mobName = GetMobName(kv.Key);
-                    sb.AppendFormat("{0} ({1:D7})", mobName, kv.Key);
-                    if (kv.Value > 1)
-                    {
-                        sb.Append(" * " + kv.Value);
+                        propBlocks.Add(PrepareText(g, "Location:", GearGraphics.ItemDetailFont, GearGraphics.LocationBrush, 0, picY += 30));
+                        foreach (var locMapNode in locNode.Nodes)
+                        {
+                            int mapID = locMapNode.GetValueEx<int>(-1);
+                            string mapName = null;
+                            if (mapID >= 0)
+                            {
+                                mapName = GetMapName(mapID);
+                            }
+                            string mobLoc = string.Format("{0}({1})", mapName ?? "null", mapID);
+
+                            propBlocks.Add(PrepareText(g, mobLoc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                        }
                     }
                 }
 
-                propBlocks.Add(PrepareText(g, sb.ToString(), GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                picY += 28;
+
+                if (MobInfo.Revive.Count > 0)
+                {
+                    Dictionary<int, int> reviveCounts = new Dictionary<int, int>();
+                    foreach (var reviveID in MobInfo.Revive)
+                    {
+                        int count = 0;
+                        reviveCounts.TryGetValue(reviveID, out count);
+                        reviveCounts[reviveID] = count + 1;
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("Revives into: ");
+                    int rowCount = 0;
+                    foreach (var kv in reviveCounts)
+                    {
+                        if (rowCount++ > 0)
+                        {
+                            sb.AppendLine().Append("       ");
+                        }
+                        string mobName = GetMobName(kv.Key);
+                        sb.AppendFormat("{0} ({1:D7})", mobName, kv.Key);
+                        if (kv.Value > 1)
+                        {
+                            sb.Append(" * " + kv.Value);
+                        }
+                    }
+
+                    propBlocks.Add(PrepareText(g, sb.ToString(), GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                }
             }
             g.Dispose();
             bmp.Dispose();
@@ -343,34 +472,47 @@ namespace WzComparerR2.CharaSimControl
             locRect.Y = textRect.Y;
 
             //绘制
-            bmp = new Bitmap(width + 20, height + 20);
+            Bitmap baseBmp = new Bitmap(width + 20, height + 20);
             titleRect.Offset(10, 10);
             imgRect.Offset(10, 10);
             textRect.Offset(10, 10);
-            locRect.Offset(10, 10);
-            g = Graphics.FromImage(bmp);
-            //绘制背景
-            GearGraphics.DrawNewTooltipBack(g, 0, 0, bmp.Width, bmp.Height);
-            //绘制标题
-            foreach (var item in titleBlocks)
+            using (g = Graphics.FromImage(baseBmp))
             {
-                DrawText(g, item, titleRect.Location);
+                //绘制背景
+                GearGraphics.DrawNewTooltipBack(g, 0, 0, baseBmp.Width, baseBmp.Height);
+                //绘制标题
+                foreach (var item in titleBlocks)
+                {
+                    DrawText(g, item, titleRect.Location);
+                }
+                //绘制图像
+                if (mobImg != null && !imgRect.IsEmpty)
+                {
+                    g.DrawImage(mobImg, imgRect);
+                }
+                //绘制文本
+                foreach (var item in propBlocks)
+                {
+                    DrawText(g, item, textRect.Location);
+                }
+                foreach (var item in locBlocks)
+                {
+                    DrawText(g, item, locRect.Location);
+                }
             }
-            //绘制图像
-            if (mobImg != null && !imgRect.IsEmpty)
+            if (subMobBmpTooltip != null)
             {
-                g.DrawImage(mobImg, imgRect);
+                bmp = new Bitmap(Math.Max(baseBmp.Width, subMobBmpTooltip.Width), baseBmp.Height + subMobBmpTooltip.Height);
+                using (g = Graphics.FromImage(bmp))
+                {
+                    g.DrawImage(baseBmp, 0, 0, new Rectangle(0, 0, baseBmp.Width, baseBmp.Height), GraphicsUnit.Pixel);
+                    g.DrawImage(subMobBmpTooltip, 0, baseBmp.Height, new Rectangle(0, 0, subMobBmpTooltip.Width, subMobBmpTooltip.Height), GraphicsUnit.Pixel);
+                }
             }
-            //绘制文本
-            foreach (var item in propBlocks)
+            else
             {
-                DrawText(g, item, textRect.Location);
+                bmp = baseBmp;
             }
-            foreach (var item in locBlocks)
-            {
-                DrawText(g, item, locRect.Location);
-            }
-            g.Dispose();
             return bmp;
         }
 
