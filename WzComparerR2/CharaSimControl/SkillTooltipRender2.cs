@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
-using Resource = CharaSimResource.Resource;
-using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
+using WzComparerR2.Common;
 using WzComparerR2.WzLib;
-using System.Text.RegularExpressions;
-using System.Linq;
+using Resource = CharaSimResource.Resource;
 
 namespace WzComparerR2.CharaSimControl
 {

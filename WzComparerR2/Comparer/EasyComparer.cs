@@ -86,6 +86,8 @@ namespace WzComparerR2.Comparer
         public long DamageSkinNumber { get; set; }
         public bool AllowFamiliarOutOfBounds { get; set; }
         public bool UseCTFamiliarUI { get; set; }
+        public bool EnableWorldArchive { get; set; }
+        public bool ShowNpcQuotes { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
@@ -2480,7 +2482,17 @@ namespace WzComparerR2.Comparer
                 mobRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
                 mobRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 mobRenderNewOld[i].ShowAllSubMobAtOnce = true;
+                mobRenderNewOld[i].EnableWorldArchive = this.EnableWorldArchive;
                 mobRenderNewOld[i].MaxWidth = 3840;
+            }
+
+            if (this.EnableWorldArchive)
+            {
+                HashSet<int> WorldArchiveDeltaIDs = WorldArchiveDelta(mobRenderNewOld[0].StringLinker.StringWorldArchiveMob, mobRenderNewOld[1].StringLinker.StringWorldArchiveMob);
+                foreach (var i in WorldArchiveDeltaIDs)
+                {
+                    OutputMobTooltipIDs.Add(i.ToString());
+                }
             }
 
             foreach (var mobID in OutputMobTooltipIDs)
@@ -2642,6 +2654,17 @@ namespace WzComparerR2.Comparer
                 npcRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
                 npcRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 npcRenderNewOld[i].ShowAllIllustAtOnce = true;
+                npcRenderNewOld[i].EnableWorldArchive = this.EnableWorldArchive;
+                npcRenderNewOld[i].ShowNpcQuotes = this.ShowNpcQuotes;
+            }
+
+            if (this.EnableWorldArchive)
+            {
+                HashSet<int> WorldArchiveDeltaIDs = WorldArchiveDelta(npcRenderNewOld[0].StringLinker.StringWorldArchiveNpc, npcRenderNewOld[1].StringLinker.StringWorldArchiveNpc);
+                foreach (var i in WorldArchiveDeltaIDs)
+                {
+                    OutputNpcTooltipIDs.Add(i.ToString());
+                }
             }
 
             foreach (var npcID in OutputNpcTooltipIDs)
@@ -4312,6 +4335,22 @@ namespace WzComparerR2.Comparer
                 default:
                     return true;
             }
+        }
+
+        public HashSet<int> WorldArchiveDelta(Dictionary<int, StringResult> dictOld, Dictionary<int, StringResult> dictNew)
+        {
+            HashSet<int> result = new HashSet<int>();
+            var oldOnly = dictOld.Keys.Except(dictNew.Keys).ToList();
+            var newOnly = dictNew.Keys.Except(dictOld.Keys).ToList();
+            var delta = dictOld.Keys.Intersect(dictNew.Keys).Where(k => !EqualityComparer<StringResult>.Default.Equals(dictOld[k], dictNew[k])).ToList();
+
+            foreach (var key in oldOnly)
+                result.Add(key);
+            foreach (var key in newOnly)
+                result.Add(key);
+            foreach (var key in delta)
+                result.Add(key);
+            return result;
         }
     }
 }

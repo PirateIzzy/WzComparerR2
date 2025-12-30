@@ -322,7 +322,10 @@ namespace WzComparerR2
             tooltipQuickView.MobRender.MaxWidth = Screen.PrimaryScreen.Bounds.Width;
             tooltipQuickView.MobRender.ShowAllSubMobAtOnce = Setting.Mob.ShowAllSubMobAtOnce;
             tooltipQuickView.MobRender.MseaMode = Setting.Misc.MseaMode;
+            tooltipQuickView.MobRender.EnableWorldArchive = Setting.Misc.EnableWorldArchive;
             tooltipQuickView.NpcRender.ShowAllIllustAtOnce = Setting.Npc.ShowAllIllustAtOnce;
+            tooltipQuickView.NpcRender.ShowNpcQuotes = Setting.Npc.ShowNpcQuotes;
+            tooltipQuickView.NpcRender.EnableWorldArchive = Setting.Misc.EnableWorldArchive;
             tooltipQuickView.QuestRender.ShowObjectID = Setting.Quest.ShowID;
             tooltipQuickView.QuestRender.DefaultState = Setting.Quest.DefaultState;
             tooltipQuickView.QuestRender.ShowAllStates = Setting.Quest.ShowAllStates;
@@ -3989,14 +3992,48 @@ namespace WzComparerR2
             }
             if (obj != null)
             {
+                StringResult waSr = new StringResult();
+                StringResult mbSr = new StringResult();
+                StringBuilder npcQuoteSb = new StringBuilder();
                 if (tooltipQuickView.TargetItem != null)
                 {
                     switch (tooltipQuickView.TargetItem)
                     {
                         case Mob item:
+                            if (CharaSimConfig.Default.Misc.EnableWorldArchive)
+                            {
+                                if (stringLinker == null || !stringLinker.StringWorldArchiveMob.TryGetValue(item.ID, out waSr))
+                                {
+                                    waSr = new StringResult();
+                                }
+                            }
                             item.Dispose();
                             break;
                         case Npc item:
+                            if (CharaSimConfig.Default.Misc.EnableWorldArchive)
+                            {
+                                if (stringLinker == null || !stringLinker.StringWorldArchiveNpc.TryGetValue(item.ID, out waSr))
+                                {
+                                    waSr = new StringResult();
+                                }
+                                if (CharaSimConfig.Default.Npc.ShowNpcQuotes)
+                                {
+                                    NpcQuote quote = NpcQuote.CreateFromNode(PluginManager.FindWz($@"String\Npc.img\{item.ID}"), PluginManager.FindWz, stringLinker);
+                                    if (quote != null)
+                                    {
+                                        foreach (var kvp in quote.NQuote)
+                                            npcQuoteSb.AppendLine($"n{kvp.Key}: {kvp.Value}");
+                                        foreach (var kvp in quote.FQuote)
+                                            npcQuoteSb.AppendLine($"f{kvp.Key}: {kvp.Value}");
+                                        foreach (var kvp in quote.WQuote)
+                                            npcQuoteSb.AppendLine($"w{kvp.Key}: {kvp.Value}");
+                                        foreach (var kvp in quote.DQuote)
+                                            npcQuoteSb.AppendLine($"d{kvp.Key}: {kvp.Value}");
+                                        foreach (var kvp in quote.SpecialQuote)
+                                            npcQuoteSb.AppendLine($"s{kvp.Key}: {kvp.Value}");
+                                    }
+                                }
+                            }
                             item.Dispose();
                             break;
                         case Quest item:
@@ -4009,9 +4046,9 @@ namespace WzComparerR2
                 if (wzf.Type is not Wz_Type.Quest)
                 {
                     tooltipQuickView.NodeName = sr.Name;
-                    tooltipQuickView.Desc = sr.Desc;
-                    tooltipQuickView.Pdesc = sr.Pdesc;
-                    tooltipQuickView.AutoDesc = altAutoDesc ?? sr.AutoDesc;
+                    tooltipQuickView.Desc = sr.Desc ?? mbSr.Desc;
+                    tooltipQuickView.Pdesc = sr.Pdesc ?? waSr.Desc;
+                    tooltipQuickView.AutoDesc = altAutoDesc ?? sr.AutoDesc ?? npcQuoteSb.ToString();
                     tooltipQuickView.Hdesc = sr["h"];
                     tooltipQuickView.DescLeftAlign = sr["desc_leftalign"];
                 }
@@ -4459,6 +4496,8 @@ namespace WzComparerR2
                     comparer.DamageSkinNumber = CharaSimConfig.Default.DamageSkin.DamageSkinNumber;
                     comparer.AllowFamiliarOutOfBounds = CharaSimConfig.Default.Familiar.AllowOutOfBounds;
                     comparer.UseCTFamiliarUI = CharaSimConfig.Default.Familiar.UseCTFamiliarUI;
+                    comparer.EnableWorldArchive = CharaSimConfig.Default.Misc.EnableWorldArchive;
+                    comparer.ShowNpcQuotes = CharaSimConfig.Default.Npc.ShowNpcQuotes;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try

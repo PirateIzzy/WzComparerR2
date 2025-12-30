@@ -313,6 +313,20 @@ namespace WzComparerR2
             set { chkShowAllIllustAtOnce.Checked = value; }
         }
 
+        [Link]
+        public bool Npc_ShowNpcQuotes
+        {
+            get { return chkShowNpcQuotes.Checked; }
+            set { chkShowNpcQuotes.Checked = value; }
+        }
+
+        [Link]
+        public bool Misc_EnableWorldArchive
+        {
+            get { return chkEnableWorldArchive.Checked; }
+            set { chkEnableWorldArchive.Checked = value; }
+        }
+
 
         public int PreferredStringCopyMethod
         {
@@ -448,6 +462,11 @@ namespace WzComparerR2
             this.comboBoxExQuestState.Enabled = !this.chkQAS.Checked;
             this.labelXQS.Enabled = !this.chkQAS.Checked;
             this.labelXQSHint.Enabled = !this.chkQAS.Checked;
+        }
+
+        private void chkEnableWorldArchive_CheckedChanged(object sender, EventArgs e)
+        {
+            this.chkShowNpcQuotes.Enabled = chkEnableWorldArchive.Checked;
         }
 
         private void txtDamageSkinNumber_TextChanged(object sender, EventArgs e)

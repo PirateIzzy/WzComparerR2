@@ -32,6 +32,8 @@
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowNpcQuotes = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkEnableWorldArchive = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowAllIllustAtOnce = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowAllSubMobAtOnce = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX23 = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -1241,6 +1243,8 @@
             this.superTabControlPanel5.Controls.Add(this.chkShowAllIllustAtOnce);
             this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
             this.superTabControlPanel5.Controls.Add(this.chkMseaMode);
+            this.superTabControlPanel5.Controls.Add(this.chkShowNpcQuotes);
+            this.superTabControlPanel5.Controls.Add(this.chkEnableWorldArchive);
             this.superTabControlPanel5.Controls.Add(this.chkCopyParsedSkillString);
             this.superTabControlPanel5.Controls.Add(this.labelX4);
             this.superTabControlPanel5.Controls.Add(this.cmbPreferredStringCopyMethod);
@@ -1350,6 +1354,37 @@
             this.chkShowAllSubMobAtOnce.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkShowAllSubMobAtOnce.TabIndex = 7;
             this.chkShowAllSubMobAtOnce.Text = "Show All Sub Mob in Quest Group";
+            // 
+            // chkEnableWorldArchive
+            // 
+            this.chkEnableWorldArchive.AutoSize = true;
+            this.chkEnableWorldArchive.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkEnableWorldArchive.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkEnableWorldArchive.Location = new System.Drawing.Point(13, 156);
+            this.chkEnableWorldArchive.Name = "chkEnableWorldArchive";
+            this.chkEnableWorldArchive.Size = new System.Drawing.Size(145, 16);
+            this.chkEnableWorldArchive.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkEnableWorldArchive.TabIndex = 8;
+            this.chkEnableWorldArchive.Text = "Enable World Archive";
+            this.chkEnableWorldArchive.CheckedChanged += chkEnableWorldArchive_CheckedChanged;
+            // 
+            // chkShowNpcQuotes
+            // 
+            this.chkShowNpcQuotes.AutoSize = true;
+            this.chkShowNpcQuotes.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowNpcQuotes.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowNpcQuotes.Location = new System.Drawing.Point(13, 180);
+            this.chkShowNpcQuotes.Name = "chkShowNpcQuotes";
+            this.chkShowNpcQuotes.Size = new System.Drawing.Size(145, 16);
+            this.chkShowNpcQuotes.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowNpcQuotes.TabIndex = 9;
+            this.chkShowNpcQuotes.Text = "Show NPC Quotes";
             // 
             // buttonX2
             // 
@@ -1473,6 +1508,8 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowNpcQuotes;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableWorldArchive;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowAllSubMobAtOnce;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowAllIllustAtOnce;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkinID;
