@@ -1,8 +1,10 @@
-﻿using System;
+﻿using SharpDX.MediaFoundation;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -836,18 +838,32 @@ namespace WzComparerR2.CharaSimControl
 
                     case "i":
                     case "v":
-                        string itemIconPrefix = "[[File:Item ";
+                        string itemIconPrefix = "";
                         StringLinker.StringItem.TryGetValue(id, out sr);
+
                         if (sr == null)
                         {
                             StringLinker.StringEqp.TryGetValue(id, out sr);
-                            itemIconPrefix = "[[File:Eqp ";
+                        }
+
+                        switch (id / 1000000)
+                        {
+                            case 1: itemIconPrefix = "[[File:Eqp ";
+                                break;
+                            case 2: itemIconPrefix = "[[File:Use ";
+                                break;
+                            case 3: itemIconPrefix = "[[File:Setup ";
+                                break;
+                            case 4: itemIconPrefix = "[[File:Etc ";
+                                break;
+                            case 5: itemIconPrefix = "[[File:Cash ";
+                                break;
                         }
                         return isMapleWiki ? itemIconPrefix + $"{sr?.Name ?? id.ToString()}.png]]" : $"{sr?.Name ?? id.ToString()}";
 
                     case "y":
                         StringLinker.StringQuest.TryGetValue(id, out sr);
-                        return isMapleWiki ? $"[[{sr?.Name ?? id.ToString()}]]" : $"{sr?.Name ?? id.ToString()}";
+                        return isMapleWiki ? $"{sr?.Name ?? id.ToString()}" : $"{sr?.Name ?? id.ToString()}";
 
                     default:
                         if (tag.StartsWith("a"))
