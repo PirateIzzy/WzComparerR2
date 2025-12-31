@@ -2231,6 +2231,32 @@ namespace WzComparerR2
                     addPath();
                     break;
 
+                case "Roguelike.img":
+                case "Redmoon.img":
+                    switch (pathArray[1])
+                    {
+                        case "artifact":
+                            wzPath.Add("Item");
+                            wzPath.Add("Consume");
+                            id = id.PadLeft(8, '0');
+                            wzPath.Add(id.Substring(0, 4) + ".img");
+                            imagePath.Add(id);
+                            addPath();
+                            break;
+                        case "skill":
+                            foreach (var i in new string[] { "Skill", "Buff" })
+                            {
+                                wzPath.Clear();
+                                wzPath.AddRange(new string[] { "Skill", "Roguelike", i, id + ".img" });
+                                addPath();
+                                wzPath.Clear();
+                                wzPath.AddRange(new string[] { "Skill", "Roguelike", i, "Redmoon", id + ".img" });
+                                addPath();
+                            }
+                            break;
+                    }
+                    break;
+
                 case "Skill.img":
                     id = id.PadLeft(7, '0');
                     wzPath.Add("Skill");
@@ -2940,6 +2966,7 @@ namespace WzComparerR2
                     dicts.Add(stringLinker.StringMob);
                     dicts.Add(stringLinker.StringNpc);
                     dicts.Add(stringLinker.StringQuest);
+                    dicts.Add(stringLinker.StringRoguelikeSkill);
                     dicts.Add(stringLinker.StringSkill);
                     dicts.Add(stringLinker.StringSetItem);
                     dicts.Add(stringLinker.StringAchievement);
@@ -2963,6 +2990,7 @@ namespace WzComparerR2
                     dicts.Add(stringLinker.StringQuest);
                     break;
                 case 7:
+                    dicts.Add(stringLinker.StringRoguelikeSkill);
                     dicts.Add(stringLinker.StringSkill);
                     break;
                 case 8:
@@ -3825,6 +3853,30 @@ namespace WzComparerR2
                     {
                         Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz, PluginManager.FindWz);
                         if (stringLinker == null || !stringLinker.StringSkill.TryGetValue(skill.SkillID, out sr))
+                        {
+                            sr = new StringResultSkill();
+                            sr.Name = "Unknown Skill";
+                        }
+                        if (skill != null)
+                        {
+                            switch (this.skillDefaultLevel)
+                            {
+                                case DefaultLevel.Level0: skill.Level = 0; break;
+                                case DefaultLevel.Level1: skill.Level = 1; break;
+                                case DefaultLevel.LevelMax: skill.Level = skill.MaxLevel; break;
+                                case DefaultLevel.LevelMaxWithCO: skill.Level = skill.MaxLevel + 2; break;
+                            }
+                            obj = skill;
+                            fileName = "skill_" + skill.SkillID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png";
+                            tooltipQuickView.NodeID = skill.SkillID;
+                        }
+                    }
+                    else if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\\Roguelike\\.+\\(\d+)\.img$"))
+                    {
+                        if ((image = skillNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                            return;
+                        Skill skill = Skill.CreateFromNode(image.Node, PluginManager.FindWz, PluginManager.FindWz);
+                        if (stringLinker == null || !stringLinker.StringRoguelikeSkill.TryGetValue(skill.SkillID, out sr))
                         {
                             sr = new StringResultSkill();
                             sr.Name = "Unknown Skill";
