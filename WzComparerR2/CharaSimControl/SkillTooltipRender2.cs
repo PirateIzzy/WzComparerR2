@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
-using Resource = CharaSimResource.Resource;
-using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
+using WzComparerR2.Common;
 using WzComparerR2.WzLib;
-using System.Text.RegularExpressions;
-using System.Linq;
+using Resource = CharaSimResource.Resource;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -162,10 +159,21 @@ namespace WzComparerR2.CharaSimControl
             string skillIDstr = Skill.SkillID.ToString().PadLeft(7, '0');
 
             //获取文字
-            if (StringLinker == null || !(StringLinker.StringSkill.TryGetValue(Skill.SkillID, out var _sr) && _sr is StringResultSkill sr))
+            if (StringLinker == null || !(StringLinker.StringSkill.TryGetValue(Skill.SkillID, out StringResult _sr) && _sr is StringResultSkill sr))
             {
                 sr = new StringResultSkill();
                 sr.Name = "(null)";
+            }
+
+            // Roguelike Check
+            if (Skill.IsRoguelikeSkill)
+            {
+                if (StringLinker == null || !(StringLinker.StringRoguelikeSkill.TryGetValue(Skill.SkillID, out StringResult _sr2) && _sr2 is StringResultSkill sr2))
+                {
+                    sr2 = new StringResultSkill();
+                    sr2.Name = "(null)";
+                }
+                sr = sr2;
             }
 
             bool isTranslateRequired = Translator.IsTranslateEnabled;
@@ -495,6 +503,10 @@ namespace WzComparerR2.CharaSimControl
                 if (Skill.ReqLevel > 0)
                  {
                     attr.Add("[Lv. " + Skill.ReqLevel + " required]");
+                }
+                if (Skill.IsRoguelikeSkill)
+                {
+                    attr.Add("Roguelike Skill: " + (Skill.IsRedmoon ? "Red Moon Forest" : "Pharaoh's Treasure"));
                 }
                 if (Skill.Invisible)
                 {
