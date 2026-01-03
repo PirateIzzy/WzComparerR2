@@ -4887,6 +4887,8 @@ namespace WzComparerR2
                 if (frm.ShowDialog() == DialogResult.OK)
                 {
                     List<int> selectedJob = frm.SelectedJobCodes;
+                    bool doRoguelikePharaoh = selectedJob.Contains(99990000);
+                    bool doRedmoon = selectedJob.Contains(99990001);
                     string exportedFolder = frm.ExportFolderPath;
                     labelX2.Text = "Exporting";
                     System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -5025,6 +5027,90 @@ namespace WzComparerR2
                                             resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
                                             resultImage.Dispose();
                                         }
+                                    }
+                                }
+                            }
+                            if (doRoguelikePharaoh)
+                            {
+                                var jobImg = PluginManager.FindWz($"Skill\\Roguelike\\Skill");
+                                if (jobImg != null)
+                                {
+                                    foreach (var i in jobImg.Nodes)
+                                    {
+                                        StringResult sr;
+                                        string skillName;
+                                        Wz_Image image;
+                                        if ((image = i.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                                            return;
+                                        if (tooltip.StringLinker == null || !tooltip.StringLinker.StringRoguelikeSkill.TryGetValue(int.Parse(i.Text.Replace(".img", "")), out sr))
+                                        {
+                                            sr = new StringResultSkill();
+                                            sr.Name = "Unknown Skill";
+                                        }
+                                        skillName = sr.Name;
+                                        labelX2.Text = string.Format("Exporting：{0} - {1}", i.Text.Replace(".img", ""), skillName);
+                                        Skill skill = Skill.CreateFromNode(image.Node, PluginManager.FindWz, PluginManager.FindWz);
+                                        if (skill != null)
+                                        {
+                                            skill.Level = skill.MaxLevel;
+                                            tooltip.Skill = skill;
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                        Bitmap resultImage = tooltip.Render();
+                                        string categoryPath = "Roguelike Skill (Pharaoh's Treasure)";
+                                        if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
+                                        {
+                                            Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
+                                        }
+                                        string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + i.Text.Replace(".img", "") + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                        if (File.Exists(imageName)) File.Delete(imageName);
+                                        resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                                        resultImage.Dispose();
+                                    }
+                                }
+                            }
+                            if (doRedmoon)
+                            {
+                                var jobImg = PluginManager.FindWz($"Skill\\Roguelike\\Skill\\Redmoon");
+                                if (jobImg != null)
+                                {
+                                    foreach (var i in jobImg.Nodes)
+                                    {
+                                        StringResult sr;
+                                        string skillName;
+                                        Wz_Image image;
+                                        if ((image = i.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                                            continue;
+                                        if (tooltip.StringLinker == null || !tooltip.StringLinker.StringRoguelikeSkill.TryGetValue(int.Parse(i.Text.Replace(".img", "")), out sr))
+                                        {
+                                            sr = new StringResultSkill();
+                                            sr.Name = "Unknown Skill";
+                                        }
+                                        skillName = sr.Name;
+                                        labelX2.Text = string.Format("Exporting：{0} - {1}", i.Text.Replace(".img", ""), skillName);
+                                        Skill skill = Skill.CreateFromNode(image.Node, PluginManager.FindWz, PluginManager.FindWz);
+                                        if (skill != null)
+                                        {
+                                            skill.Level = skill.MaxLevel;
+                                            tooltip.Skill = skill;
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                        Bitmap resultImage = tooltip.Render();
+                                        string categoryPath = isMsea ? "Roguelike Skill (Blood Moon Forest)" : "Roguelike Skill (Red Moon Forest)";
+                                        if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
+                                        {
+                                            Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
+                                        }
+                                        string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + i.Text.Replace(".img", "") + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                        if (File.Exists(imageName)) File.Delete(imageName);
+                                        resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                                        resultImage.Dispose();
                                     }
                                 }
                             }

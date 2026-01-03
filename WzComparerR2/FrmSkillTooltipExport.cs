@@ -109,6 +109,8 @@ namespace WzComparerR2
             { "Iel", new int[] { 18002, 18300, 18310, 18311, 18312, 18314 } },
             { "5th (Other)", new int[] { 40000, 40001, 40002, 40003, 40004, 40005 } },
             { "6th (Other)", new int[] { 50000, 50006, 50007 } },
+            { "Roguelike Skill (Pharaoh's Treasure)", new int[] { 99990000 } },
+            { "Roguelike Skill (Red Moon Forest)", new int[] { 99990001 } },
         };
 
         private static Dictionary<string, int[]> jobNameToCodeSea = new Dictionary<string, int[]>()
@@ -180,6 +182,8 @@ namespace WzComparerR2
             { "Iel", new int[] { 18002, 18300, 18310, 18311, 18312, 18314 } },
             { "5th (Other)", new int[] { 40000, 40001, 40002, 40003, 40004, 40005 } },
             { "6th (Other)", new int[] { 50000, 50006, 50007 } },
+            { "Roguelike Skill (Pharaoh's Treasure)", new int[] { 99990000 } },
+            { "Roguelike Skill (Blood Moon Forest)", new int[] { 99990001 } },
         };
         private static HashSet<int> AllClassesCode()
         {
@@ -254,6 +258,14 @@ namespace WzComparerR2
                 if (this.clbJobName.CheckedItems.Contains("Other"))
                 {
                     selectedJob.AddRange(skillImg.Except(AllClassesCode()));
+                }
+                if (this.clbJobName.CheckedItems.Contains("Roguelike Skill (Pharaoh's Treasure)"))
+                {
+                    selectedJob.Add(99990000);
+                }
+                if (this.clbJobName.CheckedItems.Contains("Roguelike Skill (Red Moon Forest)") || this.clbJobName.CheckedItems.Contains("Roguelike Skill (Blood Moon Forest)"))
+                {
+                    selectedJob.Add(99990001);
                 }
                 ExportFolderPath = dlg.SelectedPath;
                 SelectedJobCodes = allSelected ? skillImg : selectedJob;

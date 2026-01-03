@@ -282,6 +282,10 @@ namespace WzComparerR2.CharaSimControl
                     hdescAppend.AppendLine($"Required Skill: #c{skillName} Lv. {kv.Value}#");
                     }
                 */
+                if (Skill.IsRoguelikeSkill)
+                {
+                    hdesc = hdesc.Replace("<style color=\"Orange\">", "#c").Replace("</>", "#");
+                }
                 if (isTranslateRequired)
                 {
                     string mergedDescString = Translator.MergeString(hdesc, Translator.TranslateString(hdesc), 2);
