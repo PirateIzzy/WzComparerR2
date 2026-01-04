@@ -615,9 +615,17 @@ namespace WzComparerR2.CharaSimControl
                         return "x%";
 
                     case "c":
-                    case "R":
                         return "0";
-                    //return "미완";
+
+                    case "R":
+                        if (this.Quest.InfoexCond == true)
+                        {
+                            return "0";
+                        }
+                        else
+                        {
+                            return "Incomplete";
+                        }
 
                     case "u":
                         return "Not Started";

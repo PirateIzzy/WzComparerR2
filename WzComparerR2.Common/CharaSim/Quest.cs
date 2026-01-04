@@ -27,6 +27,7 @@ namespace WzComparerR2.CharaSim
         public bool Blocked { get; set; }
         public bool LvLimit { get; set; }
         public bool RecommendExcept { get; set; }
+        public bool InfoexCond { get; set; }
         public string Name { get; set; }
         public string DemandBase { get; set; }
         public string DemandSummary { get; set; }
@@ -167,6 +168,16 @@ namespace WzComparerR2.CharaSim
                             break;
                         case "npc":
                             quest.Check1NpcID = propNode.GetValueEx<int>(0); break;
+                        case "infoex":
+                            foreach (var subNode in propNode.Nodes)
+                            {
+                                var cond = subNode.FindNodeByPath("cond").GetValueEx<int>(0);
+                                if (cond.Equals(1))
+                                {
+                                    quest.InfoexCond = true;
+                                }
+                            }
+                            break;
                     }
                 }
             }
