@@ -618,14 +618,16 @@ namespace WzComparerR2.CharaSimControl
                         return "0";
 
                     case "R":
-                        if (this.Quest.InfoexCond == true)
+                        var m = Regex.Match(info, @"\d+Ex(\w+)Ref\d+");
+                        if (m.Success)
                         {
-                            return "0";
+                            var exVariable = m.Groups[1].Value;
+                            if (this.Quest.Check1Infoex.TryGetValue(exVariable, out var cond))
+                            {
+                                return cond ? "0" : "Incomplete";
+                            }
                         }
-                        else
-                        {
-                            return "Incomplete";
-                        }
+                        return "0";
 
                     case "u":
                         return "Not Started";
