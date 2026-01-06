@@ -513,7 +513,7 @@ namespace WzComparerR2.CharaSim
             switch (sourceLanguage)
             {
                 case "zh-CN":
-                    irlPrice = pointValue / 100.00; break;  // CMS: 0.98 CNY per 100 points
+                    irlPrice = pointValue / 100.00; break;  // CMS: 1 CNY per 100 points
                 case "en":
                     irlPrice = pointValue / 1000.00; break; // GMS: $1 per 1,000 points
                 default:
@@ -535,9 +535,9 @@ namespace WzComparerR2.CharaSim
             {
                 case "jpy":
                 case "krw":
-                    return "Approx" + Math.Round(convertedPrice).ToString() + dictCurrencyName[DefaultDesiredCurrency];
+                    return "Approx " + Math.Round(convertedPrice).ToString() + dictCurrencyName[DefaultDesiredCurrency];
                 default:
-                    return "Approx" + convertedPrice.ToString("0.##") + dictCurrencyName[DefaultDesiredCurrency];
+                    return "Approx " + convertedPrice.ToString("0.##") + dictCurrencyName[DefaultDesiredCurrency];
             }
         }
 

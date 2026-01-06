@@ -60,7 +60,6 @@ namespace WzComparerR2.CharaSimControl
         public bool MaxStar25 { get; set; } = false;
         public bool MseaMode { get; set; }
         public bool IsCombineProperties { get; set; } = true;
-        public bool ShowSoldPrice { get; set; }
         public bool ShowCashPurchasePrice { get; set; }
         public bool AutoTitleWrap { get; set; }
         public int CosmeticHairColor { get; set; }
@@ -243,6 +242,17 @@ namespace WzComparerR2.CharaSimControl
                 sr.Name = "(null)";
             }
             string gearName = sr.Name;
+            if (Translator.DefaultDesiredCurrency != "none")
+            {
+                if (Translator.DefaultDetectCurrency == "auto")
+                {
+                    titleLanguage = Translator.GetLanguage(gearName);
+                }
+                else
+                {
+                    titleLanguage = Translator.ConvertCurrencyToLang(Translator.DefaultDetectCurrency);
+                }
+            }
             int gender = Gear.GetGender(Gear.ItemID);
             switch (gender)
             {
@@ -1553,6 +1563,24 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
             */
+
+            if (Gear.Cash && ShowCashPurchasePrice)
+            {
+                if (CharaSimLoader.LoadedCommoditiesByItemIdInteractive.ContainsKey(Gear.ItemID))
+                {
+                    int price = CharaSimLoader.LoadedCommoditiesByItemIdInteractive[Gear.ItemID].Values.ToList()[0];
+                    if (price > 0)
+                    {
+                        picH += 16;
+                        string approxPrice = "";
+                        if (Translator.DefaultDesiredCurrency != "none")
+                        {
+                            approxPrice = $" ({Translator.GetConvertedCurrency(price, titleLanguage)})";
+                        }
+                        GearGraphics.DrawString(g, "- Price: " + price + "NX" + approxPrice, GearGraphics.EquipDetailFont, 13, 244, ref picH, 16);
+                    }
+                }
+            }
 
             picH += 9;
             g.Dispose();

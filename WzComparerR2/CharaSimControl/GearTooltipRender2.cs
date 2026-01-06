@@ -53,6 +53,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowMedalTag { get; set; } = true;
         public bool IsCombineProperties { get; set; } = true;
+        public bool ShowCashPurchasePrice { get; set; }
         public bool CompareMode { get; set; } = false;
         public bool MseaMode { get; set; }
         public int CosmeticHairColor { get; set; }
@@ -60,6 +61,7 @@ namespace WzComparerR2.CharaSimControl
         private bool isMsnClient { get; set; }
 
         private bool isPostNEXTClient;
+        private string titleLanguage = "";
 
         public TooltipRender SetItemRender { get; set; }
 
@@ -225,6 +227,17 @@ namespace WzComparerR2.CharaSimControl
             }
             string gearName = sr.Name;
             if (String.IsNullOrEmpty(gearName)) gearName = "(null)";
+            if (Translator.DefaultDesiredCurrency != "none")
+            {
+                if (Translator.DefaultDetectCurrency == "auto")
+                {
+                    titleLanguage = Translator.GetLanguage(gearName);
+                }
+                else
+                {
+                    titleLanguage = Translator.ConvertCurrencyToLang(Translator.DefaultDetectCurrency);
+                }
+            }
             bool isTranslateRequired = Translator.IsTranslateEnabled;
             if (isTranslateRequired)
             {
@@ -1341,6 +1354,24 @@ namespace WzComparerR2.CharaSimControl
                     GearGraphics.DrawString(g, exclusiveEquip, GearGraphics.EquipDetailFont2, orange2FontColorTable, 13, 244, ref picH, 15);
                     picH += 5;
                     break;
+                }
+            }
+
+            if (Gear.Cash && ShowCashPurchasePrice)
+            {
+                if (CharaSimLoader.LoadedCommoditiesByItemIdInteractive.ContainsKey(Gear.ItemID))
+                {
+                    int price = CharaSimLoader.LoadedCommoditiesByItemIdInteractive[Gear.ItemID].Values.ToList()[0];
+                    if (price > 0)
+                    {
+                        picH += 16;
+                        string approxPrice = "";
+                        if (Translator.DefaultDesiredCurrency != "none")
+                        {
+                            approxPrice = $" ({Translator.GetConvertedCurrency(price, titleLanguage)})";
+                        }
+                        GearGraphics.DrawString(g, "- Price: " + price + "NX" + approxPrice, GearGraphics.EquipDetailFont, 13, 244, ref picH, 16);
+                    }
                 }
             }
 

@@ -266,12 +266,14 @@ namespace WzComparerR2
             tooltipQuickView.GearRender.ShowMedalTag = Setting.Gear.ShowMedalTag;
             tooltipQuickView.GearRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.GearRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.GearRender.ShowCashPurchasePrice = Setting.Gear.ShowPurchasePrice;
             tooltipQuickView.GearRender.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.GearRender22.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender22.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender22.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.GearRender22.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.GearRender22.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.GearRender22.ShowCashPurchasePrice = Setting.Gear.ShowPurchasePrice;
             tooltipQuickView.GearRender22.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
@@ -291,6 +293,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.ItemRender.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
+            tooltipQuickView.ItemRender.ShowCashPurchasePrice = Setting.Item.ShowPurchasePrice;
             tooltipQuickView.ItemRender22.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender22.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender22.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -307,6 +310,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender22.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.ItemRender22.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender22.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
+            tooltipQuickView.ItemRender22.ShowCashPurchasePrice = Setting.Item.ShowPurchasePrice;
             tooltipQuickView.UseCTFamiliarUI = Setting.Familiar.UseCTFamiliarUI;
             tooltipQuickView.FamiliarRender.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.FamiliarRender2.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
@@ -4594,6 +4598,8 @@ namespace WzComparerR2
                     comparer.UseCTFamiliarUI = CharaSimConfig.Default.Familiar.UseCTFamiliarUI;
                     comparer.EnableWorldArchive = CharaSimConfig.Default.Misc.EnableWorldArchive;
                     comparer.ShowNpcQuotes = CharaSimConfig.Default.Npc.ShowNpcQuotes;
+                    comparer.ShowItemPurchasePrice = CharaSimConfig.Default.Item.ShowPurchasePrice;
+                    comparer.ShowGearPurchasePrice = CharaSimConfig.Default.Gear.ShowPurchasePrice;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try

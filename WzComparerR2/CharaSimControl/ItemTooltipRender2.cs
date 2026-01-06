@@ -47,6 +47,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowNickTag { get; set; }
         public bool ShowLinkedTamingMob { get; set; }
+        public bool ShowCashPurchasePrice { get; set; }
         public bool CompareMode { get; set; } = false;
         public int CosmeticHairColor { get; set; }
         public int CosmeticFaceColor { get; set; }
@@ -73,6 +74,7 @@ namespace WzComparerR2.CharaSimControl
         public TooltipRender CashPackageRender { get; set; }
         public TooltipRender FamiliarRender { get; set; }
         private AvatarCanvasManager avatar { get; set; }
+        private string titleLanguage = "";
 
         public override Bitmap Render()
         {
@@ -395,6 +397,17 @@ namespace WzComparerR2.CharaSimControl
             if (!string.IsNullOrEmpty(nameAdd))
             {
                 itemName += " (" + nameAdd + ")";
+            }
+            if (Translator.DefaultDesiredCurrency != "none")
+            {
+                if (Translator.DefaultDetectCurrency == "auto")
+                {
+                    titleLanguage = Translator.GetLanguage(itemName);
+                }
+                else
+                {
+                    titleLanguage = Translator.ConvertCurrencyToLang(Translator.DefaultDetectCurrency);
+                }
             }
             if (isTranslateRequired)
             {
@@ -1136,6 +1149,52 @@ namespace WzComparerR2.CharaSimControl
                 TextRenderer.DrawText(g, string.Format("- {0} Lv {1}", sr.Name, reqSkillLevel), GearGraphics.ItemDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.SetItemNameBrush).Color, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
                 picH += 16;
                 picH += 6;
+            }
+
+
+
+            if (ShowCashPurchasePrice && item.Cash)
+            {
+                List<string> priceList = new List<string>();
+                if (CharaSimLoader.LoadedCommoditiesByItemIdInteractive.ContainsKey(item.ItemID))
+                {
+                    foreach (var i in CharaSimLoader.LoadedCommoditiesByItemIdInteractive[item.ItemID])
+                    {
+                        if (i.Value == 0) continue;
+                        string approxPrice = "";
+                        if (Translator.DefaultDesiredCurrency != "none")
+                        {
+                            approxPrice = $" ({Translator.GetConvertedCurrency(i.Value, titleLanguage)})";
+                        }
+                        if (CharaSimLoader.LoadedCommoditiesByItemIdHeroic.ContainsKey(item.ItemID)) approxPrice += " (Interactive Worlds)";
+                        string quantityUnit = i.Key == 1 ? "pc" : "pcs";
+                        priceList.Add(string.Format("   - {0} NX/{1}{2}{3}", i.Value.ToString("N0"), i.Key, quantityUnit, approxPrice));
+                    }
+                }
+                if (CharaSimLoader.LoadedCommoditiesByItemIdHeroic.ContainsKey(item.ItemID))
+                {
+                    foreach (var i in CharaSimLoader.LoadedCommoditiesByItemIdHeroic[item.ItemID])
+                    {
+                        if (i.Value == 0) continue;
+                        string quantityUnit = i.Key == 1 ? "pc" : "pcs";
+                        priceList.Add(string.Format("   - {0} mesos/{1}{2} (Heroic Worlds)", i.Value.ToString("N0"), i.Key, quantityUnit));
+                    }
+                }
+                if (priceList.Count > 0)
+                {
+                    picH += 29;
+                    switch (priceList.Count)
+                    {
+                        case 1:
+                            GearGraphics.DrawString(g, " - Price: " + priceList[0].Replace("/1pc", "").Replace("   - ", ""), GearGraphics.EquipDetailFont, 100, right, ref picH, 16);
+                            break;
+                        default:
+                            GearGraphics.DrawString(g, " - Prices:", GearGraphics.EquipDetailFont, 100, right, ref picH, 16);
+                            foreach (var i in priceList)
+                                GearGraphics.DrawString(g, i, GearGraphics.EquipDetailFont, 100, right, ref picH, 16);
+                            break;
+                    }
+                }
             }
 
             picH = Math.Max(iconY + 103, picH + 15);
