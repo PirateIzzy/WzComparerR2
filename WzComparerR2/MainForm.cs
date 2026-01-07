@@ -266,12 +266,14 @@ namespace WzComparerR2
             tooltipQuickView.GearRender.ShowMedalTag = Setting.Gear.ShowMedalTag;
             tooltipQuickView.GearRender.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.GearRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.GearRender.ShowCashPurchasePrice = Setting.Gear.ShowPurchasePrice;
             tooltipQuickView.GearRender.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.GearRender22.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender22.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender22.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
             tooltipQuickView.GearRender22.CosmeticHairColor = Setting.Item.CosmeticHairColor;
             tooltipQuickView.GearRender22.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
+            tooltipQuickView.GearRender22.ShowCashPurchasePrice = Setting.Gear.ShowPurchasePrice;
             tooltipQuickView.GearRender22.MseaMode = Setting.Misc.MseaMode;
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
@@ -291,6 +293,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.ItemRender.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
+            tooltipQuickView.ItemRender.ShowCashPurchasePrice = Setting.Item.ShowPurchasePrice;
             tooltipQuickView.ItemRender22.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender22.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender22.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -307,6 +310,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender22.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.ItemRender22.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender22.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
+            tooltipQuickView.ItemRender22.ShowCashPurchasePrice = Setting.Item.ShowPurchasePrice;
             tooltipQuickView.UseCTFamiliarUI = Setting.Familiar.UseCTFamiliarUI;
             tooltipQuickView.FamiliarRender.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.FamiliarRender2.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
@@ -705,6 +709,10 @@ namespace WzComparerR2
 
             Wz_Node node = advTree3.SelectedNode.AsWzNode();
             string aniName = GetSelectedNodeImageName();
+            if (this.pictureBoxEx1.IsPaused)
+            {
+                ResumePictureBox();
+            }
 
             //添加到动画控件
             var spineDetectResult = SpineLoader.Detect(node);
@@ -779,6 +787,10 @@ namespace WzComparerR2
 
             Wz_Node node = advTree3.SelectedNode.AsWzNode();
             string aniName = "Nested_" + GetSelectedNodeImageName();
+            if (this.pictureBoxEx1.IsPaused)
+            {
+                ResumePictureBox();
+            }
 
             if (node.Value is Wz_Png)
             {
@@ -1090,6 +1102,80 @@ namespace WzComparerR2
             {
                 labelItemStatus.Text = "Failed to save image";
             }
+        }
+
+        private void buttonItemPBPlay_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+            if (this.pictureBoxEx1.IsPlaying)
+            {
+                PausePictureBox();
+            }
+            else
+            {
+                ResumePictureBox();
+            }
+        }
+
+        private void PausePictureBox()
+        {
+            this.pictureBoxEx1.DoPause();
+            this.buttonItemPBPlay.Image = global::WzComparerR2.Properties.Resources.Play;
+            this.buttonItemPBPlay.Tooltip = "Play";
+            this.buttonItemPBGA1.Enabled = true;
+            this.buttonItemPBGA2.Enabled = true;
+            this.buttonItemPBGB1.Enabled = true;
+            this.buttonItemPBGB2.Enabled = true;
+        }
+
+        private void ResumePictureBox()
+        {
+            this.pictureBoxEx1.DoResume();
+            this.buttonItemPBPlay.Image = global::WzComparerR2.Properties.Resources.Pause;
+            this.buttonItemPBPlay.Tooltip = "Pause";
+            this.buttonItemPBGA1.Enabled = false;
+            this.buttonItemPBGA2.Enabled = false;
+            this.buttonItemPBGB1.Enabled = false;
+            this.buttonItemPBGB2.Enabled = false;
+        }
+
+        private void buttonItemPBGA1_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+            this.pictureBoxEx1.DoTimeUpdate(30);
+        }
+
+        private void buttonItemPBGA2_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+            this.pictureBoxEx1.DoTimeUpdate(360);
+        }
+
+        private void buttonItemPBGB1_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+            this.pictureBoxEx1.DoTimeUpdate(-30);
+        }
+
+        private void buttonItemPBGB2_Click(object sender, EventArgs e)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+            this.pictureBoxEx1.DoTimeUpdate(-360);
         }
 
         private void OnSaveImage(bool options)
@@ -1795,6 +1881,10 @@ namespace WzComparerR2
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     pictureBoxEx1.ShowImage(png);
                     this.cmbItemAniNames.Items.Clear();
+                    if (this.pictureBoxEx1.IsPaused)
+                    {
+                        ResumePictureBox();
+                    }
                     if (png.ActualPages > 1)
                     {
                         for (int i = 0; i < png.ActualPages; i++)
@@ -1883,6 +1973,10 @@ namespace WzComparerR2
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     this.pictureBoxEx1.ShowAnimation(videoFrameData);
                     this.cmbItemAniNames.Items.Clear();
+                    if (this.pictureBoxEx1.IsPaused)
+                    {
+                        ResumePictureBox();
+                    }
                     break;
 
                 default:
@@ -4594,6 +4688,8 @@ namespace WzComparerR2
                     comparer.UseCTFamiliarUI = CharaSimConfig.Default.Familiar.UseCTFamiliarUI;
                     comparer.EnableWorldArchive = CharaSimConfig.Default.Misc.EnableWorldArchive;
                     comparer.ShowNpcQuotes = CharaSimConfig.Default.Npc.ShowNpcQuotes;
+                    comparer.ShowItemPurchasePrice = CharaSimConfig.Default.Item.ShowPurchasePrice;
+                    comparer.ShowGearPurchasePrice = CharaSimConfig.Default.Gear.ShowPurchasePrice;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try

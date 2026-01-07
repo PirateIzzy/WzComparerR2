@@ -88,6 +88,8 @@ namespace WzComparerR2.Comparer
         public bool UseCTFamiliarUI { get; set; }
         public bool EnableWorldArchive { get; set; }
         public bool ShowNpcQuotes { get; set; }
+        public bool ShowItemPurchasePrice { get; set; }
+        public bool ShowGearPurchasePrice { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
@@ -1174,6 +1176,7 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].DisplayUnitOnSingleLine = this.DisplayDamageSkinUnitOnSingleLine;
                 itemRenderNewOld[i].UseCTFamiliarRender = this.UseCTFamiliarUI;
                 itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
+                itemRenderNewOld[i].ShowCashPurchasePrice = this.ShowItemPurchasePrice;
                 itemRenderNewOld[i].CompareMode = true;
 
                 damageSkinRenderNewOld[i] = new DamageSkinTooltipRenderer();
@@ -1479,6 +1482,7 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].AllowFamiliarOutOfBounds = this.AllowFamiliarOutOfBounds;
                 itemRenderNewOld[i].UseCTFamiliarRender = this.UseCTFamiliarUI;
                 itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
+                itemRenderNewOld[i].ShowCashPurchasePrice = this.ShowItemPurchasePrice;
                 itemRenderNewOld[i].CompareMode = true;
 
                 damageSkinRenderNewOld[i] = new DamageSkinTooltipRenderer();
@@ -1774,6 +1778,7 @@ namespace WzComparerR2.Comparer
                 gearRenderNewOld[i].StringLinker = new StringLinker();
                 gearRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
                 gearRenderNewOld[i].ShowObjectID = this.ShowObjectID;
+                gearRenderNewOld[i].ShowCashPurchasePrice = this.ShowGearPurchasePrice;
             }
 
             foreach (var gearID in OutputGearTooltipIDs)
@@ -2050,6 +2055,7 @@ namespace WzComparerR2.Comparer
                 gearRenderNewOld[i].StringLinker = new StringLinker();
                 gearRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
                 gearRenderNewOld[i].ShowObjectID = this.ShowObjectID;
+                gearRenderNewOld[i].ShowCashPurchasePrice = this.ShowGearPurchasePrice;
                 gearRenderNewOld[i].CompareMode = true;
             }
 

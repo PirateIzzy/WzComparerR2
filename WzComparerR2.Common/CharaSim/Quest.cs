@@ -18,6 +18,7 @@ namespace WzComparerR2.CharaSim
             this.Reward = new QuestReward();
             this.Category = new List<int>();
             this.Check1Items = new Dictionary<string, Check1Item>();
+            this.Check1Infoex = new Dictionary<string, bool>();
         }
 
         private int _state {  get; set; }
@@ -41,6 +42,7 @@ namespace WzComparerR2.CharaSim
         public int MedalCategory { get; set; }
         public List<int> Category { get; set; }
         public Dictionary<string, Check1Item> Check1Items { get; set; }
+        public Dictionary<string, bool> Check1Infoex { get; set; }
         public int State
         {
             get
@@ -171,13 +173,13 @@ namespace WzComparerR2.CharaSim
                         case "infoex":
                             foreach (var subNode in propNode.Nodes)
                             {
+                                var exVariable = subNode.FindNodeByPath("exVariable").GetValueEx<string>(null);
                                 var cond = subNode.FindNodeByPath("cond").GetValueEx<int>(0);
-                                if (cond.Equals(1))
-                                {
-                                    quest.InfoexCond = true;
-                                }
+                                if (exVariable != null)
+                                    quest.Check1Infoex.Add(exVariable, cond > 0 ? true : false);
                             }
                             break;
+
                     }
                 }
             }

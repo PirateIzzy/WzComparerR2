@@ -145,6 +145,13 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Item_ShowPurchasePrice
+        {
+            get { return chkShowItemPurchasePrice.Checked; }
+            set { chkShowItemPurchasePrice.Checked = value; }
+        }
+
+        [Link]
         public bool Gear_ShowLevelOrSealed
         {
             get { return checkBoxX6.Checked; }
@@ -156,6 +163,13 @@ namespace WzComparerR2
         {
             get { return checkBoxX11.Checked; }
             set { checkBoxX11.Checked = value; }
+        }
+
+        [Link]
+        public bool Gear_ShowPurchasePrice
+        {
+            get { return chkShowGearPurchasePrice.Checked; }
+            set { chkShowGearPurchasePrice.Checked = value; }
         }
 
         [Link]
