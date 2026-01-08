@@ -288,24 +288,16 @@ namespace WzComparerR2.CharaSimControl
             if (sr.Desc != null)
             if (sr.Desc != null)
             {
-                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, Skill.Common, SummaryParams.Default);
-                /*
-                StringResult sr2 = null;
-                StringBuilder hdescAppend = new StringBuilder();
-                foreach (var kv in Skill.ReqSkill)
+                Dictionary<string, string> skillCommon = Skill.Common;
+                if (Skill.PerJobAttackInfo.Count > 0)
                 {
-                    string skillName;
-                    if (this.StringLinker != null && this.StringLinker.StringSkill.TryGetValue(kv.Key, out sr2))
+                    var perJobInfo = Skill.PerJobAttackInfo.Values.ToList()[Skill.PerJobIndex];
+                    foreach (var i in perJobInfo.Keys)
                     {
-                        skillName = sr2.Name;
+                        skillCommon[i] = perJobInfo[i];
                     }
-                    else
-                    {
-                        skillName = kv.Key.ToString();
-                    }
-                    hdescAppend.AppendLine($"Required Skill: #c{skillName} Lv. {kv.Value}#");
-                    }
-                */
+                }
+                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, skillCommon, SummaryParams.Default);
                 if (Skill.IsRoguelikeSkill)
                 {
                     hdesc = hdesc.Replace("<style color=\"Orange\">", "#c").Replace("</>", "#");
@@ -696,6 +688,12 @@ namespace WzComparerR2.CharaSimControl
                     }
                     skillDescEx.Add("#c[Lv. " + kv.Value + " " + skillName + " required]#");
                 }
+            }
+
+            if (Skill.PerJobAttackInfo.Count > 0)
+            {
+                int jobID = Skill.PerJobAttackInfo.Keys.ToList()[Skill.PerJobIndex];
+                skillDescEx.Add($"#c[Applicable Job] {ItemStringHelper.GetJobName(Skill.SkillID / 100000000 == 5 ? jobID + 2 : jobID) ?? ItemStringHelper.GetJobName(Skill.SkillID / 100000000 == 5 ? jobID + 3 : jobID) ?? ItemStringHelper.GetJobName(jobID)}({jobID})#");
             }
 
             if (Skill.LT.X != 0)

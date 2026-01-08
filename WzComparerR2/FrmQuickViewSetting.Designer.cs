@@ -301,7 +301,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(142, 30);
             this.labelX3.TabIndex = 6;
-            this.labelX3.Text = "Use the <b>- +</b> keys to adjust default levels <br/> Use <b>[ ]</b> keys to adjust interval levels";
+            this.labelX3.Text = "Use the <b>- +</b> keys to adjust default levels <br/> Use <b>[ ]</b> keys to adjust interval levels <br/> Use <b>PgUp/PgDn</b> to adjust applicable jobs";
             // 
             // comboBoxEx2
             // 
