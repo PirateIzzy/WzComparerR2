@@ -23,6 +23,7 @@ using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
 using ModifierKeys = EmptyKeys.UserInterface.Input.ModifierKeys;
 using ServiceManager = EmptyKeys.UserInterface.Mvvm.ServiceManager;
 using WzComparerR2.MapRender.Effects;
+using WzComparerR2.Animation;
 #endregion
 
 namespace WzComparerR2.MapRender
@@ -688,6 +689,13 @@ namespace WzComparerR2.MapRender
             var wnd = sender as UIOptions;
             var data = wnd.DataContext as UIOptionsDataModel;
             LoadOptionData(data);
+        }
+
+        private void SpineSelector_Visible(object sender, RoutedEventArgs e)
+        {
+            UISpineSelector wnd = sender as UISpineSelector;
+            wnd.Left = (int)Math.Max(0, (this.ui.Width - wnd.Width) / 2);
+            wnd.Top = (int)Math.Max(0, (this.ui.Height - wnd.Height) / 2);
         }
 
         private void WorldMap_MapSpotClick(object sender, UIWorldMap.MapSpotEventArgs e)
