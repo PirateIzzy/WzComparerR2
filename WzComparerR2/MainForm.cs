@@ -3272,6 +3272,13 @@ namespace WzComparerR2
 
         private void buttonItemSelectStringWz_Click(object sender, EventArgs e)
         {
+            buttonItemSearchString.Enabled = false;
+            Task.Run(() => selectStringWz());
+        }
+
+        private async void selectStringWz()
+        {
+            labelItemStatus.Text = "Loading StringLinker...";
             Wz_File stringWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("String").GetNodeWzFile();
             Wz_File itemWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Item").GetNodeWzFile();
             Wz_File etcWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Etc").GetNodeWzFile();
@@ -3279,6 +3286,7 @@ namespace WzComparerR2
             if (stringWzFile == null || itemWzFile == null || etcWzFile == null)
             {
                 MessageBoxEx.Show("Select Base.wz.", "Error");
+                buttonItemSearchString.Enabled = true;
                 return;
             }
             QueryPerformance.Start();
@@ -3293,6 +3301,7 @@ namespace WzComparerR2
             {
                 MessageBoxEx.Show("Failed to reset StringLinker.", "Error");
             }
+            buttonItemSearchString.Enabled = true;
         }
 
         private void buttonItemClearStringWz_Click(object sender, EventArgs e)
