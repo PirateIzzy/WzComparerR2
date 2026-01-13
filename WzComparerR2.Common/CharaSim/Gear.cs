@@ -558,6 +558,7 @@ namespace WzComparerR2.CharaSim
                     return GearType.longSword;
                 case 1252:
                 case 1253:
+                case 1254:
                 case 1259:
                     return (GearType)(code / 1000);
                 case 1403:
