@@ -83,6 +83,7 @@ namespace WzComparerR2.Comparer
         public bool UseMiniSizeDamageSkin { get; set; }
         public bool AlwaysUseMseaFormatDamageSkin { get; set; }
         public bool DisplayDamageSkinUnitOnSingleLine { get; set; }
+        public bool UseInGameSpacing { get; set; }
         public long DamageSkinNumber { get; set; }
         public bool AllowFamiliarOutOfBounds { get; set; }
         public bool UseCTFamiliarUI { get; set; }
@@ -1174,6 +1175,7 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].AlwaysUseMseaFormatDamageSkin = this.AlwaysUseMseaFormatDamageSkin;
                 itemRenderNewOld[i].AllowFamiliarOutOfBounds = this.AllowFamiliarOutOfBounds;
                 itemRenderNewOld[i].DisplayUnitOnSingleLine = this.DisplayDamageSkinUnitOnSingleLine;
+                itemRenderNewOld[i].UseInGameSpacing = this.UseInGameSpacing;
                 itemRenderNewOld[i].UseCTFamiliarRender = this.UseCTFamiliarUI;
                 itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;
                 itemRenderNewOld[i].ShowCashPurchasePrice = this.ShowItemPurchasePrice;
@@ -1479,6 +1481,7 @@ namespace WzComparerR2.Comparer
                 itemRenderNewOld[i].UseMiniSizeDamageSkin = this.UseMiniSizeDamageSkin;
                 itemRenderNewOld[i].AlwaysUseMseaFormatDamageSkin = this.AlwaysUseMseaFormatDamageSkin;
                 itemRenderNewOld[i].DisplayUnitOnSingleLine = this.DisplayDamageSkinUnitOnSingleLine;
+                itemRenderNewOld[i].UseInGameSpacing = this.UseInGameSpacing;
                 itemRenderNewOld[i].AllowFamiliarOutOfBounds = this.AllowFamiliarOutOfBounds;
                 itemRenderNewOld[i].UseCTFamiliarRender = this.UseCTFamiliarUI;
                 itemRenderNewOld[i].DamageSkinNumber = this.DamageSkinNumber;

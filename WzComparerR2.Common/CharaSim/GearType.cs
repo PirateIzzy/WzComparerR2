@@ -533,6 +533,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         cashWeapon = 170,
         /// <summary>
+        /// Astra 172
+        /// </summary>
+        astra = 172,
+        /// <summary>
         /// Weapon -1
         /// </summary>
         weapon = -1,

@@ -55,6 +55,7 @@ namespace WzComparerR2.CharaSimControl
         public bool AlwaysUseMseaFormatDamageSkin { get; set; }
         public bool DisplayUnitOnSingleLine { get; set; }
         public bool AllowFamiliarOutOfBounds { get; set; }
+        public bool UseInGameSpacing { get; set; }
         public bool UseCTFamiliarRender { get; set; }
         public long DamageSkinNumber { get; set; }
         public int CosmeticHairColor { get; set; }
@@ -1326,6 +1327,7 @@ namespace WzComparerR2.CharaSimControl
                 defaultRenderer.AlwaysUseMseaFormat = this.AlwaysUseMseaFormatDamageSkin;
                 defaultRenderer.DisplayUnitOnSingleLine = this.DisplayUnitOnSingleLine;
                 defaultRenderer.DamageSkinNumber = this.DamageSkinNumber;
+                defaultRenderer.UseInGameSpacing = this.UseInGameSpacing;
                 renderer = defaultRenderer;
                 defaultRenderer.DamageSkin = damageSkin;
                 item.DamageSkinSampleNonCriticalBitmap = defaultRenderer.GetCustomSample(this.DamageSkinNumber, this.UseMiniSizeDamageSkin, false);
