@@ -302,7 +302,8 @@ namespace WzComparerR2.CharaSimControl
             else
             {
                 Bitmap targetIllust = bitmaps[npcIndex];
-                Bitmap result = new Bitmap(targetIllust.Width + 30, targetIllust.Height + 60, PixelFormat.Format32bppArgb);
+                if (targetIllust == null) return null;
+                Bitmap result = new Bitmap(Math.Max(targetIllust.Width, 150) + 30, targetIllust.Height + 60, PixelFormat.Format32bppArgb);
                 using (Graphics g = Graphics.FromImage(result))
                 {
                     GearGraphics.DrawNewTooltipBack(g, 0, 0, result.Width, result.Height);

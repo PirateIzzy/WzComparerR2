@@ -65,6 +65,7 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Font EquipMDMoris9Font = new Font("Arial", 12f, GraphicsUnit.Pixel);
         public static readonly Font EquipMDMoris9FontBold = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
         public static readonly Font FamiliarFont = new Font("Lucida Console", 12f, GraphicsUnit.Pixel);
+        public static readonly Font NewCTFamiliarNameFont = new Font("Noto Sans SC", 15f, FontStyle.Bold, GraphicsUnit.Pixel);
 
         private static PrivateFontCollection _pfc = new PrivateFontCollection();
         public static Font ItemNameFont2 { get; private set; }

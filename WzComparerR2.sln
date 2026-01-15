@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WzComparerR2.Network", "WzC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.CLI", "WzComparerR2.CLI\WzComparerR2.CLI.csproj", "{3F688FA8-9395-47EB-8A31-3D5ED218AC27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Updater", "WzComparerR2.Updater\WzComparerR2.Updater.csproj", "{7EC47754-3D92-6785-1991-22448D03AF6F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,6 +164,18 @@ Global
 		{3F688FA8-9395-47EB-8A31-3D5ED218AC27}.Release|x64.Build.0 = Release|Any CPU
 		{3F688FA8-9395-47EB-8A31-3D5ED218AC27}.Release|x86.ActiveCfg = Release|Any CPU
 		{3F688FA8-9395-47EB-8A31-3D5ED218AC27}.Release|x86.Build.0 = Release|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Debug|x64.Build.0 = Debug|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Debug|x86.Build.0 = Debug|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Release|x64.ActiveCfg = Release|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Release|x64.Build.0 = Release|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Release|x86.ActiveCfg = Release|Any CPU
+		{7EC47754-3D92-6785-1991-22448D03AF6F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

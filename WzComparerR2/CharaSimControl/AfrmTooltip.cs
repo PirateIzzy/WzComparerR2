@@ -784,6 +784,11 @@ namespace WzComparerR2.CharaSimControl
                                 int idx = 1;
                                 foreach (var ib in (this.TargetItem as Npc).Illustration2Bitmaps)
                                 {
+                                    if (ib == null)
+                                    {
+                                        idx++;
+                                        continue;
+                                    }
                                     string fileName = $"NPC Portrait {NodeID} {NodeName} ({idx}).png";
                                     ib.Save(Path.Combine(dlg.SelectedPath, fileName), System.Drawing.Imaging.ImageFormat.Png);
                                     idx++;

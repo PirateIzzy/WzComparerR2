@@ -185,6 +185,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         celestialLight = 1253,
         /// <summary>
+        /// Onmyo Sen 1254
+        /// </summary>
+        onmyoSen = 1254,
+        /// <summary>
         /// Beast Tamer Scepter 1259
         /// </summary>
         magicStick = 1259,
@@ -413,6 +417,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         yeouiGem = 135404,
         /// <summary>
+        /// Kanna Reifu 135430
+        /// </summary>
+        kannaReifu = 135430,
+        /// <summary>
         /// Cane 136
         /// </summary>
         cane = 136,
@@ -524,6 +532,10 @@ namespace WzComparerR2.CharaSim
         /// Cash Weapon 170
         /// </summary>
         cashWeapon = 170,
+        /// <summary>
+        /// Astra 172
+        /// </summary>
+        astra = 172,
         /// <summary>
         /// Weapon -1
         /// </summary>

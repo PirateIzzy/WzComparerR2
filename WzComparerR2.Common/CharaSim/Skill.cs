@@ -27,9 +27,12 @@ namespace WzComparerR2.CharaSim
             this.GuildCastleResearchRequirements = new Dictionary<int, int>();
             this.GuildCastleResearchReqCondition = "";
             this.VariableProps = new List<string>();
+            this.PerJobAttackInfo = new Dictionary<int, Dictionary<string, string>>();
+            this.perJobIndex = 0;
         }
 
         private int level;
+        private int perJobIndex;
         internal List<Dictionary<string, string>> levelCommon;
         internal Dictionary<string, string> common;
 
@@ -65,6 +68,15 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public int PerJobIndex
+        {
+            get { return perJobIndex; }
+            set
+            {
+                perJobIndex = Math.Max(0, Math.Min(value, this.PerJobAttackInfo.Count - 1));
+            }
+        }
+
         public int ReqLevel { get; set; }
         public int ReqAmount { get; set; }
         public bool PreBBSkill { get; set; }
@@ -96,8 +108,9 @@ namespace WzComparerR2.CharaSim
         public int AddAttackToolTipDescSkill { get; set; }
         public int AssistSkillLink { get; set; }
         public int VehicleID { get; set; }
-        public Dictionary<string, Wz_Vector> Lt {  get; set; }
+        public Dictionary<string, Wz_Vector> Lt { get; set; }
         public Dictionary<string, Wz_Vector> Rb { get; set; }
+        public Dictionary<int, Dictionary<string, string>> PerJobAttackInfo { get; set; }
 
         public Point LT { get; set; }
         public Point RB { get; set; }
@@ -226,6 +239,25 @@ namespace WzComparerR2.CharaSim
                                     else if (commonNode.Text == "rb")
                                     {
                                         skill.RB = new Point(cNode.X, cNode.Y);
+                                    }
+                                }
+                                else if (commonNode.Text == "attackInfo")
+                                {
+                                    if (commonNode.Nodes.Count > 0)
+                                    {
+                                        foreach (Wz_Node jobNode in commonNode.Nodes)
+                                        {
+                                            int jobID;
+                                            if (Int32.TryParse(jobNode.Text, out jobID))
+                                            {
+                                                Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+                                                foreach (Wz_Node infoNode in jobNode.Nodes)
+                                                {
+                                                    attackInfo[infoNode.Text] = infoNode.Value.ToString();
+                                                }
+                                                skill.PerJobAttackInfo[jobID] = attackInfo;
+                                            }
+                                        }
                                     }
                                 }
                                 else if (commonNode.Nodes.Count > 0)

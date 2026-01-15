@@ -290,6 +290,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
             tooltipQuickView.ItemRender.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
             tooltipQuickView.ItemRender.DisplayUnitOnSingleLine = Setting.DamageSkin.DisplayUnitOnSingleLine;
+            tooltipQuickView.ItemRender.UseInGameSpacing = Setting.DamageSkin.UseInGameSpacing;
             tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.ItemRender.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
@@ -307,6 +308,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender22.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
             tooltipQuickView.ItemRender22.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
             tooltipQuickView.ItemRender22.DisplayUnitOnSingleLine = Setting.DamageSkin.DisplayUnitOnSingleLine;
+            tooltipQuickView.ItemRender22.UseInGameSpacing = Setting.DamageSkin.UseInGameSpacing;
             tooltipQuickView.ItemRender22.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.ItemRender22.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender22.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
@@ -3270,6 +3272,13 @@ namespace WzComparerR2
 
         private void buttonItemSelectStringWz_Click(object sender, EventArgs e)
         {
+            buttonItemSearchString.Enabled = false;
+            Task.Run(() => selectStringWz());
+        }
+
+        private async void selectStringWz()
+        {
+            labelItemStatus.Text = "Loading StringLinker...";
             Wz_File stringWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("String").GetNodeWzFile();
             Wz_File itemWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Item").GetNodeWzFile();
             Wz_File etcWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Etc").GetNodeWzFile();
@@ -3277,6 +3286,7 @@ namespace WzComparerR2
             if (stringWzFile == null || itemWzFile == null || etcWzFile == null)
             {
                 MessageBoxEx.Show("Select Base.wz.", "Error");
+                buttonItemSearchString.Enabled = true;
                 return;
             }
             QueryPerformance.Start();
@@ -3291,6 +3301,7 @@ namespace WzComparerR2
             {
                 MessageBoxEx.Show("Failed to reset StringLinker.", "Error");
             }
+            buttonItemSearchString.Enabled = true;
         }
 
         private void buttonItemClearStringWz_Click(object sender, EventArgs e)
@@ -4333,6 +4344,16 @@ namespace WzComparerR2
                         skill.Level += this.skillInterval;
                         frm.Refresh();
                         return;
+
+                    case Keys.PageDown:
+                        skill.PerJobIndex += 1;
+                        frm.Refresh();
+                        return;
+
+                    case Keys.PageUp:
+                        skill.PerJobIndex -= 1;
+                        frm.Refresh();
+                        return;
                 }
             }
 
@@ -4683,6 +4704,7 @@ namespace WzComparerR2
                     comparer.UseMiniSizeDamageSkin = CharaSimConfig.Default.DamageSkin.UseMiniSize;
                     comparer.AlwaysUseMseaFormatDamageSkin = CharaSimConfig.Default.DamageSkin.AlwaysUseMseaFormat;
                     comparer.DisplayDamageSkinUnitOnSingleLine = CharaSimConfig.Default.DamageSkin.DisplayUnitOnSingleLine;
+                    comparer.UseInGameSpacing = CharaSimConfig.Default.DamageSkin.UseInGameSpacing;
                     comparer.DamageSkinNumber = CharaSimConfig.Default.DamageSkin.DamageSkinNumber;
                     comparer.AllowFamiliarOutOfBounds = CharaSimConfig.Default.Familiar.AllowOutOfBounds;
                     comparer.UseCTFamiliarUI = CharaSimConfig.Default.Familiar.UseCTFamiliarUI;
@@ -5099,33 +5121,56 @@ namespace WzComparerR2
                                     skillName = sr.Name;
                                     labelX2.Text = string.Format("Exporting：{0} - {1}", j.Text, skillName);
                                     Skill skill = Skill.CreateFromNode(j, PluginManager.FindWz, PluginManager.FindWz);
+                                    bool isPerJobSkill = false;
                                     if (skill != null)
                                     {
                                         skill.Level = skill.MaxLevel;
                                         tooltip.Skill = skill;
+                                        isPerJobSkill = skill.PerJobAttackInfo.Count > 0;
                                     }
                                     else
                                     {
                                         continue;
                                     }
-                                    Bitmap resultImage = tooltip.Render();
-                                    string categoryPath = "";
-                                    if (FifthJobSkillToJobID.ContainsKey(int.Parse(j.Text)))
+                                    if (isPerJobSkill)
                                     {
-                                        categoryPath = ItemStringHelper.GetFifthJobName(int.Parse(j.Text), FifthJobSkillToJobID[int.Parse(j.Text)], isMsea);
+                                        for (int jobIndex = 0; jobIndex < skill.PerJobAttackInfo.Count; jobIndex++)
+                                        {
+                                            skill.PerJobIndex = jobIndex;
+                                            Bitmap resultImage = tooltip.Render();
+                                            int jobID = skill.PerJobAttackInfo.Keys.ToList()[jobIndex];
+                                            string categoryPath = ItemStringHelper.GetJobName((i / 10000) == 5 ? jobID + 2 : jobID, isMsea) ?? ItemStringHelper.GetJobName((i / 10000) == 5 ? jobID + 3 : jobID, isMsea) ?? ItemStringHelper.GetJobName(jobID, isMsea) ?? "Etc";
+                                            if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
+                                            {
+                                                Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
+                                            }
+                                            string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + j.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                            if (File.Exists(imageName)) File.Delete(imageName);
+                                            resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                                            resultImage.Dispose();
+                                        }
                                     }
                                     else
                                     {
-                                        categoryPath = ItemStringHelper.GetJobName(i, isMsea) ?? "Other";
+                                        Bitmap resultImage = tooltip.Render();
+                                        string categoryPath = "";
+                                        if (FifthJobSkillToJobID.ContainsKey(int.Parse(j.Text)))
+                                        {
+                                            categoryPath = ItemStringHelper.GetFifthJobName(int.Parse(j.Text), FifthJobSkillToJobID[int.Parse(j.Text)]);
+                                        }
+                                        else
+                                        {
+                                            categoryPath = ItemStringHelper.GetJobName(i, isMsea) ?? "Other";
+                                        }
+                                        if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
+                                        {
+                                            Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
+                                        }
+                                        string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + j.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
+                                        if (File.Exists(imageName)) File.Delete(imageName);
+                                        resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
+                                        resultImage.Dispose();
                                     }
-                                    if (!Directory.Exists(Path.Combine(exportedFolder, categoryPath)))
-                                    {
-                                        Directory.CreateDirectory(Path.Combine(exportedFolder, categoryPath));
-                                    }
-                                    string imageName = Path.Combine(exportedFolder, categoryPath, "Skill_" + j.Text + "_" + RemoveInvalidFileNameChars(skillName) + ".png");
-                                    if (File.Exists(imageName)) File.Delete(imageName);
-                                    resultImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
-                                    resultImage.Dispose();
                                 }
                                 if (FifthJobSkillToJobID.Count > 0)
                                 {
