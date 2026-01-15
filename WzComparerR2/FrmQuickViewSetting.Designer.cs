@@ -297,7 +297,7 @@
             // 
             this.labelX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.labelX3.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.labelX3.Location = new System.Drawing.Point(13, 235);
+            this.labelX3.Location = new System.Drawing.Point(13, 225);
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(142, 30);
             this.labelX3.TabIndex = 6;
