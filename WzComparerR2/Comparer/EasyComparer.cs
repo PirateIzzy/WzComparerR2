@@ -1187,6 +1187,7 @@ namespace WzComparerR2.Comparer
                     int nullSkillIdx = 0;
 
                     int maxSkillIndex = 0;
+                    bool isSixthJobSkill = int.Parse(skillID) / 100000000 == 5;
 
                     // 変更前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
