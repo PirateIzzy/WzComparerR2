@@ -3873,6 +3873,7 @@ namespace WzComparerR2
                     CharaSimLoader.LoadSetItemsIfEmpty();
                     CharaSimLoader.LoadExclusiveEquipsIfEmpty();
                     CharaSimLoader.LoadCommoditiesIfEmpty();
+                    CharaSimLoader.LoadMsnMintableItemListIfEmpty();
                     if (characterNodePath.Contains("Familiar"))
                     {
                         var familiar = Familiar.CreateFromNode(image.Node, PluginManager.FindWz);
@@ -3906,6 +3907,7 @@ namespace WzComparerR2
                     break;
                 case Wz_Type.Item:
                     CharaSimLoader.LoadCommoditiesIfEmpty();
+                    CharaSimLoader.LoadMsnMintableItemListIfEmpty();
                     Wz_Node itemNode = selectedNode;
                     if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4,6}.img\\\d+$") || Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\Special\\0910.img\\\d+$"))
                     {

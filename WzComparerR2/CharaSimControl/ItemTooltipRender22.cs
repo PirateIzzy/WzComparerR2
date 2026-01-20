@@ -586,7 +586,7 @@ namespace WzComparerR2.CharaSimControl
                 iconX + 6 + (1 - item.Icon.Origin.X) * 2,
                 picH + 6 + (33 - item.Icon.Origin.Y) * 2);
             }
-            if (item.Cash)
+            if (item.Cash && !((item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0) || CharaSimLoader.LoadedMintableNFTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableSBTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableFTItems.Contains(item.ItemID)))
             {
                 Bitmap cashImg = null;
                 Point cashOrigin = new Point(12, 12);
@@ -1053,7 +1053,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.pquest, value));
             }
-            if (item.Props.TryGetValue(ItemPropType.tradeBlock, out value) && value != 0)
+            if ((item.Props.TryGetValue(ItemPropType.tradeBlock, out value) && value != 0) && !(item.Props.TryGetValue(ItemPropType.mintable, out _)))
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.tradeBlock, value));
             }
@@ -1096,9 +1096,13 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharableAfterExchange, value));
             }
-            if (item.Props.TryGetValue(ItemPropType.mintable, out value))
+            if (item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, value));
+            }
+            else if (CharaSimLoader.LoadedMintableNFTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableSBTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableFTItems.Contains(item.ItemID))
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, 1));
             }
 
             return tags;

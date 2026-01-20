@@ -367,8 +367,8 @@ namespace WzComparerR2.CharaSimControl
             }
             else g.DrawImage(Resource.UIToolTipNew_img_Item_Common_ItemIcon_base, 15, picH + 10);
 
-            // 캐시 Label 아이콘
-            if (Gear.Cash && !(Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0))
+            // 캐시 라벨 아이콘
+            if (Gear.Cash && !((Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0) || CharaSimLoader.LoadedMintableNFTItems.Contains(Gear.ItemID) || CharaSimLoader.LoadedMintableSBTItems.Contains(Gear.ItemID) || CharaSimLoader.LoadedMintableFTItems.Contains(Gear.ItemID)))
             {
                 Bitmap cashImg = null;
                 Point cashOrigin = new Point(12, 12);
@@ -1842,6 +1842,16 @@ namespace WzComparerR2.CharaSimControl
                 tags.Add(text);
             }
 
+            // 민팅
+            if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.mintable, value)[0]);
+            }
+            else if (CharaSimLoader.LoadedMintableNFTItems.Contains(Gear.ItemID) || CharaSimLoader.LoadedMintableSBTItems.Contains(Gear.ItemID) || CharaSimLoader.LoadedMintableFTItems.Contains(Gear.ItemID))
+            {
+                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.mintable, 1)[0]);
+            }
+
             return tags.Where(text => !string.IsNullOrEmpty(text)).ToList();
         }
 
@@ -1954,12 +1964,6 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.noPrism, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.noPrism, value)[0]);
-            }
-
-            // 민팅
-            if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetGearPropString22(GearPropType.mintable, value)[0]);
             }
 
             return tags.Where(text => !string.IsNullOrEmpty(text)).ToList();

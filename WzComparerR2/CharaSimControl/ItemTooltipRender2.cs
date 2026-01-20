@@ -495,6 +495,7 @@ namespace WzComparerR2.CharaSimControl
                 string attrStr = null;
                 for (int i = 0; i < attrList.Count; i++)
                 {
+                    if (attrList[i] == null) continue;
                     var newStr = (attrStr != null ? (attrStr + ", ") : null) + attrList[i];
                     if (TextRenderer.MeasureText(g, newStr, font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width > tooltip.Width - 7 || (attrList[i].Contains('\n') && attrStr != null))
                     {
@@ -611,7 +612,7 @@ namespace WzComparerR2.CharaSimControl
                 picH + 6 + (33 - item.Icon.Origin.Y) * 2);
                 //picH + 8 + (33 - item.Icon.Bitmap.Height) * 2);
             }
-            if (item.Cash && !(item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0))
+            if (item.Cash && !((item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0) || CharaSimLoader.LoadedMintableNFTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableSBTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableFTItems.Contains(item.ItemID)))
             {
                 Bitmap cashImg = null;
                 Point cashOrigin = new Point(12, 12);
@@ -1219,7 +1220,11 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.pquest, value));
             }
-            if (item.Props.TryGetValue(ItemPropType.tradeBlock, out value) && value != 0)
+            if (item.Props.TryGetValue(ItemPropType.only, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.only, value));
+            }
+            if ((item.Props.TryGetValue(ItemPropType.tradeBlock, out value) && value != 0) && !(item.Props.TryGetValue(ItemPropType.mintable, out _)))
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.tradeBlock, value));
             }
@@ -1258,13 +1263,13 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.multiPet, 0));
             }
-            if (item.Props.TryGetValue(ItemPropType.accountSharableAfterExchange, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharableAfterExchange, value));
-            }
-            if (item.Props.TryGetValue(ItemPropType.mintable, out value))
+            if (item.Props.TryGetValue(ItemPropType.mintable, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, value));
+            }
+            else if (CharaSimLoader.LoadedMintableNFTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableSBTItems.Contains(item.ItemID) || CharaSimLoader.LoadedMintableFTItems.Contains(item.ItemID))
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, 1));
             }
 
             return tags;
