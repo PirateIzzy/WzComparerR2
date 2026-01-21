@@ -28,5 +28,12 @@ namespace WzComparerR2.Config
             get { return (bool)this["enableWorldArchive"]; }
             set { this["enableWorldArchive"] = value; }
         }
+
+        [ConfigurationProperty("locatePetEquip", DefaultValue = true)]
+        public bool LocatePetEquip
+        {
+            get { return (bool)this["locatePetEquip"]; }
+            set { this["locatePetEquip"] = value; }
+        }
     }
 }

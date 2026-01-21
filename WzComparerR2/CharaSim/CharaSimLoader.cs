@@ -20,6 +20,7 @@ namespace WzComparerR2.CharaSim
             LoadedMintableNFTItems = new List<int>();
             LoadedMintableSBTItems = new List<int>();
             LoadedMintableFTItems = new List<int>();
+            LoadedPetEquipInfo = new Dictionary<int, List<int>>();
         }
 
         public static Dictionary<int, SetItem> LoadedSetItems { get; private set; }
@@ -31,6 +32,7 @@ namespace WzComparerR2.CharaSim
         public static List<int> LoadedMintableNFTItems { get; private set; }
         public static List<int> LoadedMintableSBTItems { get; private set; }
         public static List<int> LoadedMintableFTItems { get; private set; }
+        public static Dictionary<int, List<int>> LoadedPetEquipInfo { get; private set; }
 
         public static void LoadSetItemsIfEmpty()
         {
@@ -121,6 +123,49 @@ namespace WzComparerR2.CharaSim
                 {
                     if (int.TryParse(i.Text, out int id))
                         LoadedMintableFTItems.Add(id);
+                }
+            }
+        }
+
+        public static void LoadPetEquipInfoIfEmpty(Wz_File sourceWzFile = null)
+        {
+            if (LoadedPetEquipInfo.Count == 0)
+            {
+                LoadPetEquipInfo(sourceWzFile);
+            }
+        }
+
+        public static void LoadPetEquipInfo(Wz_File sourceWzFile)
+        {
+            Wz_Node characterWz = PluginManager.FindWz(Wz_Type.Character, sourceWzFile);
+            if (characterWz == null)
+                return;
+            Wz_Node petEquipNode = characterWz.FindNodeByPath("PetEquip", true);
+            if (petEquipNode == null)
+                return;
+
+            LoadedPetEquipInfo.Clear();
+            foreach (var i in petEquipNode.Nodes)
+            {
+                Wz_Image image = i.GetValue<Wz_Image>();
+                if (image == null || !image.TryExtract())
+                {
+                    continue;
+                }
+                else
+                {
+                    if (Int32.TryParse(i.Text.Replace(".img", ""), out int petEquipId))
+                    {
+                        List<int> applicablePets = new List<int>();
+                        foreach (var j in image.Node.Nodes)
+                        {
+                            if (Int32.TryParse(j.Text, out int petID))
+                            {
+                                applicablePets.Add(petID);
+                            }
+                        }
+                        LoadedPetEquipInfo[petEquipId] = applicablePets;
+                    }
                 }
             }
         }
@@ -248,6 +293,7 @@ namespace WzComparerR2.CharaSim
             LoadedMintableNFTItems.Clear();
             LoadedMintableSBTItems.Clear();
             LoadedMintableFTItems.Clear();
+            LoadedPetEquipInfo.Clear();
         }
 
         public static int GetActionDelay(string actionName, Wz_Node wzNode = null)

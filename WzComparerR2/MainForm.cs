@@ -30,6 +30,7 @@ using WzComparerR2.Controls;
 using WzComparerR2.Encoders;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
+using Newtonsoft.Json.Linq;
 
 namespace WzComparerR2
 {
@@ -268,6 +269,7 @@ namespace WzComparerR2
             tooltipQuickView.GearRender.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.GearRender.ShowCashPurchasePrice = Setting.Gear.ShowPurchasePrice;
             tooltipQuickView.GearRender.MseaMode = Setting.Misc.MseaMode;
+            tooltipQuickView.GearRender.ShowApplicablePet = Setting.Misc.LocatePetEquip;
             tooltipQuickView.GearRender22.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender22.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender22.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
@@ -275,6 +277,7 @@ namespace WzComparerR2
             tooltipQuickView.GearRender22.CosmeticFaceColor = Setting.Item.CosmeticFaceColor;
             tooltipQuickView.GearRender22.ShowCashPurchasePrice = Setting.Gear.ShowPurchasePrice;
             tooltipQuickView.GearRender22.MseaMode = Setting.Misc.MseaMode;
+            tooltipQuickView.GearRender22.ShowApplicablePet = Setting.Misc.LocatePetEquip;
             tooltipQuickView.ItemRender.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -295,6 +298,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
             tooltipQuickView.ItemRender.ShowCashPurchasePrice = Setting.Item.ShowPurchasePrice;
+            tooltipQuickView.ItemRender.ShowApplicablePetEquip = Setting.Misc.LocatePetEquip;
             tooltipQuickView.ItemRender22.ShowObjectID = Setting.Item.ShowID;
             tooltipQuickView.ItemRender22.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender22.LinkRecipeItem = Setting.Item.LinkRecipeItem;
@@ -313,6 +317,7 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender22.AllowFamiliarOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.ItemRender22.UseCTFamiliarRender = Setting.Familiar.UseCTFamiliarUI;
             tooltipQuickView.ItemRender22.ShowCashPurchasePrice = Setting.Item.ShowPurchasePrice;
+            tooltipQuickView.ItemRender22.ShowApplicablePetEquip = Setting.Misc.LocatePetEquip;
             tooltipQuickView.UseCTFamiliarUI = Setting.Familiar.UseCTFamiliarUI;
             tooltipQuickView.FamiliarRender.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
             tooltipQuickView.FamiliarRender2.AllowOutOfBounds = Setting.Familiar.AllowOutOfBounds;
@@ -3874,6 +3879,7 @@ namespace WzComparerR2
                     CharaSimLoader.LoadExclusiveEquipsIfEmpty();
                     CharaSimLoader.LoadCommoditiesIfEmpty();
                     CharaSimLoader.LoadMsnMintableItemListIfEmpty();
+                    if (CharaSimConfig.Default.Misc.LocatePetEquip) CharaSimLoader.LoadPetEquipInfoIfEmpty();
                     if (characterNodePath.Contains("Familiar"))
                     {
                         var familiar = Familiar.CreateFromNode(image.Node, PluginManager.FindWz);
@@ -3908,6 +3914,7 @@ namespace WzComparerR2
                 case Wz_Type.Item:
                     CharaSimLoader.LoadCommoditiesIfEmpty();
                     CharaSimLoader.LoadMsnMintableItemListIfEmpty();
+                    if (CharaSimConfig.Default.Misc.LocatePetEquip) CharaSimLoader.LoadPetEquipInfoIfEmpty();
                     Wz_Node itemNode = selectedNode;
                     if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4,6}.img\\\d+$") || Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\Special\\0910.img\\\d+$"))
                     {
@@ -4714,6 +4721,7 @@ namespace WzComparerR2
                     comparer.ShowNpcQuotes = CharaSimConfig.Default.Npc.ShowNpcQuotes;
                     comparer.ShowItemPurchasePrice = CharaSimConfig.Default.Item.ShowPurchasePrice;
                     comparer.ShowGearPurchasePrice = CharaSimConfig.Default.Gear.ShowPurchasePrice;
+                    comparer.LocatePetEquip = CharaSimConfig.Default.Misc.LocatePetEquip;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     try
@@ -5027,6 +5035,89 @@ namespace WzComparerR2
                     File.Copy(Path.Combine(dlg.SelectedPath, "ms_skill.csv"), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TranslationCache", String.Format("ms_skill_{0}.csv", langcode)));
                 }
                 MessageBoxEx.Show("Exported.");
+            }
+        }
+
+        private async void btnPetEquipExport_Click(object sender, EventArgs e)
+        {
+            if (PluginManager.FindWz(Wz_Type.Base) == null)
+            {
+                ToastNotification.Show(this, $"Error: Please open Base.wz.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+            if (openedWz.Count > 1)
+            {
+                ToastNotification.Show(this, $"Error: Please only open one Base.wz before using this feature.", null, 4000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.Description = "Select the destination folder you want to export to.";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                btnPetEquipExport.Enabled = false;
+                labelX2.Text = "Exporting";
+                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                await Task.Run(() =>
+                {
+                    sw.Start();
+                    if (!this.stringLinker.HasValues)
+                        this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+
+                    CharaSimLoader.LoadPetEquipInfoIfEmpty();
+
+                    SortedDictionary<int, List<int>> petToEquip = new SortedDictionary<int, List<int>>();
+
+                    foreach (var i in CharaSimLoader.LoadedPetEquipInfo.Keys)
+                    {
+                        List<int> applicablePets = CharaSimLoader.LoadedPetEquipInfo[i];
+                        foreach (var j in applicablePets)
+                        {
+                            if (!petToEquip.ContainsKey(j)) petToEquip[j] = new List<int>();
+                            petToEquip[j].Add(i);
+                        }
+                    }
+
+                    JObject root = new JObject();
+                    foreach (var pet in petToEquip)
+                    {
+                        int petId = pet.Key;
+                        StringResult sr;
+                        if (this.stringLinker == null || !this.stringLinker.StringItem.TryGetValue(petId, out sr))
+                        {
+                            sr = new StringResult();
+                            sr.Name = "(null)";
+                        }
+
+                        var petEquips = new Dictionary<int, string>();
+
+                        foreach (var i in pet.Value)
+                        {
+                            StringResult sr2;
+                            if (this.stringLinker == null || !this.stringLinker.StringEqp.TryGetValue(i, out sr2))
+                            {
+                                sr2 = new StringResult();
+                                sr2.Name = "(null)";
+                            }
+                            petEquips.Add(i, sr2.Name);
+                        }
+
+                        var equipsObj = new JObject(); 
+                        foreach (var eq in petEquips)
+                            equipsObj[eq.Key.ToString()] = eq.Value;
+
+                        var petObj = new JObject
+                        {
+                            ["name"] = sr.Name,
+                            ["petEquips"] = equipsObj
+                        };
+                        root[petId.ToString()] = petObj;
+                    }
+                    File.WriteAllText(Path.Combine(dlg.SelectedPath, "petToEquip.json"), root.ToString());
+                });
+                sw.Stop();
+                btnPetEquipExport.Enabled = true;
+                labelX2.Text = "Export finished. Time elapsed: " + sw.Elapsed.ToString();
+                labelItemStatus.Text = "Exported to: " + dlg.SelectedPath;
             }
         }
 

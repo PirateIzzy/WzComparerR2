@@ -54,6 +54,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowMedalTag { get; set; } = true;
         public bool IsCombineProperties { get; set; } = true;
         public bool ShowCashPurchasePrice { get; set; }
+        public bool ShowApplicablePet { get; set; }
         public bool CompareMode { get; set; } = false;
         public bool MseaMode { get; set; }
         public int CosmeticHairColor { get; set; }
@@ -64,6 +65,7 @@ namespace WzComparerR2.CharaSimControl
         private string titleLanguage = "";
 
         public TooltipRender SetItemRender { get; set; }
+        public TooltipRender ItemRender { get; set; }
 
         public override Bitmap Render()
         {
@@ -73,7 +75,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             this.isMsnClient = StringLinker?.StringEqp?.ContainsKey(1006514) ?? false;
-            int[] picH = new int[4];
+            int[] picH = new int[5];
             Bitmap left = RenderBase(out picH[0]);
             Bitmap add = RenderAddition(out picH[1]);
             int equipLevel = 0;
@@ -86,12 +88,18 @@ namespace WzComparerR2.CharaSimControl
             {
                 levelOrSealed = RenderLevelOrSealed(out picH[3]);
             }
+            Bitmap applicablePet = null;
+            if (this.ShowApplicablePet)
+            {
+                applicablePet = RenderApplicablePet(out picH[4]);
+            }
 
             int width = 261;
             if (add != null) width += add.Width;
             if (set != null) width += set.Width;
             else if (genesis != null) width += genesis.Width; // ideally genesisWeapons always have setitem
             if (levelOrSealed != null) width += levelOrSealed.Width;
+            if (applicablePet != null) width += applicablePet.Width;
             int height = 0;
             for (int i = 0; i < picH.Length; i++)
             {
@@ -177,6 +185,12 @@ namespace WzComparerR2.CharaSimControl
                 g.DrawImage(levelOrSealed, width, 0, new Rectangle(0, 0, levelOrSealed.Width, picH[3]), GraphicsUnit.Pixel);
                 width += levelOrSealed.Width;
                 levelOrSealed.Dispose();
+            }
+
+            if (applicablePet != null)
+            {
+                g.DrawImage(applicablePet, width, 0, new Rectangle(0, 0, applicablePet.Width, applicablePet.Height), GraphicsUnit.Pixel);
+                applicablePet.Dispose();
             }
 
             if (this.ShowObjectID)
@@ -1598,7 +1612,150 @@ namespace WzComparerR2.CharaSimControl
             return levelOrSealed;
         }
 
-        private Bitmap RenderGenesisSkills(out int picHeight, bool isDestinyWeapon=false)
+        private Bitmap RenderApplicablePet(out int picHeight)
+        {
+            Bitmap applicablePetBitmap = null;
+            picHeight = 0;
+            if (CharaSimLoader.LoadedPetEquipInfo.ContainsKey(Gear.ItemID))
+            {
+                if (CharaSimLoader.LoadedPetEquipInfo[Gear.ItemID].Count > 2)
+                {
+                    int reqColumns = (int)Math.Ceiling(CharaSimLoader.LoadedPetEquipInfo[Gear.ItemID].Count / 10.0);
+                    List<Dictionary<int, string>> petName = new List<Dictionary<int, string>>();
+                    List<Dictionary<int, BitmapOrigin>> petIcon = new List<Dictionary<int, BitmapOrigin>>();
+                    for (int index = 0; index < reqColumns; index++)
+                    {
+                        petName.Add(new Dictionary<int, string>());
+                        petIcon.Add(new Dictionary<int, BitmapOrigin>());
+                    }
+                    int columnIndex = 0;
+                    foreach (var i in CharaSimLoader.LoadedPetEquipInfo[Gear.ItemID])
+                    {
+                        StringResult sr;
+                        if (this.StringLinker == null || !this.StringLinker.StringItem.TryGetValue(i, out sr))
+                        {
+                            petName[columnIndex][i] = "(null)";
+                        }
+                        else
+                        {
+                            petName[columnIndex][i] = sr.Name;
+                        }
+                        Item pet = Item.CreateFromNode(PluginBase.PluginManager.FindWz($@"Item\Pet\{i}.img", this.SourceWzFile), PluginBase.PluginManager.FindWz);
+                        if (pet != null)
+                        {
+                            petIcon[columnIndex][i] = pet.Icon;
+                        }
+                        else
+                        {
+                            petIcon[columnIndex][i] = new BitmapOrigin();
+                        }
+                        if (CharaSimLoader.LoadedPetEquipInfo[Gear.ItemID].IndexOf(i) % 10 == 9) columnIndex++;
+                    }
+                    int width = 52;
+                    picHeight = 20;
+                    int[] columnWidths = new int[reqColumns];
+                    applicablePetBitmap = new Bitmap(1, 1);
+                    using (Graphics g = Graphics.FromImage(applicablePetBitmap))
+                    {
+                        for (int index = 0; index < reqColumns; index++)
+                        {
+                            int maxTextWidth = 0;
+                            foreach (var i in petName[index])
+                            {
+                                string petNameStr = $"{i.Value} ({i.Key})";
+                                SizeF nameSize = TextRenderer.MeasureText(g, petNameStr, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix);
+                                maxTextWidth = Math.Max(maxTextWidth, (int)nameSize.Width);
+                                if (index == 0) picHeight += 50;
+                            }
+                            columnWidths[index] = maxTextWidth + 35;
+                            width += maxTextWidth + 38;
+                        }
+                    }
+                    applicablePetBitmap = new Bitmap(width, picHeight);
+                    using (Graphics g = Graphics.FromImage(applicablePetBitmap))
+                    {
+                        int picH = 8;
+                        int right = width - 18;
+                        GearGraphics.DrawNewTooltipBack(g, 0, 0, width, picHeight); 
+                        g.DrawImage(Resource.UIToolTip_img_Item_Frame2_cover, 3, 3);
+                        TextRenderer.DrawText(g, "Applicable Pets", GearGraphics.ItemDetailFont, new Point(width, picH), Color.FromArgb(255, 255, 255), TextFormatFlags.HorizontalCenter);
+                        int iconLeft = 15;
+                        int txtLeft = 55;
+                        for (int index = 0; index < reqColumns; index++)
+                        {
+                            picH = 23;
+                            foreach (var i in petIcon[index])
+                            {
+                                g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_canvas_Backgrnd, iconLeft - 2, picH - 2);
+                                g.DrawImage(Resource.Item_shadow, iconLeft + 2 + 3, picH + 1 + 32 - 6);
+                                if (i.Value.Bitmap != null)
+                                {
+                                    var icon = i.Value;
+                                    g.DrawImage(icon.Bitmap, iconLeft + 2 - icon.Origin.X, picH + 1 + 32 - icon.Origin.Y);
+                                }
+                                picH += 50;
+                            }
+                            picH = 0;
+                            foreach (var i in petName[index])
+                            {
+                                picH += 34;
+                                string petNameStr = $"{i.Value} ({i.Key})";
+                                GearGraphics.DrawString(g, petNameStr, GearGraphics.ItemDetailFont, txtLeft, right, ref picH, 16);
+                            }
+                            txtLeft += columnWidths[index];
+                            iconLeft += columnWidths[index];
+                        }
+                    }
+                }
+                else
+                {
+                    List<Bitmap> petEquipBmps = new List<Bitmap>();
+                    foreach (var i in CharaSimLoader.LoadedPetEquipInfo[Gear.ItemID])
+                    {
+                        Item pet = Item.CreateFromNode(PluginBase.PluginManager.FindWz($@"Item\Pet\{i}.img", this.SourceWzFile), PluginBase.PluginManager.FindWz);
+                        if (pet != null)
+                        {
+                            TooltipRender renderer = this.ItemRender;
+                            if (renderer == null)
+                            {
+                                var defaultRenderer = new ItemTooltipRender2();
+                                defaultRenderer.StringLinker = this.StringLinker;
+                                defaultRenderer.ShowObjectID = this.ShowObjectID;
+                                defaultRenderer.ShowApplicablePetEquip = false;
+                                renderer = defaultRenderer;
+                            }
+
+                            renderer.TargetItem = pet;
+                            Bitmap bmp = renderer.Render();
+                            if (bmp != null) petEquipBmps.Add(bmp);
+                        }
+                    }
+                    if (petEquipBmps.Count > 0)
+                    {
+                        int width = 0;
+                        foreach (var i in petEquipBmps)
+                        {
+                            width = Math.Max(width, i.Width);
+                            picHeight += i.Height;
+                        }
+                        applicablePetBitmap = new Bitmap(width, picHeight);
+                        using (Graphics g = Graphics.FromImage(applicablePetBitmap))
+                        {
+                            int picH = 0;
+                            foreach (var i in petEquipBmps)
+                            {
+                                g.DrawImage(i, 0, picH, new Rectangle(0, 0, i.Width, i.Height), GraphicsUnit.Pixel);
+                                picH += i.Height;
+                            }
+                        }
+                        petEquipBmps.Clear();
+                    }
+                }
+            }
+            return applicablePetBitmap;
+        }
+
+        private Bitmap RenderGenesisSkills(out int picHeight, bool isDestinyWeapon = false)
         {
             Bitmap genesisBitmap = null;
             picHeight = 0;
