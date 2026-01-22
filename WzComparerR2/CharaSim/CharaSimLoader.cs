@@ -17,6 +17,10 @@ namespace WzComparerR2.CharaSim
             LoadedCommoditiesByItemId = new Dictionary<int, Commodity>();
             LoadedCommoditiesByItemIdInteractive = new Dictionary<int, Dictionary<int, int>>();
             LoadedCommoditiesByItemIdHeroic = new Dictionary<int, Dictionary<int, int>>();
+            LoadedMintableNFTItems = new List<int>();
+            LoadedMintableSBTItems = new List<int>();
+            LoadedMintableFTItems = new List<int>();
+            LoadedPetEquipInfo = new Dictionary<int, List<int>>();
         }
 
         public static Dictionary<int, SetItem> LoadedSetItems { get; private set; }
@@ -25,6 +29,10 @@ namespace WzComparerR2.CharaSim
         public static Dictionary<int, Commodity> LoadedCommoditiesByItemId { get; private set; }
         public static Dictionary<int, Dictionary<int, int>> LoadedCommoditiesByItemIdInteractive { get; private set; }
         public static Dictionary<int, Dictionary<int, int>> LoadedCommoditiesByItemIdHeroic { get; private set; }
+        public static List<int> LoadedMintableNFTItems { get; private set; }
+        public static List<int> LoadedMintableSBTItems { get; private set; }
+        public static List<int> LoadedMintableFTItems { get; private set; }
+        public static Dictionary<int, List<int>> LoadedPetEquipInfo { get; private set; }
 
         public static void LoadSetItemsIfEmpty()
         {
@@ -61,6 +69,103 @@ namespace WzComparerR2.CharaSim
                     SetItem setItem = SetItem.CreateFromNode(node, optionNode);
                     if (setItem != null)
                         LoadedSetItems[setItemIndex] = setItem;
+                }
+            }
+        }
+
+        public static void LoadMsnMintableItemListIfEmpty(Wz_File sourceWzFile = null)
+        {
+            if (LoadedMintableNFTItems.Count == 0 || LoadedMintableSBTItems.Count == 0 || LoadedMintableFTItems.Count == 0)
+            {
+                LoadMsnMintableItemList(sourceWzFile);
+            }
+        }
+
+        public static void LoadMsnMintableItemList(Wz_File sourceWzFile)
+        {
+            Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, sourceWzFile);
+            if (itemWz == null)
+                return;
+            Wz_Node mintableListNode = itemWz.FindNodeByPath("MintableList.img", true);
+            if (mintableListNode == null)
+                return;
+
+            LoadedMintableNFTItems.Clear();
+            LoadedMintableSBTItems.Clear();
+            LoadedMintableFTItems.Clear();
+
+            Wz_Node nftNode = mintableListNode.FindNodeByPath("NFT");
+            if (nftNode != null)
+            {
+                foreach (var i in nftNode.Nodes)
+                {
+                    switch (i.Text)
+                    {
+                        case "SBT":
+                            foreach (var j in i.Nodes)
+                            {
+                                if (int.TryParse(j.Text, out int sbtId))
+                                    LoadedMintableSBTItems.Add(sbtId);
+                            }
+                            break;
+                        default:
+                            if (int.TryParse(i.Text, out int id))
+                                LoadedMintableNFTItems.Add(id);
+                            break;
+                    }
+                }
+            }
+
+            Wz_Node ftNode = mintableListNode.FindNodeByPath("FT");
+            if (ftNode != null)
+            {
+                foreach (var i in ftNode.Nodes)
+                {
+                    if (int.TryParse(i.Text, out int id))
+                        LoadedMintableFTItems.Add(id);
+                }
+            }
+        }
+
+        public static void LoadPetEquipInfoIfEmpty(Wz_File sourceWzFile = null)
+        {
+            if (LoadedPetEquipInfo.Count == 0)
+            {
+                LoadPetEquipInfo(sourceWzFile);
+            }
+        }
+
+        public static void LoadPetEquipInfo(Wz_File sourceWzFile)
+        {
+            Wz_Node characterWz = PluginManager.FindWz(Wz_Type.Character, sourceWzFile);
+            if (characterWz == null)
+                return;
+            Wz_Node petEquipNode = characterWz.FindNodeByPath("PetEquip", true);
+            if (petEquipNode == null)
+                return;
+
+            LoadedPetEquipInfo.Clear();
+            foreach (var i in petEquipNode.Nodes)
+            {
+                Wz_Image image = i.GetValue<Wz_Image>();
+                if (image == null || !image.TryExtract())
+                {
+                    continue;
+                }
+                else
+                {
+                    if (Int32.TryParse(i.Text.Replace(".img", ""), out int petEquipId))
+                    {
+                        List<int> applicablePets = new List<int>();
+                        foreach (var j in image.Node.Nodes)
+                        {
+                            if (Int32.TryParse(j.Text, out int petID))
+                            {
+                                applicablePets.Add(petID);
+                            }
+                        }
+                        LoadedPetEquipInfo[petEquipId] = applicablePets;
+                    }
                 }
             }
         }
@@ -184,6 +289,11 @@ namespace WzComparerR2.CharaSim
             LoadedCommoditiesBySN.Clear();
             LoadedCommoditiesByItemId.Clear();
             LoadedCommoditiesByItemIdInteractive.Clear();
+            LoadedCommoditiesByItemIdHeroic.Clear();
+            LoadedMintableNFTItems.Clear();
+            LoadedMintableSBTItems.Clear();
+            LoadedMintableFTItems.Clear();
+            LoadedPetEquipInfo.Clear();
         }
 
         public static int GetActionDelay(string actionName, Wz_Node wzNode = null)

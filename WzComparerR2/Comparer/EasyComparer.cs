@@ -93,6 +93,7 @@ namespace WzComparerR2.Comparer
         public bool ShowNpcQuotes { get; set; }
         public bool ShowItemPurchasePrice { get; set; }
         public bool ShowGearPurchasePrice { get; set; }
+        public bool LocatePetEquip { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo

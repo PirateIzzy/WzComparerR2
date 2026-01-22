@@ -122,6 +122,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "Tradable once\nOnly tradable to your chars in this world after exch.";
                 case GearPropType.noPrism: return value == 0 ? null : "Cannot use Prism";
                 case GearPropType.mintable: return value == 0 ? null : "Mintable";
+                case GearPropType.notMintable: return value == 0 ? null : "Not mintable";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -376,6 +377,9 @@ namespace WzComparerR2.CharaSim
                     return res;
                 case GearPropType.mintable:
                     res[0] = value == 0 ? null : "#$rMintable#";
+                    return res;
+                case GearPropType.notMintable:
+                    res[0] = value == 0 ? null : "#$rNot mintable#";
                     return res;
                 case GearPropType.tradeAvailable:
                     switch (value)
@@ -1193,6 +1197,8 @@ namespace WzComparerR2.CharaSim
                     return value == 0 ? "" : "";
                 case ItemPropType.mintable:
                     return GetGearPropString(GearPropType.mintable, value);
+                case ItemPropType.notMintable:
+                    return GetGearPropString(GearPropType.notMintable, value);
                 default:
                     return null;
             }

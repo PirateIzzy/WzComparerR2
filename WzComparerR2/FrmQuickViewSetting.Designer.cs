@@ -32,6 +32,7 @@
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkEnable22AniStyle = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkLocatePetEquip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowNpcQuotes = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEnableWorldArchive = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowAllIllustAtOnce = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -1294,6 +1295,7 @@
             this.superTabControlPanel5.Controls.Add(this.chkShowAllIllustAtOnce);
             this.superTabControlPanel5.Controls.Add(this.chkEnable22AniStyle);
             this.superTabControlPanel5.Controls.Add(this.chkMseaMode);
+            this.superTabControlPanel5.Controls.Add(this.chkLocatePetEquip);
             this.superTabControlPanel5.Controls.Add(this.chkShowNpcQuotes);
             this.superTabControlPanel5.Controls.Add(this.chkEnableWorldArchive);
             this.superTabControlPanel5.Controls.Add(this.chkCopyParsedSkillString);
@@ -1437,6 +1439,21 @@
             this.chkShowNpcQuotes.TabIndex = 9;
             this.chkShowNpcQuotes.Text = "Show NPC Quotes";
             // 
+            // chkLocatePetEquip
+            // 
+            this.chkLocatePetEquip.AutoSize = true;
+            this.chkLocatePetEquip.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkLocatePetEquip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkLocatePetEquip.Location = new System.Drawing.Point(13, 204);
+            this.chkLocatePetEquip.Name = "chkLocatePetEquip";
+            this.chkLocatePetEquip.Size = new System.Drawing.Size(145, 16);
+            this.chkLocatePetEquip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkLocatePetEquip.TabIndex = 10;
+            this.chkLocatePetEquip.Text = "Locate Pet Equip";
+            // 
             // buttonX2
             // 
             this.buttonX2.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
@@ -1559,6 +1576,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX23;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnable22AniStyle;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkLocatePetEquip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowNpcQuotes;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableWorldArchive;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowAllSubMobAtOnce;
