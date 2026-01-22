@@ -235,7 +235,7 @@ namespace WzComparerR2.CharaSimControl
                                     {
                                         if (itemID / 10000 == 500)
                                         {
-                                            typeName = "Pet";
+                                            typeName = "(Pet)";
                                         }
                                         else
                                         {
@@ -469,7 +469,7 @@ namespace WzComparerR2.CharaSimControl
                                 sr = new StringResult();
                                 sr.Name = p.SkillID.ToString();
                             }
-                            string summary = $"[{sr.Name.Replace(Environment.NewLine, "")}] 스킬 사용 가능";
+                            string summary = $"Grants [{sr.Name.Replace(Environment.NewLine, "")}] Skill";
                             GearGraphics.DrawPlainText(g, summary, GearGraphics.EquipMDMoris9Font, color, 14 + dx, 290, ref picHeight, 15);
                         }
                     }
