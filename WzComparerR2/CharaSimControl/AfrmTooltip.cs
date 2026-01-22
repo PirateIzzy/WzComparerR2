@@ -542,7 +542,7 @@ namespace WzComparerR2.CharaSimControl
                         sb.AppendLine((check0npcName == "") ? "|npc=" : $"|npc=[[{check0npcName}]]");
                         sb.AppendLine((check0npcName == "") ? "|npcimg=" : $"|npcimg=[[File:NPC {check0npcName}.png]]");
                         sb.AppendLine($"|repeat=");
-                        sb.AppendLine((this.QuestLvmin > 0) ? $"|req=\n*At least Level {this.QuestLvmin}" : $"|req=");
+                        sb.AppendLine((this.QuestLvmin > 0) ? $"|req=\n*Level {this.QuestLvmin} or above" : $"|req=");
                         sb.AppendLine($"|cat=");
                         sb.AppendLine($"|type={this.QuestCategory}");
                         sb.AppendLine($"|avail={this.QuestAvailable.Replace("\\r\\n\\r\\n", "<br /><br /><br />").Replace("\\r\\n", "<br /><br />").Replace("\\n", "<br />").Replace("\\r", "<br />")}");
