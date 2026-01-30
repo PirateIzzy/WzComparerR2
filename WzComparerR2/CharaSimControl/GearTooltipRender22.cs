@@ -71,7 +71,7 @@ namespace WzComparerR2.CharaSimControl
         private string titleLanguage = "";
 
         private bool isPostNEXTClient;
-        private bool WillDrawMedal {  get; set; }
+        private bool WillDrawMedal { get; set; }
         private bool WillDrawChatBalloon { get; set; }
         private bool WillDrawNameTag { get; set; }
         private bool isMsnClient { get; set; }
@@ -562,8 +562,8 @@ namespace WzComparerR2.CharaSimControl
             // 착용 성별
             if (gender < 2)
             {
-                TextRenderer.DrawText(g, "Gender", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 232: 15, picH - (moveX ? 16 : 0)), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
-                TextRenderer.DrawText(g, gender == 0 ? "M" : "F", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 300: 100, picH - (moveX ? 16 : 0)), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Gender", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 232 : 15, picH - (moveX ? 16 : 0)), ((SolidBrush)GearGraphics.Equip22BrushGray).Color, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, gender == 0 ? "M" : "F", GearGraphics.EquipMDMoris9Font, new Point(moveX ? 300 : 100, picH - (moveX ? 16 : 0)), Color.White, TextFormatFlags.NoPadding);
                 if (!moveX) picH += 16;
             }
 
@@ -574,11 +574,13 @@ namespace WzComparerR2.CharaSimControl
             bool hasDescPart = false;
 
             picH -= 1;
-            AddLines(0, 7, ref picH);
+            //AddLines(0, 7, ref picH);
 
             // 안드로이드
             if (Gear.type == GearType.android && Gear.Props.TryGetValue(GearPropType.android, out value) && value > 0)
             {
+                AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                secondLineNeeded = false;
                 hasThirdContents = true;
                 hasOptionPart = true;
 
@@ -746,17 +748,6 @@ namespace WzComparerR2.CharaSimControl
             {
                 hasThirdContents = true;
                 hasOptionPart = true;
-
-                // 안드로이드 등급
-                if (Gear.Props.TryGetValue(GearPropType.grade, out value) && value > 0)
-                {
-                    hasThirdContents = true;
-                    hasOptionPart = true;
-
-                    picH += 4;
-                    TextRenderer.DrawText(g, "Rank: " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
-                    picH += 12;
-                }
             }
 
             // 세트 아이템
@@ -773,16 +764,18 @@ namespace WzComparerR2.CharaSimControl
                     }
                     else if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
                         setList.Add(setItem.SetItemName);
-                } 
+                }
                 if (Gear.Props.TryGetValue(GearPropType.jokerToSetItem, out value) && value > 0) setList.Add("Lucky Item");
 
                 var text = string.Join(", ", setList);
                 if (!string.IsNullOrEmpty(text))
                 {
+                    AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                    secondLineNeeded = false;
                     hasThirdContents = true;
                     hasOptionPart = true;
 
-                    g.DrawImage(Resource.UIToolTipNew_img_Item_Equip_textIcon_set_guide, 16, picH - 2);
+                    g.DrawImage(Resource.UIToolTipNew_img_Item_Equip_textIcon_set_guide, 16, picH);
                     GearGraphics.DrawString(g, $"#$g{text}#", GearGraphics.EquipMDMoris9Font, equip22ColorTable, 100, 308, ref picH, 16, alignment: Text.TextAlignment.Left);
                 }
             }
@@ -827,6 +820,8 @@ namespace WzComparerR2.CharaSimControl
                 var text = string.Join(", ", skillNames);
                 if (!string.IsNullOrEmpty(text))
                 {
+                    AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                    secondLineNeeded = false;
                     hasThirdContents = true;
                     hasOptionPart = true;
 
@@ -886,6 +881,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (2 <= value && value <= 9) // check valid speed
                 {
+                    AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                    secondLineNeeded = false;
                     hasThirdContents = true;
                     hasOptionPart = true;
 
@@ -901,13 +898,15 @@ namespace WzComparerR2.CharaSimControl
                 hasThirdContents = true;
                 hasOptionPart = true;
 
-                TextRenderer.DrawText(g, "Grade : " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Rank: " + value, GearGraphics.EquipMDMoris9Font, new Point(15, picH), Color.White, TextFormatFlags.NoPadding);
                 picH += 16;
             }
 
             // 내구도
             if (Gear.Props.TryGetValue(GearPropType.durability, out value))
             {
+                AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                secondLineNeeded = false;
                 hasThirdContents = true;
                 hasOptionPart = true;
 
@@ -961,6 +960,8 @@ namespace WzComparerR2.CharaSimControl
             // 기간 한정 능력치
             if (Gear.Props.TryGetValue(GearPropType.abilityTimeLimited, out value) && value != 0)
             {
+                AddLines(0, 7, ref picH, condition: secondLineNeeded);
+                secondLineNeeded = false;
                 hasThirdContents = true;
                 hasOptionPart = true;
 
@@ -1175,7 +1176,7 @@ namespace WzComparerR2.CharaSimControl
                 if (Gear.Props.TryGetValue(GearPropType.superiorEqp, out value) && value > 0) //极真
                 {
                     var text = ItemStringHelper.GetGearPropString22(GearPropType.superiorEqp, value)[0];
-                    if (!string.IsNullOrEmpty (text))
+                    if (!string.IsNullOrEmpty(text))
                     {
                         hasThirdContents = true;
                         hasDescPart = true;
@@ -1419,7 +1420,7 @@ namespace WzComparerR2.CharaSimControl
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
                         break;
                     case 1:
-                        text = $"#${GetPotentialColorTag(Gear.Grade)}Potential : {GetPotentialString((int)Gear.Grade)}#{(fixedPotential ? " (No Additional Enhancements)": "")}";
+                        text = $"#${GetPotentialColorTag(Gear.Grade)}Potential : {GetPotentialString((int)Gear.Grade)}#{(fixedPotential ? " (No Additional Enhancements)" : "")}";
                         g.DrawImage(GetPotentialGradeIcon(Gear.Grade), 15, picH);
                         GearGraphics.DrawString(g, text, GearGraphics.EquipMDMoris9Font, itemPotentialColorTable, 30, 305, ref picH, 16);
 
@@ -2159,7 +2160,7 @@ namespace WzComparerR2.CharaSimControl
             if ((GearType)Gear.Type == GearType.petEquip)
             {
                 return;
-            }    
+            }
 
             if (tuc == 0 && pot1 == 0 && pot2 == 0)
                 return;
@@ -2211,7 +2212,7 @@ namespace WzComparerR2.CharaSimControl
 
         private string GetPotentialString(int grade)
         {
-            switch(grade)
+            switch (grade)
             {
                 case 0:
                     return "None";

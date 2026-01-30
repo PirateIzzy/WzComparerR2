@@ -57,7 +57,7 @@ namespace WzComparerR2.Config
             set { this["cosmeticFaceColor"] = value; }
         }
 
-        [ConfigurationProperty("showPurchasePrice", DefaultValue = true)]
+        [ConfigurationProperty("showPurchasePrice", DefaultValue = false)]
         public bool ShowPurchasePrice
         {
             get { return (bool)this["showPurchasePrice"]; }
