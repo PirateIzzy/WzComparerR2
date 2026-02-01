@@ -540,7 +540,7 @@ namespace WzComparerR2.CharaSimControl
                         sb.AppendLine($"{{{{Quest<!--{this.NodeID}-->");
                         sb.AppendLine($"|name={this.NodeName}");
                         sb.AppendLine((check0npcName == "") ? "|npc=" : $"|npc=[[{check0npcName}]]");
-                        sb.AppendLine((check0npcName == "") ? "|npcimg=" : $"|npcimg=[[File:NPC {check0npcName}.png]]");
+                        sb.AppendLine((check0npcName == "") ? "|npcimg=" : $"|npcimg=NPC {check0npcName}.png");
                         sb.AppendLine($"|repeat=");
                         sb.AppendLine((this.QuestLvmin > 0) ? $"|req=\n*Level {this.QuestLvmin} or above" : $"|req=");
                         sb.AppendLine($"|cat=");
