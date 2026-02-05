@@ -185,7 +185,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         celestialLight = 1253,
         /// <summary>
-        /// Onmyo Sen 1254
+        /// Fan 1254
         /// </summary>
         onmyoSen = 1254,
         /// <summary>
@@ -193,7 +193,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         magicStick = 1259,
         /// <summary>
-        /// Psy-limiter
+        /// Psy-limiter 126
         /// </summary>
         espLimiter = 126,
         /// <summary>

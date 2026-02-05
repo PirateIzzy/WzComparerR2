@@ -712,6 +712,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.longSword: return "Sword";
                 case GearType.yeouiGem: return "Imugi Gem";
+
+                case GearType.onmyoSen: return "Fan";
+                case GearType.kannaReifu: return "Talisman";
                 default: return null;
             }
         }
@@ -889,8 +892,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.longSword: return isMsea ? "Longsword" : "Sword";
                 case GearType.yeouiGem: return isMsea ? "Sacred Orb" : "Imugi Gem";
 
-                case GearType.onmyoSen: return "陰陽扇";
-                case GearType.kannaReifu: return "霊符";
+                case GearType.onmyoSen: return "Fan";
+                case GearType.kannaReifu: return "Talisman";
 
                 case GearType.astra: return "Astra Sub Weapon";
                 default: return null;
@@ -1007,7 +1010,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.kodachi2: return GetExtraJobReqString(41, isMsea);
                 case GearType.onmyoSen:
                 case GearType.kannaReifu:
-                case GearType.fan: return "Kanna only"; //Haku only?
+                case GearType.fan: return GetExtraJobReqString(42, isMsea);
 
                 //5xxx
                 case GearType.soulShield: return "Mihile only";
