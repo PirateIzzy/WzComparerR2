@@ -37,6 +37,7 @@
             this.lblUpdateContent = new DevComponents.DotNetBar.LabelX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
             this.richTextBoxEx1 = new DevComponents.DotNetBar.Controls.RichTextBoxEx();
+            this.chkEnableAutoUpdate = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.elementStyle1 = new DevComponents.DotNetBar.ElementStyle();
             this.SuspendLayout();
             // 
@@ -155,6 +156,22 @@
             this.elementStyle1.Name = "elementStyle1";
             this.elementStyle1.TextColor = System.Drawing.SystemColors.ControlText;
             // 
+            // chkEnableAutoUpdate
+            // 
+            this.chkEnableAutoUpdate.AutoSize = true;
+            this.chkEnableAutoUpdate.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkEnableAutoUpdate.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkEnableAutoUpdate.Location = new System.Drawing.Point(12, 189);
+            this.chkEnableAutoUpdate.Name = "chkEnableAutoUpdate";
+            this.chkEnableAutoUpdate.Size = new System.Drawing.Size(170, 23);
+            this.chkEnableAutoUpdate.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkEnableAutoUpdate.TabIndex = 10;
+            this.chkEnableAutoUpdate.Text = "Auto Check Update";
+            this.chkEnableAutoUpdate.CheckedChanged += new System.EventHandler(this.chkEnableAutoUpdate_CheckedChanged);
+            // 
             // FrmUpdater
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -177,6 +194,8 @@
             this.Name = "FrmUpdater";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Updater";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmUpdater_FormClosed);
+            this.Load += new System.EventHandler(this.FrmUpdater_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -191,6 +210,7 @@
         private DevComponents.DotNetBar.LabelX lblLatestVer;
         private DevComponents.DotNetBar.LabelX lblUpdateContent;
         private DevComponents.DotNetBar.ButtonX buttonX1;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableAutoUpdate;
         private DevComponents.DotNetBar.Controls.RichTextBoxEx richTextBoxEx1;
         private DevComponents.DotNetBar.ElementStyle elementStyle1;
     }

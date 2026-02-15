@@ -385,19 +385,30 @@ namespace WzComparerR2
             Translator.ExchangeTable = null;
             Translator.InitializeCache();
         }
-        async Task<bool> AutomaticCheckUpdate()
+
+
+        async Task AutomaticCheckUpdate()
         {
-            return await FrmUpdater.QueryUpdate();
-            // Following code is from JMS implementation
-            /*var config = WcR2Config.Default;
+            var config = WcR2Config.Default;
             if (config.EnableAutoUpdate)
             {
-                return await FrmUpdater.QueryUpdate();
+                var updater = new Updater();
+                try
+                {
+                    await updater.QueryUpdateAsync();
+                    if (updater.UpdateAvailable)
+                    {
+                        ToastNotification.Show(this, $"Update Available: {updater.LatestVersionString}", 5000, eToastPosition.TopCenter);
+                        var frmUpdater = new FrmUpdater(updater);
+                        frmUpdater.LoadConfig(config);
+                        frmUpdater.ShowDialog(this);
+                    }
+                }
+                catch
+                {
+                    // ignore error
+                }
             }
-            else
-            {
-                return false;
-            }*/
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
@@ -5630,7 +5641,9 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-            new FrmUpdater().ShowDialog();
+            var frm = new FrmUpdater();
+            frm.LoadConfig(WcR2Config.Default);
+            frm.ShowDialog();
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)
@@ -5661,6 +5674,11 @@ namespace WzComparerR2
             }
         }
 
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            await this.AutomaticCheckUpdate();
+        }
+
         private void buttomItem13_FormClosing(object sender, EventArgs e)
         {
             this.Close();
@@ -5672,15 +5690,6 @@ namespace WzComparerR2
             string invalidChars = new string(System.IO.Path.GetInvalidFileNameChars());
             string regexPattern = $"[{Regex.Escape(invalidChars)}]";
             return Regex.Replace(fileName, regexPattern, "_");
-        }
-        private async void MainForm_Shown(object sender, EventArgs e)
-        {
-            //Automatic Update Check
-            if (WcR2Config.Default.AutoDetectUpdate)
-            {
-                bool isUpdateRequired = await AutomaticCheckUpdate();
-                if (isUpdateRequired) new FrmUpdater().ShowDialog();
-            }
         }
         
         private void colorPickerPicBoxBgColor_SelectedColorChanged(object sender, EventArgs e)

@@ -1,28 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using DevComponents.AdvTree;
-using Newtonsoft.Json;
-using WzComparerR2.Common;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using System.Net;
+using System.Drawing;
 using System.IO;
-using System.Security.Policy;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using DevComponents.DotNetBar;
+using WzComparerR2.Config;
+using WzComparerR2.Controls;
 
 namespace WzComparerR2
 {
     public partial class FrmUpdater : DevComponents.DotNetBar.Office2007Form
     {
-        public FrmUpdater()
+        public FrmUpdater() : this(new Updater())
+        {
+        }
+
+        public FrmUpdater(Updater updater)
         {
             InitializeComponent();
 #if NET6_0_OR_GREATER
@@ -30,87 +26,57 @@ namespace WzComparerR2
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
 #endif
 
-            // this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, Program.GetArchitecture());
+            this.Updater = updater;
             this.lblCurrentVer.Text = BuildInfo.BuildTime;
-            // this.lblLatestVer.Text = GetFileVersion().ToString();
-            var updateSession = new UpdaterSession();
-            // this.lblUpdateContent.Text = GetAsmCopyright().ToString();
-            Task.Run(() => this.ExecuteUpdateAsync(updateSession, updateSession.CancellationToken));
-            // GetPluginInfo();
         }
 
-        private UpdaterSession updateSession;
-        private string net462url;
-        private string net60url;
-        private string net80url;
-        private string fileurl;
+        public Updater Updater { get; set; }
 
-        private static string checkUpdateURL = "https://api.github.com/repos/PirateIzzy/WzComparerR2/releases/latest";
-
-        public static async Task<bool> QueryUpdate()
+        public bool EnableAutoUpdate
         {
-#if DEBUG
-            // Disable update check in debug builds
-            return false;
-#endif
-            var request = (HttpWebRequest)WebRequest.Create(checkUpdateURL);
-            request.Accept = "application/json";
-            request.UserAgent = "WzComparerR2/1.0";
-            try
-            {
-                using (WebResponse response = await request.GetResponseAsync())
-                using (Stream stream = response.GetResponseStream())
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    string responseString = reader.ReadToEnd();
-                    JObject UpdateContent = JObject.Parse(responseString);
-                    string BuildNumber = UpdateContent.SelectToken("tag_name").ToString();
-                    return Int64.Parse(BuildNumber) > Int64.Parse(BuildInfo.BuildTime);
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            get { return chkEnableAutoUpdate.Checked; }
+            set { chkEnableAutoUpdate.Checked = value; }
         }
 
-        private async Task ExecuteUpdateAsync(UpdaterSession session, CancellationToken cancellationToken)
+        private CancellationTokenSource cts;
+
+        private async void FrmUpdater_Load(object sender, EventArgs e)
         {
-            var request = (HttpWebRequest)WebRequest.Create(checkUpdateURL);
-            request.Accept = "application/json";
-            request.UserAgent = "WzComparerR2/1.0";
-            try
+            var updater = this.Updater;
+            if (!updater.LatestReleaseFetched)
             {
-                var response = (HttpWebResponse)request.GetResponse();
-                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                JObject UpdateContent = JObject.Parse(responseString);
-                string BuildNumber = UpdateContent.SelectToken("tag_name").ToString();
-                string ChangeTitle = UpdateContent.SelectToken("name").ToString();
-                string Changelog = UpdateContent.SelectToken("body").ToString();
-                JArray assets = (JArray)UpdateContent["assets"];
-                string[] downloadUrls = new string[assets.Count];
-                for (int i = 0; i < assets.Count; i++)
+                using var cts = new CancellationTokenSource();
+                this.cts = cts;
+                try
                 {
-                    downloadUrls[i] = assets[i]["browser_download_url"]?.ToString();
+                    await updater.QueryUpdateAsync(cts.Token);
+                    
                 }
-                // This part is for builds that are separated into 3 packages
-                foreach (string url in downloadUrls)
+                catch (TaskCanceledException)
                 {
-                    if (url.Contains("net6.0")) net60url = url;
-                    else if (url.Contains("net8.0")) net80url = url;
-                    else net462url = url;
+                    return;
                 }
+                catch (Exception ex)
+                {
+                    this.lblUpdateContent.Text = "Check Failed";
+                    this.AppendText(ex.Message + "\r\n" + ex.StackTrace, Color.Red);
+                    return;
+                }
+                finally
+                {
+                    this.cts = null;
+                }
+            }
 
-                // fileurl = downloadUrls[0];
-
-                this.lblLatestVer.Text = BuildNumber;
-                AppendText(ChangeTitle + "\r\n", Color.Red);
-                AppendText(Changelog, Color.Black);
+            if (updater.LatestReleaseFetched)
+            {
+                this.lblLatestVer.Text = updater.LatestVersionString;
+                this.AppendText(updater.Release?.Name + Environment.NewLine, Color.Red);
+                this.AppendText(updater.Release?.Body, Color.Black);
                 this.richTextBoxEx1.SelectionStart = 0;
-
-                if (Int64.Parse(BuildNumber) > Int64.Parse(BuildInfo.BuildTime))
+                if (updater.UpdateAvailable)
                 {
-                    buttonX1.Enabled = true;
+                    this.buttonX1.Enabled = true;
                     this.lblUpdateContent.Text = "Update available";
                 }
                 else
@@ -118,75 +84,117 @@ namespace WzComparerR2
                     this.lblUpdateContent.Text = "Already using the latest version";
                 }
             }
-            catch (Exception ex)
-            {
-                this.lblUpdateContent.Text = "Update check failed";
-            }
-        }
-
-        private async Task DownloadUpdateAsync(string url, UpdaterSession session, CancellationToken cancellationToken)
-        {
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string savePath = Path.Combine(currentDirectory, "update.zip");
-            try
-            {
-                buttonX1.Enabled = false;
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = "GET";
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        using (Stream responseStream = response.GetResponseStream())
-                        {
-                            using (FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write))
-                            {
-                                responseStream.CopyTo(fileStream);
-                            }
-                        }
-                    }
-                }
-                ExtractResource("WzComparerR2.Updater.exe", Path.Combine(currentDirectory, "Updater.exe"));
-#if NET6_0_OR_GREATER
-                ExtractResource("WzComparerR2.Updater.deps.json", Path.Combine(currentDirectory, "Updater.deps.json"));
-                ExtractResource("WzComparerR2.Updater.dll", Path.Combine(currentDirectory, "Updater.dll"));
-                ExtractResource("WzComparerR2.Updater.dll.config", Path.Combine(currentDirectory, "Updater.dll.config"));
-                ExtractResource("WzComparerR2.Updater.runtimeconfig.json", Path.Combine(currentDirectory, "Updater.runtimeconfig.json"));
-#else
-                ExtractResource("WzComparerR2.Updater.exe.config", Path.Combine(currentDirectory, "Updater.exe.config"));
-#endif
-                RunProgram("Updater.exe", "\"" + savePath + "\"");
-            }
-            catch (Exception ex)
-            {
-                this.lblUpdateContent.Text = "Failed to download update";
-            }
-            finally
-            {
-                buttonX1.Enabled = true;
-            }
         }
 
         private void buttonX1_Click(object sender, EventArgs e)
         {
-            this.lblUpdateContent.Text = "Downloading update...";
-            buttonX1.Enabled = false;
-            string selectedURL = "";
-            updateSession = new UpdaterSession();
-            switch (Environment.Version.Major)
+            var updater = this.Updater;
+            if (!updater.UpdateAvailable)
             {
-                default:
-                case 4:
-                    selectedURL = net462url;
-                    break;
-                case 6:
-                    selectedURL = net60url;
-                    break;
-                case 8:
-                    selectedURL = net80url;
-                    break;
+                MessageBoxEx.Show(this, "Unable to get update, please try again.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            Task.Run(() => this.DownloadUpdateAsync(selectedURL, updateSession, updateSession.CancellationToken));
+
+            var runtimeVer = Environment.Version.Major;
+            var asset = runtimeVer switch
+            {
+                4 => updater.Net462Asset,
+                6 => updater.Net6Asset,
+                8 => updater.Net8Asset,
+                10 => updater.Net10Asset,
+                _ => null,
+            };
+
+            if (asset == null)
+            {
+                MessageBoxEx.Show(this, $"Unable to locate .NET {runtimeVer} version, please download manually from Releases.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (this.cts != null)
+            {
+                MessageBoxEx.Show(this, "Another task is currently in progress, please try later.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using var cts = new CancellationTokenSource();
+            this.cts = cts;
+            this.buttonX1.Enabled = false;
+            this.lblUpdateContent.Text = "Downloading update...";
+
+            try
+            {
+                string savePath = Path.Combine(Application.StartupPath, "update.zip");
+                var result = ProgressDialog.Show(this, "Downloading update...", "Updater", true, true, async (ctx, cancellationToken) =>
+                {
+                    cancellationToken.Register(() => cts.Cancel());
+                    
+                    try
+                    {
+                        await updater.DownloadAssetAsync(asset, savePath, (downloaded, total) =>
+                        {
+                            if (total > 0)
+                            {
+                                if (ctx.Progress == 0)
+                                {
+                                    ctx.ProgressMin = 0;
+                                    ctx.ProgressMax = (int)total;
+                                }
+                                ctx.Progress = (int)downloaded;
+                                ctx.Message = $"Downloaded {(1.0 * downloaded / total):P1}";
+                            }
+                            else
+                            {
+                                ctx.Message = $"Downloaded {downloaded:N0}";
+                            }
+                        }, cts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        this.lblUpdateContent.Text = "Update Cancelled";
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        this.lblUpdateContent.Text = "Download Failed";
+                        this.AppendText(ex.Message + "\r\n" + ex.StackTrace, Color.Red);
+                        throw;
+                    }
+                });
+
+                if (result == DialogResult.OK)
+                {
+                    this.ExecuteUpdater(savePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.lblUpdateContent.Text = "Update Failed";
+                AppendText(ex.Message + "\r\n" + ex.StackTrace, Color.Red);
+            }
+            finally
+            {
+                this.cts = null;
+                if (!this.IsDisposed)
+                {
+                    this.buttonX1.Enabled = true;
+                }
+            }
+        }
+
+        private void ExecuteUpdater(string assetFileName)
+        {
+            string wcR2Folder = Application.StartupPath;
+            ExtractResource("WzComparerR2.Updater.exe", Path.Combine(wcR2Folder, "Updater.exe"));
+#if NET6_0_OR_GREATER
+            ExtractResource("WzComparerR2.Updater.deps.json", Path.Combine(wcR2Folder, "Updater.deps.json"));
+            ExtractResource("WzComparerR2.Updater.dll", Path.Combine(wcR2Folder, "Updater.dll"));
+            ExtractResource("WzComparerR2.Updater.dll.config", Path.Combine(wcR2Folder, "Updater.dll.config"));
+            ExtractResource("WzComparerR2.Updater.runtimeconfig.json", Path.Combine(wcR2Folder, "Updater.runtimeconfig.json"));
+#else
+            ExtractResource("WzComparerR2.Updater.exe.config", Path.Combine(wcR2Folder, "Updater.exe.config"));
+#endif
+            RunProgram("Updater.exe", "\"" + assetFileName + "\"");
         }
 
         private void RunProgram(string url, string argument)
@@ -227,37 +235,23 @@ namespace WzComparerR2
             resourceStream.CopyTo(fileStream);
         }
 
-        class UpdaterSession
+        private void chkEnableAutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
-            public UpdaterSession()
-            {
-                this.cancellationTokenSource = new CancellationTokenSource();
-            }
-            public Task UpdateExecTask;
+            var config = WcR2Config.Default;
+            config.EnableAutoUpdate = chkEnableAutoUpdate.Checked;
+            ConfigManager.Save();
+        }
 
-            public CancellationToken CancellationToken => this.cancellationTokenSource.Token;
-            private CancellationTokenSource cancellationTokenSource;
-            private TaskCompletionSource<bool> tcsWaiting;
+        public void LoadConfig(WcR2Config config)
+        {
+            this.EnableAutoUpdate = config.EnableAutoUpdate;
+        }
 
-            public void Cancel()
+        private void FrmUpdater_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
+        {
+            if (this.cts != null)
             {
-                this.cancellationTokenSource.Cancel();
-            }
-
-            public async Task WaitForContinueAsync()
-            {
-                var tcs = new TaskCompletionSource<bool>();
-                this.tcsWaiting = tcs;
-                this.cancellationTokenSource.Token.Register(() => tcs.TrySetCanceled());
-                await tcs.Task;
-            }
-
-            public void Continue()
-            {
-                if (this.tcsWaiting != null)
-                {
-                    this.tcsWaiting.SetResult(true);
-                }
+                this.cts.Cancel();
             }
         }
     }
