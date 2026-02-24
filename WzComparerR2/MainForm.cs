@@ -4682,6 +4682,8 @@ namespace WzComparerR2
                     selectedNodes[item] = isChecked;
                 }
                 clbRootNode.Visible = false;
+                btnSelectDeselectAllNode.Visible = false;
+                btnReverseNodeSelection.Visible = false;
                 compareThread = new Thread(() =>
                 {
                     System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
@@ -4745,6 +4747,8 @@ namespace WzComparerR2
                                     btnEasyCompare.Enabled = false;
                                     btnPreset.Enabled = false;
                                     clbRootNode.Enabled = false;
+                                    btnSelectDeselectAllNode.Enabled = false;
+                                    btnReverseNodeSelection.Enabled = false;
                                     cmbComparePng.Enabled = false;
                                     chkOutputPng.Enabled = false;
                                     chkResolvePngLink.Enabled = false;
@@ -4814,6 +4818,8 @@ namespace WzComparerR2
                         btnEasyCompare.Enabled = true;
                         btnPreset.Enabled = true;
                         clbRootNode.Enabled = true;
+                        btnSelectDeselectAllNode.Enabled = true;
+                        btnReverseNodeSelection.Enabled = true;
                         cmbComparePng.Enabled = true;
                         chkOutputPng.Enabled = true;
                         chkResolvePngLink.Enabled = true;
@@ -4884,6 +4890,8 @@ namespace WzComparerR2
         private void btnRootNode_Click(object sender, EventArgs e)
         {
             clbRootNode.Visible = !clbRootNode.Visible;
+            btnSelectDeselectAllNode.Visible = !btnSelectDeselectAllNode.Visible;
+            btnReverseNodeSelection.Visible = !btnReverseNodeSelection.Visible;
         }
 
         private void btnMusicChannel_Click(object sender, EventArgs e)
@@ -4985,7 +4993,24 @@ namespace WzComparerR2
             chkSkipKMSContent.Checked = false;
         }
 
-        private void btnExportSkill_Click(object sender, EventArgs e)
+        private void btnSelectDeselectAllNode_Click(object sender, EventArgs e)
+        {
+            bool selectAll = clbRootNode.CheckedItems.Count < clbRootNode.Items.Count;
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                clbRootNode.SetItemChecked(i, selectAll);
+            }
+        }
+
+        private void btnReverseNodeSelection_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                clbRootNode.SetItemChecked(i, !clbRootNode.GetItemChecked(i));
+            }
+        }
+
+        private async void btnExportSkill_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.Description = "Select the destination folder you want to export to.";
