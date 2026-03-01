@@ -94,6 +94,7 @@ namespace WzComparerR2.CharaSimControl
             Graphics g = Graphics.FromImage(setBitmap);
             StringFormat format = new StringFormat();
             format.Alignment = StringAlignment.Center;
+            bool isSilverWolf = IsSilverWolf();
 
             var fmtItemName = new StringFormat()
             {
@@ -129,7 +130,11 @@ namespace WzComparerR2.CharaSimControl
 
                     if (setItemPart.Value.ItemIDs.Count > 0)
                     {
-                        var itemID = setItemPart.Value.ItemIDs.First().Key;
+                        var itemID = setItemPart.Value.ItemIDs.First().Key; 
+                        if (isSilverWolf)
+                        {
+                            if (Gear.GetGearType(itemID) == GearType.katara) continue;
+                        }
 
                         switch (itemID / 1000000)
                         {
@@ -297,6 +302,12 @@ namespace WzComparerR2.CharaSimControl
                         }
                     }
                 }
+                if (isSilverWolf)
+                {
+                    TextRenderer.DrawText(g, "Silver Wolf Weapon", GearGraphics.EquipDetailFont2, new Point(10, picHeight), ((SolidBrush)GearGraphics.GrayBrush2).Color, TextFormatFlags.NoPadding);
+                    TextRenderer.DrawText(g, "(Silver Wolf)", GearGraphics.EquipDetailFont2, new Point(252 - TextRenderer.MeasureText(g, "(Silver Wolf)", GearGraphics.EquipDetailFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width, picHeight), ((SolidBrush)GearGraphics.GrayBrush2).Color, TextFormatFlags.NoPadding);
+                    picHeight += 18;
+                }
             }
             else
             {
@@ -320,6 +331,32 @@ namespace WzComparerR2.CharaSimControl
             format.Dispose();
             g.Dispose();
             return setBitmap;
+        }
+
+        private bool IsSilverWolf()
+        {
+            if (this.SetItem == null)
+            {
+                return false;
+            }
+
+            foreach (var idkvp in this.SetItem.ItemIDs.Parts)
+            {
+                foreach (var itemID in idkvp.Value.ItemIDs.Keys)
+                {
+                    if (Gear.IsWeapon(Gear.GetGearType(itemID)) || Gear.IsSubWeapon(Gear.GetGearType(itemID)))
+                    {
+                        Wz_Node weaponNode = PluginBase.PluginManager.FindWz(string.Format(@"Character\Weapon\{0:D8}.img", itemID));
+                        if (weaponNode != null)
+                        {
+                            var weapon = Gear.CreateFromNode(weaponNode, PluginManager.FindWz);
+                            weapon.Props.TryGetValue(GearPropType.plusToSetItem, out int value);
+                            if (value == 1) return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private static string Compact(Graphics g, string text, int width) // https://www.codeproject.com/Articles/37503/Auto-Ellipsis
