@@ -2319,7 +2319,7 @@ namespace WzComparerR2.CharaSimControl
                 all_categories[0].Add("Dragon Equipment");
             }
 
-            var text = ItemStringHelper.GetGearTypeString(Gear.type);
+            var text = ItemStringHelper.GetGearTypeString22(Gear.type);
             if (!string.IsNullOrEmpty(text))
             {
                 all_categories[1].Add(text);

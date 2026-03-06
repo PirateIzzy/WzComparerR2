@@ -730,7 +730,7 @@ namespace WzComparerR2.Common
                 }
             }
 
-            var worldArchiveNode = etcNode.FindNodeByPath("worldArchive.img");
+            var worldArchiveNode = etcNode?.FindNodeByPath("worldArchive.img");
             if (worldArchiveNode != null)
             {
                 Wz_Image worldArchiveImg = worldArchiveNode.Value as Wz_Image;
@@ -769,6 +769,10 @@ namespace WzComparerR2.Common
                                                         }
                                                         foreach (var mobID in mobIDs)
                                                         {
+                                                            if (!stringMob.ContainsKey(mobID))
+                                                            {
+                                                                continue;
+                                                            }
                                                             StringResult strResult = new StringResult();
                                                             strResult.Name = stringMob[mobID].Name;
                                                             strResult.Desc = desc;
@@ -792,6 +796,10 @@ namespace WzComparerR2.Common
                                                         }
                                                         foreach (var npcID in npcIDs)
                                                         {
+                                                            if (!stringNpc.ContainsKey(npcID))
+                                                            {
+                                                                continue;
+                                                            }
                                                             StringResult strResult = new StringResult();
                                                             strResult.Name = stringNpc[npcID].Name;
                                                             strResult.Desc = desc;
@@ -886,18 +894,18 @@ namespace WzComparerR2.Common
             get
             {
                 return (
-                    stringEqp.Count + 
-                    stringItem.Count + 
+                    stringEqp.Count +
+                    stringItem.Count +
                     stringMap.Count +
-                    stringMob.Count + 
-                    stringNpc.Count + 
-                    stringFamiliarSkill.Count + 
+                    stringMob.Count +
+                    stringNpc.Count +
+                    stringFamiliarSkill.Count +
                     stringGuildCastleGuildResearch.Count +
                     stringGuildCastlePersonalResearch.Count +
-                    stringSkill.Count + 
-                    stringRoguelikeSkill.Count + 
-                    stringSetItem.Count + 
-                    stringQuest.Count + 
+                    stringSkill.Count +
+                    stringRoguelikeSkill.Count +
+                    stringSetItem.Count +
+                    stringQuest.Count +
                     stringAchievement.Count > 0);
             }
         }
@@ -1037,7 +1045,7 @@ namespace WzComparerR2.Common
 
         public Dictionary<int, StringResult> StringWorldArchiveMob
         {
-            get { return stringWorldArchiveMob;  }
+            get { return stringWorldArchiveMob; }
         }
 
         public Dictionary<int, StringResult> StringWorldArchiveNpc

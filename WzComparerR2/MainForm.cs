@@ -1904,7 +1904,8 @@ namespace WzComparerR2
                         "size: " + png.Width + "*" + png.Height + "\r\n" +
                         "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
                         "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
-                        "pages: " + png.Pages + "(" + png.ActualPages + ")";
+                        "pages: " + png.Pages + "(" + png.ActualPages + ")\r\n" +
+                        "unknown 1: " + png.Unknown1;
 
                     var sourceNode = selectedNode.GetLinkedSourceNode(PluginManager.FindWz);
                     if (sourceNode != selectedNode)
@@ -1928,7 +1929,8 @@ namespace WzComparerR2
                                 "size: " + png.Width + "*" + png.Height + "\r\n" +
                                 "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
                                 "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
-                                "pages: " + png.Pages + "(" + png.ActualPages + ")");
+                                "pages: " + png.Pages + "(" + png.ActualPages + ")\r\n" +
+                                "unknown 1: " + png.Unknown1);
                         }
                     }
                     break;

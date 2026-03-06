@@ -11,7 +11,7 @@ require "helper"
 -- all variables
 local topWzPath = 'String'
 local topNode = PluginManager.FindWz(topWzPath)
-local outputDir = "D:\\wzDump"
+local outputDir = "C:\\Izzy\\MapleXML-String\\KMS"
 
 ------------------------------------------------------------
 -- main function
