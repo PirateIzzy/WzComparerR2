@@ -385,19 +385,30 @@ namespace WzComparerR2
             Translator.ExchangeTable = null;
             Translator.InitializeCache();
         }
-        async Task<bool> AutomaticCheckUpdate()
+
+
+        async Task AutomaticCheckUpdate()
         {
-            return await FrmUpdater.QueryUpdate();
-            // Following code is from JMS implementation
-            /*var config = WcR2Config.Default;
+            var config = WcR2Config.Default;
             if (config.EnableAutoUpdate)
             {
-                return await FrmUpdater.QueryUpdate();
+                var updater = new Updater();
+                try
+                {
+                    await updater.QueryUpdateAsync();
+                    if (updater.UpdateAvailable)
+                    {
+                        ToastNotification.Show(this, $"Update Available: {updater.LatestVersionString}", 5000, eToastPosition.TopCenter);
+                        var frmUpdater = new FrmUpdater(updater);
+                        frmUpdater.LoadConfig(config);
+                        frmUpdater.ShowDialog(this);
+                    }
+                }
+                catch
+                {
+                    // ignore error
+                }
             }
-            else
-            {
-                return false;
-            }*/
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
@@ -541,7 +552,7 @@ namespace WzComparerR2
                 this.listViewExString.GridLines = false;
                 this.pictureBoxEx1.BackColor = System.Drawing.Color.FromArgb(-13816528);
                 this.pictureBoxEx1.PictureBoxInfoText = Microsoft.Xna.Framework.Color.LightGray;
-                this.chkEnableDarkMode.Checked = true;
+                //this.chkEnableDarkMode.Checked = true;
                 this.clbRootNode.BackColor = System.Drawing.Color.FromArgb(-13816528);
                 this.clbRootNode.ForeColor = System.Drawing.Color.LightGray;
             }
@@ -558,7 +569,7 @@ namespace WzComparerR2
                 this.listViewExString.GridLines = true;
                 this.pictureBoxEx1.BackColor = System.Drawing.Color.White;
                 this.pictureBoxEx1.PictureBoxInfoText = Microsoft.Xna.Framework.Color.Black;
-                this.chkEnableDarkMode.Checked = false;
+                //this.chkEnableDarkMode.Checked = false;
                 this.clbRootNode.BackColor = System.Drawing.Color.White;
                 this.clbRootNode.ForeColor = System.Drawing.Color.Black;
             }
@@ -4682,6 +4693,8 @@ namespace WzComparerR2
                     selectedNodes[item] = isChecked;
                 }
                 clbRootNode.Visible = false;
+                btnSelectDeselectAllNode.Visible = false;
+                btnReverseNodeSelection.Visible = false;
                 compareThread = new Thread(() =>
                 {
                     System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
@@ -4692,7 +4705,6 @@ namespace WzComparerR2
                     comparer.OutputPng = chkOutputPng.Checked;
                     comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                     comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
-                    comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                     comparer.OutputSkillTooltip = chkOutputSkillTooltip.Checked && selectedNodes["Skill"] && selectedNodes["String"];
                     comparer.OutputItemTooltip = chkOutputItemTooltip.Checked && selectedNodes["Item"] && selectedNodes["String"];
                     comparer.OutputGearTooltip = chkOutputEqpTooltip.Checked && selectedNodes["Character"] && selectedNodes["String"];
@@ -4726,6 +4738,17 @@ namespace WzComparerR2
                     comparer.LocatePetEquip = CharaSimConfig.Default.Misc.LocatePetEquip;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
+                    comparer.ColorTable = new List<System.Drawing.Color>()
+                    {
+                        CustomCSSConfig.Default.BackgroundColor,
+                        CustomCSSConfig.Default.NormalTextColor,
+                        CustomCSSConfig.Default.ChangedBackgroundColor,
+                        CustomCSSConfig.Default.AddedBackgroundColor,
+                        CustomCSSConfig.Default.RemovedBackgroundColor,
+                        CustomCSSConfig.Default.ChangedTextColor,
+                        CustomCSSConfig.Default.AddedTextColor,
+                        CustomCSSConfig.Default.RemovedTextColor
+                    };
                     try
                     {
                         Wz_File fileNew = openedWz[0].wz_files[0];
@@ -4745,12 +4768,14 @@ namespace WzComparerR2
                                     btnEasyCompare.Enabled = false;
                                     btnPreset.Enabled = false;
                                     clbRootNode.Enabled = false;
+                                    btnSelectDeselectAllNode.Enabled = false;
+                                    btnReverseNodeSelection.Enabled = false;
+                                    btnCustomCSS.Enabled = false;
                                     cmbComparePng.Enabled = false;
                                     chkOutputPng.Enabled = false;
                                     chkResolvePngLink.Enabled = false;
                                     chkOutputAddedImg.Enabled = false;
                                     chkOutputRemovedImg.Enabled = false;
-                                    chkEnableDarkMode.Enabled = false;
                                     chkOutputSkillTooltip.Enabled = false;
                                     chkOutputItemTooltip.Enabled = false;
                                     chkOutputEqpTooltip.Enabled = false;
@@ -4814,12 +4839,14 @@ namespace WzComparerR2
                         btnEasyCompare.Enabled = true;
                         btnPreset.Enabled = true;
                         clbRootNode.Enabled = true;
+                        btnSelectDeselectAllNode.Enabled = true;
+                        btnReverseNodeSelection.Enabled = true;
+                        btnCustomCSS.Enabled = true;
                         cmbComparePng.Enabled = true;
                         chkOutputPng.Enabled = true;
                         chkResolvePngLink.Enabled = true;
                         chkOutputAddedImg.Enabled = true;
                         chkOutputRemovedImg.Enabled = true;
-                        chkEnableDarkMode.Enabled = true;
                         chkOutputSkillTooltip.Enabled = true;
                         chkOutputItemTooltip.Enabled = true;
                         chkOutputEqpTooltip.Enabled = true;
@@ -4884,6 +4911,8 @@ namespace WzComparerR2
         private void btnRootNode_Click(object sender, EventArgs e)
         {
             clbRootNode.Visible = !clbRootNode.Visible;
+            btnSelectDeselectAllNode.Visible = !btnSelectDeselectAllNode.Visible;
+            btnReverseNodeSelection.Visible = !btnReverseNodeSelection.Visible;
         }
 
         private void btnMusicChannel_Click(object sender, EventArgs e)
@@ -4985,7 +5014,24 @@ namespace WzComparerR2
             chkSkipKMSContent.Checked = false;
         }
 
-        private void btnExportSkill_Click(object sender, EventArgs e)
+        private void btnSelectDeselectAllNode_Click(object sender, EventArgs e)
+        {
+            bool selectAll = clbRootNode.CheckedItems.Count < clbRootNode.Items.Count;
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                clbRootNode.SetItemChecked(i, selectAll);
+            }
+        }
+
+        private void btnReverseNodeSelection_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < clbRootNode.Items.Count; i++)
+            {
+                clbRootNode.SetItemChecked(i, !clbRootNode.GetItemChecked(i));
+            }
+        }
+
+        private async void btnExportSkill_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.Description = "Select the destination folder you want to export to.";
@@ -5491,6 +5537,21 @@ namespace WzComparerR2
             }
         }
 
+        private void btnCustomCSS_Click(object sender, EventArgs e)
+        {
+            ConfigManager.Reload();
+            var Setting = CustomCSSConfig.Default;
+            using (FrmCustomCSS frm = new FrmCustomCSS(styleManager1.ManagerStyle == eStyle.VisualStudio2012Dark))
+            {
+                frm.LoadConfig(Setting);
+                if (frm.ShowDialog() == DialogResult.OK)
+                {
+                    frm.SaveConfig(Setting);
+                    ConfigManager.Save();
+                }
+            }
+        }
+
         private void btnExportSkillOption_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
@@ -5580,7 +5641,9 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-            new FrmUpdater().ShowDialog();
+            var frm = new FrmUpdater();
+            frm.LoadConfig(WcR2Config.Default);
+            frm.ShowDialog();
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)
@@ -5611,6 +5674,11 @@ namespace WzComparerR2
             }
         }
 
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            await this.AutomaticCheckUpdate();
+        }
+
         private void buttomItem13_FormClosing(object sender, EventArgs e)
         {
             this.Close();
@@ -5622,15 +5690,6 @@ namespace WzComparerR2
             string invalidChars = new string(System.IO.Path.GetInvalidFileNameChars());
             string regexPattern = $"[{Regex.Escape(invalidChars)}]";
             return Regex.Replace(fileName, regexPattern, "_");
-        }
-        private async void MainForm_Shown(object sender, EventArgs e)
-        {
-            //Automatic Update Check
-            if (WcR2Config.Default.AutoDetectUpdate)
-            {
-                bool isUpdateRequired = await AutomaticCheckUpdate();
-                if (isUpdateRequired) new FrmUpdater().ShowDialog();
-            }
         }
         
         private void colorPickerPicBoxBgColor_SelectedColorChanged(object sender, EventArgs e)

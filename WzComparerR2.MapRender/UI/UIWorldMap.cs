@@ -551,8 +551,9 @@ namespace WzComparerR2.MapRender.UI
             return item;
         }
 
-        private void OnMapAreaClick(object obj)
+        private void OnMapAreaClick(object obj, EmptyKeys.UserInterface.Input.MouseButton targetButton)
         {
+            if (targetButton != EmptyKeys.UserInterface.Input.MouseButton.Left) return;
             if (obj is MapLink)
             {
                 var link = (MapLink)obj;
@@ -813,14 +814,11 @@ namespace WzComparerR2.MapRender.UI
 
                 if (curMap.Fog != null && this.SelectedFogIndex > -1 && this.SelectedFogIndex < curMap.Fog.Count)
                 {
-                    for (int i = 0; i <= this.SelectedFogIndex; i++)
+                    var fog = curMap.Fog[this.SelectedFogIndex];
+                    //重写底图
+                    if (fog.Img != null)
                     {
-                        var fog = curMap.Fog[i];
-                        //重写底图
-                        if (fog.Img != null)
-                        {
-                            addItem(fog.Img, null);
-                        }
+                        addItem(fog.Img, null);
                     }
                 }
 

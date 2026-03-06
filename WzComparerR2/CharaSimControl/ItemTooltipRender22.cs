@@ -831,7 +831,7 @@ namespace WzComparerR2.CharaSimControl
 
                     if (value < 1000)
                     {
-                        this.avatar.AddBodyFromSkin4((int)value);
+                        this.avatar.AddBodyFromSkin3((int)value);
                     }
                     else
                     {

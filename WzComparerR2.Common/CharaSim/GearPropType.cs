@@ -204,6 +204,8 @@ namespace WzComparerR2.CharaSim
         magicLayerWz2,
         setExtraOption,
         reissueBan,
+        collabo,
+        isAbleCustomIllust,
 
         //MSN exclusive stats
         blockUpgradeExtraOption,

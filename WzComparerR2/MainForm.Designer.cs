@@ -219,7 +219,7 @@ namespace WzComparerR2
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.btnCustomCSS = new DevComponents.DotNetBar.ButtonX();
             this.chkOutputCashTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputEqpTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputItemTooltip = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -299,6 +299,8 @@ namespace WzComparerR2
             this.comboItem22 = new DevComponents.Editors.ComboItem();
             this.btnRootNode = new DevComponents.DotNetBar.ButtonX();
             this.clbRootNode = new System.Windows.Forms.CheckedListBox();
+            this.btnSelectDeselectAllNode = new DevComponents.DotNetBar.ButtonX();
+            this.btnReverseNodeSelection = new DevComponents.DotNetBar.ButtonX();
             this.btnPetEquipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnSkillTooltipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnPreset = new DevComponents.DotNetBar.ButtonX();
@@ -2627,7 +2629,7 @@ namespace WzComparerR2
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.chkHashPngFileName);
-            this.superTabControlPanel2.Controls.Add(this.chkEnableDarkMode);
+            this.superTabControlPanel2.Controls.Add(this.btnCustomCSS);
             this.superTabControlPanel2.Controls.Add(this.chkOutputCashTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputEqpTooltip);
             this.superTabControlPanel2.Controls.Add(this.chkOutputItemTooltip);
@@ -2654,6 +2656,8 @@ namespace WzComparerR2
             this.superTabControlPanel2.Controls.Add(this.btnEasyCompare);
             this.superTabControlPanel2.Controls.Add(this.btnRootNode);
             this.superTabControlPanel2.Controls.Add(this.clbRootNode);
+            this.superTabControlPanel2.Controls.Add(this.btnSelectDeselectAllNode);
+            this.superTabControlPanel2.Controls.Add(this.btnReverseNodeSelection);
             this.superTabControlPanel2.Controls.Add(this.btnPreset);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel2.Location = new System.Drawing.Point(0, 0);
@@ -2676,19 +2680,21 @@ namespace WzComparerR2
             this.chkResolvePngLink.TabIndex = 9;
             this.chkResolvePngLink.Text = "Resolve Link";
             // 
-            // chkEnableDarkMode
+            // btnCustomCSS
             // 
             // 
             // 
             // 
-            this.chkEnableDarkMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkEnableDarkMode.Location = new System.Drawing.Point(215, 61);
-            this.chkEnableDarkMode.Name = "chkEnableDarkMode";
-            this.chkEnableDarkMode.Size = new System.Drawing.Size(115, 23);
-            this.chkEnableDarkMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkEnableDarkMode, new DevComponents.DotNetBar.SuperTooltipInfo("Enable Dark Mode", "", "Outputs the comparison with dark mode HTML.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 70)));
-            this.chkEnableDarkMode.TabIndex = 9;
-            this.chkEnableDarkMode.Text = "Enable Dark Mode";
+            this.btnCustomCSS.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnCustomCSS.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnCustomCSS.Location = new System.Drawing.Point(328, 61);
+            this.btnCustomCSS.Name = "btnCustomCSS";
+            this.btnCustomCSS.Size = new System.Drawing.Size(115, 23);
+            this.btnCustomCSS.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnCustomCSS.TabIndex = 11;
+            this.btnCustomCSS.Text = "Custom CSS";
+            this.superTooltip1.SetSuperTooltip(this.btnCustomCSS, new DevComponents.DotNetBar.SuperTooltipInfo("Custom CSS", "", "Change the color scheme of comparison report.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 90)));
+            this.btnCustomCSS.Click += new System.EventHandler(this.btnCustomCSS_Click);
             // 
             // chkOutputSkillTooltip
             // 
@@ -3542,7 +3548,7 @@ namespace WzComparerR2
             //
             //
             this.chkHashPngFileName.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHashPngFileName.Location = new System.Drawing.Point(328, 61);
+            this.chkHashPngFileName.Location = new System.Drawing.Point(215, 61);
             this.chkHashPngFileName.Name = "chkHashPngFileName";
             this.chkHashPngFileName.Size = new System.Drawing.Size(107, 23);
             this.chkHashPngFileName.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -3559,7 +3565,7 @@ namespace WzComparerR2
             this.btnRootNode.Size = new System.Drawing.Size(100, 30);
             this.btnRootNode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.btnRootNode.TabIndex = 25;
-            this.btnRootNode.Text = "Root Node▼";
+            this.btnRootNode.Text = "Root Node ▾";
             this.btnRootNode.Click += new System.EventHandler(this.btnRootNode_Click);
             //
             // clbRootNode
@@ -3570,6 +3576,32 @@ namespace WzComparerR2
             this.clbRootNode.Visible = false;
             this.clbRootNode.BorderStyle = BorderStyle.FixedSingle;
             this.clbRootNode.BringToFront();
+            // 
+            // btnSelectDeselectAllNode
+            // 
+            this.btnSelectDeselectAllNode.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnSelectDeselectAllNode.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnSelectDeselectAllNode.Location = new System.Drawing.Point(clbRootNode.Location.X, clbRootNode.Location.Y + clbRootNode.Size.Height - 6);
+            this.btnSelectDeselectAllNode.Name = "btnSelectDeselectAllNode";
+            this.btnSelectDeselectAllNode.Size = new System.Drawing.Size(100, 20);
+            this.btnSelectDeselectAllNode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnSelectDeselectAllNode.TabIndex = 95;
+            this.btnSelectDeselectAllNode.Text = "Sel./Deselect All";
+            this.btnSelectDeselectAllNode.Visible = false;
+            this.btnSelectDeselectAllNode.Click += new System.EventHandler(this.btnSelectDeselectAllNode_Click);
+            // 
+            // btnReverseNodeSelection
+            // 
+            this.btnReverseNodeSelection.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnReverseNodeSelection.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnReverseNodeSelection.Location = new System.Drawing.Point(btnSelectDeselectAllNode.Location.X, btnSelectDeselectAllNode.Location.Y + btnSelectDeselectAllNode.Size.Height + 4);
+            this.btnReverseNodeSelection.Name = "btnReverseNodeSelection";
+            this.btnReverseNodeSelection.Size = new System.Drawing.Size(100, 20);
+            this.btnReverseNodeSelection.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnReverseNodeSelection.TabIndex = 96;
+            this.btnReverseNodeSelection.Text = "Reverse Select";
+            this.btnReverseNodeSelection.Visible = false;
+            this.btnReverseNodeSelection.Click += new System.EventHandler(this.btnReverseNodeSelection_Click);
             // 
             // btnPreset
             // 
@@ -3910,7 +3942,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
+        private DevComponents.DotNetBar.ButtonX btnCustomCSS;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputCashTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputEqpTooltip;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputItemTooltip;
@@ -3939,6 +3971,8 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
         private DevComponents.DotNetBar.ButtonX btnRootNode;
         private System.Windows.Forms.CheckedListBox clbRootNode;
+        private DevComponents.DotNetBar.ButtonX btnSelectDeselectAllNode;
+        private DevComponents.DotNetBar.ButtonX btnReverseNodeSelection;
         private DevComponents.DotNetBar.ButtonX btnPetEquipExport;
         private DevComponents.DotNetBar.ButtonX btnSkillTooltipExport;
         private DevComponents.DotNetBar.ButtonX btnPreset;

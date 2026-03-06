@@ -23,6 +23,7 @@ using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
 using ModifierKeys = EmptyKeys.UserInterface.Input.ModifierKeys;
 using ServiceManager = EmptyKeys.UserInterface.Mvvm.ServiceManager;
 using WzComparerR2.MapRender.Effects;
+using WzComparerR2.Animation;
 #endregion
 
 namespace WzComparerR2.MapRender
@@ -137,6 +138,8 @@ namespace WzComparerR2.MapRender
         bool prepareCapture;
         bool captureViewPortOnly;
         bool ForceCaptureWithResolution;
+        bool showFootholdBoundary;
+        bool enableMobMovement;
         Task captureTask;
         Resolution resolution;
         float opacity;
@@ -688,6 +691,13 @@ namespace WzComparerR2.MapRender
             LoadOptionData(data);
         }
 
+        private void SpineSelector_Visible(object sender, RoutedEventArgs e)
+        {
+            UISpineSelector wnd = sender as UISpineSelector;
+            wnd.Left = (int)Math.Max(0, (this.ui.Width - wnd.Width) / 2);
+            wnd.Top = (int)Math.Max(0, (this.ui.Height - wnd.Height) / 2);
+        }
+
         private void WorldMap_MapSpotClick(object sender, UIWorldMap.MapSpotEventArgs e)
         {
             int mapID = e.MapID;
@@ -749,6 +759,8 @@ namespace WzComparerR2.MapRender
                     this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] History of visited maps");
                     this.ui.ChatBox.AppendTextHelp(@"/minimap Mini map settings");
                     this.ui.ChatBox.AppendTextHelp(@"/scene Scene settings");
+                    this.ui.ChatBox.AppendTextHelp(@"/spine Open Spine Animation Toggle Window");
+                    this.ui.ChatBox.AppendTextHelp(@"/summon Summon a Monster");
                     this.ui.ChatBox.AppendTextHelp(@"/quest Quest settings");
                     this.ui.ChatBox.AppendTextHelp(@"/questex Set Quest key value");
                     this.ui.ChatBox.AppendTextHelp(@"/date Date settings");
@@ -1119,6 +1131,65 @@ namespace WzComparerR2.MapRender
                     }
                     break;
 
+                case "/spine":
+                    var uiSpineSelector = this.ui.Windows.OfType<UISpineSelector>().FirstOrDefault();
+                    if (uiSpineSelector == null)
+                    {
+                        uiSpineSelector = new UISpineSelector();
+                        uiSpineSelector.Visible += SpineSelector_Visible;
+                        uiSpineSelector.Visibility = EmptyKeys.UserInterface.Visibility.Visible;
+                        this.ui.Windows.Add(uiSpineSelector);
+                        uiSpineSelector.Parent = this.ui;
+                        uiSpineSelector.Hide();
+                    }
+
+                    var back = this?.mapData.Scene.Back.Slots.OfType<BackItem>().Where(item => item.View.Animator is ISpineAnimator)
+                        .Concat(this?.mapData.Scene.Front.Slots.OfType<BackItem>().Where(item => item.View.Animator is ISpineAnimator)).ToList();
+                    var obj = this?.mapData.Scene.Layers.Nodes.OfType<LayerNode>()
+                        .Select(layerNode => layerNode.Obj.Slots.OfType<ObjItem>()
+                            .Where(item => item.View.Animator is ISpineAnimator)
+                            .ToList()).ToList();
+                    uiSpineSelector.LoadTabContents(back, obj);
+
+                    uiSpineSelector.Show();
+                    break;
+
+                case "/summon":
+                    var si = arguments.ElementAtOrDefault(1);
+                    var sx = arguments.ElementAtOrDefault(2);
+                    var sy = arguments.ElementAtOrDefault(3);
+                    if (int.TryParse(si, out int mobID))
+                    {
+                        int x, y;
+                        if (!int.TryParse(sx, out x) || !int.TryParse(sy, out y))
+                        {
+                            var p = this.renderEnv.Camera.CameraToWorld(renderEnv.Input.MousePosition);
+                            x = p.X;
+                            y = p.Y;
+                        }
+                        StringResult sr;
+                        string mobName = string.Empty;
+                        if (this.StringLinker != null)
+                        {
+                            this.StringLinker.StringMob.TryGetValue(mobID, out sr);
+                            mobName = sr?.Name ?? "(null)";
+                        }
+                        if (this.mapData.SummonMob(mobID, x, y, 0, 0, -1, playRegenMotion: false))
+                        {
+                            this.ui.ChatBox.AppendTextHelp($@"Summoned Monster: {mobName}({mobID})");
+                        }
+                        else
+                        {
+                            this.ui.ChatBox.AppendTextHelp($@"Unable to locate Monster: ({mobID})");
+                        }
+                    }
+                    else
+                    {
+                        this.ui.ChatBox.AppendTextHelp(@"/summon (mobID) Summon a Monster of specific mobID at cursor location");
+                        this.ui.ChatBox.AppendTextHelp(@"/summon (mobID) (x) (y) Summon a Monster of specific mobID at specific x, y offset");
+                    }
+                    break;
+
                 default:
                     this.ui.ChatBox.AppendTextSystem($"Unknown command: {arguments[0]}");
                     break;
@@ -1378,6 +1449,12 @@ namespace WzComparerR2.MapRender
             this.batcher.D2DEnabled = config.UseD2dRenderer;
             (this.Content as WcR2ContentManager).UseD2DFont = config.UseD2dRenderer;
             this.ForceCaptureWithResolution = config.ForceCaptureWithResolution;
+            this.showFootholdBoundary = config.ShowFootholdBoundary;
+            this.enableMobMovement = config.EnableMobMovement;
+            if (this.mapData != null)
+            {
+                this.mapData.EnableMobMovement = this.enableMobMovement;
+            }
         }
 
         private void LoadOptionData(UIOptionsDataModel model)
@@ -1395,6 +1472,8 @@ namespace WzComparerR2.MapRender
             model.Minimap_CameraRegionVisible = this.ui.Minimap.CameraRegionVisible;
             model.WorldMap_UseImageNameAsInfoName = this.ui.WorldMap.UseImageNameAsInfoName;
             model.ForceCaptureWithResolution = config.ForceCaptureWithResolution;
+            model.ShowFootholdBoundary = config.ShowFootholdBoundary;
+            model.EnableMobMovement = config.EnableMobMovement;
             LoadCaptureRectOptionData(model);
         }
 
@@ -1414,6 +1493,8 @@ namespace WzComparerR2.MapRender
             config.Minimap_CameraRegionVisible = model.Minimap_CameraRegionVisible;
             config.WorldMap_UseImageNameAsInfoName = model.WorldMap_UseImageNameAsInfoName;
             config.ForceCaptureWithResolution = model.ForceCaptureWithResolution;
+            config.ShowFootholdBoundary = model.ShowFootholdBoundary;
+            config.EnableMobMovement = model.EnableMobMovement;
             WzComparerR2.Config.ConfigManager.Save();
 
             if (int.TryParse(model.ScLeft, out int left) && int.TryParse(model.ScTop, out int top)

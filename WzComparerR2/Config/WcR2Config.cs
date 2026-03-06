@@ -25,6 +25,7 @@ namespace WzComparerR2.Config
             this.DetectCurrency = "auto";
             this.DesiredCurrency = "none";
             this.OpenAIExtraOption = false;
+            this.EnableAutoUpdate = true;
             this.OpenAISystemMessage = "";
             this.LMTemperature = 0.7;
             this.MaximumToken = -1;
@@ -198,6 +199,16 @@ namespace WzComparerR2.Config
         {
             get { return (ConfigItem<string>)this["nxSecretKey"]; }
             set { this["nxSecretKey"] = value; }
+        }
+        
+        /// <summary>
+        /// Automatic Update Configuration
+        /// </summary>
+        [ConfigurationProperty("EnableAutoUpdate")]
+        public ConfigItem<bool> EnableAutoUpdate
+        {
+            get { return (ConfigItem<bool>)this["EnableAutoUpdate"]; }
+            set { this["EnableAutoUpdate"] = value; }
         }
 
         /// <summary>

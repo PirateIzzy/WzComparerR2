@@ -152,20 +152,10 @@ namespace WzComparerR2.MapRender.UI
         private UIElement GetTabContent1()
         {
             Grid grid = new Grid();
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            //grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            //grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            for (int i = 0; i < 13; i++)
+                grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            for (int i = 0; i < 2; i++)
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
 
             TextBlock lbl1 = new TextBlock();
             lbl1.VerticalAlignment = VerticalAlignment.Center;
@@ -289,6 +279,34 @@ namespace WzComparerR2.MapRender.UI
             Grid.SetColumn(chk5, 0);
             Grid.SetColumnSpan(chk5, 2);
             grid.Children.Add(chk5);
+
+            CheckBox chk6 = new CheckBox();
+            chk6.Content = "Show Foothold Boundary";
+            chk6.Margin = new Thickness(18, 0, 0, 0);
+            chk6.Background = Brushes.Gray;
+            chk6.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.ShowFootholdBoundary)));
+            Grid.SetRow(chk6, 10);
+            Grid.SetColumn(chk6, 0);
+            Grid.SetColumnSpan(chk6, 2);
+            grid.Children.Add(chk6);
+
+            TextBlock lbl6 = new TextBlock();
+            lbl6.VerticalAlignment = VerticalAlignment.Center;
+            lbl6.Text = "Simulation";
+            lbl6.Foreground = Brushes.Yellow;
+            Grid.SetRow(lbl6, 11);
+            Grid.SetColumn(lbl6, 0);
+            grid.Children.Add(lbl6);
+
+            CheckBox chk7 = new CheckBox();
+            chk7.Content = "Allow Monsters Moving";
+            chk7.Margin = new Thickness(18, 0, 0, 0);
+            chk7.Background = Brushes.Gray;
+            chk7.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.EnableMobMovement)));
+            Grid.SetRow(chk7, 12);
+            Grid.SetColumn(chk7, 0);
+            Grid.SetColumnSpan(chk7, 2);
+            grid.Children.Add(chk7);
 
             /*TextBlock lbl6 = new TextBlock();
             lbl6.VerticalAlignment = VerticalAlignment.Center;
@@ -573,6 +591,12 @@ namespace WzComparerR2.MapRender.UI
                  "[Alt+Enter] Change Resolution",
                  "[S] Show Screenshot Range",
                  "[ScrollLock] Screenshot",
+                 "",
+                 "Mouse:",
+                 "",
+                 "[Left-Click on Monster] Attack Monster",
+                 "[Middle-Click on Monster] Show Monster Skill",
+                 "[Hold Right-Click and Move] Move around map"
             };
 
             foreach (var tip in tips)
@@ -633,6 +657,8 @@ namespace WzComparerR2.MapRender.UI
         private bool _minimap_cameraRegionVisible;
         private bool _worldmap_useImageNameAsInfoName;
         private bool _forceCaptureWithResolution;
+        private bool _showFootholdBoundary;
+        private bool _enableMobMovement;
         private string _screenshotBackgroundColor;
         private string _scLeft;
         private string _scTop;
@@ -679,6 +705,18 @@ namespace WzComparerR2.MapRender.UI
         {
             get { return this._mobNameVisible; }
             set { base.SetProperty(ref this._mobNameVisible, value); }
+        }
+
+        public bool ShowFootholdBoundary
+        {
+            get { return this._showFootholdBoundary; }
+            set { base.SetProperty(ref this._showFootholdBoundary, value); }
+        }
+
+        public bool EnableMobMovement
+        {
+            get { return this._enableMobMovement; }
+            set { base.SetProperty(ref this._enableMobMovement, value); }
         }
 
         public string ScreenshotBackgroundColor
