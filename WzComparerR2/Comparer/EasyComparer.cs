@@ -61,7 +61,6 @@ namespace WzComparerR2.Comparer
         public bool OutputPng { get; set; }
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
-        public bool EnableDarkMode { get; set; }
         public bool OutputAchvTooltip { get; set; }
         public bool OutputCashTooltip { get; set; }
         public bool OutputGearTooltip { get; set; }
@@ -94,6 +93,7 @@ namespace WzComparerR2.Comparer
         public bool ShowItemPurchasePrice { get; set; }
         public bool ShowGearPurchasePrice { get; set; }
         public bool LocatePetEquip { get; set; }
+        public List<Color> ColorTable { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
         public string StateInfo
@@ -591,7 +591,6 @@ namespace WzComparerR2.Comparer
                     this.OutputPng ? "- Include PNG" : null,
                     this.OutputAddedImg ? "- Added Files" : null,
                     this.OutputRemovedImg ? "- Removed Files" : null,
-                    this.EnableDarkMode ? "- Enable Dark Mode" : null,
                     "- Compare " + this.Comparer.PngComparison,
                     this.Comparer.ResolvePngLink ? "- Resolve Link" : null,
                     this.SkipKMSContent ? "- Skip KMS Content" : null,
@@ -4113,45 +4112,24 @@ namespace WzComparerR2.Comparer
             string path = Path.Combine(outputDir, "style.css");
             if (File.Exists(path))
                 return;
+            StringBuilder css = new StringBuilder();
+            css.AppendLine($"body {{ font-size:12px; background-color:{ColorToHex(ColorTable[0])}; color:{ColorToHex(ColorTable[1])}; }}");
+            css.AppendLine($"a {{ color:white; }}");
+            css.AppendLine($"p.wzf {{ }}");
+            css.AppendLine($"table, tr, th, td {{ border:1px solid #ff8000; border-collapse:collapse; }}");
+            css.AppendLine($"table {{ margin-bottom:16px; }}");
+            css.AppendLine($"th {{ text-align:left; }}");
+            css.AppendLine($"table.lst0 {{ }}");
+            css.AppendLine($"table.lst1 {{ }}");
+            css.AppendLine($"table.lst2 {{ }}");
+            css.AppendLine($"table.img {{ }}");
+            css.AppendLine($"table.img tr.r0 {{ background-color:{ColorToHex(ColorTable[2])}; color:{ColorToHex(ColorTable[5])}; }}");
+            css.AppendLine($"table.img tr.r1 {{ background-color:{ColorToHex(ColorTable[3])}; color:{ColorToHex(ColorTable[6])}; }}");
+            css.AppendLine($"table.img tr.r2 {{ background-color:{ColorToHex(ColorTable[4])}; color:{ColorToHex(ColorTable[7])}; }}");
+            css.AppendLine($"table.img.noChange {{ display:none; }}");
             FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-            if (EnableDarkMode)
-            {
-
-                sw.WriteLine("body { font-size:12px; background-color:black; color:white; }");
-                sw.WriteLine("a { color:white; }");
-                sw.WriteLine("p.wzf { }");
-                sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
-                sw.WriteLine("table { margin-bottom:16px; }");
-                sw.WriteLine("th { text-align:left; }");
-                sw.WriteLine("table.lst0 { }");
-                sw.WriteLine("table.lst1 { }");
-                sw.WriteLine("table.lst2 { }");
-                sw.WriteLine("table.img { }");
-                sw.WriteLine("table.img tr.r0 { background-color:#003049; }");
-                sw.WriteLine("table.img tr.r1 { background-color:#000000; }");
-                sw.WriteLine("table.img tr.r2 { background-color:#462306; }");
-                sw.WriteLine("table.img.noChange { display:none; }");
-            }
-            else
-            {
-                sw.WriteLine("body { font-size:12px; background-color:#bbbbbb }");
-                sw.WriteLine("p.wzf { }");
-                sw.WriteLine("table, tr, th, td { border:2px solid #ff8000; border-collapse:collapse; }");
-                sw.WriteLine("table { margin-bottom:16px; }");
-                sw.WriteLine("th { text-align:left; }");
-                sw.WriteLine("table.lst0 { }");
-                sw.WriteLine("table.lst0 a:link { }");
-                sw.WriteLine("table.lst0 a:visited { }");
-                sw.WriteLine("table.lst0 a:hover { }");
-                sw.WriteLine("table.lst0 a:activated { }");
-                sw.WriteLine("table.lst1 { }");
-                sw.WriteLine("table.lst2 { }");
-                sw.WriteLine("table.img tr.r0 { background-color:#CCCC00; color:#000000; }");
-                sw.WriteLine("table.img tr.r1 { background-color:#154211; }");
-                sw.WriteLine("table.img tr.r2 { background-color:#961e1e; }");
-                sw.WriteLine("table.img.noChange { display:none; }");
-            }
+            sw.Write(css.ToString());
             sw.Flush();
             sw.Close();
         }
@@ -4179,6 +4157,11 @@ namespace WzComparerR2.Comparer
             string invalidChars = new string(System.IO.Path.GetInvalidFileNameChars());
             string regexPattern = $"[{Regex.Escape(invalidChars)}]";
             return Regex.Replace(fileName, regexPattern, "_");
+        }
+
+        private static string ColorToHex(Color color)
+        {
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         }
 
         private static string GetBitmapHash(Bitmap bitmap)
