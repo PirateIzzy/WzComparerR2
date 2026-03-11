@@ -842,8 +842,46 @@ namespace WzComparerR2.CharaSimControl
 
         private Bitmap GetWorldArchiveNpcIllust(int objectID)
         {
-            BitmapOrigin waBitmap = BitmapOrigin.CreateFromNode(PluginManager.FindWz(@$"UI\UIworldArchive.img\illust\npc\{objectID}"), PluginManager.FindWz);
-            return waBitmap.Bitmap;
+            Wz_Node npcBitmapNode = PluginManager.FindWz(@$"UI\UIworldArchive.img\illust\npc\{objectID}");
+            BitmapOrigin npcBitmap = new BitmapOrigin();
+            if (npcBitmapNode == null) return null;
+            else if (npcBitmapNode.Nodes.Count > 1)
+            {
+                List<Bitmap> specialBitmaps = new List<Bitmap>();
+                int width = 0;
+                int height = 0;
+                foreach (Wz_Node subNode in npcBitmapNode.Nodes)
+                {
+                    npcBitmap = BitmapOrigin.CreateFromNode(subNode, PluginManager.FindWz);
+                    if (npcBitmap.Bitmap == null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        specialBitmaps.Add(npcBitmap.Bitmap);
+                        width = Math.Max(width, npcBitmap.Bitmap.Width);
+                        height += npcBitmap.Bitmap.Height;
+                    }
+                }
+                Bitmap specialNpcTooltip = new Bitmap(width, height);
+                using (Graphics g = Graphics.FromImage(specialNpcTooltip))
+                {
+                    int picH = 0;
+                    foreach (Bitmap subBitmap in specialBitmaps)
+                    {
+                        g.DrawImage(subBitmap, 10, picH, new Rectangle(0, 0, subBitmap.Width, subBitmap.Height), GraphicsUnit.Pixel);
+                        picH += subBitmap.Height;
+                    }
+                }
+                specialBitmaps.Clear();
+                return specialNpcTooltip;
+            }
+            else
+            {
+                BitmapOrigin waBitmap = BitmapOrigin.CreateFromNode(PluginManager.FindWz(@$"UI\UIworldArchive.img\illust\npc\{objectID}"), PluginManager.FindWz);
+                return waBitmap.Bitmap;
+            }
         }
 
         private string ReplaceQuestString(string text, Quest quest)
