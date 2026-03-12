@@ -88,7 +88,7 @@ namespace WzComparerR2.WzLib
                 {
                     if (this.Checksum != this.CalcCheckSum(this.stream))
                     {
-                        e = new ArgumentException("チェックサムエラー");
+                        e = new ArgumentException("checksum error");
                         return false;
                     }
                     this.chec = true;
@@ -307,7 +307,7 @@ namespace WzComparerR2.WzLib
                         }
                         else
                         {
-                            throw new Exception("Convex2Dには非vector2D項目が含まれています。");
+                            throw new Exception("Convex2D contains non vector2D items.");
                         }
                     }
                     parent.Value = new Wz_Convex(points);
@@ -345,7 +345,7 @@ namespace WzComparerR2.WzLib
 
                             if (!this.TryDecryptWaveFormatEx(fmtExData, out Interop.WAVEFORMATEX waveFormatEx))
                             {
-                                throw new Exception($"オフセット{this.Offset}+{reader.BaseStream.Position}でWaveFormatEx構造体を解析できませんでした。");
+                                throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.Offset} + {reader.BaseStream.Position}.");
                             }
                             switch (waveFormatEx.FormatTag)
                             {
@@ -369,7 +369,7 @@ namespace WzComparerR2.WzLib
                                     break;
 
                                 default:
-                                    throw new Exception($"オフセット{this.Offset}+{reader.BaseStream.Position}に不明なWaveFormatEx.FormatTag{waveFormatEx.FormatTag}があります。");
+                                    throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.Offset} + {reader.BaseStream.Position}.");
                             }
                             break;
                     }
@@ -419,7 +419,7 @@ namespace WzComparerR2.WzLib
                     break;
 
                 default:
-                    throw new Exception("不明なWZタグ:" + tag);
+                    throw new Exception("Unknown WZ tag: " + tag);
             }
         }
 
@@ -517,12 +517,12 @@ namespace WzComparerR2.WzLib
                     this.ExtractImg(reader, parent);
                     if (reader.BaseStream.Position != eob)
                     {
-                        throw new Exception($"オブジェクトはオフセット{this.Offset}+{reader.BaseStream.Position}で完全にロードされていません。");
+                        throw new Exception($"Object is not fully loaded at offset {this.Offset} + {reader.BaseStream.Position}.");
                     }
                     break;
 
                 default:
-                    throw new Exception($"オフセット{this.Offset}+{reader.BaseStream.Position}に不明な値タイプ{flag}があります。");
+                    throw new Exception($"Unknown value type {flag} at offset {this.Offset} + {reader.BaseStream.Position}.");
             }
         }
 
@@ -568,7 +568,7 @@ namespace WzComparerR2.WzLib
                         break;
 
                     default:
-                        throw new Exception($"オフセット{this.Offset}+{reader.BaseStream.Position}に不明なLuaフラグ{flag}があります。");
+                        throw new Exception($"Unknown Lua flag {flag} at Offset {this.Offset} + {reader.BaseStream.Position}.");
                 }
             }
         }
@@ -763,7 +763,7 @@ namespace WzComparerR2.WzLib
                 if (reader.ReadRepeatChars(' ') == 0)
                 {
                     int nextChar = reader.Peek();
-                    throw new FormatException($"Expect space char after node name but get {(char)nextChar}({nextChar}).");
+                    throw new FormatException($"Expected a space after node name, but got {(char)nextChar}({nextChar}).");
                 }
                 string typeName = reader.ReadUntilWhitespace();
                 if (!TryParseNodeType(typeName, out type))
