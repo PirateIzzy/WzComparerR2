@@ -63,7 +63,7 @@ namespace WzComparerR2.CharaSimControl
         public bool UseCTFamiliarRender { get; set; }
         public bool ShowApplicablePetEquip { get; set; }
         public long DamageSkinNumber { get; set; }
-        public CashPackage CashPackage { get; set; }
+        public CashPackage TargetCashPackage { get; set; }
         private bool WillDrawNickTag { get; set; }
         private Wz_Node NickResNode {  get; set; }
         private Bitmap ItemSample { get; set; }
@@ -101,8 +101,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Special\{0:D4}.img\{1}", this.item.ItemID / 10000, this.item.ItemID));
                 Wz_Node cashPackageNode = PluginBase.PluginManager.FindWz(string.Format(@"Etc\CashPackage.img\{0}", this.item.ItemID));
-                CashPackage cashPackage = CashPackage.CreateFromNode(itemNode, cashPackageNode, PluginBase.PluginManager.FindWz);
-                return RenderCashPackage(cashPackage);
+                TargetCashPackage = CashPackage.CreateFromNode(itemNode, cashPackageNode, PluginBase.PluginManager.FindWz);
+                return RenderCashPackage(TargetCashPackage);
             }
 
             Action<int> AppendGearOrItem = (int itemID) =>
@@ -950,12 +950,12 @@ namespace WzComparerR2.CharaSimControl
                     picH += 12;
                     if (isTranslateRequired)
                     {
-                        string mergedDescLeftAlign = Translator.MergeString(descLeftAlign, Translator.TranslateString(descLeftAlign), 2);
+                        string mergedDescLeftAlign = Translator.MergeString(ReplaceDescTags(descLeftAlign), Translator.TranslateString(descLeftAlign), 2);
                         GearGraphics.DrawString(g, mergedDescLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
                     }
                     else
                     {
-                        GearGraphics.DrawString(g, descLeftAlign, GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
+                        GearGraphics.DrawString(g, ReplaceDescTags(descLeftAlign), GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
                     }
                 }
                 if (item.CoreSpecs.Count > 0)
@@ -1000,9 +1000,19 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (item.Sample.Bitmap != null)
                 {
-                    g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
-                    picH += item.Sample.Bitmap.Height;
-                    picH += 2;
+                    if (item.Sample.Bitmap.Width > 270)
+                    {
+                        Bitmap bmp = new Bitmap(item.Sample.Bitmap, new Size(270, (int)(item.Sample.Bitmap.Height * 270.0 / item.Sample.Bitmap.Width)));
+                        g.DrawImage(bmp, (tooltip.Width - bmp.Width) / 2, picH);
+                        picH += bmp.Height;
+                        picH += 4;
+                    }
+                    else
+                    {
+                        g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
+                        picH += item.Sample.Bitmap.Height;
+                        picH += 2;
+                    }
                 }
                 else if (item.DamageSkinID != null)
                 {
@@ -1694,7 +1704,29 @@ namespace WzComparerR2.CharaSimControl
 
                 text = text.Replace("#cosmetic_EULO#", name);
             }
-            
+
+            text = Regex.Replace(text, @$"#(t)\s*(\d{{1,9}}).*?#", match => // id should be less than 1,000,000,000
+            {
+                string tag = match.Groups[1].Value;
+                if (!int.TryParse(match.Groups[2].Value, out int id)) id = -1;
+                StringResult sr;
+                var name = "";
+                switch (tag)
+                {
+                    case "t":
+                        StringLinker.StringItem.TryGetValue(id, out sr);
+                        if (sr == null)
+                        {
+                            StringLinker.StringEqp.TryGetValue(id, out sr);
+                        }
+                        name = sr?.Name ?? id.ToString();
+                        return $"{name}";
+
+                    default:
+                        return id.ToString();
+                }
+            });
+
             return text;
         }
 
