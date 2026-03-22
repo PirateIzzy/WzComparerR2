@@ -112,7 +112,7 @@ namespace WzComparerR2
             {
                 this.btnTranslate.Enabled = false;
                 string originalText = this.richDescription.Text;
-                UpdateText("翻訳中...");
+                UpdateText("Translating...");
                 await Task.Run(() =>
                 {
                     string translatedText = Translator.TranslateString(originalText);
