@@ -2,7 +2,7 @@
 
 function isWzImage(value)
   return value and type(value) == "userdata" 
-    and (value:GetType().Name == 'Wz_Image' or value:GetType().Name == 'Ms_Image')
+    and (value:GetType().Name == 'Wz_Image' or value:GetType().Name == 'Ms_Image' or value:GetType().Name == 'Ms_ImageV2')
 end
 
 function enumAllWzNodes(node) 
