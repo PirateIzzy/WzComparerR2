@@ -595,7 +595,7 @@ namespace WzComparerR2.MapRender.UI
                  "Mouse:",
                  "",
                  "[Left-Click on Monster] Attack Monster",
-                 "[Middle-Click on Monster] Show Monster Skill",
+                 "[Ctrl + Left-Click on Monster] Show Monster Skill",
                  "[Hold Right-Click and Move] Move around map"
             };
 

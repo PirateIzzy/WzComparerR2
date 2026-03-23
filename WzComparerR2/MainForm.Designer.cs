@@ -303,6 +303,7 @@ namespace WzComparerR2
             this.btnReverseNodeSelection = new DevComponents.DotNetBar.ButtonX();
             this.btnPetEquipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnSkillTooltipExport = new DevComponents.DotNetBar.ButtonX();
+            this.btnWorldArchiveBrowser = new DevComponents.DotNetBar.ButtonItem();
             this.btnPreset = new DevComponents.DotNetBar.ButtonX();
             this.btnMusicChannel = new DevComponents.DotNetBar.ButtonItem();
             this.btnSkillChangeInfo = new DevComponents.DotNetBar.ButtonItem();
@@ -856,6 +857,14 @@ namespace WzComparerR2
             // 
             this.itemContainer34.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.itemContainer34.Name = "itemContainer34";
+            this.itemContainer34.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnWorldArchiveBrowser});
+            //
+            // btnWorldArchiveBrowser
+            //
+            this.btnWorldArchiveBrowser.Name = "btnWorldArchiveBrowser";
+            this.btnWorldArchiveBrowser.Text = "World Archive";
+            this.btnWorldArchiveBrowser.Click += new System.EventHandler(this.btnWorldArchiveBrowser_Click);
             // 
             // 
             // 
@@ -3975,6 +3984,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ButtonX btnReverseNodeSelection;
         private DevComponents.DotNetBar.ButtonX btnPetEquipExport;
         private DevComponents.DotNetBar.ButtonX btnSkillTooltipExport;
+        private DevComponents.DotNetBar.ButtonItem btnWorldArchiveBrowser;
         private DevComponents.DotNetBar.ButtonX btnPreset;
         private DevComponents.DotNetBar.ButtonItem btnMusicChannel;
         private DevComponents.DotNetBar.ButtonItem btnSkillChangeInfo;
