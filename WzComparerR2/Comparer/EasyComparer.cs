@@ -1940,7 +1940,7 @@ namespace WzComparerR2.Comparer
                     }
 
                     var itemTypeTextInfo = g.MeasureString(itemType, GearGraphics.ItemDetailFont);
-                    int picH = 0;
+                    int picH = ShowObjectID ? 13 : 1;
                     if (ShowChangeType && nullItemIdx != 0) GearGraphics.DrawPlainText(g, itemType, itemTypeFont, Color.FromArgb(255, 255, 255), 2, (int)Math.Ceiling(itemTypeTextInfo.Width) + 2, ref picH, 10);
 
                     string imageName = Path.Combine(itemTooltipPath, categoryPath, "Item_" + itemID + "_" + ItemName + "_" + itemType + ".png");
@@ -4114,7 +4114,7 @@ namespace WzComparerR2.Comparer
                 return;
             StringBuilder css = new StringBuilder();
             css.AppendLine($"body {{ font-size:12px; background-color:{ColorToHex(ColorTable[0])}; color:{ColorToHex(ColorTable[1])}; }}");
-            css.AppendLine($"a {{ color:white; }}");
+            css.AppendLine($"a {{ color:{ColorToHex(ColorTable[8])}; }}");
             css.AppendLine($"p.wzf {{ }}");
             css.AppendLine($"table, tr, th, td {{ border:1px solid #ff8000; border-collapse:collapse; }}");
             css.AppendLine($"table {{ margin-bottom:16px; }}");
