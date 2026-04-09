@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.IO;
 using System.Linq;
-using System.Text;
+using WzComparerR2.WzLib.Compatibility;
 
 namespace WzComparerR2.WzLib
 {
@@ -18,7 +19,6 @@ namespace WzComparerR2.WzLib
             this.TextEncoding = Wz_Structure.DefaultEncoding;
             this.AutoDetectExtFiles = Wz_Structure.DefaultAutoDetectExtFiles;
             this.ImgCheckDisabled = Wz_Structure.DefaultImgCheckDisabled;
-            this.WzVersionVerifyMode = Wz_Structure.DefaultWzVersionVerifyMode;
         }
 
         public List<Wz_File> wz_files;
@@ -32,7 +32,6 @@ namespace WzComparerR2.WzLib
         public Encoding TextEncoding { get; set; }
         public bool AutoDetectExtFiles { get; set; }
         public bool ImgCheckDisabled { get; set; }
-        public WzVersionVerifyMode WzVersionVerifyMode { get; set; }
 
         public void Clear()
         {
@@ -80,7 +79,7 @@ namespace WzComparerR2.WzLib
             calculate_img_count();
         }
 
-        public Wz_File LoadFile(string fileName, Wz_Node node, bool useBaseWz = false, bool loadWzAsFolder = false, string fallbackFileName = null, bool force = false)
+        public Wz_File LoadFile(string fileName, Wz_Node node, bool useBaseWz = false, bool loadWzAsFolder = false, string fallbackFileName = null)
         {
             Wz_File file = null;
 
@@ -93,53 +92,119 @@ namespace WzComparerR2.WzLib
                 }
                 this.wz_files.Add(file);
                 file.TextEncoding = this.TextEncoding;
-                if (!this.encryption.IsDirEncDetected(file))
+
+                // 1. pre-read
+                WzPreReadResult preReadResult = null;
+                foreach (var preReader in WzPreReaders.All)
                 {
-                    this.encryption.DetectEncryption(file);
+                    if (preReader.TryPreRead(file, out var result))
+                    {
+                        preReadResult = result;
+                        break;
+                    }
                 }
+
+                WzVersionProfile matchedProfile = null;
+
+                // 2. detect version and assign OffsetCalc to wz_file
+                if (preReadResult != null)
+                {
+                    // Try cached profiles first
+                    foreach (var cached in this.encryption.KnownProfiles)
+                    {
+                        var cachedProfile = WzVersionProfiles.GetByName(cached.ProfileName);
+                        if (cachedProfile != null && cachedProfile.Format == preReadResult.Format)
+                        {
+                            var iter = cachedProfile.CreateIterator(file);
+                            if (iter.IsMatch(cached.WzVersion, cached.HashVersion)
+                                && WzVersionDetectHelper.FastDetectSingleVersion(file, preReadResult,
+                                    cached.WzVersion, cached.HashVersion,
+                                    (f, hv) => cachedProfile.CreateOffsetCalc(f, hv)))
+                            {
+                                matchedProfile = cachedProfile;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Full detection: iterate candidate profiles
+                    if (matchedProfile == null)
+                    {
+                        foreach (var profile in WzVersionProfiles.GetCandidates(preReadResult.Format))
+                        {
+                            var iter = profile.CreateIterator(file);
+                            if (profile.TryDetect(file, preReadResult, iter))
+                            {
+                                matchedProfile = profile;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Cache on success
+                    if (matchedProfile != null)
+                    {
+                        var entry = new Wz_Crypto.KnownProfileEntry(matchedProfile.Name, file.Header.WzVersion, file.Header.HashVersion);
+                        int idx = this.encryption.KnownProfiles.FindIndex(e => e.ProfileName == entry.ProfileName
+                            && e.WzVersion == file.Header.WzVersion
+                            && e.HashVersion == file.Header.HashVersion);
+                        if (idx >= 0)
+                            this.encryption.KnownProfiles[idx] = entry;
+                        else
+                            this.encryption.KnownProfiles.Add(entry);
+                    }
+                }
+
+                // 3. detect string encryption, assign to crypto
+                if (preReadResult != null && matchedProfile != null)
+                {
+                    if (!this.encryption.IsDirEncDetected(file))
+                    {
+                        this.DetectCryptoKeyType(file, matchedProfile, preReadResult);
+                    }
+
+                    if (matchedProfile is Pkg2Profile pkg2Profile && file.Header is Wz_Header.WzPkg2Header pkg2Header)
+                    {
+                        pkg2Header.DirStringReader = pkg2Profile.CreateDirStringReader(file, this.encryption);
+                    }
+                }
+
+                // temp workaround for unknown pkg2 encryption
+                // brute-force search for all possible image offsets
+                if (file.Header.IsPkg2 && matchedProfile == null && file.CandidateImageInfos.Count == 0)
+                {
+                    if (preReadResult != null && file.Header is Wz_Header.WzPkg2Header pkg2Header)
+                    {
+                        var unknownProfile = (UnknownPkg2Profile)WzVersionProfiles.GetUnknownPkg2Profile();
+                        pkg2Header.DirStringReader = unknownProfile.CreateDirStringReader(file, this.encryption);
+                        if (preReadResult.Pkg2DirEntryCounts.Count > 0)
+                        {
+                            file.ForcedCounts = new Queue<int>(preReadResult.Pkg2DirEntryCounts.Select(ec => ec.ActualEntryCount));
+                            var imgSearchCount = preReadResult.Pkg2DirEntryCounts.Sum(ec => ec.ActualImgCount);
+                            if (imgSearchCount >= 1)
+                            {
+                                file.FindAllHits(imgSearchCount);
+                            }
+                        }
+                    }
+                }
+
+                // 4. full dir tree read
                 node.Value = file;
                 file.Node = node;
-                file.FileStream.Position = file.Header.DataStartPosition;
-                file.GetDirTree(node, useBaseWz, loadWzAsFolder);
-                file.Header.DirEndPosition = file.FileStream.Position;
+                file.FileStream.Position = file.Header.DirStartPosition;
+                file.GetDirTree(node, useBaseWz, loadWzAsFolder, fileName, fallbackFileName);
                 file.DetectWzType();
-                file.DetectWzVersion();
                 return file;
             }
             catch
             {
-                if (file.Header.Signature == "PKG2")
+                if (file != null)
                 {
-                    try
-                    {
-                        file.FindAllHits(file);
-                        file.retInited = true;
-                        file.ForceGetDirTree(node, useBaseWz, loadWzAsFolder, fileName, fallbackFileName);
-                        file.Header.DirEndPosition = file.FileStream.Position;
-                        file.Forced = true;
-                        file.DetectWzType();
-                        file.DetectWzVersion();
-                        return file;
-                    }
-                    catch
-                    {
-                        if (file != null)
-                        {
-                            file.Close();
-                            this.wz_files.Remove(file);
-                        }
-                        throw;
-                    }
+                    file.Close();
+                    this.wz_files.Remove(file);
                 }
-                else
-                {
-                    if (file != null)
-                    {
-                        file.Close();
-                        this.wz_files.Remove(file);
-                    }
-                    throw;
-                }
+                throw;
             }
         }
 
@@ -181,12 +246,11 @@ namespace WzComparerR2.WzLib
 
         public void LoadKMST1125DataWz(string fileName, string fallbackFileName = null)
         {
-            this.LoadWzFolder(Path.GetDirectoryName(fileName), ref this.WzNode, true, fallbackFileName == null ? (string)null : Path.GetDirectoryName(fallbackFileName));
-            this.calculate_img_count();
-            this.calculate_img_count();
+            this.LoadWzFolder(Path.GetDirectoryName(fileName), ref this.WzNode, true, fallbackFileName == null ? null : Path.GetDirectoryName(fallbackFileName));
+            calculate_img_count();
         }
 
-        public bool IsKMST1125WzFormat(string fileName)
+        public bool IsKMST1125WzFormat(string fileName, string fallbackFileName = null)
         {
             if (!string.Equals(Path.GetExtension(fileName), ".wz", StringComparison.OrdinalIgnoreCase))
             {
@@ -194,39 +258,47 @@ namespace WzComparerR2.WzLib
             }
 
             string iniFile = Path.ChangeExtension(fileName, ".ini");
+            if (!File.Exists(iniFile) && fallbackFileName != null)
+            {
+                iniFile = Path.ChangeExtension(fallbackFileName, ".ini");
+            }
             if (!File.Exists(iniFile))
             {
                 return false;
             }
 
-            // check if the file is an empty wzfile
-            using (var file = new Wz_File(fileName, this))
+            using (var file = new Wz_File(fileName, this, fallbackFileName))
             {
                 if (!file.Loaded)
                 {
                     return false;
                 }
-                var tempNode = new Wz_Node();
-                if (!this.encryption.IsDirEncDetected(file))
+                foreach (var preReader in WzPreReaders.All)
                 {
-                    this.encryption.DetectEncryption(file);
+                    if (preReader.TryPreRead(file, out var result))
+                    {
+                        return !result.Nodes.Any(n => n.NodeType == 0x02 || n.NodeType == 0x04);
+                    }
                 }
-                file.FileStream.Position = file.Header.DataStartPosition;
-                file.GetDirTree(tempNode);
-                return file.ImageCount == 0;
+                return false;
             }
         }
 
-        public void LoadWzFolder(string folder, ref Wz_Node node, bool useBaseWz = false, string fallbackFolder = null, bool force = false)
+        public void LoadWzFolder(string folder, ref Wz_Node node, bool useBaseWz = false, string fallbackFolder = null)
         {
             string baseName = Path.Combine(folder, Path.GetFileName(folder));
-            string fallbackBaseName = fallbackFolder == null ? (string)null : Path.Combine(fallbackFolder, Path.GetFileName(fallbackFolder));
+            string fallbackBaseName = fallbackFolder == null ? null : Path.Combine(fallbackFolder, Path.GetFileName(fallbackFolder));
             string entryWzFileName = Path.ChangeExtension(baseName, ".wz");
             string iniFileName = Path.ChangeExtension(baseName, ".ini");
             Func<int, string> extraWzFileName = _index => Path.ChangeExtension($"{baseName}_{_index:D3}", ".wz");
-            Func<int, string> fallbackWzFileName = index => Path.ChangeExtension($"{fallbackBaseName}_{index:D3}", ".wz");
+            Func<int, string> fallbackExtraWzFileName = _index => Path.ChangeExtension($"{fallbackBaseName}_{_index:D3}", ".wz");
+
             // load iniFile
             int? lastWzIndex = null;
+            if (!File.Exists(iniFileName))
+            {
+                iniFileName = Path.ChangeExtension(fallbackBaseName, ".ini");
+            }
             if (File.Exists(iniFileName))
             {
                 var iniConf = File.ReadAllLines(iniFileName).Select(row =>
@@ -248,7 +320,8 @@ namespace WzComparerR2.WzLib
                 for (int i = 0; ; i++)
                 {
                     string extraFile = extraWzFileName(i);
-                    if (!File.Exists(extraFile))
+                    string fallbackExtraFile = fallbackExtraWzFileName(i);
+                    if (!File.Exists(extraFile) && !File.Exists(fallbackExtraFile))
                     {
                         break;
                     }
@@ -261,16 +334,17 @@ namespace WzComparerR2.WzLib
             {
                 node = new Wz_Node(Path.GetFileName(entryWzFileName));
             }
-            var entryWzf = this.LoadFile(entryWzFileName, node, useBaseWz, true, Path.ChangeExtension(fallbackBaseName, ".wz"), force);
+            var entryWzf = this.LoadFile(entryWzFileName, node, useBaseWz, true, Path.ChangeExtension(fallbackBaseName, ".wz"));
+
             // load extra file
             if (lastWzIndex != null)
             {
                 for (int i = 0, j = lastWzIndex.Value; i <= j; i++)
                 {
                     string extraFile = extraWzFileName(i);
-                    string fallbackFileName = fallbackWzFileName(i);
+                    string fallbackExtraFile = fallbackExtraWzFileName(i);
                     var tempNode = new Wz_Node(Path.GetFileName(extraFile));
-                    var extraWzf = this.LoadFile(extraFile, tempNode, false, true, fallbackFileName: fallbackFileName, force: force);
+                    var extraWzf = this.LoadFile(extraFile, tempNode, false, true, fallbackExtraFile);
 
                     /*
                      * there is a little hack here, we'll move all img to the entry file, and each img still refers to the original wzfile.
@@ -360,6 +434,15 @@ namespace WzComparerR2.WzLib
             }
         }
 
+        private void DetectCryptoKeyType(Wz_File file, WzVersionProfile profile, WzPreReadResult preReadResult)
+        {
+            profile.DetectCryptoKeyType(file, this.encryption, preReadResult, out var pkg1KeyType, out var pkg2KeyType);
+            if (pkg1KeyType != Wz_CryptoKeyType.Unknown)
+                this.encryption.Pkg1EncType = pkg1KeyType;
+            if (pkg2KeyType != Wz_CryptoKeyType.Unknown)
+                this.encryption.Pkg2EncType = pkg2KeyType;
+        }
+
         #region Global Settings
         public static Encoding DefaultEncoding
         {
@@ -373,7 +456,6 @@ namespace WzComparerR2.WzLib
 
         public static bool DefaultImgCheckDisabled { get; set; }
 
-        public static WzVersionVerifyMode DefaultWzVersionVerifyMode { get; set; }
         #endregion
     }
 }

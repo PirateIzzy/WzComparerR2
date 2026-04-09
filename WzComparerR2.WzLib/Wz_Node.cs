@@ -460,6 +460,7 @@ namespace WzComparerR2.WzLib
                 return 1;
             }
         }
+
         [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
         static extern int StrCmpLogicalW(string psz1, string psz2);
     }

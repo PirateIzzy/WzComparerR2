@@ -39,8 +39,7 @@ namespace WzComparerR2.WzLib
         public uint HashedOffset { get; set; }
         public uint HashedOffsetPosition { get; set; }
         public long Offset { get; set; }
-        public long ForcedOffset { get; set; } = -1;
-
+        
         public Wz_Node Node { get; private set; }
 
         public Wz_Node OwnerNode { get; set; }
@@ -95,14 +94,15 @@ namespace WzComparerR2.WzLib
                     this.chec = true;
                 }
 
-                if (TextImageReaderV1.PreCheck(this.stream))
+                if (RawTextReader.PreCheck(this))
                 {
                     try
                     {
                         lock (this.WzFile.ReadLock)
                         {
                             this.stream.Position = 0;
-                            Wz_Image.RawTextReader.ExtractImg(new WzStreamReader(this.stream), this.Node);
+                            var reader = new WzStreamReader(this.stream);
+                            RawTextReader.ExtractImg(reader, this.Node);
                             this.extr = true;
                         }
                     }
@@ -113,13 +113,13 @@ namespace WzComparerR2.WzLib
                         return false;
                     }
                 }
-                else if (Wz_Image.TextImageReaderV1.PreCheck(this.stream))
+                else if (TextImageReaderV1.PreCheck(this.stream))
                 {
                     try
                     {
                         lock (this.WzFile.ReadLock)
                         {
-                            this.stream.Position = 0L;
+                            this.stream.Position = 0;
                             var reader = new WzStreamReader(this.stream);
                             TextImageReaderV1.ExtractImg(reader, this.Node);
                             this.extr = true;
@@ -216,7 +216,7 @@ namespace WzComparerR2.WzLib
             this.Node.Nodes.Clear();
         }
 
-        public virtual unsafe int CalcCheckSum(Stream stream)
+        public virtual int CalcCheckSum(Stream stream)
         {
             lock (this.WzFile.ReadLock)
             {
@@ -230,21 +230,7 @@ namespace WzComparerR2.WzLib
                     int count;
                     while ((count = stream.Read(buffer, 0, Math.Min(size, buffer.Length))) > 0)
                     {
-                        fixed (byte* pBuffer = buffer)
-                        {
-                            int* p = (int*)pBuffer;
-                            int i, j = count / 4;
-                            for (i = 0; i < j; i++)
-                            {
-                                int data = *(p + i);
-                                cs += (data & 0xff) + (data >> 8 & 0xff) + (data >> 16 & 0xff) + (data >> 24 & 0xff);
-                            }
-                            for (i = i * 4; i < count; i++)
-                            {
-                                cs += buffer[i];
-                            }
-                        }
-
+                        cs += MathHelper.SumBytes(buffer.AsSpan(0, count));
                         size -= count;
                     }
                 }
@@ -355,13 +341,13 @@ namespace WzComparerR2.WzLib
                     mediaType.FixedSizeSamples = reader.ReadByte() != 0;
                     mediaType.TemporalCompression = reader.ReadByte() != 0;
                     mediaType.FormatType = new Guid(reader.ReadBytes(16));
-                    switch (soundDecl)
+                    switch(soundDecl)
                     {
                         case 2:
                             int fmtExLen = reader.ReadCompressedInt32();
                             var fmtExData = reader.ReadBytes(fmtExLen);
                             mediaType.CbFormat = (uint)fmtExLen;
-
+                            
                             if (!this.TryDecryptWaveFormatEx(fmtExData, out Interop.WAVEFORMATEX waveFormatEx))
                             {
                                 throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.Offset} + {reader.BaseStream.Position}.");
@@ -560,14 +546,14 @@ namespace WzComparerR2.WzLib
                 if (MemoryMarshal.TryRead(dataCopy, out waveFormatEx))
                 {
                     if ((data.Length == waveFormatEx.CbSize + Interop.WAVEFORMATEX_SIZE)
-                         // workaround for KMST1185, waveFormatEx only has 18 bytes but cbsize is also 18.
-                         || (data.Length == waveFormatEx.CbSize && waveFormatEx.FormatTag == Interop.WAVE_FORMAT_MPEGLAYER3)
-                         )
+                        // workaround for KMST1185, waveFormatEx only has 18 bytes but cbsize is also 18.
+                        || (data.Length == waveFormatEx.CbSize && waveFormatEx.FormatTag == Interop.WAVE_FORMAT_MPEGLAYER3)
+                        )
                     {
                         // copy back to the original buffer
                         dataCopy.CopyTo(data);
                         return true;
-                    }
+                    } 
                 }
             }
             waveFormatEx = default;
@@ -600,7 +586,7 @@ namespace WzComparerR2.WzLib
             {
                 TryDetectLuaEnc(data);
             }
-            this.EncKeys.Decrypt(data, 0, data.Length);
+            this.EncKeys.Decrypt(data.AsSpan());
             string luaCode = Encoding.UTF8.GetString(data);
             parent.Value = luaCode;
         }
@@ -622,7 +608,7 @@ namespace WzComparerR2.WzLib
             {
                 Buffer.BlockCopy(luaBinary, 0, tempBuffer, 0, tempBuffer.Length);
 
-                this.WzFile.WzStructure.encryption.GetKeys(enc).Decrypt(tempBuffer, 0, tempBuffer.Length);
+                this.WzFile.WzStructure.encryption.GetKeys(enc).Decrypt(tempBuffer.AsSpan());
                 int count = Encoding.UTF8.GetChars(tempBuffer, 0, tempBuffer.Length, tempStr, 0);
                 int asciiCount = tempStr.Take(count).Count(chr => 32 <= chr && chr <= 127);
 
@@ -782,7 +768,7 @@ namespace WzComparerR2.WzLib
                 if (reader.ReadRepeatChars(' ') == 0)
                 {
                     int nextChar = reader.Peek();
-                    throw new FormatException($"Expected a space after node name, but got {(char)nextChar}({nextChar}).");
+                    throw new FormatException($"Expect space char after node name but get {(char)nextChar}({nextChar}).");
                 }
                 string typeName = reader.ReadUntilWhitespace();
                 if (!TryParseNodeType(typeName, out type))
@@ -917,17 +903,24 @@ namespace WzComparerR2.WzLib
 
         internal class RawTextReader
         {
-            public static bool PreCheck(Wz_Image img) => string.Equals(Path.GetExtension(img.Name), ".txt", StringComparison.OrdinalIgnoreCase);
+            public static bool PreCheck(Wz_Image img)
+            {
+                if (string.Equals(Path.GetExtension(img.Name), ".txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                return false;
+            }
 
             public static void ExtractImg(WzStreamReader reader, Wz_Node parent)
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 while (!reader.EndOfStream)
                 {
-                    string str = reader.ReadLine();
-                    stringBuilder.Append(str).Append("\r\n");
+                    var line = reader.ReadLine();
+                    sb.Append(line).Append("\r\n");
                 }
-                parent.Value = (object)stringBuilder.ToString();
+                parent.Value = sb.ToString();
             }
         }
 
