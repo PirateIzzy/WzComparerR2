@@ -87,12 +87,12 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMADr: return (isMsea ? "MAGIC ATTACK : " : "Magic Attack: ") + sign + value + "%";
                 case GearPropType.incPDD: return (isMsea ? "DEF" : "Defense: ") + sign + value;
                 case GearPropType.incPDDr: return (isMsea ? "DEF" : "Defense: ") + sign + value + "%";
-                //case GearPropType.incMDD: return "MAGIC DEF. : " + sign + value;
-                //case GearPropType.incMDDr: return "MAGIC DEF. : " + sign + value + "%";
-                //case GearPropType.incACC: return "ACCURACY : " + sign + value;
-                //case GearPropType.incACCr: return "ACCURACY : " + sign + value + "%";
-                //case GearPropType.incEVA: return "AVOIDABILITY : " + sign + value;
-                //case GearPropType.incEVAr: return "AVOIDABILITY : " + sign + value + "%";
+                case GearPropType.incMDD: return "MAGIC DEF. : " + sign + value;
+                case GearPropType.incMDDr: return "MAGIC DEF. : " + sign + value + "%";
+                case GearPropType.incACC: return "ACCURACY : " + sign + value;
+                case GearPropType.incACCr: return "ACCURACY : " + sign + value + "%";
+                case GearPropType.incEVA: return "AVOIDABILITY : " + sign + value;
+                case GearPropType.incEVAr: return "AVOIDABILITY : " + sign + value + "%";
                 case GearPropType.incSpeed: return "Speed: " + sign + value;
                 case GearPropType.incJump: return "Jump: " + sign + value;
                 case GearPropType.incCraft: return "Diligence: " + sign + value;
@@ -156,7 +156,9 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPAD_incMAD:
                 case GearPropType.incAD: return "Attack Power & Magic ATT: " + sign + value;
                 case GearPropType.incPDD_incMDD: return "Defense: " + sign + value;
-                //case GearPropType.incACC_incEVA: return "ACC/AVO :" + sign + value;
+                case GearPropType.incACC_incEVA: return "ACC/AVO :" + sign + value;
+                case GearPropType.incCRT: return "Critical Rate :" + sign + value;
+                case GearPropType.incCRD: return "Critical Damage : " + sign + value;
 
                 case GearPropType.incARC: return "ARC : " + sign + value;
                 case GearPropType.incAUT: return (isMsea ? "AUT : " : "SAC : ") + sign + value;
@@ -272,6 +274,30 @@ namespace WzComparerR2.CharaSim
                     res[0] = "Defense";
                     res[1] = sign + value + "%";
                     return res;
+                case GearPropType.incMDD:
+                    res[0] = "Magic Defense";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incMDDr:
+                    res[0] = "Magic Defense";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incACC:
+                    res[0] = "Accuracy";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incACCr:
+                    res[0] = "Accuracy";
+                    res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incEVA:
+                    res[0] = "Avoidability";
+                    res[1] = sign + value;
+                    return res;
+                case GearPropType.incEVAr:
+                    res[0] = "Avoidability";
+                    res[1] = sign + value + "%";
+                    return res;
                 case GearPropType.incSpeed:
                     res[0] = "Speed";
                     res[1] = sign + value;
@@ -289,9 +315,17 @@ namespace WzComparerR2.CharaSim
                     res[0] = "Damage";
                     res[1] = sign + value + "%";
                     return res;
+                case GearPropType.incCRT:
+                    res[0] = "Critical Rate";
+                    res[1] = sign + value;
+                    return res;
                 case GearPropType.incCr:
                     res[0] = "Critical Rate";
                     res[1] = sign + value + "%";
+                    return res;
+                case GearPropType.incCRD:
+                    res[0] = "Critical Damage";
+                    res[1] = sign + value;
                     return res;
                 case GearPropType.incCDr:
                     res[0] = "Critical Damage";
@@ -427,7 +461,9 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPDD_incMDD:
                     res[0] = "Defense  " + sign + value;
                     return res;
-
+                case GearPropType.incACC_incEVA: 
+                    res[0] = "Accuracy/Avoidability :" + sign + value;
+                    return res;
                 case GearPropType.Etuc:
                     res[0] = $"#$dExceptional: None (Max {value} time(s))#";
                     return res;
@@ -554,6 +590,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.head_n: return "Head";
                 case GearType.face:
                 case GearType.face2:
+                case GearType.face3:
                 case GearType.face_n: return "Face";
                 case GearType.hair:
                 case GearType.hair2:

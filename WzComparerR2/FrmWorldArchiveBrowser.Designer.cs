@@ -57,7 +57,6 @@ namespace WzComparerR2
             this.btnExport.TabIndex = 9;
             this.btnExport.Text = "Export";
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            this.btnExport.Enabled = false;
             // 
             // btnLocateExtraIllust
             // 

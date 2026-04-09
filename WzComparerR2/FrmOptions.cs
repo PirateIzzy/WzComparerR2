@@ -39,12 +39,6 @@ namespace WzComparerR2
                 new ComboItem("ASCII"){ Value = -1 },
             });
 
-            cmbWzVersionVerifyMode.Items.AddRange(new[]
-            {
-                new ComboItem("Fast"){ Value = WzLib.WzVersionVerifyMode.Fast },
-                new ComboItem("Legacy"){ Value = WzLib.WzVersionVerifyMode.Default },
-            });
-
             cmbDesiredLanguage.Items.AddRange(new[]
             {
                 new ComboItem("Cantonese (HKMS)"){ Value = "yue" },
@@ -513,17 +507,6 @@ namespace WzComparerR2
 #endif
         }
 
-        public WzLib.WzVersionVerifyMode WzVersionVerifyMode
-        {
-            get { return ((cmbWzVersionVerifyMode.SelectedItem as ComboItem)?.Value as WzLib.WzVersionVerifyMode?) ?? default; }
-            set
-            {
-                var items = cmbWzVersionVerifyMode.Items.Cast<ComboItem>();
-                var item = items.FirstOrDefault(_item => _item.Value as WzLib.WzVersionVerifyMode? == value)
-                    ?? items.First();
-                cmbWzVersionVerifyMode.SelectedItem = item;
-            }
-        }
 
         public void Load(WcR2Config config)
         {
@@ -531,8 +514,6 @@ namespace WzComparerR2
             this.SortWzByImgID = config.SortWzByImgID;
             this.DefaultWzCodePage = config.WzEncoding;
             this.AutoDetectExtFiles = config.AutoDetectExtFiles;
-            this.ImgCheckDisabled = config.ImgCheckDisabled;
-            this.WzVersionVerifyMode = config.WzVersionVerifyMode;
             this.NxSecretKey = config.NxSecretKey;
             this.MozhiBackend = config.MozhiBackend;
             this.LanguageModel = config.LanguageModel;
@@ -556,7 +537,6 @@ namespace WzComparerR2
             config.WzEncoding = this.DefaultWzCodePage;
             config.AutoDetectExtFiles = this.AutoDetectExtFiles;
             config.ImgCheckDisabled = this.ImgCheckDisabled;
-            config.WzVersionVerifyMode = this.WzVersionVerifyMode;
             config.NxSecretKey = this.NxSecretKey;
             config.MozhiBackend = this.MozhiBackend;
             if (this.LanguageModel != "none") config.LanguageModel = this.LanguageModel;
