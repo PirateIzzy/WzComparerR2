@@ -20,6 +20,9 @@ namespace WzComparerR2.CharaSim
         face_n = 1790,
         hair_n = 1791,
         head_n = 1792,
+        hair2_n = 1793,
+        face3 = 8,
+
         /// <summary>
         /// Face Accessory 101
         /// </summary>
