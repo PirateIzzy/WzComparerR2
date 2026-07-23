@@ -4279,7 +4279,7 @@ namespace WzComparerR2
                                 mbSr = new StringResult();
                             }
                         }
-                        item.Dispose();
+                        //item.Dispose();
                         break;
                     case Npc item:
                         if (CharaSimConfig.Default.Misc.EnableWorldArchive)
@@ -4306,10 +4306,10 @@ namespace WzComparerR2
                                 }
                             }
                         }
-                        item.Dispose();
+                        //item.Dispose();
                         break;
                     case Quest item:
-                        item.Dispose();
+                        //item.Dispose();
                         break;
                 }
                 if (wzf.Type is not Wz_Type.Quest)
