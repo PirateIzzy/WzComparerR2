@@ -63,7 +63,7 @@ namespace WzComparerR2
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbComparePng = new DevComponents.DotNetBar.Controls.ComboBoxEx();
-            this.chkOutputPng = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkKeepOldWz = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkCompare = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.panelEx2 = new DevComponents.DotNetBar.PanelEx();
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
@@ -181,7 +181,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkDeadPatch.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkDeadPatch.Location = new System.Drawing.Point(120, 87);
+            this.chkDeadPatch.Location = new System.Drawing.Point(90, 87);
             this.chkDeadPatch.Name = "chkDeadPatch";
             this.chkDeadPatch.Size = new System.Drawing.Size(88, 18);
             this.chkDeadPatch.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -352,8 +352,8 @@ namespace WzComparerR2
             //this.expandablePanel2.Controls.Add(this.chkOutputRemovedImg);
             //this.expandablePanel2.Controls.Add(this.chkOutputAddedImg);
             //this.expandablePanel2.Controls.Add(this.cmbComparePng);
-            //this.expandablePanel2.Controls.Add(this.chkOutputPng);
             //this.expandablePanel2.Controls.Add(this.chkCompare);
+            this.expandablePanel2.Controls.Add(this.chkKeepOldWz);
             this.expandablePanel2.Controls.Add(this.panelEx2);
             this.expandablePanel2.Controls.Add(this.buttonXPatch);
             this.expandablePanel2.Controls.Add(this.chkDeadPatch);
@@ -450,24 +450,26 @@ namespace WzComparerR2
             "\r\nPixel - Carefully checks the comparison process, although this may consume some time, it'll make sure that the size of the images are the same.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, true, new System.Drawing.Size(300, 170)));
             this.cmbComparePng.TabIndex = 12;
             // 
-            // chkOutputPng
+            // chkKeepOldWz
             // 
-            this.chkOutputPng.AutoSize = true;
-            this.chkOutputPng.BackColor = System.Drawing.Color.Transparent;
+            this.chkKeepOldWz.AutoSize = true;
+            this.chkKeepOldWz.BackColor = System.Drawing.Color.Transparent;
             // 
             // 
             // 
-            this.chkOutputPng.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputPng.Checked = true;
-            this.chkOutputPng.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkOutputPng.CheckValue = "Y";
-            this.chkOutputPng.Location = new System.Drawing.Point(204, 111);
-            this.chkOutputPng.Name = "chkOutputPng";
-            this.chkOutputPng.Size = new System.Drawing.Size(82, 16);
-            this.chkOutputPng.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputPng, new DevComponents.DotNetBar.SuperTooltipInfo("PNG && Audio", "", "Shows PNG and audio files.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
-            this.chkOutputPng.TabIndex = 11;
-            this.chkOutputPng.Text = "PNG && Audio";
+            this.chkKeepOldWz.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkKeepOldWz.Location = new System.Drawing.Point(200, 87);
+            this.chkKeepOldWz.Name = "chkKeepOldWz";
+            this.chkKeepOldWz.Size = new System.Drawing.Size(85, 16);
+            this.chkKeepOldWz.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            superTooltipInfo10.BodyText = "This is a special patching mode designed for WZ Compare.\r\nBy using this mode, old WZ files will be moved to DataBk directory inside of game directory instead of being overwritten by new WZ files.\r\nImmediate Patch will be unusable with it enabled.";
+            superTooltipInfo10.Color = DevComponents.DotNetBar.eTooltipColor.System;
+            superTooltipInfo10.CustomSize = new System.Drawing.Size(250, 180);
+            superTooltipInfo10.FooterVisible = false;
+            superTooltipInfo10.HeaderText = "Keep Old WZ Files";
+            this.superTooltip1.SetSuperTooltip(this.chkKeepOldWz, superTooltipInfo10);
+            this.chkKeepOldWz.TabIndex = 11;
+            this.chkKeepOldWz.Text = "Keep Old WZ";
             // 
             // chkCompare
             // 
@@ -966,7 +968,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ButtonX buttonXCheck;
         private DevComponents.AdvTree.ColumnHeader columnHeader6;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbComparePng;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputPng;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkKeepOldWz;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
         private DevComponents.DotNetBar.ExpandablePanel expandablePanel3;
         private DevComponents.DotNetBar.LabelX labelX3;

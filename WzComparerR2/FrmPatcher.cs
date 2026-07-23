@@ -12,7 +12,6 @@ using System.Windows.Forms;
 using DevComponents.AdvTree;
 using DevComponents.DotNetBar;
 using DevComponents.Editors;
-using WzComparerR2.Comparer;
 using WzComparerR2.Config;
 using WzComparerR2.Patcher;
 using WzComparerR2.WzLib;
@@ -54,12 +53,6 @@ namespace WzComparerR2
             }
             if (comboBoxEx1.Items.Count > 0)
                 comboBoxEx1.SelectedIndex = 0;
-
-            foreach (WzPngComparison comp in Enum.GetValues(typeof(WzPngComparison)))
-            {
-                cmbComparePng.Items.Add(comp);
-            }
-            cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
         }
 
         private MainForm _mainFormReference;
@@ -289,6 +282,10 @@ namespace WzComparerR2
                 MessageBoxEx.Show("You do not have permission to patch games installed in this folder.\r\n\r\nPlease run WzComparerR2 with administrator privileges.", "Error", MessageBoxButtons.OK);
                 return;
             }
+            if (!this.ValidateKeepOldWzBeforePatch())
+            {
+                return;
+            }
             if (this.patcherSession != null)
             {
                 if (this.patcherSession.State == PatcherTaskState.WaitForContinue)
@@ -302,24 +299,14 @@ namespace WzComparerR2
                     return;
                 }
             }
-            string compareFolder = null;
-            if (chkCompare.Checked)
-            {
-                FolderBrowserDialog dlg = new FolderBrowserDialog();
-                dlg.Description = "Please select the destination folder for the comparison results.";
-                if (dlg.ShowDialog(this) != DialogResult.OK)
-                {
-                    return;
-                }
-                compareFolder = dlg.SelectedPath;
-            }
 
             var session = new PatcherSession()
             {
                 PatchFile = txtPatchFile.Text,
                 MSFolder = txtMSFolder.Text,
                 PrePatch = chkPrePatch.Checked,
-                DeadPatch = chkDeadPatch.Checked,
+                DeadPatch = chkDeadPatch.Checked && !chkKeepOldWz.Checked,
+                KeepOldWz = chkKeepOldWz.Checked,
             };
             session.LoggingFileName = Path.Combine(session.MSFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
             session.PatchExecTask = Task.Run(() => this.ExecutePatchAsync(session, session.CancellationToken));
@@ -353,6 +340,7 @@ namespace WzComparerR2
                 patcher = new WzPatcher(session.PatchFile);
                 this.chkPrePatch.Enabled = false;
                 this.chkDeadPatch.Enabled = false;
+                this.chkKeepOldWz.Enabled = false;
                 this.txtPatchFile.Enabled = false;
                 this.txtMSFolder.Enabled = false;
                 this.buttonXOpen1.Enabled = false;
@@ -514,6 +502,7 @@ namespace WzComparerR2
                 AppendStateText("Applying patch\r\n");
                 var sw = Stopwatch.StartNew();
                 patcher.Patch(session.MSFolder, cancellationToken);
+                this.RestoreMissingDataFilesFromBackup(session, patcher.PatchParts, AppendStateText);
                 sw.Stop();
                 AppendStateText("Completed\r\n");
                 session.State = PatcherTaskState.Complete;
@@ -537,6 +526,7 @@ namespace WzComparerR2
             {
                 this.chkPrePatch.Enabled = true;
                 this.chkDeadPatch.Enabled = true;
+                this.chkKeepOldWz.Enabled = true;
                 this.txtPatchFile.Enabled = true;
                 this.txtMSFolder.Enabled = true;
                 this.buttonXOpen1.Enabled = true;
@@ -635,6 +625,11 @@ namespace WzComparerR2
                     }
                     break;
                 case PatchingState.ApplyFile:
+                    if (session.KeepOldWz && !session.KeepOldWzPrepared)
+                    {
+                        this.PrepareKeepOldWz(session, logFunc);
+                        session.KeepOldWzPrepared = true;
+                    }
                     logFunc($"Applying files: {e.Part.FileName}\r\n");
                     break;
                 case PatchingState.FileSkipped:
@@ -772,6 +767,210 @@ namespace WzComparerR2
             }
         }
 
+        private bool ValidateKeepOldWzBeforePatch()
+        {
+            if (!this.chkKeepOldWz.Checked)
+            {
+                return true;
+            }
+
+            string backupDir = Path.Combine(this.txtMSFolder.Text, "DataBk");
+            if (!Directory.Exists(backupDir))
+            {
+                return true;
+            }
+
+            bool hasAnyEntries;
+            try
+            {
+                hasAnyEntries = Directory.EnumerateFileSystemEntries(backupDir).Any();
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(this, "An error occurred while checking the DataBk folder.\r\n" + ex.Message, "Error", MessageBoxButtons.OK);
+                return false;
+            }
+
+            if (!hasAnyEntries)
+            {
+                return true;
+            }
+
+            bool hasOpenedFiles = _mainFormReference.openedWz
+                .SelectMany(openedWzStructure => openedWzStructure.wz_files)
+                .Any(wzFile => wzFile.FileStream.Name.StartsWith(backupDir, StringComparison.OrdinalIgnoreCase));
+            if (hasOpenedFiles)
+            {
+                MessageBoxEx.Show(this,
+                    "Keep Old WZ mode is enabled and an existing DataBk folder was found.\r\n" +
+                    "Files in DataBk are currently open, so the process cannot continue.\r\n" +
+                    "Please close the files opened from the DataBk folder and try again.",
+                    "Confirm", MessageBoxButtons.OK);
+                return false;
+            }
+
+            var result = MessageBoxEx.Show(this,
+                "Keep Old WZ mode is enabled and an existing (non-empty) DataBk folder was found.\r\n" +
+                "Continuing will automatically delete the existing DataBk folder.\r\n\r\n" +
+                "Do you want to continue?",
+                "Confirm",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+            if (result != DialogResult.Yes)
+            {
+                return false;
+            }
+
+            try
+            {
+                RemoveReadOnlyAttributesRecursively(backupDir);
+                Directory.Delete(backupDir, true);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(this, "Failed to delete the existing DataBk folder.\r\n" + ex.Message, "Error", MessageBoxButtons.OK);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void PrepareKeepOldWz(PatcherSession session, Action<string> logFunc)
+        {
+            if (!session.KeepOldWz)
+            {
+                return;
+            }
+
+            string dataDir = Path.Combine(session.MSFolder, "Data");
+            string backupDir = Path.Combine(session.MSFolder, "DataBk");
+
+            if (!Directory.Exists(dataDir))
+            {
+                logFunc("Keep Old WZ: Data folder not found, skipping.\r\n");
+                return;
+            }
+
+            if (Directory.Exists(backupDir))
+            {
+                logFunc("Keep Old WZ: Deleting existing DataBk folder...\r\n");
+                RemoveReadOnlyAttributesRecursively(backupDir);
+                Directory.Delete(backupDir, true);
+            }
+
+            logFunc("Keep Old WZ: Renaming Data folder to DataBk...\r\n");
+            Directory.Move(dataDir, backupDir);
+            logFunc("Keep Old WZ: Completed\r\n");
+        }
+
+        private void RestoreMissingDataFilesFromBackup(PatcherSession session, IEnumerable<PatchPartContext> patchParts, Action<string> logFunc)
+        {
+            if (!session.KeepOldWz)
+            {
+                return;
+            }
+
+            string dataDir = Path.Combine(session.MSFolder, "Data");
+            string backupDir = Path.Combine(session.MSFolder, "DataBk");
+            if (!Directory.Exists(backupDir))
+            {
+                logFunc("Keep Old WZ: DataBk folder not found, skipping copy of missing files.\r\n");
+                return;
+            }
+
+            Directory.CreateDirectory(dataDir);
+            var deletedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var deletedDirs = new List<string>();
+            foreach (var part in patchParts.Where(p => p.Type == 2))
+            {
+                var fileName = (part.FileName ?? string.Empty).Replace('/', '\\');
+                if (!fileName.StartsWith("Data\\", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var relativePath = fileName.Substring("Data\\".Length).TrimEnd('\\');
+                if (string.IsNullOrEmpty(relativePath))
+                {
+                    continue;
+                }
+
+                if (fileName.EndsWith("\\", StringComparison.Ordinal))
+                {
+                    deletedDirs.Add(relativePath);
+                }
+                else
+                {
+                    deletedFiles.Add(relativePath);
+                }
+            }
+
+            int copiedCount = 0;
+            foreach (string backupFile in Directory.EnumerateFiles(backupDir, "*", SearchOption.AllDirectories))
+            {
+                string relativePath = backupFile.Substring(backupDir.Length)
+                    .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                    .Replace('/', '\\');
+                if (deletedFiles.Contains(relativePath))
+                {
+                    continue;
+                }
+                if (deletedDirs.Any(dir => relativePath.Equals(dir, StringComparison.OrdinalIgnoreCase)
+                    || relativePath.StartsWith(dir + "\\", StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                string targetFile = Path.Combine(dataDir, relativePath);
+                if (File.Exists(targetFile))
+                {
+                    continue;
+                }
+
+                string targetDir = Path.GetDirectoryName(targetFile);
+                if (!string.IsNullOrEmpty(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+                File.Copy(backupFile, targetFile, false);
+                copiedCount++;
+            }
+
+            logFunc($"Keep Old WZ: Copied {copiedCount} missing file(s) from DataBk.\r\n");
+        }
+
+        private static void RemoveReadOnlyAttributesRecursively(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+            {
+                return;
+            }
+
+            foreach (string filePath in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
+            {
+                var attr = File.GetAttributes(filePath);
+                if ((attr & FileAttributes.ReadOnly) != 0)
+                {
+                    File.SetAttributes(filePath, attr & ~FileAttributes.ReadOnly);
+                }
+            }
+
+            foreach (string dirPath in Directory.EnumerateDirectories(directoryPath, "*", SearchOption.AllDirectories))
+            {
+                var attr = File.GetAttributes(dirPath);
+                if ((attr & FileAttributes.ReadOnly) != 0)
+                {
+                    File.SetAttributes(dirPath, attr & ~FileAttributes.ReadOnly);
+                }
+            }
+
+            var rootAttr = File.GetAttributes(directoryPath);
+            if ((rootAttr & FileAttributes.ReadOnly) != 0)
+            {
+                File.SetAttributes(directoryPath, rootAttr & ~FileAttributes.ReadOnly);
+            }
+        }
+
         private static bool HasWritePermission(string directoryPath)
         {
             try
@@ -795,9 +994,10 @@ namespace WzComparerR2
 
             public string PatchFile;
             public string MSFolder;
-            public string CompareFolder;
             public bool PrePatch;
             public bool DeadPatch;
+            public bool KeepOldWz;
+            public bool KeepOldWzPrepared;
 
             public Task PatchExecTask;
             public string LoggingFileName;
