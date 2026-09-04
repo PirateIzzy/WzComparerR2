@@ -1,31 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net462;net6.0-windows;net8.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyName>WzComparerR2.Avatar</AssemblyName>
-    <RootNamespace>WzComparerR2.Avatar</RootNamespace>
+    <AssemblyName>WzComparerR2.DB2</AssemblyName>
+    <RootNamespace>WzComparerR2.DB2</RootNamespace>
     <IsPublishable>false</IsPublishable>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <WcR2Plugin>true</WcR2Plugin>
+    <Platforms>AnyCPU;ARM64</Platforms>
   </PropertyGroup>
   <Import Project="$(ProjectDir)..\Build\Common.props" />
-  <PropertyGroup Condition="$(DotnetEdition) == 'core'">
-    
-  </PropertyGroup>
-  <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
-    
-  </PropertyGroup>
-  <ItemGroup Condition="$(DotnetEdition) == 'core'">
-
-  </ItemGroup>
   <ItemGroup Condition="$(DotnetEdition) == 'framework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Configuration" />
-	<Reference Include="System.Net.Http" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
@@ -40,6 +33,7 @@
       <Private>false</Private>
       <ExcludeAssets>all</ExcludeAssets>
     </ProjectReference>
+    <!-- 只用到主程式的 BassSoundPlayer；與 Avatar / MapRender 相同，僅編譯期參考不複製。 -->
     <ProjectReference Include="..\WzComparerR2\WzComparerR2.csproj">
       <Private>false</Private>
       <ExcludeAssets>all</ExcludeAssets>
@@ -48,10 +42,7 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="tls-client-sharp" Version="1.0.0" Condition="'$(TargetFramework)' == 'net8.0-windows'" />
     <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsVersion)" ExcludeAssets="runtime" />
-    <PackageReference Include="ZXing.Net" Version="0.16.11" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
@@ -59,20 +50,40 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="UI\AvatarAPIForm.cs">
+    <Compile Update="DB2Form.cs">
       <SubType>Form</SubType>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    <Compile Update="DB2Form.designer.cs">
+      <DependentUpon>DB2Form.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="DB2Form.resx">
+      <DependentUpon>DB2Form.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Update="IconsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="IconsForm.designer.cs">
+      <DependentUpon>IconsForm.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <EmbeddedResource Update="IconsForm.resx">
+      <DependentUpon>IconsForm.cs</DependentUpon>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>IconsForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Update="ImageViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ImageViewerForm.designer.cs">
+      <DependentUpon>ImageViewerForm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="ImageViewerForm.resx">
+      <DependentUpon>ImageViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Update="DataGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\Build\WcR2Plugin.targets" />
 </Project>

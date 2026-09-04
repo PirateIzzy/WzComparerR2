@@ -135,6 +135,7 @@ namespace WzComparerR2.Avatar.UI
             this.btnGenerate.TabIndex = 5;
             this.btnGenerate.Text = "Generate";
             this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
+            this.btnGenerate.Enabled = false;
             // 
             // btnSaveQR
             // 

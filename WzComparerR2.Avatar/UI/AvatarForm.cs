@@ -859,7 +859,7 @@ namespace WzComparerR2.Avatar.UI
                     this.SelectBodyAction(forceAction);
                 }
 
-                int forceEmotion = this.avatar.Chair.Node.FindNodeByPath("info\\sitEmotion").GetValueEx<int>(-1);
+                int forceEmotion = this.avatar.Chair.Node.FindNodeByPath("info\\sitEmotion").GetValueEx<int>(01);
                 this.SelectEmotionByIndex(forceEmotion);
             }
         }
@@ -2048,17 +2048,18 @@ namespace WzComparerR2.Avatar.UI
 
         private async void btnExportLwa_Click(object sender, EventArgs e)
         {
+#if !NET8_0_OR_GREATER
+            ToastNotification.Show(this, $"Error: This feature requires .NET 8.0.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+            return;
+#endif
             string code = GetAllPartsTag();
             if (!Regex.IsMatch(code, @"\d"))
             {
                 ToastNotification.Show(this, $"Error: Please initialize an avatar before use.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
                 return;
             }
-            var API = new OpenAPI.AvatarCodeEncoder();
-            string avatarCode = API.ConvertCsvToAvatarCode(code);
-            // Clipboard.SetText(avatarCode);
             LWAForm frm = new LWAForm();
-            frm.avatarCode = avatarCode;
+            frm.csvCode = code;
             frm.ShowDialog(this);
         }
 
