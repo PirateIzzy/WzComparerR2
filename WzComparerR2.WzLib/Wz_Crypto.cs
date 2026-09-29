@@ -338,8 +338,8 @@ namespace WzComparerR2.WzLib
                 this.baseKey = baseKey;
             }
 
-            private ulong baseKey;
-            private byte[] keys;
+            protected ulong baseKey;
+            protected byte[] keys;
 
             protected void SetBaseKey(ulong baseKey)
             {
@@ -359,7 +359,7 @@ namespace WzComparerR2.WzLib
                 }
             }
 
-            private void CreateKeyIfNotExist()
+            protected virtual void CreateKeyIfNotExist()
             {
                 if (this.keys != null) 
                 { 
@@ -406,6 +406,7 @@ namespace WzComparerR2.WzLib
 
                 this.CreateKeyIfNotExist();
 
+                /*
                 long keyVal = MemoryMarshal.Cast<byte, long>(this.keys)[0];
                 while (inputBuffer.Length >= 8)
                 {
@@ -414,6 +415,7 @@ namespace WzComparerR2.WzLib
                     inputBuffer = inputBuffer.Slice(8);
                     outputBuffer = outputBuffer.Slice(8);
                 }
+                */
                 for (int i = 0; i < inputBuffer.Length; i++)
                 {
                     outputBuffer[i] = (byte)(inputBuffer[i] ^ keys[i % keys.Length]);
@@ -550,6 +552,26 @@ namespace WzComparerR2.WzLib
                 ulong baseKey = v46 ^ (v46 >> 29);
 
                 this.SetBaseKey(baseKey);
+            }
+        }
+
+        public class Pkg2DirStringKeyV6 : Pkg2DirStringKeyV5
+        {
+            public Pkg2DirStringKeyV6(ulong hash1, ulong hashVersion) : base(hash1, hashVersion) { }
+
+            protected override void CreateKeyIfNotExist()
+            {
+                if (this.keys != null)
+                {
+                    return;
+                }
+                byte[] keys = new byte[16];
+                Span<ushort> u16Keys = MemoryMarshal.Cast<byte, ushort>(keys.AsSpan());
+                for (int i = 0; i < u16Keys.Length; i++)
+                {
+                    u16Keys[i] = (ushort)(this.baseKey >> (8 * i));
+                }
+                this.keys = keys;
             }
         }
     }

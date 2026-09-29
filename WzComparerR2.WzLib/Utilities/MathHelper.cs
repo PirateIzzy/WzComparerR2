@@ -276,6 +276,14 @@ namespace WzComparerR2.WzLib.Utilities
                  | (uint)data[offsets[3]] << 24;
         }
 
+        public static uint GatherAsUInt32New(ReadOnlySpan<byte> data, ReadOnlySpan<int> offsets)
+        {
+            return (uint)(data[offsets[0]] ^ (byte)(90 - 101 * offsets[0]))
+                 | (uint)(data[offsets[1]] ^ (byte)(90 - 101 * offsets[1])) << 8
+                 | (uint)(data[offsets[2]] ^ (byte)(90 - 101 * offsets[2])) << 16
+                 | (uint)(data[offsets[3]] ^ (byte)(90 - 101 * offsets[3])) << 24;
+        }
+
         public static ulong GatherAsUInt64(ReadOnlySpan<byte> data, ReadOnlySpan<int> offsets)
         {
             return (ulong)data[offsets[0]]
@@ -286,6 +294,17 @@ namespace WzComparerR2.WzLib.Utilities
                  | (ulong)data[offsets[5]] << 40
                  | (ulong)data[offsets[6]] << 48
                  | (ulong)data[offsets[7]] << 56;
+        }
+        public static ulong GatherAsUInt64New(ReadOnlySpan<byte> data, ReadOnlySpan<int> offsets)
+        {
+            return (ulong)(data[offsets[0]] ^ (byte)(90 - 101 * offsets[0]))
+                 | (ulong)(data[offsets[1]] ^ (byte)(90 - 101 * offsets[1])) << 8
+                 | (ulong)(data[offsets[2]] ^ (byte)(90 - 101 * offsets[2])) << 16
+                 | (ulong)(data[offsets[3]] ^ (byte)(90 - 101 * offsets[3])) << 24
+                 | (ulong)(data[offsets[4]] ^ (byte)(90 - 101 * offsets[4])) << 32
+                 | (ulong)(data[offsets[5]] ^ (byte)(90 - 101 * offsets[5])) << 40
+                 | (ulong)(data[offsets[6]] ^ (byte)(90 - 101 * offsets[6])) << 48
+                 | (ulong)(data[offsets[7]] ^ (byte)(90 - 101 * offsets[7])) << 56;
         }
     }
 }

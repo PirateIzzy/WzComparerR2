@@ -490,7 +490,10 @@ namespace WzComparerR2.WzLib.Compatibility
         {
             const ulong hashVersion = 0x8F08109B6A61D954;
             if (Verify(hash1, hash2, hashVersion))
-                return new[] { 0x8F08109B6A61D954 };
+                return new[] { hashVersion };
+            const ulong hashVersionNew = 0xB8047BAB2410606A;
+            if (Verify(hash1, hash2, hashVersionNew))
+                return new[] { hashVersionNew };
             return new ulong[0];
         }
 

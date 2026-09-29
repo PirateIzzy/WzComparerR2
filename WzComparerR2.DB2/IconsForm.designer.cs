@@ -38,7 +38,7 @@ namespace WzComparerR2.DB2
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 12;
             this.listBox1.Items.AddRange(new object[] {
-            "Point",
+            "Cash",
             "Consumable",
             "Weapon",
             "Cap",
