@@ -24,7 +24,7 @@ using WzComparerR2.Config;
 
 namespace WzComparerR2.Comparer
 {
-    public class EasyComparer
+    public partial class EasyComparer
     {
         private static readonly HttpClient _httpClient = new HttpClient(
             new HttpClientHandler { AllowAutoRedirect = true })
@@ -53,6 +53,9 @@ namespace WzComparerR2.Comparer
         private HashSet<string> OutputNpcTooltipIDs { get; set; } = new HashSet<string>();
         private HashSet<string> OutputQuestTooltipIDs { get; set; } = new HashSet<string>();
         private HashSet<string> OutputAchvTooltipIDs { get; set; } = new HashSet<string>();
+        private HashSet<string> OutputChairIDs { get; set; } = new HashSet<string>();
+        private HashSet<string> OutputTamingMobIDs { get; set; } = new HashSet<string>();
+        private HashSet<string> DiffItemIDs { get; set; } = new HashSet<string>();
         private Dictionary<string, List<string>> DiffCashTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffGearTags { get; set; } = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> DiffItemTags { get; set; } = new Dictionary<string, List<string>>();
@@ -107,6 +110,16 @@ namespace WzComparerR2.Comparer
         public bool ShowItemPurchasePrice { get; set; }
         public bool ShowGearPurchasePrice { get; set; }
         public bool LocatePetEquip { get; set; }
+        /// <summary>
+        /// Whether to render avatar examples for chairs and riding mounts (TamingMob).
+        /// </summary>
+        public bool OutputChairAndRidingMount { get; set; } = true;
+        /// <summary>
+        /// Avatar code used when rendering the chair and riding mount examples.
+        /// Configured from the settings dialog.
+        /// </summary>
+        public string AvatarCode { get; set; } = DefaultAvatarCode;
+        public const string DefaultAvatarCode = "2000,12000,51484,61183,1003968,1052667,1072867,1082552,1113329,1703113";
         public List<Color> ColorTable { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
@@ -382,6 +395,18 @@ namespace WzComparerR2.Comparer
                 var cmp = comparer.Compare(fileNew.Node, fileOld.Node);
                 CreateStyleSheet(outputDir);
                 OutputFile(fileNew, fileOld, fileNew.Type, cmp.ToList(), outputDir, index);
+            }
+
+            // export the chair examples at the end as well, in case the String output was skipped
+            if (OutputChairAndRidingMount && OutputItemTooltip && OutputChairIDs.Count > 0)
+            {
+                SaveChairExamples(outputDir);
+            }
+
+            // export the taming mob examples at the end in the same way
+            if (OutputChairAndRidingMount && (OutputItemTooltip || OutputGearTooltip))
+            {
+                SaveTamingMobExamples(outputDir);
             }
 
             GC.Collect();
@@ -854,6 +879,14 @@ namespace WzComparerR2.Comparer
                 {
                     SaveItemTooltip(itemTooltipPath);
                 }
+            }
+            if (OutputChairAndRidingMount && OutputItemTooltip && type.ToString() == "String" && OutputChairIDs.Count > 0)
+            {
+                SaveChairExamples(outputDir);
+            }
+            if (OutputChairAndRidingMount && (OutputItemTooltip || OutputGearTooltip) && type.ToString() == "String")
+            {
+                SaveTamingMobExamples(outputDir);
             }
             if (OutputGearTooltip && type.ToString() == "String" && OutputGearTooltipIDs != null)
             {
@@ -1420,11 +1453,13 @@ namespace WzComparerR2.Comparer
                     {
                         itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 100, itemID);
                         categoryPath = "Chair";
+                        OutputChairIDs.Add(itemID);
                     }
                     else if (itemID.StartsWith("0301")) // 判断开头是否是0301
                     {
                         itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 1000, itemID);
                         categoryPath = "Chair";
+                        OutputChairIDs.Add(itemID);
                     }
                     else if (itemID.StartsWith("500")) // 判断开头是否是0500
                     {
@@ -1727,11 +1762,13 @@ namespace WzComparerR2.Comparer
                     {
                         itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 100, itemID);
                         categoryPath = "Chair";
+                        OutputChairIDs.Add(itemID);
                     }
                     else if (itemID.StartsWith("0301")) // 判断开头是否是0301
                     {
                         itemNodePath = String.Format(@"Item\Install\0{0:D}.img\{1:D}", int.Parse(itemID) / 1000, itemID);
                         categoryPath = "Chair";
+                        OutputChairIDs.Add(itemID);
                     }
                     else if (itemID.StartsWith("500")) // 判断开头是否是0500
                     {
@@ -3361,6 +3398,16 @@ namespace WzComparerR2.Comparer
                         itemID = itemID.PadLeft(8, '0');
                     }
 
+                    if (OutputItemTooltip && OutputChairAndRidingMount && itemID.StartsWith("0301")) // chair
+                    {
+                        OutputChairIDs.Add(itemID);
+                    }
+
+                    if (OutputItemTooltip && OutputChairAndRidingMount && DiffItemIDs != null)
+                    {
+                        DiffItemIDs.Add(itemID);
+                    }
+
                     if (!OutputItemTooltipIDs.Contains(itemID))
                     {
                         OutputItemTooltipIDs.Add(itemID);
@@ -3455,6 +3502,12 @@ namespace WzComparerR2.Comparer
                     if (tag != null && !DiffGearTags[gearID].Contains(tag))
                     {
                         DiffGearTags[gearID].Add(tag);
+                    }
+
+                    // a changed taming mob image is also rendered as an avatar example
+                    if (OutputChairAndRidingMount && Regex.IsMatch(node.FullPathToFile, @"^Character\\TamingMob\\\d+\.img"))
+                    {
+                        OutputTamingMobIDs.Add(gearID);
                     }
                 }
             }
