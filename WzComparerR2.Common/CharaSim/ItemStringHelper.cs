@@ -935,8 +935,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.onmyoSen: return "Fan";
                 case GearType.kannaReifu: return "Talisman";
 
-                case GearType.carta: return "카르타";
-                case GearType.magicQuill: return "마법깃펜";
+                case GearType.carta: return "Dominium";
+                case GearType.magicQuill: return "Quill";
                 
                 case GearType.equipBag: return "Equip Bag";
 
