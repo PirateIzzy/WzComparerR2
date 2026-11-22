@@ -744,7 +744,10 @@ namespace WzComparerR2.MapRender
                 case 2: aniDir = $"spine{back.SpineNo}"; break;
                 default: throw new Exception($"Unknown back ani value: {back.Ani}.");
             }
-            string path = $@"Map\Back\{back.BS}.img\{aniDir}\{back.No}";
+            // no が空のまま組み立てると img\back などのディレクトリを指してしまい、
+            // 本来の 1 枚絵ではなくディレクトリ内の全画像を順に表示してしまうため、0 に補完します。
+            string no = string.IsNullOrEmpty(back.No) ? "0" : back.No;
+            string path = $@"Map\Back\{back.BS}.img\{aniDir}\{no}";
             var aniItem = resLoader.LoadAnimationData(path);
 
             back.View = new BackItem.ItemView()
@@ -866,6 +869,16 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        /// <summary>
+        /// ポータル種別（<c>pt</c>）に対応する画像名を返します。範囲外の種別（新しいクライアントの拡張値）でも
+        /// 例外にせず既定の <c>sp</c> として扱います。
+        /// </summary>
+        private static string GetPortalTypeName(int portalType)
+        {
+            string[] typeNames = PortalItem.PortalTypes;
+            return portalType >= 0 && portalType < typeNames.Length ? typeNames[portalType] : typeNames[0];
+        }
+
         private void PreloadResource(ResourceLoader resLoader, PortalItem portal)
         {
             string path;
@@ -873,7 +886,7 @@ namespace WzComparerR2.MapRender
             var view = new PortalItem.ItemView();
             //加载editor
             {
-                var typeName = PortalItem.PortalTypes[portal.Type];
+                var typeName = GetPortalTypeName(portal.Type);
                 path = $@"Map\MapHelper.img\portal\editor\{typeName}";
                 var aniData = resLoader.LoadAnimationData(path);
                 if (aniData != null)
@@ -890,7 +903,7 @@ namespace WzComparerR2.MapRender
                     case 7:
                         typeName = PortalItem.PortalTypes[2]; break;
                     default:
-                        typeName = PortalItem.PortalTypes[portal.Type]; break;
+                        typeName = GetPortalTypeName(portal.Type); break;
                 }
 
                 switch (portal.Image)
@@ -929,6 +942,9 @@ namespace WzComparerR2.MapRender
                     }
                 }
             }
+
+            // Classic（Unity）データセットでも MapHelper.img/portal の画像は spriteset として
+            // 収録されています。画像が無いデータセットでは描画側（GetMeshPortal）が代替マーカーを表示します。
 
             portal.View = view;
         }

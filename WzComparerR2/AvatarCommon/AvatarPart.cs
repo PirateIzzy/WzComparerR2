@@ -76,10 +76,11 @@ namespace WzComparerR2.AvatarCommon
 
         private void LoadInfo()
         {
-            var m = Regex.Match(Node.Text, @"^(\d+)\.img$");
+            // Unity データセットの img 名には .img 拡張子がありません。
+            var m = Regex.Match(Node.Text, @"^(\d+)(?:\.img)?$");
             if (!m.Success)
             {
-                m = Regex.Match(Node.FullPath, @"^\d+\.img\\(\d+)$");
+                m = Regex.Match(Node.FullPath, @"^\d+(?:\.img)?\\(\d+)$");
             }
             if (m.Success)
             {

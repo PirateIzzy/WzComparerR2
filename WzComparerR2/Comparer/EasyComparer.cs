@@ -165,6 +165,45 @@ namespace WzComparerR2.Comparer
                 this.PatchingStateChanged(this, e);
         }
 
+        /// <summary>
+        /// 比較対象 <paramref name="i"/>（0 = 新、1 = 旧）のデータセットからノードを解決します。
+        /// Unity データセットは Wz_File を持たないため、比較中は解決先を比較対象へ固定します
+        /// (see <see cref="SetUnityResolveSlot"/>). For WZ comparisons this is equivalent to <see cref="PluginManager.FindWz(string, Wz_File)"/>.
+        /// </summary>
+        private Wz_Node FindWzSide(string fullPath, int i)
+        {
+            SetUnityResolveSlot(i);
+            return PluginManager.FindWz(fullPath, WzFileNewOld[i]);
+        }
+
+        private Wz_Node FindWzSide(Wz_Type type, int i)
+        {
+            SetUnityResolveSlot(i);
+            return PluginManager.FindWz(type, WzFileNewOld[i]);
+        }
+
+        /// <summary>
+        /// 比較対象 <paramref name="i"/> のツールチップ用文字列リンカーを作成します。
+        /// Unity データセットは String.wz を持たないため、String/&lt;region&gt;/&lt;category&gt; を
+        /// WZ 形式に整理したテーブルから読み込みます。
+        /// </summary>
+        private StringLinker LoadCompareStringLinker(int i)
+        {
+            SetUnityResolveSlot(i);
+            StringLinker linker = new StringLinker();
+            if (this.TryLoadUnityStringLinker(i, linker))
+            {
+                return linker;
+            }
+
+            this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
+            this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
+            this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
+            this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
+            linker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+            return linker;
+        }
+
         public void EasyCompareWzFiles(Wz_File fileNew, Wz_File fileOld, string outputDir, StreamWriter index = null)
         {
             StateInfo = "Comparing...";
@@ -186,8 +225,8 @@ namespace WzComparerR2.Comparer
                     StateInfo = "Initialize V Skill Information...";
                     for (int i = 0; i < 2; i++)
                     {
-                        Wz_Node vCoreData = PluginManager.FindWz("Etc\\VcoreNew.img\\vSkill\\CoreData", WzFileNewOld[i]);
-                        if (vCoreData == null || vCoreData.FullPath == "Base.wz") vCoreData = PluginManager.FindWz("Etc\\VCore.img\\CoreData", WzFileNewOld[i]);
+                        Wz_Node vCoreData = this.FindWzSide("Etc\\VcoreNew.img\\vSkill\\CoreData", i);
+                        if (vCoreData == null || vCoreData.FullPath == "Base.wz") vCoreData = this.FindWzSide("Etc\\VCore.img\\CoreData", i);
                         if (vCoreData == null || vCoreData.FullPath == "Base.wz") break;
 
                         foreach (Wz_Node data in vCoreData.Nodes)
@@ -307,15 +346,21 @@ namespace WzComparerR2.Comparer
                         }
                     }
                 }
-                if (OutputItemTooltip || OutputGearTooltip) // Check commodity differences
+                if (OutputItemTooltip || OutputGearTooltip || OutputCashTooltip) // Check commodity differences
                 {
                     CharaSimLoader.ClearAll();
+                    this.SetUnityResolveSlot(0);
                     CharaSimLoader.LoadSetItemsIfEmpty(fileNew);
                     CharaSimLoader.LoadAstraSubWeaponsIfEmpty(fileNew);
                     CharaSimLoader.LoadExclusiveEquipsIfEmpty(fileNew);
                     CharaSimLoader.LoadMsnMintableItemListIfEmpty(fileNew);
                     CharaSimLoader.LoadGmsTucBlacklistItemsIfEmpty(fileNew);
                     if (this.LocatePetEquip) CharaSimLoader.LoadPetEquipInfoIfEmpty(fileNew);
+                    this.SetUnityResolveSlot(1);
+                    CharaSimLoader.LoadCommodities(fileOld, slotIdx: 1);
+                    this.SetUnityResolveSlot(0);
+                    CharaSimLoader.LoadCommodities(fileNew, slotIdx: 0);
+                    this.CompareCommodities();
                 }
 
 
@@ -841,7 +886,34 @@ namespace WzComparerR2.Comparer
                 OnPatchingStateChanged(new Patcher.PatchingEventArgs(null, Patcher.PatchingState.CompareFinished));
             }
 
-            if (OutputQuestTooltip && type.ToString() == "Quest" && OutputQuestTooltipIDs != null)
+            this.SaveTooltips(type.ToString(), outputDir);
+        }
+
+        /// <summary>
+        /// Collects the item and gear tooltip IDs whose cash shop commodity prices changed.
+        /// </summary>
+        private void CompareCommodities()
+        {
+            // This fork's CharaSimLoader keeps a single set of commodities (the slot index is ignored),
+            // so the old and new commodity prices cannot be compared. Keep the hook for parity with upstream.
+        }
+
+        /// <summary>
+        /// 変更点のあるツールチップ画像を出力します。
+        /// </summary>
+        /// <param name="typeName">Name of the <see cref="Wz_Type"/> being written (tooltips are written together after the String/Quest pages).</param>
+        private void SaveTooltips(string typeName, string outputDir)
+        {
+            string skillTooltipPath = Path.Combine(outputDir, "Skill Tooltips");
+            string itemTooltipPath = Path.Combine(outputDir, "Item Tooltips");
+            string gearTooltipPath = Path.Combine(outputDir, "Gear Tooltips");
+            string mapTooltipPath = Path.Combine(outputDir, "Map Tooltips");
+            string mobTooltipPath = Path.Combine(outputDir, "Mob Tooltips");
+            string npcTooltipPath = Path.Combine(outputDir, "Npc Tooltips");
+            string questTooltipPath = Path.Combine(outputDir, "Quest Tooltips");
+            string achvTooltipPath = Path.Combine(outputDir, "Achievement Tooltips");
+
+            if (OutputQuestTooltip && typeName == "Quest" && OutputQuestTooltipIDs != null)
             {
                 if (!Directory.Exists(questTooltipPath))
                 {
@@ -849,7 +921,7 @@ namespace WzComparerR2.Comparer
                 }
                 SaveQuestTooltip(questTooltipPath);
             }
-            if (OutputSkillTooltip && type.ToString() == "String" && OutputSkillTooltipIDs != null)
+            if (OutputSkillTooltip && typeName == "String" && OutputSkillTooltipIDs != null)
             {
                 if (!Directory.Exists(skillTooltipPath))
                 {
@@ -857,7 +929,7 @@ namespace WzComparerR2.Comparer
                 }
                 SaveSkillTooltip(skillTooltipPath);
             }
-            if (OutputSkillTooltip && type.ToString() == "String" && OutputPerJobSkillTooltipIDs != null)
+            if (OutputSkillTooltip && typeName == "String" && OutputPerJobSkillTooltipIDs != null)
             {
                 if (!Directory.Exists(skillTooltipPath))
                 {
@@ -865,7 +937,7 @@ namespace WzComparerR2.Comparer
                 }
                 SavePerJobSkillTooltip(skillTooltipPath);
             }
-            if (OutputItemTooltip && type.ToString() == "String" && OutputItemTooltipIDs != null)
+            if (OutputItemTooltip && typeName == "String" && OutputItemTooltipIDs != null)
             {
                 if (!Directory.Exists(itemTooltipPath))
                 {
@@ -880,15 +952,15 @@ namespace WzComparerR2.Comparer
                     SaveItemTooltip(itemTooltipPath);
                 }
             }
-            if (OutputChairAndRidingMount && OutputItemTooltip && type.ToString() == "String" && OutputChairIDs.Count > 0)
+            if (OutputChairAndRidingMount && OutputItemTooltip && typeName == "String" && OutputChairIDs.Count > 0)
             {
                 SaveChairExamples(outputDir);
             }
-            if (OutputChairAndRidingMount && (OutputItemTooltip || OutputGearTooltip) && type.ToString() == "String")
+            if (OutputChairAndRidingMount && (OutputItemTooltip || OutputGearTooltip) && typeName == "String")
             {
                 SaveTamingMobExamples(outputDir);
             }
-            if (OutputGearTooltip && type.ToString() == "String" && OutputGearTooltipIDs != null)
+            if (OutputGearTooltip && typeName == "String" && OutputGearTooltipIDs != null)
             {
                 if (!Directory.Exists(gearTooltipPath))
                 {
@@ -903,7 +975,7 @@ namespace WzComparerR2.Comparer
                     SaveGearTooltip(gearTooltipPath);
                 }
             }
-            if (OutputMapTooltip && type.ToString() == "String" && OutputMapTooltipIDs != null)
+            if (OutputMapTooltip && typeName == "String" && OutputMapTooltipIDs != null)
             {
                 if (!Directory.Exists(mapTooltipPath))
                 {
@@ -911,7 +983,7 @@ namespace WzComparerR2.Comparer
                 }
                 SaveMapTooltip(mapTooltipPath);
             }
-            if (OutputMobTooltip && type.ToString() == "String" && OutputMobTooltipIDs != null)
+            if (OutputMobTooltip && typeName == "String" && OutputMobTooltipIDs != null)
             {
                 if (!Directory.Exists(mobTooltipPath))
                 {
@@ -919,7 +991,7 @@ namespace WzComparerR2.Comparer
                 }
                 SaveMobTooltip(mobTooltipPath);
             }
-            if (OutputNpcTooltip && type.ToString() == "String" && OutputNpcTooltipIDs != null)
+            if (OutputNpcTooltip && typeName == "String" && OutputNpcTooltipIDs != null)
             {
                 if (!Directory.Exists(npcTooltipPath))
                 {
@@ -927,7 +999,7 @@ namespace WzComparerR2.Comparer
                 }
                 SaveNpcTooltip(npcTooltipPath);
             }
-            if (OutputCashTooltip && type.ToString() == "String" && OutputCashTooltipIDs != null)
+            if (OutputCashTooltip && typeName == "String" && OutputCashTooltipIDs != null)
             {
                 if (!Directory.Exists(itemTooltipPath))
                 {
@@ -935,7 +1007,7 @@ namespace WzComparerR2.Comparer
                 }
                 SaveCashTooltip(itemTooltipPath);
             }
-            if (OutputAchvTooltip && type.ToString() == "String" && OutputAchvTooltipIDs != null)
+            if (OutputAchvTooltip && typeName == "String" && OutputAchvTooltipIDs != null)
             {
                 if (!Directory.Exists(achvTooltipPath))
                 {
@@ -955,7 +1027,7 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                var skill_wz = PluginManager.FindWz(Wz_Type.Skill, WzFileNewOld[i]);
+                var skill_wz = this.FindWzSide(Wz_Type.Skill, i);
                 foreach (var skill_img in skill_wz?.Nodes ?? new Wz_Node.WzNodeCollection(null))
                 {
                     if (!Regex.Match(skill_img.Text, @"^\d+[.]img$").Success) continue;
@@ -1010,14 +1082,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 skillRenderNewOld[i] = new SkillTooltipRender2();
-                skillRenderNewOld[i].StringLinker = new StringLinker();
-                skillRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                skillRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 skillRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 skillRenderNewOld[i].ShowDelay = true;
                 skillRenderNewOld[i].ShowArea = true;
@@ -1072,10 +1138,10 @@ namespace WzComparerR2.Comparer
                     // Modified前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Skill skill = Skill.CreateFromNode(PluginManager.FindWz("Skill" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
-                            (Skill.CreateFromNode(PluginManager.FindWz("Skill001" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
-                            (Skill.CreateFromNode(PluginManager.FindWz("Skill002" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
-                            Skill.CreateFromNode(PluginManager.FindWz("Skill003" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i])));
+                        Skill skill = Skill.CreateFromNode(this.FindWzSide("Skill" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
+                            (Skill.CreateFromNode(this.FindWzSide("Skill001" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
+                            (Skill.CreateFromNode(this.FindWzSide("Skill002" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
+                            Skill.CreateFromNode(this.FindWzSide("Skill003" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i])));
 
                         if (skill != null)
                         {
@@ -1178,14 +1244,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 skillRenderNewOld[i] = new SkillTooltipRender2();
-                skillRenderNewOld[i].StringLinker = new StringLinker();
-                skillRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                skillRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 skillRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 skillRenderNewOld[i].ShowDelay = true;
                 skillRenderNewOld[i].wzNode = WzNewOld[i];
@@ -1239,10 +1299,10 @@ namespace WzComparerR2.Comparer
                     // 変更前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Skill skill = Skill.CreateFromNode(PluginManager.FindWz("Skill" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
-                            (Skill.CreateFromNode(PluginManager.FindWz("Skill001" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
-                            (Skill.CreateFromNode(PluginManager.FindWz("Skill002" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
-                            Skill.CreateFromNode(PluginManager.FindWz("Skill003" + skillNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i])));
+                        Skill skill = Skill.CreateFromNode(this.FindWzSide("Skill" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
+                            (Skill.CreateFromNode(this.FindWzSide("Skill001" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
+                            (Skill.CreateFromNode(this.FindWzSide("Skill002" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i]) ??
+                            Skill.CreateFromNode(this.FindWzSide("Skill003" + skillNodePath, i), PluginManager.FindWz, PluginManager.FindWz, WzFileNewOld[i])));
 
                         if (skill != null)
                         {
@@ -1404,14 +1464,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 itemRenderNewOld[i] = new ItemTooltipRender2();
-                itemRenderNewOld[i].StringLinker = new StringLinker();
-                itemRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                itemRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 itemRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 itemRenderNewOld[i].Enable22AniStyle = this.Enable22AniStyle;
                 itemRenderNewOld[i].ShowLinkedTamingMob = this.ShowLinkedTamingMob;
@@ -1515,7 +1569,7 @@ namespace WzComparerR2.Comparer
                     // Modified前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Item item = Item.CreateFromNode(PluginManager.FindWz(itemNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+                        Item item = Item.CreateFromNode(this.FindWzSide(itemNodePath, i), PluginManager.FindWz);
 
                         if (item != null)
                         {
@@ -1525,7 +1579,7 @@ namespace WzComparerR2.Comparer
 
                             if (isDamageSkin)
                             {
-                                DamageSkin damageSkin = DamageSkin.CreateFromNode(PluginManager.FindWz($@"Etc\DamageSkin.img\{item.DamageSkinID}", WzFileNewOld[i]), PluginManager.FindWz) ?? DamageSkin.CreateFromNode(PluginManager.FindWz($@"Effect\DamageSkin.img\{item.DamageSkinID}", WzFileNewOld[i]), PluginManager.FindWz);
+                                DamageSkin damageSkin = DamageSkin.CreateFromNode(this.FindWzSide($@"Etc\DamageSkin.img\{item.DamageSkinID}", i), PluginManager.FindWz) ?? DamageSkin.CreateFromNode(this.FindWzSide($@"Effect\DamageSkin.img\{item.DamageSkinID}", i), PluginManager.FindWz);
                                 damageSkinRenderNewOld[i].DamageSkin = damageSkin;
                                 categoryPath = "DamageSkin";
 
@@ -1714,14 +1768,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 itemRenderNewOld[i] = new ItemTooltipRender22();
-                itemRenderNewOld[i].StringLinker = new StringLinker();
-                itemRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                itemRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 itemRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 itemRenderNewOld[i].ShowLinkedTamingMob = this.ShowLinkedTamingMob;
                 itemRenderNewOld[i].ShowDamageSkinID = this.ShowObjectID;
@@ -1824,7 +1872,7 @@ namespace WzComparerR2.Comparer
                     // Modified前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Item item = Item.CreateFromNode(PluginManager.FindWz(itemNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+                        Item item = Item.CreateFromNode(this.FindWzSide(itemNodePath, i), PluginManager.FindWz);
 
                         if (item != null)
                         {
@@ -1834,7 +1882,7 @@ namespace WzComparerR2.Comparer
 
                             if (isDamageSkin)
                             {
-                                DamageSkin damageSkin = DamageSkin.CreateFromNode(PluginManager.FindWz($@"Etc\DamageSkin.img\{item.DamageSkinID}", WzFileNewOld[i]), PluginManager.FindWz) ?? DamageSkin.CreateFromNode(PluginManager.FindWz($@"Effect\DamageSkin.img\{item.DamageSkinID}", WzFileNewOld[i]), PluginManager.FindWz);
+                                DamageSkin damageSkin = DamageSkin.CreateFromNode(this.FindWzSide($@"Etc\DamageSkin.img\{item.DamageSkinID}", i), PluginManager.FindWz) ?? DamageSkin.CreateFromNode(this.FindWzSide($@"Effect\DamageSkin.img\{item.DamageSkinID}", i), PluginManager.FindWz);
                                 damageSkinRenderNewOld[i].DamageSkin = damageSkin;
                                 categoryPath = "DamageSkin";
 
@@ -2022,14 +2070,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 gearRenderNewOld[i] = new GearTooltipRender2();
-                gearRenderNewOld[i].StringLinker = new StringLinker();
-                gearRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                gearRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 gearRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 gearRenderNewOld[i].ShowCashPurchasePrice = this.ShowGearPurchasePrice;
             }
@@ -2204,7 +2246,7 @@ namespace WzComparerR2.Comparer
                     // Modified前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Gear gear = Gear.CreateFromNode(PluginManager.FindWz(gearNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+                        Gear gear = Gear.CreateFromNode(this.FindWzSide(gearNodePath, i), PluginManager.FindWz);
 
                         if (gear != null)
                         {
@@ -2304,14 +2346,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 gearRenderNewOld[i] = new GearTooltipRender22();
-                gearRenderNewOld[i].StringLinker = new StringLinker();
-                gearRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                gearRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 gearRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 gearRenderNewOld[i].ShowCashPurchasePrice = this.ShowGearPurchasePrice;
                 gearRenderNewOld[i].CompareMode = true;
@@ -2486,7 +2522,7 @@ namespace WzComparerR2.Comparer
                     // Before後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Gear gear = Gear.CreateFromNode(PluginManager.FindWz(gearNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+                        Gear gear = Gear.CreateFromNode(this.FindWzSide(gearNodePath, i), PluginManager.FindWz);
 
                         if (gear != null)
                         {
@@ -2586,14 +2622,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 mapRenderNewOld[i] = new MapTooltipRenderer();
-                mapRenderNewOld[i].StringLinker = new StringLinker();
-                mapRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                mapRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 mapRenderNewOld[i].Enable22AniStyle = this.Enable22AniStyle;
                 mapRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 mapRenderNewOld[i].ShowMiniMap = true;
@@ -2646,7 +2676,7 @@ namespace WzComparerR2.Comparer
                     // Before後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Map map = Map.CreateFromNode(PluginManager.FindWz(mapNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+                        Map map = Map.CreateFromNode(this.FindWzSide(mapNodePath, i), PluginManager.FindWz);
 
                         if (map != null)
                         {
@@ -2741,14 +2771,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 mobRenderNewOld[i] = new MobTooltipRenderer();
-                mobRenderNewOld[i].StringLinker = new StringLinker();
-                mobRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                mobRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 mobRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 mobRenderNewOld[i].ShowAllSubMobAtOnce = true;
                 mobRenderNewOld[i].EnableWorldArchive = this.EnableWorldArchive;
@@ -2816,7 +2840,7 @@ namespace WzComparerR2.Comparer
                         Mob mob = null;
                         foreach (var path in mobNodePaths)
                         {
-                            mob = Mob.CreateFromNode(PluginManager.FindWz(path, WzFileNewOld[i]), PluginManager.FindWz);
+                            mob = Mob.CreateFromNode(this.FindWzSide(path, i), PluginManager.FindWz);
                             if (mob != null) break;
                         }
 
@@ -2913,14 +2937,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 npcRenderNewOld[i] = new NpcTooltipRenderer();
-                npcRenderNewOld[i].StringLinker = new StringLinker();
-                npcRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                npcRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 npcRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 npcRenderNewOld[i].ShowAllIllustAtOnce = true;
                 npcRenderNewOld[i].EnableWorldArchive = this.EnableWorldArchive;
@@ -2977,7 +2995,7 @@ namespace WzComparerR2.Comparer
                     // Modified前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Npc npc = Npc.CreateFromNode(PluginManager.FindWz(npcNodePath, WzFileNewOld[i]), PluginManager.FindWz);
+                        Npc npc = Npc.CreateFromNode(this.FindWzSide(npcNodePath, i), PluginManager.FindWz);
 
                         if (npc != null)
                         {
@@ -3072,14 +3090,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 cashRenderNewOld[i] = new CashPackageTooltipRender();
-                cashRenderNewOld[i].StringLinker = new StringLinker();
-                cashRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                cashRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 cashRenderNewOld[i].ShowObjectID = this.ShowObjectID;
             }
 
@@ -3128,7 +3140,7 @@ namespace WzComparerR2.Comparer
                     // Modified前後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        CashPackage item = CashPackage.CreateFromNode(PluginManager.FindWz(itemNodePath, WzFileNewOld[i]), PluginBase.PluginManager.FindWz(string.Format(@"Etc\CashPackage.img\{0}", itemID)), PluginManager.FindWz);
+                        CashPackage item = CashPackage.CreateFromNode(this.FindWzSide(itemNodePath, i), PluginBase.PluginManager.FindWz(string.Format(@"Etc\CashPackage.img\{0}", itemID)), PluginManager.FindWz);
 
                         if (item != null)
                         {
@@ -3223,14 +3235,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 questRenderNewOld[i] = new QuestTooltipRenderer();
-                questRenderNewOld[i].StringLinker = new StringLinker();
-                questRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                questRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 questRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 questRenderNewOld[i].CompareMode = true;
                 questRenderNewOld[i].ShowAllStates = true;
@@ -3277,7 +3283,7 @@ namespace WzComparerR2.Comparer
                     // Before後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Quest quest = Quest.CreateFromNode(PluginManager.FindWz(questNodePath, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz) ?? Quest.CreateFromNode(PluginManager.FindWz(questNodePathLegacy, WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz, fromInfoNode: int.Parse(questID));
+                        Quest quest = Quest.CreateFromNode(this.FindWzSide(questNodePath, i), PluginManager.FindWz, PluginManager.FindWz) ?? Quest.CreateFromNode(this.FindWzSide(questNodePathLegacy, i), PluginManager.FindWz, PluginManager.FindWz, fromInfoNode: int.Parse(questID));
                         if (quest == null)
                         {
                             isQuestNull[i] = true;
@@ -3656,14 +3662,8 @@ namespace WzComparerR2.Comparer
 
             for (int i = 0; i < 2; i++) // 0: New, 1: Old
             {
-                this.StringWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("String").GetNodeWzFile();
-                this.ItemWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Item").GetNodeWzFile();
-                this.EtcWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Etc").GetNodeWzFile();
-                this.QuestWzNewOld[i] = WzNewOld[i]?.FindNodeByPath("Quest").GetNodeWzFile();
-
                 achvRenderNewOld[i] = new AchievementTooltipRenderer();
-                achvRenderNewOld[i].StringLinker = new StringLinker();
-                achvRenderNewOld[i].StringLinker.Load(StringWzNewOld[i], ItemWzNewOld[i], EtcWzNewOld[i], QuestWzNewOld[i]);
+                achvRenderNewOld[i].StringLinker = this.LoadCompareStringLinker(i);
                 achvRenderNewOld[i].ShowObjectID = this.ShowObjectID;
                 achvRenderNewOld[i].CompareMode = true;
             }
@@ -3708,7 +3708,7 @@ namespace WzComparerR2.Comparer
                     // Before後のツールチップ画像の作成
                     for (int i = 0; i < 2; i++) // 0: New, 1: Old
                     {
-                        Achievement achv = Achievement.CreateFromNode(PluginManager.FindWz($@"Etc\Achievement\AchievementData\{achvID}.img", WzFileNewOld[i]), PluginManager.FindWz, PluginManager.FindWz);
+                        Achievement achv = Achievement.CreateFromNode(this.FindWzSide($@"Etc\Achievement\AchievementData\{achvID}.img", i), PluginManager.FindWz, PluginManager.FindWz);
 
                         if (achv == null)
                         {
@@ -4096,8 +4096,14 @@ namespace WzComparerR2.Comparer
                         // Skip unparseable content
                         try
                         {
+                            png.EnsureExternalPngInfo();
                             using (Bitmap bmp = png.ExtractPng())
                             {
+                                if (bmp == null)
+                                {
+                                    // データセット側に画像が無い canvas（描画できる PNG が存在しない）。
+                                    return "No image data";
+                                }
                                 bmp.Save(Path.Combine(outputDir, fileName), System.Drawing.Imaging.ImageFormat.Png);
                             }
                         }
@@ -4131,7 +4137,8 @@ namespace WzComparerR2.Comparer
                     {
                         char[] invalidChars = Path.GetInvalidFileNameChars();
                         string colName = col == 0 ? "new" : (col == 1 ? "old" : col.ToString());
-                        string filePath = fullPath.Replace('\\', '.') + "_" + colName + ".mp3";
+                        bool isOgg = sound.SoundType == Wz_SoundType.Ogg;
+                        string filePath = fullPath.Replace('\\', '.') + "_" + colName + (isOgg ? ".ogg" : ".mp3");
 
                         for (int i = 0; i < invalidChars.Length; i++)
                         {
@@ -4160,7 +4167,7 @@ namespace WzComparerR2.Comparer
                             }
                             return string.Format("Unable to analyze audio data: {0} bytes", sound.DataLength);
                         }
-                        return string.Format("<audio controls src=\"{0}\" type=\"audio/mpeg\">audio {1} ms\n</audio>", Path.Combine(new DirectoryInfo(outputDir).Name, filePath), sound.Ms);
+                        return string.Format("<audio controls src=\"{0}\" type=\"{2}\">audio {1} ms\n</audio>", Path.Combine(new DirectoryInfo(outputDir).Name, filePath), sound.Ms, isOgg ? "audio/ogg" : "audio/mpeg");
                     }
                     else
                     {

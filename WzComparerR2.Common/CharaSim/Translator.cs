@@ -422,6 +422,18 @@ namespace WzComparerR2.CharaSim
         }
 
         /// <summary>
+        /// Normalizes text for fuzzy searching: kana is unified to full-width katakana and
+        /// full-width alphanumerics to half-width. Both the search keyword and the candidate text
+        /// should be passed through this method before comparing.
+        /// </summary>
+        public static string NormalizeForSearch(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            return FullWidthKatakana(text);
+        }
+
+        /// <summary>
         /// Converts Hiragana to Katakana and normalizes to full-width form.
         /// </summary>
         public static string FullWidthKatakana(string inputString, bool ConvertHiragana = true)

@@ -293,6 +293,7 @@ namespace WzComparerR2
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
             this.chkHashPngFileName = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
+            this.btnItemOpenUnityFolder = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
@@ -306,6 +307,7 @@ namespace WzComparerR2
             this.btnPetEquipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnSkillTooltipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnWorldArchiveBrowser = new DevComponents.DotNetBar.ButtonItem();
+            this.btnMonsterBookBrowser = new DevComponents.DotNetBar.ButtonItem();
             this.btnPreset = new DevComponents.DotNetBar.ButtonX();
             this.btnMusicChannel = new DevComponents.DotNetBar.ButtonItem();
             this.btnSkillChangeInfo = new DevComponents.DotNetBar.ButtonItem();
@@ -814,6 +816,12 @@ namespace WzComparerR2
             this.buttonItemCharaEquip.Tooltip = "Open/close Equipment window";
             this.buttonItemCharaEquip.CheckedChanged += new System.EventHandler(this.buttonItemCharaEquip_CheckedChanged);
             // 
+            // btnMonsterBookBrowser
+            // 
+            this.btnMonsterBookBrowser.Name = "btnMonsterBookBrowser";
+            this.btnMonsterBookBrowser.Text = "Monster Book";
+            this.btnMonsterBookBrowser.Click += new System.EventHandler(this.btnMonsterBookBrowser_Click);
+            // 
             // itemContainer32
             // 
             // 
@@ -837,6 +845,7 @@ namespace WzComparerR2
             // 
             // 
             this.itemContainer33.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer33.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemContainer33.Name = "itemContainer33";
             this.itemContainer33.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonItemAddItem});
@@ -858,9 +867,11 @@ namespace WzComparerR2
             // 
             // 
             this.itemContainer34.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer34.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemContainer34.Name = "itemContainer34";
             this.itemContainer34.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.btnWorldArchiveBrowser});
+            this.btnWorldArchiveBrowser,
+            this.btnMonsterBookBrowser});
             //
             // btnWorldArchiveBrowser
             //
@@ -1720,6 +1731,7 @@ namespace WzComparerR2
             this.itemContainer3.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.btnItemOpenWz,
             this.btnItemOpenImg,
+            this.btnItemOpenUnityFolder,
             this.buttonItemClose,
             this.buttonItemCloseAll});
             // 
@@ -1740,6 +1752,12 @@ namespace WzComparerR2
             this.btnItemOpenImg.Name = "btnItemOpenImg";
             this.btnItemOpenImg.Text = "Open IMG";
             this.btnItemOpenImg.Click += new System.EventHandler(this.btnItemOpenImg_Click);
+            // 
+            // btnItemOpenUnityFolder
+            // 
+            this.btnItemOpenUnityFolder.Name = "btnItemOpenUnityFolder";
+            this.btnItemOpenUnityFolder.Text = "Open Unity Asset Folder(&U)...";
+            this.btnItemOpenUnityFolder.Click += new System.EventHandler(this.btnItemOpenUnityFolder_Click);
             // 
             // buttonItemClose
             // 
@@ -3981,6 +3999,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
         private DevComponents.DotNetBar.ButtonItem btnItemOpenImg;
+        private DevComponents.DotNetBar.ButtonItem btnItemOpenUnityFolder;
         private DevComponents.DotNetBar.ButtonItem buttonItemSaveWithOptions;
         private DevComponents.DotNetBar.ButtonItem buttonCaptureAni;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
@@ -4022,6 +4041,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ButtonX btnPetEquipExport;
         private DevComponents.DotNetBar.ButtonX btnSkillTooltipExport;
         private DevComponents.DotNetBar.ButtonItem btnWorldArchiveBrowser;
+        private DevComponents.DotNetBar.ButtonItem btnMonsterBookBrowser;
         private DevComponents.DotNetBar.ButtonX btnPreset;
         private DevComponents.DotNetBar.ButtonItem btnMusicChannel;
         private DevComponents.DotNetBar.ButtonItem btnSkillChangeInfo;

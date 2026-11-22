@@ -241,6 +241,11 @@ namespace WzComparerR2.MapRender
                         bgmNode = uol.HandleUol(bgmNode);
                     }
                     var bgm = resLoader.Load<Music>(bgmNode);
+                    if (bgm == null)
+                    {
+                        // Unity データセットなど Wz_Sound を持たない（FSB5 未デコードの）ソースです。
+                        return null;
+                    }
                     bgm.IsLoop = true;
                     return bgm;
                 }
@@ -270,6 +275,10 @@ namespace WzComparerR2.MapRender
                 if (useHolder)
                 {
                     var bgm = resLoader.Load<Music>(bgmNode);
+                    if (bgm == null)
+                    {
+                        return null;
+                    }
                     bgm.IsLoop = false;
                     return bgm;
                 }
@@ -280,6 +289,10 @@ namespace WzComparerR2.MapRender
                     if (bgm != null)
                     {
                         sound = new Music(bgm);
+                    }
+                    if (sound == null)
+                    {
+                        return null;
                     }
 
                     sound.IsLoop = false;

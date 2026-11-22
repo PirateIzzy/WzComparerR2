@@ -101,5 +101,13 @@ namespace WzComparerR2.MapRender.Config
             get { return (ConfigItem<bool>)this["enableMobMovement"]; }
             set { this["enableMobMovement"] = value; }
         }
+
+        /// <summary>ポータル画像が無い場合に表示する代替マーカー（青色の円柱）の表示設定。</summary>
+        [ConfigurationProperty("showPortalMarker")]
+        public ConfigItem<bool> ShowPortalMarker
+        {
+            get { return (ConfigItem<bool>)this["showPortalMarker"]; }
+            set { this["showPortalMarker"] = value; }
+        }
     }
 }

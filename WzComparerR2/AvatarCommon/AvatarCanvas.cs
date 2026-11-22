@@ -91,8 +91,174 @@ namespace WzComparerR2.AvatarCommon
 
         public bool LoadZ()
         {
-            return LoadZ(PluginBase.PluginManager.FindWz("Base\\zmap.img"));
+            Wz_Node zMapNode = PluginBase.PluginManager.FindWz("Base\\zmap.img");
+            if (zMapNode != null)
+            {
+                return LoadZ(zMapNode);
+            }
+
+            // Unity データセットには Base/zmap.img がありません: zmap と同じ順序の組み込みレイヤーテーブルを使用します。
+            this.ZMap.Clear();
+            this.ZMap.AddRange(DefaultZMap);
+            return true;
         }
+
+        /// <summary>
+        /// zmap のレイヤー順（index 0 が最前面、後ろほど背面）。
+        /// 従来クライアントの Base.wz/zmap.img から取得し、zmap を持たないデータセット（Unity アセット）向けに提供します。
+        /// </summary>
+        private static readonly string[] DefaultZMap =
+        {
+            "mobEquipFront",
+            "tamingMobFront",
+            "mobEquipMid",
+            "saddleFront",
+            "mobEquipUnderSaddle",
+            "tamingMobMid",
+            "characterStart",
+            "emotionOverBody",
+            "weaponWristOverGlove",
+            "capeOverHead",
+            "weaponOverGlove",
+            "gloveWristOverHair",
+            "gloveOverHair",
+            "handOverHair",
+            "weaponOverHand",
+            "shieldOverHair",
+            "gloveWristBelowWeapon",
+            "gloveBelowWeapon",
+            "handBelowWeapon",
+            "weaponOverArm",
+            "gloveWristBelowMailArm",
+            "mailArmOverHair",
+            "gloveBelowMailArm",
+            "armOverHair",
+            "mailArmOverHairBelowWeapon",
+            "armOverHairBelowWeapon",
+            "weaponBelowArm",
+            "capOverHair",
+            "hairOverHead",
+            "accessoryEyeOverCap",
+            "capAccessory",
+            "cap",
+            "hair",
+            "accessoryEye",
+            "accessoryEyeShadow",
+            "accessoryFace",
+            "capAccessoryBelowAccFace",
+            "accessoryEar",
+            "capBelowAccessory",
+            "accessoryFaceOverFaceBelowCap",
+            "face",
+            "accessoryFaceBelowFace",
+            "hairShade",
+            "head",
+            "cape",
+            "gloveWrist",
+            "mailArm",
+            "glove",
+            "hand",
+            "arm",
+            "weapon",
+            "shield",
+            "weaponOverArmBelowHead",
+            "gloveWristBelowHead",
+            "mailArmBelowHeadOverMailChest",
+            "gloveBelowHead",
+            "armBelowHeadOverMailChest",
+            "mailArmBelowHead",
+            "armBelowHead",
+            "weaponOverBody",
+            "mailChestTop",
+            "gloveWristOverBody",
+            "mailChestOverHighest",
+            "pantsOverMailChest",
+            "mailChest",
+            "shoesTop",
+            "pantsOverShoesBelowMailChest",
+            "shoesOverPants",
+            "mailChestOverPants",
+            "pants",
+            "shoes",
+            "pantsBelowShoes",
+            "mailChestBelowPants",
+            "gloveOverBody",
+            "body",
+            "gloveWristBelowBody",
+            "gloveBelowBody",
+            "capAccessoryBelowBody",
+            "shieldBelowBody",
+            "capeBelowBody",
+            "hairBelowBody",
+            "weaponBelowBody",
+            "backHairOverCape",
+            "backWing",
+            "backWeaponOverShield",
+            "backShield",
+            "backCapOverHair",
+            "backHair",
+            "backCap",
+            "backWeaponOverHead",
+            "backHairBelowCapWide",
+            "backHairBelowCapNarrow",
+            "backHairBelowCap",
+            "backCape",
+            "backAccessoryFaceOverHead",
+            "backHead",
+            "backMailChestOverPants",
+            "backPantsOverMailChest",
+            "backMailChest",
+            "backPantsOverShoesBelowMailChest",
+            "backShoes",
+            "backPants",
+            "backShoesBelowPants",
+            "backPantsBelowShoes",
+            "backMailChestBelowPants",
+            "backWeaponOverGlove",
+            "backGloveWrist",
+            "backGlove",
+            "backBody",
+            "backAccessoryEar",
+            "backAccessoryFace",
+            "backCapAccessory",
+            "backMailChestAccessory",
+            "backShieldBelowBody",
+            "backHairBelowHead",
+            "backWeapon",
+            "characterEnd",
+            "saddleRear",
+            "tamingMobRear",
+            "mobEquipRear",
+            "backMobEquipFront",
+            "backTamingMobFront",
+            "backMobEquipMid",
+            "backSaddle",
+            "backMobEquipUnderSaddle",
+            "backTamingMobMid",
+            "Sd",
+            "Tm",
+            "Sr",
+            "Wg",
+            "Ma",
+            "Ws",
+            "Pn",
+            "So",
+            "Si",
+            "Wp",
+            "Gv",
+            "Ri",
+            "Cp",
+            "Ay",
+            "As",
+            "Ae",
+            "Am",
+            "Af",
+            "At",
+            "Fc",
+            "Hr",
+            "Hd",
+            "Bd",
+        };
 
         public bool LoadZ(Wz_Node zMapNode)
         {
@@ -272,7 +438,7 @@ namespace WzComparerR2.AvatarCommon
             for (int i = 0; i < 2; i++)
             {
                 var eff = effNode?.FindNodeByPath(dir[i]);
-                var cnt = eff?.Nodes?.Count(item => item.Value is not Wz_Png) ?? 0;
+                var cnt = eff?.Nodes?.Count(item => item.Value is not Wz_Png && item.Value is not IWzPngSource) ?? 0;
 
                 if (cnt > 0)
                 {
@@ -1196,7 +1362,7 @@ namespace WzComparerR2.AvatarCommon
                 {
                     linkPartMixNode = linkPartMixNode.GetValue<Wz_Uol>().HandleUol(linkPartMixNode);
                 }
-                if (linkPartNode.Value is Wz_Png)
+                if (linkPartNode.Value is Wz_Png || linkPartNode.Value is IWzPngSource)
                 {
                     string frameIdx = linkPartNode.Text;
 
@@ -1310,7 +1476,7 @@ namespace WzComparerR2.AvatarCommon
                             continue;
                         }
                     }
-                    if (linkNode.Value is Wz_Png)
+                    if (linkNode.Value is Wz_Png || linkNode.Value is IWzPngSource)
                     {
                         PrismDataCollection.PrismDataType pidx = 0;
                         string defaultCapType = "default";

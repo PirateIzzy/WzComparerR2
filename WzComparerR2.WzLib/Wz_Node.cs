@@ -462,6 +462,66 @@ namespace WzComparerR2.WzLib
 
     public static class Wz_NodeExtension
     {
+        /// <summary>
+        /// 非 WZ ファイルソース（例: Unity データセット）の型解決処理。null を返すとそのノードは外部ソースに属しません。
+        /// </summary>
+        public static Func<Wz_Node, Wz_Type?> ExternalTypeResolver { get; set; }
+
+        /// <summary>
+        /// 非 WZ ファイルソースの img 内容展開処理: img ノードを渡すと、その内容ルートノードを返します
+        /// （例: Unity アセットの <c>UnityWzImage</c>）。見つからない場合は null を返します。
+        /// </summary>
+        public static Func<Wz_Node, Wz_Node> ExternalImageResolver { get; set; }
+
+        /// <summary>
+        /// img ノードの内容ルートノードを取得します: 従来の WZ は <see cref="Wz_Image"/> を展開し、
+        /// その他のソース（例: Unity データセット）は <see cref="ExternalImageResolver"/> に委ねます。
+        /// </summary>
+        public static Wz_Node GetImageContentNode(this Wz_Node imageNode)
+        {
+            if (imageNode == null)
+            {
+                return null;
+            }
+            Wz_Image image = imageNode.GetValue<Wz_Image>();
+            if (image != null)
+            {
+                if (image.WzFile == null)
+                {
+                    // 非 WZ ファイルソース（例: Unity アセット）: 外部リゾルバーで上位ノードチェーンを補い、
+                    // FullPathToFile などのパス判定を WZ のロジックのまま使えるようにします。
+                    Func<Wz_Node, Wz_Node> externalResolver = ExternalImageResolver;
+                    Wz_Node external = externalResolver?.Invoke(imageNode);
+                    if (external != null)
+                    {
+                        return external;
+                    }
+                }
+                return image.TryExtract() ? image.Node : null;
+            }
+            Func<Wz_Node, Wz_Node> resolver = ExternalImageResolver;
+            return resolver?.Invoke(imageNode);
+        }
+
+        /// <summary>
+        /// ノードが属する WZ 型を取得します: まず所属する <see cref="Wz_File"/> を探し、
+        /// 見つからない場合は <see cref="ExternalTypeResolver"/>（例: Unity データセット）に問い合わせます。
+        /// </summary>
+        public static Wz_Type? GetNodeWzType(this Wz_Node node)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+            Wz_File wzFile = node.GetNodeWzFile();
+            if (wzFile != null)
+            {
+                return wzFile.Type;
+            }
+            Func<Wz_Node, Wz_Type?> resolver = ExternalTypeResolver;
+            return resolver?.Invoke(node);
+        }
+
         public static T GetValueEx<T>(this Wz_Node node, T defaultValue)
         {
             if (node == null)

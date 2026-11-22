@@ -14,8 +14,35 @@ namespace WzComparerR2.Rendering
             return ToTexture(png, 0, graphicsDevice);
         }
 
+        /// <summary>
+        /// <see cref="IWzPngSource"/>（例: Unity アセットの Canvas ノード）からテクスチャを作成します。
+        /// 画像がない場合は null を返します。
+        /// </summary>
+        public static Texture2D ToTexture(this IWzPngSource pngSource, GraphicsDevice graphicsDevice)
+        {
+            byte[] pngData = pngSource?.GetPngData();
+            if (pngData == null || pngData.Length == 0)
+            {
+                return null;
+            }
+            using (var stream = new System.IO.MemoryStream(pngData))
+            using (var bitmap = new System.Drawing.Bitmap(stream))
+            {
+                return bitmap.ToTexture(graphicsDevice);
+            }
+        }
+
         public static Texture2D ToTexture(this Wz_Png png, int page, GraphicsDevice graphicsDevice)
         {
+            if (png.PngDataProvider != null)
+            {
+                // 非 WZ ソース（Unity canvas）: WZ のピクセル形式パイプラインを通さず、PNG を直接デコードします。
+                using (var bitmap = png.ExtractPng(page))
+                {
+                    return bitmap?.ToTexture(graphicsDevice);
+                }
+            }
+
             var format = GetTextureFormatOfPng(png.Format);
             if (format == SurfaceFormat.Bgra4444)
             {
@@ -54,6 +81,18 @@ namespace WzComparerR2.Rendering
 
         public static void ToTexture(this Wz_Png png, int page, Texture2D texture, Point origin)
         {
+            if (png.PngDataProvider != null)
+            {
+                using (var bitmap = png.ExtractPng(page))
+                {
+                    if (bitmap != null)
+                    {
+                        bitmap.ToTexture(texture, origin);
+                    }
+                }
+                return;
+            }
+
             Rectangle rect = new Rectangle(origin, new Point(png.Width, png.Height));
             if (png.Format == Wz_TextureFormat.BC7)
             {

@@ -557,26 +557,47 @@ namespace WzComparerR2.MapRender.UI
                 var mapHelperNode = PluginBase.PluginManager.FindWz("Map/MapHelper.img/minimap");
                 Action<string> addResource = (key) =>
                 {
-                    Wz_Node resNode = mapHelperNode.Nodes[key];
-                    var texture = UIHelper.LoadTexture(resNode);
+                    TextureBase texture = UIHelper.LoadTexture(mapHelperNode?.Nodes[key]);
+                    if (texture == null)
+                    {
+                        // Classic（Unity）データセットには Map/MapHelper.img/minimap がありません。
+                        // 埋め込みリソースの同等アイコンで代用します。
+                        texture = LoadEmbeddedIcon(key);
+                    }
                     if (texture != null)
                     {
                         this.Resources[key] = texture;
                     }
                 };
 
-                if (mapHelperNode != null)
+                addResource("transport");
+                addResource("portal");
+                addResource("enchantportal");
+                addResource("hiddenportal");
+                addResource("npc");
+                addResource("eventnpc");
+                addResource("shop");
+                addResource("trunk");
+                addResource("arrowup");
+                addResource("another");
+            }
+
+            /// <summary>
+            /// WZ データが無い場合の代替ミニマップアイコンです（アプリ側のマップツールチップと同じ埋め込み画像）。
+            /// <c>another</c> はボスのようにミニマップへ表示される MOB のアイコンです。
+            /// </summary>
+            private static TextureBase LoadEmbeddedIcon(string key)
+            {
+                string resourceName = key == "another"
+                    ? "MapHelper_img_minimap_mob_1"
+                    : "MapHelper_img_minimap_" + key;
+                try
                 {
-                    addResource("transport");
-                    addResource("portal");
-                    addResource("enchantportal");
-                    addResource("hiddenportal");
-                    addResource("npc");
-                    addResource("eventnpc");
-                    addResource("shop");
-                    addResource("trunk");
-                    addResource("arrowup");
-                    addResource("another");
+                    return Engine.Instance.AssetManager.LoadTexture(null, resourceName);
+                }
+                catch (Exception)
+                {
+                    return null;
                 }
             }
 

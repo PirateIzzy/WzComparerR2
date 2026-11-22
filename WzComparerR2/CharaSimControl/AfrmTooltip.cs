@@ -644,7 +644,12 @@ namespace WzComparerR2.CharaSimControl
             PreProcessText();
             foreach (var i in this.TargetCashPackage.SN)
             {
-                Commodity commodity = CharaSimLoader.LoadedCommoditiesBySN[i];
+                Commodity commodity;
+                if (!CharaSimLoader.LoadedCommoditiesBySN.TryGetValue(i, out commodity) || commodity == null)
+                {
+                    // Commodity 表に無い SN（削除済み・別バージョンのデータなど）は無視します。
+                    continue;
+                }
                 if (commodity.ItemId > 0) this.PackageIDs.Add(commodity.ItemId);
             }
             if (this.PackageIDs.Count > 0)

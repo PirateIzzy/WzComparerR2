@@ -79,6 +79,8 @@ namespace WzComparerR2.Comparer
             string chairExamplePath = Path.Combine(outputDir, ChairExampleFolderName);
             Directory.CreateDirectory(chairExamplePath);
 
+            // 椅子・アバターの各画像は「新しいバージョン」のデータセットから解決します。
+            SetUnityResolveSlot(0);
             var config = ImageHandlerConfig.Default;
             var stringLinker = this.CreateChairStringLinker();
             var log = new StringBuilder();
@@ -140,6 +142,8 @@ namespace WzComparerR2.Comparer
             string tamingMobExamplePath = Path.Combine(outputDir, TamingMobExampleFolderName);
             Directory.CreateDirectory(tamingMobExamplePath);
 
+            // テイミングモブ・アバターの各画像は「新しいバージョン」のデータセットから解決します。
+            SetUnityResolveSlot(0);
             var config = ImageHandlerConfig.Default;
             var stringLinker = this.CreateChairStringLinker();
             var log = new StringBuilder();
@@ -1005,6 +1009,12 @@ namespace WzComparerR2.Comparer
         private StringLinker CreateChairStringLinker()
         {
             var stringLinker = new StringLinker();
+            if (this.TryLoadUnityStringLinker(0, stringLinker))
+            {
+                // Unity データセットは String.wz を持たないため、文字列テーブルから読み込みます。
+                return stringLinker;
+            }
+
             for (int i = 0; i < 2; i++)
             {
                 Wz_File stringWz = this.StringWzNewOld[i];
@@ -1078,6 +1088,7 @@ namespace WzComparerR2.Comparer
 
         /// <summary>
         /// Resolves a path such as "Item\Install\03019.img\03019829" only when it actually exists.
+        /// img ノード名の <c>.img</c> 有無（Unity アセットツリー）も許容します。
         /// </summary>
         private Wz_Node ResolveWzNode(string fullPath)
         {
@@ -1095,7 +1106,7 @@ namespace WzComparerR2.Comparer
                     return null;
                 }
 
-                node = node.Nodes[parts[i]];
+                node = FindChildNode(node, parts[i]);
                 if (node == null)
                 {
                     return null;
@@ -1431,6 +1442,28 @@ namespace WzComparerR2.Comparer
             }
         }
 
+        /// <summary>
+        /// 子ノードを名前で取得します。WZ の img ノード名（<c>0301.img</c>）と、
+        /// Unity アセットツリーの img ノード名（<c>0301</c>）の両方を許容します。
+        /// </summary>
+        private static Wz_Node FindChildNode(Wz_Node parent, string name)
+        {
+            if (parent == null || string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+            Wz_Node node = parent.Nodes[name];
+            if (node != null)
+            {
+                return node;
+            }
+            if (name.EndsWith(".img", StringComparison.OrdinalIgnoreCase))
+            {
+                return parent.Nodes[name.Substring(0, name.Length - 4)];
+            }
+            return parent.Nodes[name + ".img"];
+        }
+
         private Wz_Node FindGearNode(int id)
         {
             string imgName = id.ToString("D8") + ".img";
@@ -1457,7 +1490,7 @@ namespace WzComparerR2.Comparer
                     continue;
                 }
 
-                Wz_Node imgNode = node1.Text == imgName ? node1 : node1.Nodes[imgName];
+                Wz_Node imgNode = node1.Text == imgName ? node1 : FindChildNode(node1, imgName);
                 if (imgNode == null)
                 {
                     continue;

@@ -63,26 +63,24 @@ namespace WzComparerR2.DB2
 
         public static string ImgName(this Wz_Node Node)
         {
-            try
-            {
-                return Node.GetNodeWzImage().Name;
-            }
-            catch
-            {
-                return "(null)";
-            }
+            return Node?.Text ?? "(null)";
         }
 
+        /// <summary>
+        /// img ノードの識別子（文件夾下的 <c>00002000.img</c> / Unity の <c>00002000</c>）を返します。
+        /// Unity データセットでは <see cref="Wz_Image.Name"/> が索引キー（<c>Character/Cap/01002000</c>）になるため、
+        /// ノード名から求めます。
+        /// </summary>
         public static string ImgID(this Wz_Node Node)
         {
-            try
-            {
-                return Node.GetNodeWzImage().Name.Replace(".img", "");
-            }
-            catch
+            string text = Node?.Text;
+            if (string.IsNullOrEmpty(text))
             {
                 return "0";
             }
+            return text.EndsWith(".img", StringComparison.OrdinalIgnoreCase)
+                ? text.Substring(0, text.Length - 4)
+                : text;
         }
 
         public static T GetValue2<T>(this Wz_Node Node, string Path, T DefaultValue)

@@ -84,7 +84,41 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_Image WzImage { get; set; }
 
+        /// <summary>
+        /// 非 WZ ファイルソース（例: Unity アセットの Canvas）の PNG バイト列提供者。
+        /// 設定すると <see cref="ExtractPng(int)"/> は WZ データストリームを読まず、この PNG を直接デコードします。
+        /// </summary>
+        public Func<byte[]> PngDataProvider { get; set; }
+
         public int GetRawDataSize() => this.GetRawDataSizePerPage() * this.ActualPages;
+
+        /// <summary>
+        /// 外部 PNG（<see cref="PngDataProvider"/>）のサイズとデータ長を補います。
+        /// これらの情報は PNG のヘッダーを読むだけで取得でき、画像全体をデコードする必要はありません。
+        /// WZ ソースの画像は元からこれらの値を持つため、このメソッドを呼んでも効果はありません。
+        /// </summary>
+        public void EnsureExternalPngInfo()
+        {
+            Func<byte[]> provider = this.PngDataProvider;
+            if (provider == null)
+            {
+                return;
+            }
+
+            byte[] data = provider();
+            if (data == null || data.Length < 24)
+            {
+                return;
+            }
+
+            this.DataLength = data.Length;
+            if (data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47
+                && data[12] == 'I' && data[13] == 'H' && data[14] == 'D' && data[15] == 'R')
+            {
+                this.Width = (int)(((uint)data[16] << 24) | ((uint)data[17] << 16) | ((uint)data[18] << 8) | data[19]);
+                this.Height = (int)(((uint)data[20] << 24) | ((uint)data[21] << 16) | ((uint)data[22] << 8) | data[23]);
+            }
+        }
 
         public int GetRawDataSizePerPage() => GetUncompressedDataSize(this.Format, this.ActualScale, this.Width, this.Height);
 
@@ -140,6 +174,11 @@ namespace WzComparerR2.WzLib
 
         public Stream UnsafeOpenRead()
         {
+            if (this.WzImage == null)
+            {
+                // 非 WZ 檔來源（例如 Unity canvas）沒有 WZ 資料流，改用 PngDataProvider。
+                throw new NotSupportedException("Cannot read the raw data because this image does not originate from a WZ file.");
+            }
             DeflateStream zlib;
 
             var stream = this.WzImage.OpenRead();
@@ -172,6 +211,12 @@ namespace WzComparerR2.WzLib
 
         public Bitmap ExtractPng(int page)
         {
+            Func<byte[]> provider = this.PngDataProvider;
+            if (provider != null)
+            {
+                return ExtractExternalPng(provider);
+            }
+
             if (this.Pages > 0)
             {
                 if (page < 0 || page >= this.Pages)
@@ -314,8 +359,24 @@ namespace WzComparerR2.WzLib
             return pngDecoded;
         }
 
-        private static void CopyBmpDataWithStride(byte[] source, int stride, BitmapData bmpData)
+        private Bitmap ExtractExternalPng(Func<byte[]> provider)
         {
+            byte[] data = provider();
+            if (data == null || data.Length == 0)
+            {
+                return null;
+            }
+            this.DataLength = data.Length;
+            using (var stream = new MemoryStream(data))
+            using (var decoded = new Bitmap(stream))
+            {
+                this.Width = decoded.Width;
+                this.Height = decoded.Height;
+                return new Bitmap(decoded);
+            }
+        }
+
+        private static void CopyBmpDataWithStride(byte[] source, int stride, BitmapData bmpData)        {
             if (bmpData.Stride == stride)
             {
                 Marshal.Copy(source, 0, bmpData.Scan0, source.Length);

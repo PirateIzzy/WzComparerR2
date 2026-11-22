@@ -1,0 +1,997 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using WzComparerR2.UnityLib.Classic;
+using WzComparerR2.UnityLib.Unity;
+
+namespace WzComparerR2.UnityLib.Images
+{
+    /// <summary>spritesheet 的一組索引與 atlas 頁。</summary>
+    public sealed class UnitySheetEntry
+    {
+        public UnitySheetEntry()
+        {
+            this.AtlasPages = new List<KeyValuePair<int, UnityEntryLocation>>();
+        }
+
+        /// <summary>container 條目順序不保證 index 早於 atlas，建構途中允許尚未看到索引。</summary>
+        public UnityEntryLocation IndexLocation { get; set; }
+
+        /// <summary>新版圖集用 .asset 保存路徑與裁切資料；舊版仍使用 WZSS。</summary>
+        public bool IndexIsAsset { get; set; }
+
+        /// <summary>(page 序號, Texture2D 物件位置)，依頁號排序。</summary>
+        public List<KeyValuePair<int, UnityEntryLocation>> AtlasPages { get; private set; }
+    }
+
+    /// <summary>WZ の <c>origin</c> に相当する、画像左上から見た基準点。</summary>
+    public struct UnitySpriteOrigin
+    {
+        public UnitySpriteOrigin(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+
+        public int X { get; private set; }
+        public int Y { get; private set; }
+    }
+
+    /// <summary>spriteset 的一個 sprite：Sprite 物件位置 + 其 Texture2D 物件位置 + origin。</summary>
+    public sealed class UnitySetSpriteEntry
+    {
+        public UnitySetSpriteEntry(UnityEntryLocation spriteLocation, UnityEntryLocation textureLocation, UnitySpriteOrigin origin)
+            : this(spriteLocation, textureLocation, origin, null)
+        {
+        }
+
+        public UnitySetSpriteEntry(
+            UnityEntryLocation spriteLocation, UnityEntryLocation textureLocation, UnitySpriteOrigin origin,
+            UnityRectF? cropRect)
+        {
+            this.SpriteLocation = spriteLocation;
+            this.TextureLocation = textureLocation;
+            this.Origin = origin;
+            this.CropRect = cropRect;
+        }
+
+        public UnityEntryLocation SpriteLocation { get; private set; }
+        public UnityEntryLocation TextureLocation { get; private set; }
+
+        /// <summary>Sprite の m_Pivot から求めた WZ 互換の origin。</summary>
+        public UnitySpriteOrigin Origin { get; private set; }
+
+        /// <summary>
+        /// atlas 詰めの sprite（<c>m_RD.texture</c> を持たず SpriteAtlas を参照するもの）の切り出し矩形。
+        /// 通常の sprite は null（Sprite 自身の m_Rect を使います）。
+        /// </summary>
+        public UnityRectF? CropRect { get; private set; }
+    }
+
+    /// <summary>spriteset .asset payload の 1 エントリ（名前＋Sprite への PPtr）。</summary>
+    public struct UnitySetAssetEntry
+    {
+        public UnitySetAssetEntry(string name, int fileId, long pathId)
+        {
+            this.Name = name;
+            this.FileId = fileId;
+            this.PathId = pathId;
+        }
+
+        /// <summary>名前（名前なし一覧では空文字）。</summary>
+        public string Name { get; private set; }
+
+        /// <summary>PPtr の fileID（別 SerializedFile を指す場合は 0 以外）。</summary>
+        public int FileId { get; private set; }
+
+        /// <summary>Sprite の pathID。</summary>
+        public long PathId { get; private set; }
+    }
+
+    /// <summary>
+    /// 圖片索引：邏輯路徑 → 圖片來源。
+    /// <list type="bullet">
+    /// <item>spritesheet_*：container 裡的 <c>.wzspritesheet</c>（舊 WZSS）或
+    /// <c>.asset</c>（新版索引物件）+ <c>_N.png</c>（atlas 頁 Texture2D）。</item>
+    /// <item>spriteset_*：container 裡的 <c>.asset</c>（sprite 清單 MonoBehaviour）+
+    /// Sprite(213) 物件 + Texture2D。</item>
+    /// </list>
+    /// </summary>
+    public sealed class UnityImageIndex
+    {
+        private const string SheetPrefix = "assets/wzassets/spritesheet/";
+        private const string SetPrefix = "assets/wzassets/spriteset/";
+        private const string AtlasPrefix = "assets/wzassets/atlas/";
+
+        public UnityImageIndex()
+        {
+            this.SheetsByPath = new Dictionary<string, Dictionary<string, UnitySheetEntry>>(StringComparer.Ordinal);
+            this.SetAssets = new Dictionary<string, Dictionary<string, UnitySetSpriteEntry>>(StringComparer.Ordinal);
+            this.AtlasAssets = new Dictionary<string, Dictionary<string, UnitySetSpriteEntry>>(StringComparer.Ordinal);
+            this.SetPrefixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>邏輯路徑 → 語系 → 該語系的一組索引與圖頁。</summary>
+        public Dictionary<string, Dictionary<string, UnitySheetEntry>> SheetsByPath { get; private set; }
+
+        /// <summary>asset 路徑（去前綴去副檔名）→ sprite 清單（名稱 → sprite）。</summary>
+        public Dictionary<string, Dictionary<string, UnitySetSpriteEntry>> SetAssets { get; private set; }
+
+        /// <summary>
+        /// SpriteAtlas（<c>Assets/WzAssets/Atlas/&lt;name&gt;.spriteatlasv2</c>）→ sprite 清單。
+        /// キーは WZ 形式の <c>UI/&lt;atlas 名&gt;</c> で、ツリーでは <c>UI/&lt;atlas 名&gt;.img</c> として見えます。
+        /// </summary>
+        public Dictionary<string, Dictionary<string, UnitySetSpriteEntry>> AtlasAssets { get; private set; }
+
+        /// <summary>spriteset / atlas のどちらの sprite でも引けるようにします。</summary>
+        public Dictionary<string, UnitySetSpriteEntry> FindSpriteAsset(string key)
+        {
+            if (key == null)
+            {
+                return null;
+            }
+            Dictionary<string, UnitySetSpriteEntry> asset;
+            if (this.SetAssets.TryGetValue(key, out asset))
+            {
+                return asset;
+            }
+            if (this.AtlasAssets.TryGetValue(key, out asset))
+            {
+                return asset;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// spriteset キーの 1 セグメント目（地域コード、例: <c>Common</c>、<c>CN</c>、<c>TW</c>）。
+        /// WZ アセットの <c>SpriteSet/&lt;region&gt;/…</c> ディレクトリに対応します。
+        /// </summary>
+        public HashSet<string> SetPrefixes { get; private set; }
+
+        /// <summary>
+        /// 使用 Catalog 已解析的 SerializedFile 與 AssetBundle container 收錄圖片來源。
+        /// <paramref name="objectLocations"/> は全 bundle 横断の pathID → 位置（atlas 参照など別ファイルのオブジェクト解決用）。
+        /// </summary>
+        internal void CollectFromContainer(
+            UnityFsBundle bundle, int bundleIndex, string bundleStem, int nodeIndex,
+            UnitySerializedFile serializedFile, IReadOnlyList<UnityContainerEntry> container,
+            Dictionary<long, UnityObjectInfo> objectsByPathId,
+            Dictionary<long, UnityEntryLocation> objectLocations,
+            Func<UnityEntryLocation, byte[]> readEntryBytes)
+        {
+            // 初期 beta の bundle 名は spritesheetgroup_*/spritesetgroup_*（Addressables
+            // グループプレフィックス）ため、ファイル名の前方一致だけでは判断できず、container のパスで判定します。
+            bool isSheet = bundleStem.StartsWith("spritesheet", StringComparison.Ordinal)
+                || ContainsPathPrefix(container, SheetPrefix);
+            bool isSet = bundleStem.StartsWith("spriteset", StringComparison.Ordinal)
+                || ContainsPathPrefix(container, SetPrefix);
+            bool isAtlas = bundleStem.StartsWith("atlas", StringComparison.Ordinal)
+                || ContainsPathPrefix(container, AtlasPrefix);
+            if (!isSheet && !isSet && !isAtlas)
+            {
+                return;
+            }
+
+            Func<long, UnityEntryLocation> locationOf = pathId =>
+            {
+                UnityObjectInfo obj;
+                if (!objectsByPathId.TryGetValue(pathId, out obj))
+                {
+                    return null;
+                }
+                long absolute = serializedFile.DataOffset + obj.ByteStart;
+                if (absolute < serializedFile.DataOffset)
+                {
+                    return null;
+                }
+                return new UnityEntryLocation(
+                    bundleIndex, nodeIndex, absolute, obj.ByteSize, obj.ClassId);
+            };
+
+            if (isSheet)
+            {
+                this.CollectSheet(container, locationOf);
+            }
+            if (isSet)
+            {
+                this.CollectSet(
+                    bundle, bundleIndex, nodeIndex, serializedFile, container, locationOf,
+                    objectLocations, readEntryBytes);
+            }
+            if (isAtlas)
+            {
+                this.CollectAtlas(
+                    bundle, bundleIndex, nodeIndex, serializedFile, container, locationOf,
+                    objectLocations, readEntryBytes);
+            }
+        }
+
+        /// <summary>container 内に前方一致するパスがあるか（大文字小文字を無視、索引キーは小文字）。</summary>
+        private static bool ContainsPathPrefix(
+            IReadOnlyList<UnityContainerEntry> container, string prefix)
+        {
+            foreach (UnityContainerEntry entry in container)
+            {
+                string path = entry.Path;
+                if (path != null && path.Length >= prefix.Length
+                    && path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>現在のロケールを優先し、次に共通アトラスを使用します。それでも見つからない場合はいずれかを使用し、地域選択の誤りで画像がすべて消えるのを防ぎます。</summary>
+        public static UnitySheetEntry SelectLocalized(
+            Dictionary<string, UnitySheetEntry> variants, string locale)
+        {
+            if (variants == null || variants.Count == 0)
+            {
+                return null;
+            }
+            if (variants.Count == 1)
+            {
+                foreach (UnitySheetEntry only in variants.Values)
+                {
+                    return only;
+                }
+            }
+            UnitySheetEntry found;
+            if (locale != null && variants.TryGetValue(locale.ToUpperInvariant(), out found))
+            {
+                return found;
+            }
+            if (variants.TryGetValue("COMMON", out found))
+            {
+                return found;
+            }
+            string firstKey = null;
+            foreach (string key in variants.Keys)
+            {
+                if (firstKey == null || string.CompareOrdinal(key, firstKey) < 0)
+                {
+                    firstKey = key;
+                }
+            }
+            return firstKey == null ? null : variants[firstKey];
+        }
+
+        private void CollectSheet(
+            IReadOnlyList<UnityContainerEntry> container, Func<long, UnityEntryLocation> locationOf)
+        {
+            foreach (UnityContainerEntry entry in container)
+            {
+                string locale;
+                string rest;
+                if (!TrySplitSheetPath(entry.Path, out locale, out rest))
+                {
+                    continue;
+                }
+
+                string key;
+                bool isAsset;
+                int page;
+                if (TryStripSuffix(rest, ".wzspritesheet", out key))
+                {
+                    isAsset = false;
+                }
+                else if (TryStripSuffix(rest, ".asset", out key))
+                {
+                    isAsset = true;
+                }
+                else if (TrySplitAtlasPage(rest, out key, out page))
+                {
+                    UnityEntryLocation pageLocation = locationOf(entry.Asset.PathId);
+                    if (pageLocation == null)
+                    {
+                        continue;
+                    }
+                    UnitySheetEntry pageEntry = this.GetOrCreateSheet(key, locale);
+                    bool exists = false;
+                    foreach (KeyValuePair<int, UnityEntryLocation> item in pageEntry.AtlasPages)
+                    {
+                        if (item.Key == page)
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        pageEntry.AtlasPages.Add(new KeyValuePair<int, UnityEntryLocation>(page, pageLocation));
+                        pageEntry.AtlasPages.Sort((a, b) => a.Key.CompareTo(b.Key));
+                    }
+                    continue;
+                }
+                else
+                {
+                    continue;
+                }
+
+                UnityEntryLocation indexLocation = locationOf(entry.Asset.PathId);
+                if (indexLocation == null)
+                {
+                    continue;
+                }
+                UnitySheetEntry sheet = this.GetOrCreateSheet(key, locale);
+                sheet.IndexLocation = indexLocation;
+                sheet.IndexIsAsset = isAsset;
+            }
+        }
+
+        private void CollectSet(
+            UnityFsBundle bundle, int bundleIndex, int nodeIndex, UnitySerializedFile serializedFile,
+            IReadOnlyList<UnityContainerEntry> container, Func<long, UnityEntryLocation> locationOf,
+            Dictionary<long, UnityEntryLocation> objectLocations,
+            Func<UnityEntryLocation, byte[]> readEntryBytes)
+        {
+            // .asset path → (名稱 → sprite PPtr)
+            Dictionary<string, Dictionary<string, UnitySetAssetEntry>> assetMap =
+                new Dictionary<string, Dictionary<string, UnitySetAssetEntry>>(StringComparer.Ordinal);
+            foreach (UnityContainerEntry entry in container)
+            {
+                string lower = entry.Path.ToLowerInvariant();
+                if (!lower.StartsWith(SetPrefix, StringComparison.Ordinal) || !lower.EndsWith(".asset", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+                string key = entry.Path.Substring(SetPrefix.Length, entry.Path.Length - SetPrefix.Length - ".asset".Length);
+                UnityEntryLocation assetLocation = locationOf(entry.Asset.PathId);
+                if (assetLocation == null)
+                {
+                    continue;
+                }
+                byte[] data = bundle.ReadNodeRange(
+                    nodeIndex, assetLocation.AbsoluteOffset, (int)assetLocation.ByteSize);
+                UnityMonoBehaviourInfo mono;
+                try
+                {
+                    mono = UnityObjectParsers.ParseMonoBehaviour(data, serializedFile.IsLittleEndian);
+                }
+                catch (UnityException)
+                {
+                    continue;
+                }
+                if (mono.HeaderLength > data.Length)
+                {
+                    continue;
+                }
+                byte[] payload = new byte[data.Length - mono.HeaderLength];
+                Buffer.BlockCopy(data, mono.HeaderLength, payload, 0, payload.Length);
+
+                Dictionary<string, UnitySetAssetEntry> sprites;
+                if (!assetMap.TryGetValue(key, out sprites))
+                {
+                    sprites = new Dictionary<string, UnitySetAssetEntry>(StringComparer.Ordinal);
+                    assetMap[key] = sprites;
+                }
+                foreach (UnitySetAssetEntry item in ParseSetAssetPayload(payload))
+                {
+                    // 名前なしフレーム一覧は全エントリの名前が空になるため、pid を仮キーにして
+                    // 上書きで消えないようにします（最終的な名前はスプライト側から補います）。
+                    string entryKey = string.IsNullOrEmpty(item.Name)
+                        ? UnnamedEntryKeyPrefix + item.PathId.ToString()
+                        : item.Name;
+                    sprites[entryKey] = item;
+                }
+            }
+
+            // 同一ファイル優先、無ければ全 bundle 横断の索引で解決します
+            // （spriteset の .asset は別ファイル（atlas bundle など）の Sprite を参照することがあります）。
+            Func<long, UnityEntryLocation> resolve =
+                pathId => this.ResolveLocation(pathId, locationOf, objectLocations);
+            Func<UnityEntryLocation, byte[]> readBytes =
+                location => this.ReadLocationBytes(location, bundle, bundleIndex, nodeIndex, readEntryBytes);
+
+            // atlas 詰め sprite 用のキャッシュ（SpriteAtlas の bytes は 1 回だけ読みます）
+            Dictionary<long, UnitySpriteAtlasInfo> atlasCache = new Dictionary<long, UnitySpriteAtlasInfo>();
+
+            // sprite pid → UnitySetSpriteEntry（解析 Sprite 拿 texture pid）
+            foreach (KeyValuePair<string, Dictionary<string, UnitySetAssetEntry>> asset in assetMap)
+            {
+                Dictionary<string, UnitySetSpriteEntry> output =
+                    new Dictionary<string, UnitySetSpriteEntry>(StringComparer.Ordinal);
+                foreach (KeyValuePair<string, UnitySetAssetEntry> item in asset.Value)
+                {
+                    UnityEntryLocation spriteLocation = resolve(item.Value.PathId);
+                    if (spriteLocation == null || spriteLocation.ClassId != UnityClassIds.Sprite)
+                    {
+                        continue;
+                    }
+                    bool sameFile = spriteLocation.BundleIndex == bundleIndex && spriteLocation.NodeIndex == nodeIndex;
+                    bool littleEndian = sameFile ? serializedFile.IsLittleEndian : true;
+                    byte[] data;
+                    try
+                    {
+                        data = readBytes(spriteLocation);
+                    }
+                    catch (Exception ex) when (ex is UnityException || ex is IOException)
+                    {
+                        continue;
+                    }
+                    if (data == null)
+                    {
+                        continue;
+                    }
+                    UnitySpriteInfo sprite;
+                    try
+                    {
+                        sprite = UnityObjectParsers.ParseSprite(data, littleEndian);
+                    }
+                    catch (UnityException)
+                    {
+                        continue;
+                    }
+
+                    UnityPPtr texturePtr = sprite.Texture;
+                    UnityRectF? cropRect = null;
+                    if (texturePtr.PathId == 0 && sprite.SpriteAtlas.PathId != 0)
+                    {
+                        // atlas 詰め sprite：SpriteAtlas のレンダーデータから実テクスチャと切り出し矩形を引きます。
+                        UnitySpriteAtlasInfo atlas = this.GetSpriteAtlas(sprite.SpriteAtlas.PathId, resolve, readBytes, atlasCache);
+                        if (atlas == null
+                            || !atlas.TryGetRenderData(sprite.RenderDataKeyGuid, out texturePtr, out UnityRectF atlasRect))
+                        {
+                            continue;
+                        }
+                        cropRect = atlasRect;
+                    }
+                    if (texturePtr.PathId == 0)
+                    {
+                        continue;
+                    }
+                    UnityEntryLocation textureLocation = resolve(texturePtr.PathId);
+                    if (textureLocation == null || textureLocation.ClassId != UnityClassIds.Texture2D)
+                    {
+                        continue;
+                    }
+
+                    // 名前なしフレーム一覧（portal など）はスプライト名（"0"、"1"…）で補います。
+                    string spriteName = item.Key;
+                    if (string.IsNullOrEmpty(spriteName) || spriteName.StartsWith(UnnamedEntryKeyPrefix, StringComparison.Ordinal))
+                    {
+                        spriteName = sprite.Name;
+                    }
+                    if (string.IsNullOrEmpty(spriteName))
+                    {
+                        spriteName = output.Count.ToString();
+                    }
+                    if (output.ContainsKey(spriteName))
+                    {
+                        spriteName = spriteName + "_" + output.Count.ToString();
+                    }
+                    int originX, originY;
+                    sprite.GetWzOrigin(cropRect ?? sprite.Rect, out originX, out originY);
+                    output[spriteName] = new UnitySetSpriteEntry(
+                        spriteLocation, textureLocation, new UnitySpriteOrigin(originX, originY), cropRect);
+                }
+                if (output.Count > 0)
+                {
+                    this.SetAssets[asset.Key] = output;
+                    int slash = asset.Key.IndexOf('/');
+                    if (slash > 0)
+                    {
+                        this.SetPrefixes.Add(asset.Key.Substring(0, slash));
+                    }
+                }
+            }
+        }
+
+        /// <summary>SpriteAtlas(687078895) の bytes を読み、<see cref="UnitySpriteAtlasInfo"/> をキャッシュします。</summary>
+        private UnitySpriteAtlasInfo GetSpriteAtlas(
+            long atlasPathId, Func<long, UnityEntryLocation> resolve,
+            Func<UnityEntryLocation, byte[]> readBytes, Dictionary<long, UnitySpriteAtlasInfo> cache)
+        {
+            UnitySpriteAtlasInfo atlas;
+            if (cache.TryGetValue(atlasPathId, out atlas))
+            {
+                return atlas;
+            }
+            atlas = null;
+            UnityEntryLocation location = resolve(atlasPathId);
+            if (location != null && location.ClassId == UnityClassIds.SpriteAtlas && readBytes != null)
+            {
+                try
+                {
+                    byte[] data = readBytes(location);
+                    if (data != null)
+                    {
+                        atlas = UnitySpriteAtlasInfo.Parse(data, true);
+                    }
+                }
+                catch (Exception ex) when (ex is UnityException || ex is IOException || ex is ArgumentException)
+                {
+                    atlas = null;
+                }
+            }
+            cache[atlasPathId] = atlas;
+            return atlas;
+        }
+
+        /// <summary>
+        /// SpriteAtlas（<c>Assets/WzAssets/Atlas/&lt;name&gt;.spriteatlasv2</c>）を <c>UI/&lt;atlas 名&gt;</c> として収録します。
+        /// 子ノードは atlas に詰められた sprite で、名前は sprite 名（重複は <c>_N</c> で区別）です。
+        /// </summary>
+        private void CollectAtlas(
+            UnityFsBundle bundle, int bundleIndex, int nodeIndex, UnitySerializedFile serializedFile,
+            IReadOnlyList<UnityContainerEntry> container, Func<long, UnityEntryLocation> locationOf,
+            Dictionary<long, UnityEntryLocation> objectLocations,
+            Func<UnityEntryLocation, byte[]> readEntryBytes)
+        {
+            Func<long, UnityEntryLocation> resolve =
+                pathId => this.ResolveLocation(pathId, locationOf, objectLocations);
+            Func<UnityEntryLocation, byte[]> readBytes =
+                location => this.ReadLocationBytes(location, bundle, bundleIndex, nodeIndex, readEntryBytes);
+
+            foreach (UnityContainerEntry entry in container)
+            {
+                string lower = entry.Path.ToLowerInvariant();
+                if (!lower.StartsWith(AtlasPrefix, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+                if (!lower.EndsWith(".spriteatlasv2", StringComparison.Ordinal)
+                    && !lower.EndsWith(".spriteatlas", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                string fileName = entry.Path.Substring(entry.Path.LastIndexOf('/') + 1);
+                int dot = fileName.IndexOf('.');
+                string atlasName = dot > 0 ? fileName.Substring(0, dot) : fileName;
+                if (string.IsNullOrEmpty(atlasName))
+                {
+                    continue;
+                }
+
+                UnityEntryLocation atlasLocation = resolve(entry.Asset.PathId);
+                if (atlasLocation == null)
+                {
+                    continue;
+                }
+
+                UnitySpriteAtlasInfo atlas;
+                try
+                {
+                    byte[] atlasData = readBytes(atlasLocation);
+                    atlas = atlasData != null ? UnitySpriteAtlasInfo.Parse(atlasData, true) : null;
+                }
+                catch (Exception ex) when (ex is UnityException || ex is IOException || ex is ArgumentException)
+                {
+                    atlas = null;
+                }
+                if (atlas == null || atlas.Sprites.Count == 0)
+                {
+                    continue;
+                }
+
+                Dictionary<string, UnitySetSpriteEntry> output =
+                    new Dictionary<string, UnitySetSpriteEntry>(StringComparer.Ordinal);
+                for (int i = 0; i < atlas.Sprites.Count; i++)
+                {
+                    UnityPPtr spritePtr = atlas.Sprites[i];
+                    UnityEntryLocation spriteLocation = resolve(spritePtr.PathId);
+                    if (spriteLocation == null || spriteLocation.ClassId != UnityClassIds.Sprite)
+                    {
+                        continue;
+                    }
+                    bool sameFile = spriteLocation.BundleIndex == bundleIndex && spriteLocation.NodeIndex == nodeIndex;
+                    byte[] data;
+                    UnitySpriteInfo sprite;
+                    try
+                    {
+                        data = readBytes(spriteLocation);
+                        if (data == null)
+                        {
+                            continue;
+                        }
+                        sprite = UnityObjectParsers.ParseSprite(data, sameFile ? serializedFile.IsLittleEndian : true);
+                    }
+                    catch (Exception ex) when (ex is UnityException || ex is IOException)
+                    {
+                        continue;
+                    }
+
+                    UnityPPtr texturePtr = sprite.Texture;
+                    UnityRectF? cropRect = null;
+                    if (texturePtr.PathId == 0)
+                    {
+                        if (!atlas.TryGetRenderData(sprite.RenderDataKeyGuid, out texturePtr, out UnityRectF atlasRect))
+                        {
+                            continue;
+                        }
+                        cropRect = atlasRect;
+                    }
+                    if (texturePtr.PathId == 0)
+                    {
+                        continue;
+                    }
+                    UnityEntryLocation textureLocation = resolve(texturePtr.PathId);
+                    if (textureLocation == null || textureLocation.ClassId != UnityClassIds.Texture2D)
+                    {
+                        continue;
+                    }
+
+                    string spriteName = sprite.Name;
+                    if (string.IsNullOrEmpty(spriteName))
+                    {
+                        spriteName = i.ToString();
+                    }
+                    if (output.ContainsKey(spriteName))
+                    {
+                        spriteName = spriteName + "_" + output.Count.ToString();
+                    }
+                    int originX, originY;
+                    sprite.GetWzOrigin(cropRect ?? sprite.Rect, out originX, out originY);
+                    output[spriteName] = new UnitySetSpriteEntry(
+                        spriteLocation, textureLocation, new UnitySpriteOrigin(originX, originY), cropRect);
+                }
+
+                if (output.Count > 0)
+                {
+                    this.AtlasAssets["UI/" + atlasName] = output;
+                }
+            }
+        }
+
+        private UnityEntryLocation ResolveLocation(
+            long pathId, Func<long, UnityEntryLocation> locationOf,
+            Dictionary<long, UnityEntryLocation> objectLocations)
+        {
+            UnityEntryLocation location = locationOf(pathId);
+            if (location != null || objectLocations == null)
+            {
+                return location;
+            }
+            return objectLocations.TryGetValue(pathId, out location) ? location : null;
+        }
+
+        private byte[] ReadLocationBytes(
+            UnityEntryLocation location, UnityFsBundle bundle, int bundleIndex, int nodeIndex,
+            Func<UnityEntryLocation, byte[]> readEntryBytes)
+        {
+            if (location.BundleIndex == bundleIndex && location.NodeIndex == nodeIndex)
+            {
+                return bundle.ReadNodeRange(nodeIndex, location.AbsoluteOffset, (int)location.ByteSize);
+            }
+            return readEntryBytes != null ? readEntryBytes(location) : null;
+        }
+
+        private UnitySheetEntry GetOrCreateSheet(string key, string locale)
+        {
+            Dictionary<string, UnitySheetEntry> variants;
+            if (!this.SheetsByPath.TryGetValue(key, out variants))
+            {
+                variants = new Dictionary<string, UnitySheetEntry>(StringComparer.Ordinal);
+                this.SheetsByPath[key] = variants;
+            }
+            string code = locale.ToUpperInvariant();
+            UnitySheetEntry entry;
+            if (!variants.TryGetValue(code, out entry))
+            {
+                entry = new UnitySheetEntry();
+                variants[code] = entry;
+            }
+            return entry;
+        }
+
+        private static bool TrySplitSheetPath(string path, out string locale, out string rest)
+        {
+            locale = null;
+            rest = null;
+            if (path == null || path.Length <= SheetPrefix.Length)
+            {
+                return false;
+            }
+            if (string.Compare(path, 0, SheetPrefix, 0, SheetPrefix.Length, StringComparison.OrdinalIgnoreCase) != 0)
+            {
+                return false;
+            }
+            string tail = path.Substring(SheetPrefix.Length);
+            int slash = tail.IndexOf('/');
+            if (slash <= 0 || slash == tail.Length - 1)
+            {
+                return false;
+            }
+            locale = tail.Substring(0, slash);
+            rest = tail.Substring(slash + 1);
+            return true;
+        }
+
+        private static bool TryStripSuffix(string value, string suffix, out string result)
+        {
+            if (value.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            {
+                result = value.Substring(0, value.Length - suffix.Length);
+                return true;
+            }
+            result = null;
+            return false;
+        }
+
+        /// <summary>"login_2.png" → ("login", 2)；無 _N 後綴 → false。</summary>
+        private static bool TrySplitAtlasPage(string value, out string key, out int page)
+        {
+            key = null;
+            page = 0;
+            if (!TryStripSuffix(value, ".png", out string baseName))
+            {
+                return false;
+            }
+            int underscore = baseName.LastIndexOf('_');
+            if (underscore <= 0 || underscore == baseName.Length - 1)
+            {
+                return false;
+            }
+            if (!int.TryParse(baseName.Substring(underscore + 1), System.Globalization.NumberStyles.Integer,
+                System.Globalization.CultureInfo.InvariantCulture, out page) || page < 0)
+            {
+                return false;
+            }
+            key = baseName.Substring(0, underscore);
+            return true;
+        }
+
+        /// <summary>
+        /// spriteset .asset payload：(count, (string, pathID)×n) 或 (count, PPtr×n)；
+        /// 另有無 count 前綴、直接連排 PPtr 的佈局。回傳 (名稱, sprite pathID, fileID)；
+        /// 未命名條目名稱給 ""。
+        /// </summary>
+        internal static List<UnitySetAssetEntry> ParseSetAssetPayload(byte[] payload)
+        {
+            List<UnitySetAssetEntry> output = new List<UnitySetAssetEntry>();
+
+            // 新しいフレーム一覧（例: Map/MapHelper/portal/game/pv）は
+            // [名前数 i64 = 0][件数 i64][(pathId i64 + 16 バイト) × 件数] の配置です。
+            // 名前を持たないため、スプライト側の名前は CollectSet で補います。
+            List<UnitySetAssetEntry> framedEntries;
+            if (TryParseFramedEntries(payload, out framedEntries))
+            {
+                return framedEntries;
+            }
+
+            uint count = U32At(payload, 0);
+            if (count > 100000)
+            {
+                return output;
+            }
+
+            if (IsNamedEntries(payload))
+            {
+                // 名前付きエントリは PPtr に fileID を持たない古い配置と、
+                // (fileID i32, pathID i64) を持つ新しい配置（例: 2.0.6 の Map/MapHelper/mark）があります。
+                // 先に新しい配置で読み、件数が合わなければ古い配置へフォールバックします。
+                List<UnitySetAssetEntry> withFileId = ParseNamedEntries(payload, count, true, out int endWithFileId);
+                if (withFileId.Count == count && endWithFileId == payload.Length)
+                {
+                    return withFileId;
+                }
+                List<UnitySetAssetEntry> withoutFileId = ParseNamedEntries(payload, count, false, out int endWithoutFileId);
+                if (withoutFileId.Count == count && endWithoutFileId == payload.Length)
+                {
+                    return withoutFileId;
+                }
+                return withoutFileId.Count > withFileId.Count ? withoutFileId : withFileId;
+            }
+
+            // count 為 0 有兩種可能：真的是空集合，或根本沒有 count 前綴、
+            // 開頭就是 PPtr。後者（および先頭 i32 が fileID のもの）は直接連排解析。
+            if (count == 0 || IsBarePPtrLayout(payload))
+            {
+                return ParseBarePPtrs(payload);
+            }
+
+            int position = 4;
+            for (uint i = 0; i < count; i++)
+            {
+                // PPtr: fileID i32 + pathID i64（null エントリは読み飛ばして続行します）
+                if (position > payload.Length - 12)
+                {
+                    break;
+                }
+                int fileId = I32At(payload, position);
+                long pathId = I64At(payload, position + 4);
+                position += 12;
+                if (pathId == 0)
+                {
+                    continue;
+                }
+                output.Add(new UnitySetAssetEntry(string.Empty, fileId, pathId));
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// 先頭から PPtr が連なっている配置かどうか（count 前綴が無い、または count = PPtr の fileID）。
+        /// atlas 内の Sprite を参照する spriteset は先頭 i32 が fileID（≠ 0）になります。
+        /// </summary>
+        private static bool IsBarePPtrLayout(byte[] payload)
+        {
+            if (payload == null || payload.Length < 12)
+            {
+                return false;
+            }
+            long firstPathId = I64At(payload, 4);
+            return firstPathId != 0 && (uint)firstPathId > 100000;
+        }
+
+
+        /// <summary>
+        /// 名前なしフレーム一覧の配置（<c>[名前数 i64 = 0][件数 i64][(pathId i64 + 16 バイト) × 件数]</c>）を読みます。
+        /// 該当しない場合（従来の PPTR 連排・名前付きエントリ）は false を返します。
+        /// </summary>
+        private static bool TryParseFramedEntries(byte[] payload, out List<UnitySetAssetEntry> entries)
+        {
+            entries = null;
+            if (payload == null || payload.Length < FramedHeaderLength + FramedEntryStride)
+            {
+                return false;
+            }
+            if (I64At(payload, 0) != 0)
+            {
+                return false; // 名前付きエントリは別形式
+            }
+            long count = I64At(payload, 8);
+            if (count <= 0 || count > 100000)
+            {
+                return false;
+            }
+            if (FramedHeaderLength + count * FramedEntryStride != payload.Length)
+            {
+                return false;
+            }
+
+            List<UnitySetAssetEntry> output = new List<UnitySetAssetEntry>((int)count);
+            for (int i = 0; i < count; i++)
+            {
+                long pathId = I64At(payload, FramedHeaderLength + i * FramedEntryStride);
+                if (pathId == 0)
+                {
+                    continue;
+                }
+                output.Add(new UnitySetAssetEntry(string.Empty, 0, pathId));
+            }
+            if (output.Count == 0)
+            {
+                return false;
+            }
+            entries = output;
+            return true;
+        }
+
+        /// <summary>名前付きエントリのヘッダ長（名前数 i64 + 件数 i64）。</summary>
+        private const int FramedHeaderLength = 16;
+
+        /// <summary>名前なしエントリの仮キーの接頭辞（<see cref="CollectSet"/> 内でのみ使用）。</summary>
+        private const string UnnamedEntryKeyPrefix = "#pid:";
+
+        /// <summary>名前なしフレーム一覧の 1 エントリ長（pathId i64 + 付加情報 16 バイト）。</summary>
+        private const int FramedEntryStride = 24;
+
+        /// <summary>payload が「名前長 + 名前」形式のエントリかどうか。</summary>
+        private static bool IsNamedEntries(byte[] payload)
+        {
+            uint declaredLength = U32At(payload, 4);
+            if (declaredLength == 0 || declaredLength >= 512)
+            {
+                return false;
+            }
+            long end = 8L + declaredLength;
+            if (end > payload.Length)
+            {
+                return false;
+            }
+            for (int i = 8; i < end; i++)
+            {
+                byte c = payload[i];
+                if (!((c >= 0x21 && c <= 0x7E) || c == 0x20))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 名前付きエントリを読みます。<paramref name="includeFileId"/> は PPtr の前に fileID (i32) を挟む配置かどうか。
+        /// <paramref name="end"/> は読み終わった位置（配置判定用）。
+        /// </summary>
+        private static List<UnitySetAssetEntry> ParseNamedEntries(byte[] payload, uint count, bool includeFileId, out int end)
+        {
+            List<UnitySetAssetEntry> output = new List<UnitySetAssetEntry>();
+            int stride = includeFileId ? 12 : 8;
+            int position = 4;
+            for (uint i = 0; i < count; i++)
+            {
+                if (position > payload.Length - 4)
+                {
+                    break;
+                }
+                int length = (int)U32At(payload, position);
+                position += 4;
+                if (length < 0 || position > payload.Length - length)
+                {
+                    break;
+                }
+                string name = System.Text.Encoding.UTF8.GetString(payload, position, length);
+                position = (position + length + 3) & ~3;
+                if (position > payload.Length - stride)
+                {
+                    break;
+                }
+                int fileId = 0;
+                if (includeFileId)
+                {
+                    fileId = I32At(payload, position);
+                    position += 4;
+                }
+                long pathId = I64At(payload, position);
+                position += 8;
+                if (pathId == 0)
+                {
+                    break;
+                }
+                output.Add(new UnitySetAssetEntry(name, fileId, pathId));
+            }
+            end = position;
+            return output;
+        }
+
+        /// <summary>
+        /// 無 count 前綴的 PPtr 連排：(fileID i32, pathID i64)×n。
+        /// pathID 為 0（或已到尾端）時結束。
+        /// </summary>
+        private static List<UnitySetAssetEntry> ParseBarePPtrs(byte[] payload)
+        {
+            List<UnitySetAssetEntry> output = new List<UnitySetAssetEntry>();
+            int position = 0;
+            while (position <= payload.Length - 12)
+            {
+                int fileId = I32At(payload, position);
+                long pathId = I64At(payload, position + 4);
+                if (pathId == 0)
+                {
+                    break;
+                }
+                output.Add(new UnitySetAssetEntry(string.Empty, fileId, pathId));
+                position += 12;
+            }
+            return output;
+        }
+
+        private static uint U32At(byte[] data, int position)
+        {
+            if (position < 0 || position > data.Length - 4)
+            {
+                return 0;
+            }
+            return (uint)(data[position]
+                | (data[position + 1] << 8)
+                | (data[position + 2] << 16)
+                | (data[position + 3] << 24));
+        }
+
+        private static int I32At(byte[] data, int position)
+        {
+            return unchecked((int)U32At(data, position));
+        }
+
+        private static long I64At(byte[] data, int position)
+        {
+            if (position < 0 || position > data.Length - 8)
+            {
+                return 0;
+            }
+            return data[position]
+                | ((long)data[position + 1] << 8)
+                | ((long)data[position + 2] << 16)
+                | ((long)data[position + 3] << 24)
+                | ((long)data[position + 4] << 32)
+                | ((long)data[position + 5] << 40)
+                | ((long)data[position + 6] << 48)
+                | ((long)data[position + 7] << 56);
+        }
+    }
+}
+

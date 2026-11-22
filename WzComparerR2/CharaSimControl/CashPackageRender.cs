@@ -55,6 +55,64 @@ namespace WzComparerR2.CharaSimControl
             return tooltip;
         }
 
+        /// <summary>
+        /// パッケージ名／説明が無い場合（Unity クライアントの <c>Item/Special</c> には <c>name</c> がありません）
+        /// を、文字列テーブルから補います。
+        /// </summary>
+        private void FillMissingPackageText()
+        {
+            if (!string.IsNullOrEmpty(CashPackage.name) && !string.IsNullOrEmpty(CashPackage.desc))
+            {
+                return;
+            }
+            StringResult sr;
+            if (StringLinker == null || !StringLinker.StringItem.TryGetValue(CashPackage.ItemID, out sr) || sr == null)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(CashPackage.name))
+            {
+                CashPackage.name = sr.Name;
+            }
+            if (string.IsNullOrEmpty(CashPackage.desc))
+            {
+                CashPackage.desc = sr.Desc;
+            }
+        }
+
+        /// <summary>
+        /// 商品 id のアイコン（<c>info/iconRaw</c> または <c>info/icon</c>）を、型ルート + id から探します。
+        /// WZ とディレクトリ構成が異なるデータセット（Unity クライアント）でも解決できるようにするための
+        /// フォールバックで、WZ では文字列パスから解決できなかった場合だけ使用されます。
+        /// </summary>
+        private static Wz_Node FindItemIconNode(int itemId)
+        {
+            foreach (Wz_Type type in new[] { Wz_Type.Character, Wz_Type.Item })
+            {
+                Wz_Node imgNode = PluginBase.PluginManager.FindWz(type + "/" + itemId);
+                if (imgNode == null)
+                {
+                    continue;
+                }
+                Wz_Node iconNode = imgNode.FindNodeByPath("info\\iconRaw", true) ?? imgNode.FindNodeByPath("info\\icon", true);
+                if (iconNode != null)
+                {
+                    return iconNode;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// パッケージの SN から商品情報を取得します。読み込み済みの Commodity 表に存在しない SN
+        /// （クライアント側で削除済み、別バージョンのデータなど）は null を返します。
+        /// </summary>
+        private static Commodity GetCommodity(int sn)
+        {
+            Commodity commodity;
+            return CharaSimLoader.LoadedCommoditiesBySN.TryGetValue(sn, out commodity) ? commodity : null;
+        }
+
         private Bitmap RenderCashPackage(out int picH)
         {
             Bitmap cashBitmap = new Bitmap(260, DefaultPicHeight);
@@ -67,12 +125,19 @@ namespace WzComparerR2.CharaSimControl
             if (CharaSimLoader.LoadedCommoditiesByItemId.ContainsKey(CashPackage.ItemID))
                 commodityPackage = CharaSimLoader.LoadedCommoditiesByItemId[CashPackage.ItemID];
 
-            int fullWidth = Math.Max(220, TextRenderer.MeasureText(g, CashPackage.name, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix).Width + 12 * 2);
+            FillMissingPackageText();
+
+            int fullWidth = Math.Max(290, TextRenderer.MeasureText(g, CashPackage.name, GearGraphics.ItemNameFont2, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPrefix).Width + 12 * 2);
             int[] columnWidth = { CashPackage.SN.Count < 8 ? fullWidth : 220, 220, 220 };
 
             for (int i = 0; i < CashPackage.SN.Count; ++i)
             {
-                Commodity commodity = CharaSimLoader.LoadedCommoditiesBySN[CashPackage.SN[i]];
+                Commodity commodity = GetCommodity(CashPackage.SN[i]);
+                if (commodity == null)
+                {
+                    // クライアントの Commodity 表に無い SN（削除済み・別バージョンのデータなど）は出力しません。
+                    continue;
+                }
                 string name = null;
 
                 StringResult sr = null;
@@ -369,13 +434,19 @@ namespace WzComparerR2.CharaSimControl
                     }
                 }
 
+                Commodity commodity = GetCommodity(CashPackage.SN[i]);
+                if (commodity == null)
+                {
+                    // クライアントの Commodity 表に無い SN は出力しません（列の区切りは維持します）。
+                    continue;
+                }
+
                 if (hasLine)
                 {
                     g.DrawImage(Resource.CSDiscount_Line, columnLeft + 13, picH);
                     picH += 1;
                 }
 
-                Commodity commodity = CharaSimLoader.LoadedCommoditiesBySN[CashPackage.SN[i]];
                 string name = null, info = null, time = null;
                 BitmapOrigin IconRaw = new BitmapOrigin();
 
@@ -420,6 +491,11 @@ namespace WzComparerR2.CharaSimControl
                     else
                     {
                         name = "(null)";
+                    }
+                    if (iconNode == null)
+                    {
+                        // Unity クライアントの文字列テーブルは WZ とパス構成が異なるため、型ルートから id で探します。
+                        iconNode = FindItemIconNode(commodity.ItemId);
                     }
                     if (iconNode != null)
                     {

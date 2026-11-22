@@ -19,6 +19,9 @@ using DevComponents.AdvTree;
 using DevComponents.AdvTree.Display;
 using DevComponents.DotNetBar;
 using DevComponents.DotNetBar.Controls;
+using WzComparerR2.UnityLib.Classic;
+using WzComparerR2.UnityLib.Unity;
+using WzComparerR2.UnityLib.Wzjs;
 
 using WzComparerR2.Animation;
 using WzComparerR2.CharaSim;
@@ -57,6 +60,33 @@ namespace WzComparerR2
         }
 
         public List<Wz_Structure> openedWz;
+        private Dictionary<Node, UnityAssetDocument> openedUnitySources;
+
+        /// <summary>最近使った項目で Unity アセットフォルダーを表す接頭辞です。</summary>
+        private const string UnityRecentPrefix = "Unity:";
+
+        /// <summary>開啟中的 Unity 資產資料集；保留根 Wz_Node 以免 AdvTree 的 WeakReference 失效。</summary>
+        private sealed class UnityAssetDocument
+        {
+            public UnityAssetDocument(ClassicWzSource source, Wz_Node rootNode, string sourcePath)
+            {
+                this.Source = source;
+                this.RootNode = rootNode;
+                this.SourcePath = sourcePath;
+            }
+
+            public ClassicWzSource Source { get; }
+            public Wz_Node RootNode { get; }
+
+            /// <summary>ユーザーが選択したフォルダー（bundle フォルダーとは限りません）。</summary>
+            public string SourcePath { get; }
+
+            /// <summary>advTree1 内で <see cref="RootNode"/> に対応するノード。</summary>
+            public Node TreeNode { get; set; }
+
+            /// <summary>String/Etc/Quest 資產整理成的類 WZ 節點，供 StringLinker 使用。</summary>
+            public ClassicStringLinkerTables StringTables { get; set; }
+        }
         StringLinker stringLinker;
         HistoryList<Node> historyNodeList;
         bool historySelecting;
@@ -73,12 +103,16 @@ namespace WzComparerR2
         DefaultLevel skillDefaultLevel = DefaultLevel.Level0;
         int skillInterval = 32;
 
+        /// <summary>The region code chosen the last time a Unity dataset was opened. Used as the default when a multi-region dataset is opened again.</summary>
+        string lastUnityLocale;
+
         //compare
         Thread compareThread;
 
         private void initFields()
         {
             openedWz = new List<Wz_Structure>();
+            openedUnitySources = new Dictionary<Node, UnityAssetDocument>();
             stringLinker = new StringLinker();
             historyNodeList = new HistoryList<Node>();
 
@@ -131,6 +165,10 @@ namespace WzComparerR2
             soundTimer.Enabled = true;
 
             PluginBase.PluginManager.WzFileFinding += new FindWzEventHandler(CharaSimLoader_WzFileFinding);
+            CharaSimLoader.ActionDelayResolver = this.ResolveUnityActionDelay;
+            QuestTooltipRenderer.ExternalNodeResolver = this.FindUnityNodeByPath;
+            Wz_NodeExtension.ExternalTypeResolver = this.ResolveUnityWzType;
+            Wz_NodeExtension.ExternalImageResolver = this.ResolveUnityImageNode;
 
             foreach (WzPngComparison comp in Enum.GetValues(typeof(WzPngComparison)))
             {
@@ -468,16 +506,18 @@ namespace WzComparerR2
 
             if (fullPath == null || fullPath.Length <= 1)
             {
-                if (e.WzType != Wz_Type.Unknown && preSearch.Count > 0) //返回wzFile
+                if (e.WzType != Wz_Type.Unknown) //wzFile を返す
                 {
-                    e.WzNode = preSearch[0];
-                    e.WzFile = preSearch[0].Value as Wz_File;
+                    if (preSearch.Count > 0)
+                    {
+                        e.WzNode = preSearch[0];
+                        e.WzFile = preSearch[0].Value as Wz_File;
+                    }
+                    else
+                    {
+                        e.WzNode = this.FindUnityTypeNode(e.WzType);
+                    }
                 }
-                return;
-            }
-
-            if (preSearch.Count <= 0)
-            {
                 return;
             }
 
@@ -501,8 +541,34 @@ namespace WzComparerR2
                     return;
                 }
             }
-            //寻找失败
-            e.WzNode = null;
+            // 検索失敗: Unity データセットを検索します（.img 拡張子なし、ディレクトリ構成も異なる）
+            e.WzNode = this.FindUnityNodeByPath(e.FullPath);
+        }
+
+        /// <summary>Unity データセット内で <paramref name="wzType"/> に対応するルートノード（Base はデータセット全体）。</summary>
+        private Wz_Node FindUnityTypeNode(Wz_Type wzType)
+        {
+            if (this.openedUnitySources == null || this.openedUnitySources.Count == 0)
+            {
+                return null;
+            }
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                Wz_Node root = document.RootNode;
+                if (wzType == Wz_Type.Base)
+                {
+                    // Unity データセットには Base.wz がありません。開いていれば利用可能とみなします。
+                    return root;
+                }
+                foreach (Wz_Node child in root.Nodes)
+                {
+                    if (string.Equals(child.Text, wzType.ToString(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        return child;
+                    }
+                }
+            }
+            return null;
         }
 
         #region 界面主题配置
@@ -816,7 +882,7 @@ namespace WzComparerR2
                 ResumePictureBox();
             }
 
-            if (node.Value is Wz_Png)
+            if (node.Value is Wz_Png || node.Value is IWzPngSource)
             {
                 var pngFrameData = this.pictureBoxEx1.LoadPngFrameAnimation(node);
 
@@ -1252,11 +1318,18 @@ namespace WzComparerR2
 
                 using (var bmp = frame.Png.ExtractPng(page))
                 {
+                    if (bmp == null)
+                    {
+                        // 画像を持たない canvas（例: データセットに該 sprite がない）は保存できません。
+                        labelItemStatus.Text = "Failed to save the image.";
+                        return;
+                    }
                     bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
                 }
                 labelItemStatus.Text = "Image saved: " + pngFileName;
             }
-            else if ((pictureBoxEx1.ShowOverlayAni || !string.IsNullOrEmpty(captureTime)) && frame.Texture != null) // 애니메이션 중첩
+            else if (frame.Texture != null
+                && (pictureBoxEx1.ShowOverlayAni || !string.IsNullOrEmpty(captureTime) || frame.Png == null)) // 애니메이션 중첩（または Wz_Png を持たない画像）
             {
                 var config = ImageHandlerConfig.Default;
                 string pngFileName = string.IsNullOrEmpty(captureTime) ? pictureBoxEx1.PictureName + ".png" : $"{pictureBoxEx1.PictureName}_{captureTime}.png";
@@ -1380,6 +1453,7 @@ namespace WzComparerR2
             {
                 btnItemOpenWz.Enabled = false;
                 btnItemOpenImg.Enabled = false;
+                btnItemOpenUnityFolder.Enabled = false;
                 buttonItemClose.Enabled = false;
                 buttonItemCloseAll.Enabled = false;
                 buttonItemSearchWz.Enabled = false;
@@ -1424,21 +1498,18 @@ namespace WzComparerR2
                 OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
                 if (!this.stringLinker.HasValues)
                 {
-                    this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+                    this.LoadStringLinker();
                 }
                 QueryPerformance.End();
                 labelItemStatus.Text = (this.stringLinker.HasValues ? "Read WZ File. Time elapsed: " : "Read WZ File, but String Table is not initialized. Time elapsed: ") + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms, " + wz.img_number + " IMG";
 
                 ConfigManager.Reload();
-                WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
-                WcR2Config.Default.RecentDocuments.Insert(0, wzFilePath);
-                ConfigManager.Save();
-                refreshRecentDocItems();
+                this.AddRecentDocument(wzFilePath);
             }
             catch (FileNotFoundException)
             {
                 MessageBoxEx.Show("File not found.", "Error");
-                WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
+                this.RemoveRecentDocument(wzFilePath);
             }
             catch (Exception ex)
             {
@@ -1449,6 +1520,7 @@ namespace WzComparerR2
             {
                 btnItemOpenWz.Enabled = true;
                 btnItemOpenImg.Enabled = true;
+                btnItemOpenUnityFolder.Enabled = true;
                 buttonItemClose.Enabled = true;
                 buttonItemCloseAll.Enabled = true;
                 buttonItemSearchWz.Enabled = true;
@@ -1493,6 +1565,7 @@ namespace WzComparerR2
             {
                 btnItemOpenWz.Enabled = false;
                 btnItemOpenImg.Enabled = false;
+                btnItemOpenUnityFolder.Enabled = false;
                 buttonItemClose.Enabled = false;
                 buttonItemCloseAll.Enabled = false;
                 buttonItemSearchWz.Enabled = false;
@@ -1522,6 +1595,170 @@ namespace WzComparerR2
             {
                 btnItemOpenWz.Enabled = true;
                 btnItemOpenImg.Enabled = true;
+                btnItemOpenUnityFolder.Enabled = true;
+                buttonItemClose.Enabled = true;
+                buttonItemCloseAll.Enabled = true;
+                buttonItemSearchWz.Enabled = true;
+                buttonItemSearchString.Enabled = true;
+                galleryContainerRecent.Enabled = true;
+                advTree1.EndUpdate();
+            }
+        }
+
+        private void btnItemOpenUnityFolder_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+            {
+                dlg.Description = "Select the client folder of MapleStory Classic World, or a folder that contains *.bundle files (e.g. StreamingAssets/aa).";
+                dlg.ShowNewFolderButton = false;
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    Task.Run(() => openUnityFolder(dlg.SelectedPath));
+                }
+            }
+        }
+
+        private void openUnityFolder(string assetFolderPath)
+        {
+            string sourcePath = NormalizeRecentPath(assetFolderPath);
+            if (this.openedUnitySources.Values.Any(document =>
+                string.Equals(NormalizeRecentPath(document.SourcePath), sourcePath, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(NormalizeRecentPath(document.Source.Catalog.RootPath), sourcePath, StringComparison.OrdinalIgnoreCase)))
+            {
+                MessageBoxEx.Show(this, "This Unity asset folder is already opened.", "Error");
+                return;
+            }
+
+            labelItemStatus.Text = $"Loading: {assetFolderPath}";
+            advTree1.BeginUpdate();
+            ClassicWzSource unitySource = null;
+            try
+            {
+                btnItemOpenWz.Enabled = false;
+                btnItemOpenImg.Enabled = false;
+                btnItemOpenUnityFolder.Enabled = false;
+                buttonItemClose.Enabled = false;
+                buttonItemCloseAll.Enabled = false;
+                buttonItemSearchWz.Enabled = false;
+                buttonItemSearchString.Enabled = false;
+                galleryContainerRecent.Enabled = false;
+
+                var sw = Stopwatch.StartNew();
+                unitySource = ClassicWzSource.Open(assetFolderPath);
+                int bundleCount = unitySource.Catalog.Bundles.Count;
+
+                // Multi-region dataset: let the user choose the preferred region code (the language of string tables and atlases).
+                // openUnityFolder 執行於背景執行緒，對話方塊必須回到 UI 執行緒顯示。
+                if (unitySource.Locales.Count > 1)
+                {
+                    string selectedLocale = null;
+                    bool cancelled = false;
+                    this.Invoke(new Action(() =>
+                    {
+                        using (FrmSelectUnityLocale dialog = new FrmSelectUnityLocale(
+                            unitySource.Locales,
+                            this.lastUnityLocale ?? unitySource.Locale,
+                            assetFolderPath,
+                            styleManager1.ManagerStyle == eStyle.VisualStudio2012Dark))
+                        {
+                            if (dialog.ShowDialog(this) == DialogResult.OK)
+                            {
+                                selectedLocale = dialog.SelectedLocale;
+                            }
+                            else
+                            {
+                                cancelled = true;
+                            }
+                        }
+                    }));
+                    if (cancelled || selectedLocale == null)
+                    {
+                        unitySource.Dispose();
+                        unitySource = null;
+                        labelItemStatus.Text = "Loading cancelled.";
+                        return;
+                    }
+                    this.lastUnityLocale = selectedLocale;
+                    unitySource.Locale = selectedLocale;
+                }
+                string loadedLocale = unitySource.Locale;
+                int entryCount = unitySource.Catalog.Entries.Count;
+                string unitySourceRootPath = unitySource.Catalog.RootPath;
+                UnityClientInfo clientInfo = unitySource.ClientInfo;
+
+                // String/<region>/<category> 整理成 String.wz 的節點形狀；失敗不阻擋資料集開啟。
+                ClassicStringLinkerTables stringTables = null;
+                string stringTableError = null;
+                try
+                {
+                    stringTables = unitySource.StringTables;
+                }
+                catch (Exception ex)
+                {
+                    stringTableError = ex.Message;
+                }
+
+                // img 內容延後到選取時才解碼（UnityWzImage.AsWzNode），避免一次載入整個資料集。
+                Wz_Node rootNode = ClassicWzBridge.CreateCatalogNode(unitySource, false, false);
+                Node treeNode = createNode(rootNode);
+                treeNode.Expand();
+                advTree1.Nodes.Add(treeNode);
+                this.openedUnitySources.Add(treeNode, new UnityAssetDocument(unitySource, rootNode, assetFolderPath)
+                {
+                    TreeNode = treeNode,
+                    StringTables = stringTables,
+                });
+                unitySource = null; // 所有權轉移到 openedUnitySources
+
+                if (!this.stringLinker.HasValues)
+                {
+                    this.LoadStringLinker();
+                }
+
+                this.AddRecentDocument(UnityRecentPrefix + assetFolderPath);
+
+                sw.Stop();
+                string clientText = clientInfo == null ? null : clientInfo.DisplayName;
+                if (!string.IsNullOrEmpty(clientInfo?.EngineVersion))
+                {
+                    clientText = (clientText == null ? null : clientText + ", ")
+                        + "Unity " + clientInfo.EngineVersion;
+                }
+                // Show the actual bundle folder when it differs from the selected folder (e.g. the aa or client folder was selected).
+                string bundleFolderText = null;
+                string resolvedBundleFolder = unitySourceRootPath;
+                if (!string.IsNullOrEmpty(resolvedBundleFolder)
+                    && !string.Equals(
+                        System.IO.Path.GetFullPath(resolvedBundleFolder).TrimEnd('\\'),
+                        System.IO.Path.GetFullPath(assetFolderPath).TrimEnd('\\'),
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    bundleFolderText = System.IO.Path.GetFileName(resolvedBundleFolder);
+                }
+                labelItemStatus.Text = $"Opened the Unity asset folder. Elapsed time: {sw.ElapsedMilliseconds} ms, "
+                    + $"{entryCount} entries, {bundleCount} bundles, region: {loadedLocale}"
+                    + (bundleFolderText == null ? null : ", bundle: " + bundleFolderText)
+                    + (string.IsNullOrEmpty(clientText) ? null : ", client: " + clientText)
+                    + (stringTableError == null ? null : ", failed to load string table: " + stringTableError);
+            }
+            catch (Exception ex)
+            {
+                if (ex is DirectoryNotFoundException || ex is ClassicAssetException)
+                {
+                    // Remove the entry from the recent documents when the folder was moved or deleted.
+                    this.RemoveRecentDocument(UnityRecentPrefix + assetFolderPath);
+                }
+                MessageBoxEx.Show(this, ex.ToString(), "Error");
+            }
+            finally
+            {
+                if (unitySource != null)
+                {
+                    unitySource.Dispose();
+                }
+                btnItemOpenWz.Enabled = true;
+                btnItemOpenImg.Enabled = true;
+                btnItemOpenUnityFolder.Enabled = true;
                 buttonItemClose.Enabled = true;
                 buttonItemCloseAll.Enabled = true;
                 buttonItemSearchWz.Enabled = true;
@@ -1541,6 +1778,17 @@ namespace WzComparerR2
             Node baseWzNode = advTree1.SelectedNode;
             while (baseWzNode.Parent != null)
                 baseWzNode = baseWzNode.Parent;
+            if (this.openedUnitySources.TryGetValue(baseWzNode, out UnityAssetDocument unityDocument))
+            {
+                advTree1.Nodes.Remove(baseWzNode);
+                advTree2.ClearAndDisposeAllNodes();
+                advTree3.ClearAndDisposeAllNodes();
+                listViewExWzDetail.Items.Clear();
+                this.openedUnitySources.Remove(baseWzNode);
+                unityDocument.Source.Dispose();
+                labelItemStatus.Text = "Closed";
+                return;
+            }
             if (baseWzNode.Text.ToLower() == "list.wz")
             {
                 advTree1.Nodes.Remove(baseWzNode);
@@ -1597,6 +1845,11 @@ namespace WzComparerR2
                 wz.Clear();
             }
             openedWz.Clear();
+            foreach (UnityAssetDocument unityDocument in this.openedUnitySources.Values)
+            {
+                unityDocument.Source.Dispose();
+            }
+            this.openedUnitySources.Clear();
             CharaSimLoader.ClearAll();
             stringLinker.Clear();
             labelItemStatus.Text = "All Closed";
@@ -1618,7 +1871,20 @@ namespace WzComparerR2
 
             foreach (var doc in WcR2Config.Default.RecentDocuments)
             {
-                ButtonItem item = new ButtonItem() { Text = "&" + (items.Count + 1) + ". " + Path.GetFileName(doc), Tooltip = doc, Tag = doc };
+                string unityFolder;
+                bool isUnity = TryGetUnityRecentPath(doc, out unityFolder);
+                string displayPath = isUnity ? unityFolder : doc;
+                string displayName = Path.GetFileName(displayPath);
+                if (string.IsNullOrEmpty(displayName))
+                {
+                    displayName = displayPath;
+                }
+                ButtonItem item = new ButtonItem()
+                {
+                    Text = "&" + (items.Count + 1) + ". " + displayName,
+                    Tooltip = doc,
+                    Tag = doc,
+                };
                 item.Click += new EventHandler(buttonItemRecentDocument_Click);
                 items.Add(item);
             }
@@ -1628,10 +1894,91 @@ namespace WzComparerR2
         void buttonItemRecentDocument_Click(object sender, EventArgs e)
         {
             ButtonItem btnItem = sender as ButtonItem;
-            string path;
-            if (btnItem == null || (path = btnItem.Tag as string) == null)
+            string document;
+            if (btnItem == null || (document = btnItem.Tag as string) == null)
                 return;
-            Task.Run(() => openWz(path));
+            string unityFolder;
+            if (TryGetUnityRecentPath(document, out unityFolder))
+            {
+                Task.Run(() => openUnityFolder(unityFolder));
+                return;
+            }
+            Task.Run(() => openWz(document));
+        }
+
+        /// <summary>最近使った項目に Unity アセットフォルダーを登録します（<c>unity:&lt;フォルダー&gt;</c> 形式）。</summary>
+        private void AddRecentDocument(string document)
+        {
+            if (this.InvokeRequired)
+            {
+                try
+                {
+                    this.BeginInvoke(new Action(() => this.AddRecentDocument(document)));
+                }
+                catch (InvalidOperationException)
+                {
+                    // フォームが閉じている場合は何もしません。
+                }
+                return;
+            }
+            WcR2Config.Default.RecentDocuments.Remove(document);
+            WcR2Config.Default.RecentDocuments.Insert(0, document);
+            ConfigManager.Save();
+            refreshRecentDocItems();
+        }
+
+        /// <summary>開けなくなった項目を最近使った項目から取り除きます。</summary>
+        private void RemoveRecentDocument(string document)
+        {
+            if (this.InvokeRequired)
+            {
+                try
+                {
+                    this.BeginInvoke(new Action(() => this.RemoveRecentDocument(document)));
+                }
+                catch (InvalidOperationException)
+                {
+                }
+                return;
+            }
+            if (WcR2Config.Default.RecentDocuments.Remove(document))
+            {
+                ConfigManager.Save();
+                refreshRecentDocItems();
+            }
+        }
+
+        private static bool TryGetUnityRecentPath(string document, out string folderPath)
+        {
+            folderPath = null;
+            if (document == null
+                || !document.StartsWith(UnityRecentPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            string path = document.Substring(UnityRecentPrefix.Length);
+            if (path.Length == 0)
+            {
+                return false;
+            }
+            folderPath = path;
+            return true;
+        }
+
+        private static string NormalizeRecentPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+            try
+            {
+                return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            }
+            catch (Exception)
+            {
+                return path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            }
         }
         #endregion
 
@@ -1734,6 +2081,33 @@ namespace WzComparerR2
 
                 autoResizeColumns(listViewExWzDetail);
             }
+            else if (selectedNode.Value is UnityAssetImage unityImage)
+            {
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "IMG Name", unityImage.Name }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] {
+                    "WZ Type", ClassicWzTypeMap.GetWzTypeOrBase(unityImage.Name).ToString() }));
+                autoResizeColumns(listViewExWzDetail);
+
+                advTree2.ClearAndDisposeAllNodes();
+
+                QueryPerformance.Start();
+                try
+                {
+                    // 内容（WZJS ツリー／サウンド一覧）は初回選択時に構築し、UnityAssetImage が結果を保持します。
+                    // 上位ノードチェーンを補い、プラグイン（アバター等）が WZ と同じ型判定・パス判定を使えるようにします。
+                    Node imageNode = createNode(unityImage.GetRootedNode());
+                    advTree2.Nodes.Add(imageNode);
+                    imageNode.Expand();
+                    QueryPerformance.End();
+                    double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
+
+                    labelItemStatus.Text = "Imported. Elapsed time: " + ms + " ms";
+                }
+                catch (Exception ex)
+                {
+                    labelItemStatus.Text = "Failed to import: " + ex.Message;
+                }
+            }
             else if (selectedNode.Value is Wz_Image wzImage)
             {
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Name", wzImage.Name }));
@@ -1770,6 +2144,33 @@ namespace WzComparerR2
                     labelItemStatus.Text = "Import failed: " + ex.Message;
                 }
             }
+            else if (selectedNode.Value is UnityJsonAsset jsonAsset)
+            {
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "JSON Name", jsonAsset.Name }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] {
+                    "WZ Type", ClassicWzTypeMap.GetWzTypeOrBase(jsonAsset.ImageKey).ToString() }));
+                autoResizeColumns(listViewExWzDetail);
+
+                advTree2.ClearAndDisposeAllNodes();
+
+                QueryPerformance.Start();
+                try
+                {
+                    // JSON 於第一次選取時才解析，UnityJsonAsset 會保留結果。
+                    // 上位ノードチェーンを補い、プラグインが WZ と同じ型判定・パス判定を使えるようにします。
+                    Node jsonNode = createNode(jsonAsset.GetRootedNode());
+                    advTree2.Nodes.Add(jsonNode);
+                    jsonNode.Expand();
+                    QueryPerformance.End();
+                    double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
+
+                    labelItemStatus.Text = "Imported. Elapsed time: " + ms + " ms";
+                }
+                catch (Exception ex)
+                {
+                    labelItemStatus.Text = "Failed to import: " + ex.Message;
+                }
+            }
             listViewExWzDetail.EndUpdate();
         }
 
@@ -1786,24 +2187,34 @@ namespace WzComparerR2
         {
             if (e.Node == null || e.Button != MouseButtons.Left)
                 return;
+            this.ShowNodeDetail(e.Node);
+        }
+
+        /// <summary>
+        /// 指定ノードを 3 番目のツリービュー（ノード詳細）に展開表示します。
+        /// advTree2 のダブルクリックと、DB2 などからのノード選択で共用します。
+        /// </summary>
+        private void ShowNodeDetail(Node parentNode)
+        {
             historyNodeList.Clear();
             advTree3.Nodes.Clear();
 
-            var selectedNode = e.Node.AsWzNode();
-            if (selectedNode != null)
+            if (parentNode == null || parentNode.AsWzNode() == null)
             {
-                advTree3.BeginUpdate();
-                try
-                {
-                    var node = createNodeDetail(e.Node);
-                    node.ExpandAll();
-                    advTree3.Nodes.Add(node);
-                    advTree3.SelectedNode = node;
-                }
-                finally
-                {
-                    advTree3.EndUpdate();
-                }
+                return;
+            }
+
+            advTree3.BeginUpdate();
+            try
+            {
+                var node = createNodeDetail(parentNode);
+                node.ExpandAll();
+                advTree3.Nodes.Add(node);
+                advTree3.SelectedNode = node;
+            }
+            finally
+            {
+                advTree3.EndUpdate();
             }
         }
 
@@ -1829,8 +2240,20 @@ namespace WzComparerR2
         {
             switch (value)
             {
+                case UnityCanvas unityCanvas:
+                    return "canvas " + unityCanvas.Path;
+
                 case Wz_Png png:
                     return $"PNG {png.Width}*{png.Height} ({(int)png.Format}{(png.Scale > 0 ? $", {png.Scale}" : null)})";
+
+                case byte[] pngData:
+                    return $"png {pngData.Length} bytes";
+
+                case UnityJsonAsset jsonAsset:
+                    return "json " + jsonAsset.ImageKey;
+
+                case UnityWzImage unityImage:
+                    return $"unity img {unityImage.Name}";
 
                 case Wz_Vector vector:
                     return $"({vector.X}, {vector.Y})";
@@ -1869,7 +2292,10 @@ namespace WzComparerR2
             {
                 string => "str",
                 short or int or long or float or double=> "num",
+                UnityCanvas => "png",
+                UnityWzImage => "img",
                 Wz_Png => "png",
+                byte[] => "png",
                 Wz_Vector => "vector",
                 Wz_Uol => "uol",
                 Wz_Sound sound => sound.SoundType == Wz_SoundType.Binary ? "rawdata" : "mp3",
@@ -1901,6 +2327,38 @@ namespace WzComparerR2
 
             switch (selectedNode.Value)
             {
+                case UnityCanvas unityCanvas:
+                    try
+                    {
+                        byte[] canvasPng = unityCanvas.GetPng();
+                        if (canvasPng != null)
+                        {
+                            unityCanvas.EnsureExternalPngInfo();
+                            pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                            // Wz_Png として表示する: 保存時に元の PNG をそのまま書き出せるようにするため。
+                            pictureBoxEx1.ShowImage(unityCanvas);
+                            this.cmbItemAniNames.Items.Clear();
+                            if (this.pictureBoxEx1.IsPaused)
+                            {
+                                ResumePictureBox();
+                            }
+                            advTree3.PathSeparator = ".";
+                            textBoxX1.Text = "Data length:  " + canvasPng.Length + " bytes\r\n" +
+                                "Size:  " + unityCanvas.Width + "*" + unityCanvas.Height + "\r\n" +
+                                "Path:  " + unityCanvas.Path;
+                        }
+                        else
+                        {
+                            textBoxX1.Text = "Image not found.";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        textBoxX1.Text = "Failed to load the image: " + ex.Message;
+                    }
+                    break;
+
+
                 case Wz_Png png:
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     pictureBoxEx1.ShowImage(png);
@@ -1949,6 +2407,25 @@ namespace WzComparerR2
                                 "pages: " + png.Pages + "(" + png.ActualPages + ")\r\n" +
                                 "unknown 1: " + png.Unknown1);
                         }
+                    }
+                    break;
+
+                case byte[] pngData:
+                    try
+                    {
+                        pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                        pictureBoxEx1.ShowImage(pngData);
+                        this.cmbItemAniNames.Items.Clear();
+                        if (this.pictureBoxEx1.IsPaused)
+                        {
+                            ResumePictureBox();
+                        }
+                        advTree3.PathSeparator = ".";
+                        textBoxX1.Text = "Data length:  " + pngData.Length + " bytes";
+                    }
+                    catch (Exception)
+                    {
+                        textBoxX1.Text = "Failed to load the image.";
                     }
                     break;
 
@@ -2129,6 +2606,11 @@ namespace WzComparerR2
             }
 
             //失败
+            if (this.TryFindUnityStringNode(id, nodePath))
+            {
+                return;
+            }
+
             string path;
             if (objPathList.Count == 1)
             {
@@ -2185,15 +2667,278 @@ namespace WzComparerR2
             return null;
         }
 
-        private bool OnSelectedWzNode(Wz_Node wzNode)
+        /// <summary>文字列結果の分類。Unity アセットのノード名には <c>.img</c> 拡張子がありません。</summary>
+        private enum UnityStringCategory
         {
-            Wz_File wzFile = wzNode.GetNodeWzFile();
-            string[] path = wzNode.FullPathToFile.Split('\\');
-            if (wzFile == null)
+            None,
+            Item,
+            Equip,
+            Mob,
+            Npc,
+            Skill,
+            Map,
+            Quest,
+        }
+
+        /// <summary>
+        /// 文字列検索結果から Unity データセット内の対応ノードを探します: まず img を選択し（advTree1）、
+        /// 続いて img 内のノードを選択します（advTree2）。
+        /// </summary>
+        private bool TryFindUnityStringNode(string id, string stringNodePath)
+        {
+            if (this.openedUnitySources == null || this.openedUnitySources.Count == 0)
             {
                 return false;
             }
 
+            int entryId;
+            if (!int.TryParse(id, out entryId))
+            {
+                return false;
+            }
+
+            UnityStringCategory category = GetUnityStringCategory(stringNodePath);
+            string rootDirectory = GetUnityStringRootDirectory(category);
+            if (rootDirectory == null)
+            {
+                return false;
+            }
+
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                ClassicCatalog catalog = document.Source.Catalog;
+                foreach (string candidate in GetUnityStringPathCandidates(catalog, category, entryId))
+                {
+                    if (this.SelectUnityNode(document, candidate))
+                    {
+                        return true;
+                    }
+                }
+
+                // 保険: WZ の分類ディレクトリやゼロ埋め方法はアセットツリーと異なる場合があるため、id の数値で分類ディレクトリを走査します。
+                string imageKey = catalog.FindImageKeyByNumericName(rootDirectory, entryId);
+                if (imageKey != null && this.SelectUnityNode(document, imageKey))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 文字列ノードのパス（例: <c>Eqp.img\100\0\01002000</c>）で分類を判定します。
+        /// Unity の文字列テーブルのノード名は <c>.img</c> 付き、アセットツリーはなしですが、どちらの書き方も受け付けます。
+        /// </summary>
+        private static UnityStringCategory GetUnityStringCategory(string stringNodePath)
+        {
+            if (string.IsNullOrEmpty(stringNodePath))
+            {
+                return UnityStringCategory.None;
+            }
+            int arrow = stringNodePath.IndexOf(" -> ", StringComparison.Ordinal);
+            if (arrow >= 0)
+            {
+                stringNodePath = stringNodePath.Substring(0, arrow);
+            }
+            foreach (string segment in stringNodePath.Split('\\'))
+            {
+                string name = segment;
+                if (name.EndsWith(".img", StringComparison.OrdinalIgnoreCase))
+                {
+                    name = name.Substring(0, name.Length - 4);
+                }
+                switch (name.ToLowerInvariant())
+                {
+                    case "eqp":
+                        return UnityStringCategory.Equip;
+                    case "item":
+                    case "consume":
+                    case "install":
+                    case "ins":
+                    case "etc":
+                    case "pet":
+                    case "cash":
+                        return UnityStringCategory.Item;
+                    case "mob":
+                        return UnityStringCategory.Mob;
+                    case "npc":
+                        return UnityStringCategory.Npc;
+                    case "skill":
+                        return UnityStringCategory.Skill;
+                    case "map":
+                        return UnityStringCategory.Map;
+                    case "quest":
+                    case "questdata":
+                    case "questinfo":
+                        return UnityStringCategory.Quest;
+                }
+            }
+            return UnityStringCategory.None;
+        }
+
+        private static string GetUnityStringRootDirectory(UnityStringCategory category)
+        {
+            switch (category)
+            {
+                case UnityStringCategory.Item:
+                    return "Item";
+                case UnityStringCategory.Equip:
+                    return "Character";
+                case UnityStringCategory.Mob:
+                    return "Mob";
+                case UnityStringCategory.Npc:
+                    return "Npc";
+                case UnityStringCategory.Skill:
+                    return "Skill";
+                case UnityStringCategory.Map:
+                    return "Map";
+                case UnityStringCategory.Quest:
+                    return "Quest";
+                default:
+                    return null;
+            }
+        }
+
+        private static List<string> GetUnityStringPathCandidates(
+            ClassicCatalog catalog, UnityStringCategory category, int id)
+        {
+            switch (category)
+            {
+                case UnityStringCategory.Item:
+                    return catalog.GetItemPathCandidates(id);
+                case UnityStringCategory.Equip:
+                    return catalog.GetEquipPathCandidates(id);
+                case UnityStringCategory.Mob:
+                    return catalog.GetMobPathCandidates(id);
+                case UnityStringCategory.Npc:
+                    return catalog.GetNpcPathCandidates(id);
+                case UnityStringCategory.Skill:
+                    return catalog.GetSkillPathCandidates(id);
+                case UnityStringCategory.Map:
+                    return catalog.GetMapPathCandidates(id);
+                case UnityStringCategory.Quest:
+                    return catalog.GetQuestPathCandidates(id);
+                default:
+                    return new List<string>();
+            }
+        }
+
+        /// <summary>Unity データセット内のパスを選択します: まず advTree1 で img を選び、次に advTree2 でその中のノードを選びます。</summary>
+        private bool SelectUnityNode(UnityAssetDocument document, string nodePath)
+        {
+            string imageKey, innerPath;
+            if (!document.Source.Catalog.TrySplitImagePrefix(nodePath, out imageKey, out innerPath))
+            {
+                return false;
+            }
+
+            Node imageTreeNode = findUnityTreeNode(document.TreeNode, imageKey.Split('/'));
+            if (imageTreeNode == null)
+            {
+                return false;
+            }
+
+            advTree1.SelectedNode = imageTreeNode;
+            imageTreeNode.EnsureVisible();
+            if (advTree2.Nodes.Count == 0)
+            {
+                return false;
+            }
+
+            Node targetNode = string.IsNullOrEmpty(innerPath)
+                ? advTree2.Nodes[0]
+                : findUnityTreeNode(advTree2.Nodes[0], innerPath.Split('/'));
+            if (targetNode == null)
+            {
+                return false;
+            }
+
+            targetNode.EnsureVisible();
+            advTree2.SelectedNode = targetNode;
+            this.ShowNodeDetail(targetNode);
+            return true;
+        }
+
+        /// <summary>
+        /// ノードを生成した Unity データセットを返します（上位チェーンを辿って img から判定）。
+        /// </summary>
+        private static ClassicWzSource GetUnityNodeSource(Wz_Node node)
+        {
+            for (Wz_Node current = node; current != null; current = current.ParentNode)
+            {
+                if (current.GetValue<Wz_Image>() is UnityAssetImage image)
+                {
+                    return image.Source;
+                }
+            }
+            return null;
+        }
+
+        private static Node findUnityTreeNode(Node parent, string[] segments)
+        {
+            Node node = parent;
+            foreach (string segment in segments)
+            {
+                if (segment.Length == 0)
+                {
+                    continue;
+                }
+                Node next = null;
+                long segmentNumber;
+                bool segmentIsNumber = long.TryParse(segment, out segmentNumber);
+                foreach (Node child in node.Nodes)
+                {
+                    if (string.Equals(child.Text, segment, StringComparison.OrdinalIgnoreCase))
+                    {
+                        next = child;
+                        break;
+                    }
+                }
+                if (next == null)
+                {
+                    // img ノードは .img 付きで、パスの側は .img 無しの場合があります（例: 01002000 / 01002000.img）。
+                    foreach (Node child in node.Nodes)
+                    {
+                        if (string.Equals(StripImgSuffix(child.Text), StripImgSuffix(segment), StringComparison.OrdinalIgnoreCase))
+                        {
+                            next = child;
+                            break;
+                        }
+                        // id ノードのゼロ埋め桁数が異なる場合があります（02000000 / 2000000）。
+                        long childNumber;
+                        if (segmentIsNumber && long.TryParse(StripImgSuffix(child.Text), out childNumber)
+                            && childNumber == segmentNumber)
+                        {
+                            next = child;
+                        }
+                    }
+                }
+                if (next == null)
+                {
+                    return null;
+                }
+                node = next;
+            }
+            return node;
+        }
+
+        private static string StripImgSuffix(string name)
+        {
+            return name != null && name.EndsWith(".img", StringComparison.OrdinalIgnoreCase)
+                ? name.Substring(0, name.Length - 4)
+                : name;
+        }
+
+        private bool OnSelectedWzNode(Wz_Node wzNode)
+        {
+            Wz_File wzFile = wzNode.GetNodeWzFile();
+            if (wzFile == null)
+            {
+                // Unity データセットのノードは Wz_File を持たないため、アセットツリーを辿って選択します。
+                return this.SelectUnityWzNode(wzNode);
+            }
+
+            string[] path = wzNode.FullPathToFile.Split('\\');
             Node treeNode = findWzFileTreeNode(wzFile);
             if (treeNode == null)
             {
@@ -2234,7 +2979,101 @@ namespace WzComparerR2
                 }
             }
 
+            treeNode.EnsureVisible();
             advTree2.SelectedNode = treeNode;
+            this.ShowNodeDetail(treeNode);
+            return true;
+        }
+
+        /// <summary>
+        /// Unity データセットのノードを選択します。img 相当のノードを advTree1 で選び、
+        /// 残りのパスを advTree2 で辿ってから 3 番目のツリービューを展開します。
+        /// </summary>
+        private bool SelectUnityWzNode(Wz_Node wzNode)
+        {
+            if (this.openedUnitySources == null || this.openedUnitySources.Count == 0)
+            {
+                return false;
+            }
+
+            string[] segments = wzNode.FullPathToFile.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length == 0)
+            {
+                return false;
+            }
+
+            // 複数の Unity クライアントを開いている場合に備え、このノードを生成したデータセットを優先します。
+            ClassicWzSource ownerSource = GetUnityNodeSource(wzNode);
+            List<UnityAssetDocument> documents = this.openedUnitySources.Values.ToList();
+            if (ownerSource != null)
+            {
+                documents = documents.OrderBy(d => ReferenceEquals(d.Source, ownerSource) ? 0 : 1).ToList();
+            }
+
+            // まずカタログキー形式（Item/Consume/0200/02000000/info/icon）で選択を試します。
+            string catalogPath = string.Join("/", segments.Select(StripImgSuffix));
+            foreach (UnityAssetDocument document in documents)
+            {
+                if (this.SelectUnityNode(document, catalogPath))
+                {
+                    return true;
+                }
+            }
+
+            // カタログに無いパス（合成ディレクトリなど）は .img ノードを直接辿ります。
+            int imageIndex = segments.Length - 1;
+            while (imageIndex > 0 && !segments[imageIndex].EndsWith(".img", StringComparison.OrdinalIgnoreCase))
+            {
+                imageIndex--;
+            }
+            if (imageIndex < 0 || !segments[imageIndex].EndsWith(".img", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Node imageTreeNode = null;
+            foreach (UnityAssetDocument document in documents)
+            {
+                // コンテンツツリーのルート名（データセット名など）は環境によって異なるため、
+                // 先頭セグメントを落としながら一致を試します。
+                for (int start = 0; start <= imageIndex && imageTreeNode == null; start++)
+                {
+                    string[] imageSegments = new string[imageIndex + 1 - start];
+                    Array.Copy(segments, start, imageSegments, 0, imageSegments.Length);
+                    imageTreeNode = findUnityTreeNode(document.TreeNode, imageSegments);
+                }
+                if (imageTreeNode != null)
+                {
+                    break;
+                }
+            }
+            if (imageTreeNode == null)
+            {
+                return false;
+            }
+
+            advTree1.SelectedNode = imageTreeNode;
+            imageTreeNode.EnsureVisible();
+            if (advTree2.Nodes.Count == 0)
+            {
+                return false;
+            }
+
+            Node targetNode = advTree2.Nodes[0];
+            if (imageIndex + 1 < segments.Length)
+            {
+                string[] innerSegments = new string[segments.Length - imageIndex - 1];
+                Array.Copy(segments, imageIndex + 1, innerSegments, 0, innerSegments.Length);
+                targetNode = findUnityTreeNode(targetNode, innerSegments);
+                if (targetNode == null)
+                {
+                    return false;
+                }
+            }
+
+            targetNode.EnsureVisible();
+            advTree2.SelectedNode = targetNode;
+            this.ShowNodeDetail(targetNode);
             return true;
         }
 
@@ -2672,7 +3511,16 @@ namespace WzComparerR2
             {
                 QueryPerformance.Start();
                 labelItemStatus.Text = "Updating StringLinker...";
-                r = this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz()) && stringLinker.Update(stringNode, itemNode, etcNode, questNode); //reset(needed?) and update
+                UnityAssetDocument unityDoc = this.FindUnityDocument(advTree1.SelectedNode);
+                if (unityDoc != null && unityDoc.StringTables != null)
+                {
+                    // String tables of a Unity dataset are rebuilt as a whole; the selected subtree is not updated separately.
+                    r = this.LoadStringLinker();
+                }
+                else
+                {
+                    r = this.LoadStringLinker() && stringLinker.Update(stringNode, itemNode, etcNode, questNode); //reset(needed?) and update
+                }
                 QueryPerformance.End();
             });
             if (r)
@@ -2716,7 +3564,11 @@ namespace WzComparerR2
                 progressBarItem1.Visible = true;
                 await Task.Run(() =>
                 {
-                    BatchExportSound(soundNode.GetValue<Wz_Image>().Node, exportedFolder);
+                    Wz_Image soundImage = soundNode.GetValue<Wz_Image>();
+                    if (soundImage.TryExtract())
+                    {
+                        BatchExportSound(soundImage.Node, exportedFolder);
+                    }
                 });
                 progressBarItem1.Visible = false;
                 labelItemStatus.Text = "Exported: " + exportedFolder;
@@ -2785,6 +3637,7 @@ namespace WzComparerR2
                     {
                         case Wz_SoundType.Mp3: soundName += ".mp3"; break;
                         case Wz_SoundType.Pcm: soundName += ".wav"; break;
+                        case Wz_SoundType.Ogg: soundName += ".ogg"; break;
                     }
 
                     FileStream fs = null;
@@ -3095,7 +3948,7 @@ namespace WzComparerR2
             QueryPerformance.Start();
             if (!this.stringLinker.HasValues)
             {
-                if (!this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz()))
+                if (!this.LoadStringLinker())
                 {
                     MessageBoxEx.Show("Select Base.wz.", "Error");
                     return;
@@ -3252,6 +4105,66 @@ namespace WzComparerR2
             return null;
         }
 
+        /// <summary>
+        /// Loads the string tables for the currently opened dataset: WZ first, then the Unity dataset
+        /// (String/&lt;region&gt;/&lt;category&gt;).
+        /// </summary>
+        private bool LoadStringLinker()
+        {
+            Wz_File stringWz = findStringWz();
+            Wz_File itemWz = findItemWz();
+            Wz_File etcWz = findEtcWz();
+            Wz_File questWz = findQuestWz();
+            if (stringWz != null || itemWz != null || etcWz != null || questWz != null)
+            {
+                return this.stringLinker.Load(stringWz, itemWz, etcWz, questWz);
+            }
+
+            UnityAssetDocument unityDoc = this.openedUnitySources.Values
+                .FirstOrDefault(doc => doc.StringTables != null && doc.StringTables.HasValues);
+            if (unityDoc != null)
+            {
+                this.stringLinker.Clear();
+                return this.stringLinker.Load(
+                    unityDoc.StringTables.StringNode,
+                    unityDoc.StringTables.ItemNode,
+                    unityDoc.StringTables.EtcNode,
+                    unityDoc.StringTables.QuestNode);
+            }
+
+            this.stringLinker.Clear();
+            return false;
+        }
+
+        /// <summary>Finds the Unity dataset that owns the AdvTree node (walking up to the root node).</summary>
+        private UnityAssetDocument FindUnityDocument(Node node)
+        {
+            while (node != null)
+            {
+                if (node.Parent == null)
+                {
+                    UnityAssetDocument document;
+                    return this.openedUnitySources.TryGetValue(node, out document) ? document : null;
+                }
+                node = node.Parent;
+            }
+            return null;
+        }
+
+        /// <summary>Determines whether the text contains at least one CJK ideograph (Simplified/Traditional Chinese, Kanji).</summary>
+        private static bool HasCjkIdeograph(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+            foreach (char c in text)
+            {
+                if ((c >= '\u3400' && c <= '\u4DBF') || (c >= '\u4E00' && c <= '\u9FFF'))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex, bool ignoreArticles)
         {
             string[] match = (key).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -3335,6 +4248,20 @@ namespace WzComparerR2
             Wz_File questWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Quest").GetNodeWzFile();
             if (stringWzFile == null || itemWzFile == null || etcWzFile == null)
             {
+                UnityAssetDocument unityDoc = this.FindUnityDocument(advTree1.SelectedNode);
+                if (unityDoc != null && unityDoc.StringTables != null)
+                {
+                    if (this.LoadStringLinker())
+                    {
+                        labelItemStatus.Text = "The string table link has been reset.";
+                    }
+                    else
+                    {
+                        MessageBoxEx.Show(this, "Failed to reset the string table link.", "Error");
+                    }
+                    buttonItemSearchString.Enabled = true;
+                    return;
+                }
                 MessageBoxEx.Show("Select Base.wz.", "Error");
                 buttonItemSearchString.Enabled = true;
                 return;
@@ -3405,6 +4332,7 @@ namespace WzComparerR2
             {
                 case Wz_SoundType.Mp3: soundName += ".mp3"; break;
                 case Wz_SoundType.Pcm: soundName += ".wav"; break;
+                case Wz_SoundType.Ogg: soundName += ".ogg"; break;
             }
             soundPlayer.PlayingSoundName = soundName;
             labelItemSoundTitle.Tooltip = soundName;
@@ -3601,6 +4529,7 @@ namespace WzComparerR2
                     {
                         case Wz_SoundType.Mp3: dlg.FileName += ".mp3"; break;
                         case Wz_SoundType.Pcm: dlg.FileName += ".pcm"; break;
+                        case Wz_SoundType.Ogg: dlg.FileName += ".ogg"; break;
                     }
                 }
                 dlg.Filter = "All Files (*.*)|*.*";
@@ -3894,16 +4823,36 @@ namespace WzComparerR2
 
             Wz_Image image;
 
+            UnityWzImage unityImage = FindUnityWzImage(selectedNode);
+            if (unityImage != null)
+            {
+                this.quickViewUnity(selectedNode, unityImage);
+                return;
+            }
+
+            if (IsUnityNode(selectedNode))
+            {
+                // Unity assets (sound img / JSON / sprite / directory) have no Wz_File.
+                // Keep the current state when there is no matching tooltip.
+                return;
+            }
+
             Wz_File wzf = selectedNode.GetNodeWzFile();
             if (wzf == null)
             {
-                labelItemStatus.Text = "The WZ file where the node belongs to has not been found.";
+                if (this.openedWz == null || this.openedWz.Count == 0)
+                {
+                    // Nodes of a Unity dataset (without a Wz_File) or content nodes detached by a comparison.
+                    // Keep the current state when there is no tooltip support.
+                    return;
+                }
+                labelItemStatus.Text = "The WZ file the node belongs to has not been found.";
                 return;
             }
 
             if (!this.stringLinker.HasValues)
             {
-                this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+                this.LoadStringLinker();
             }
 
             object obj = null;
@@ -4328,6 +5277,1096 @@ namespace WzComparerR2
             }
         }
 
+        /// <summary>
+        /// 上位へ辿ってノードが属する Unity WZJS img を求めます。Unity 以外のノードでは null。
+        /// </summary>
+        private static UnityWzImage FindUnityWzImage(Wz_Node node)
+        {
+           // Nodes inside an img are nested under a Wz_ImageNode (whose Value is null),
+           // so check not only Value but also GetNodeWzImage (which looks at Wz_ImageNode.Image).
+           return node == null ? null : node.GetNodeWzImage() as UnityWzImage;
+        }
+
+        /// <summary>
+        /// Determines whether the node comes from a Unity dataset (it has no Wz_File, so avoid the WZ error display).
+        /// </summary>
+        private bool IsUnityNode(Wz_Node node)
+        {
+           if (node == null)
+           {
+               return false;
+           }
+
+           for (Wz_Node cursor = node; cursor != null; cursor = cursor.ParentNode)
+           {
+               if (cursor.Value is UnityAssetImage
+                   || cursor.Value is UnityJsonAsset
+                   || cursor.Value is UnityCanvas
+                   || cursor.GetValue<Wz_Image>(null) is UnityAssetImage)
+               {
+                   return true;
+               }
+           }
+
+           // Directory node: whether the root node matches an opened Unity dataset.
+           if (this.openedUnitySources == null || this.openedUnitySources.Count == 0)
+           {
+               return false;
+           }
+           Wz_Node root = node;
+           while (root.ParentNode != null)
+           {
+               root = root.ParentNode;
+           }
+           foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+           {
+               if (ReferenceEquals(document.RootNode, root))
+               {
+                   return true;
+               }
+           }
+           return false;
+        }
+
+        /// <summary>
+        /// When the selected node lies directly under an img content tree, returns its first-level node.
+        /// Returns null when the img itself or a node outside the content tree is selected.
+        /// </summary>
+        private static Wz_Node GetUnityImageChildNode(Wz_Node node, Wz_Node imageContent)
+        {
+           if (node == null || imageContent == null)
+           {
+               return null;
+           }
+
+           Wz_Node result = null;
+           for (Wz_Node cursor = node; cursor != null; cursor = cursor.ParentNode)
+           {
+               if (ReferenceEquals(cursor, imageContent))
+               {
+                   return result;
+               }
+               result = cursor;
+           }
+           return null;
+        }
+
+        /// <summary>
+        /// Unity アセットのクイックプレビュー。アイテム（Item）、装備（Character）、モブ（Mob）
+        /// と NPC（Npc）の分類。
+        /// <para>
+        /// Classic の Item アセットは従来の WZ と同じくグループ化されています: グループ img は
+        /// <c>Item/Consume/0200</c> で、アイテム自体は img 内の子ノードです
+        /// <c>0200/02000000</c>。そのため「親ノードがグループ img」のノードまで遡り、
+        /// img のルートを直接使うのではなく、
+        /// </para>
+        /// <para>
+        /// 装備 / モブ / NPC はすべて 1 id 1 img です（例: <c>Character/Cap/01002000</c>、
+        /// <c>Mob/0100100</c>、<c>Npc/1010100</c>）。その img を選ぶと tooltip を表示します。
+        /// </para>
+        /// <para>その他の分類は未対応です。表示できない場合は何もせず、現在の tooltip を維持します。</para>
+        /// </summary>
+        private void quickViewUnity(Wz_Node selectedNode, UnityWzImage unityImage)
+        {
+            UnityStringCategory category = GetUnityImageCategory(unityImage.Name);
+            if (category == UnityStringCategory.None)
+            {
+                // 未対応の分類では現在の tooltip を維持します。
+                return;
+            }
+
+            if (category == UnityStringCategory.Item || category == UnityStringCategory.Equip)
+            {
+                // WZ のプレビューと同じ補助データ（セットアイテム、ポイントアイテムなど）を先に読み込みます。
+                this.ensureUnityTooltipData();
+            }
+
+            if (category == UnityStringCategory.Skill)
+            {
+                // スキルは img 内の skill/<id> ノードです（例: Skill/100/skill/1001002）。
+                this.quickViewUnitySkill(selectedNode);
+                return;
+            }
+
+            if (category == UnityStringCategory.Quest)
+            {
+                // クエストは Quest/QuestInfo img 内の <id> ノードです。
+                this.quickViewUnityQuest(selectedNode, unityImage);
+                return;
+            }
+
+            if (category != UnityStringCategory.Item)
+            {
+                // The img itself is the target; nodes inside the img show the same tooltip (same behavior as WZ).
+                // advTree1 的節點是目錄索引（不含子樹），tooltip 需要展開後的 WZJS 內容。
+                Wz_Node imageNode;
+                try
+                {
+                    imageNode = unityImage.GetRootedNode();
+                }
+                catch (Exception ex)
+                {
+                    labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+                    return;
+                }
+
+                switch (category)
+                {
+                    case UnityStringCategory.Equip:
+                        this.quickViewUnityGear(imageNode);
+                        break;
+                    case UnityStringCategory.Mob:
+                        this.quickViewUnityMob(imageNode);
+                        break;
+                    case UnityStringCategory.Npc:
+                        this.quickViewUnityNpc(imageNode);
+                        break;
+                    case UnityStringCategory.Map:
+                        this.quickViewUnityMap(imageNode, unityImage);
+                        break;
+                }
+                return;
+            }
+
+            // アイテムには 2 つの形があります: グループ img（Item/Consume/0200、アイテムは img 内の子ノード）と
+            // 1 id 1 img（Item/Pet/5002584、img 自体がアイテム）。
+            Wz_Node itemNode;
+            if (selectedNode.Value is UnityWzImage && IsUnityPerItemImageKey(unityImage.Name))
+            {
+                try
+                {
+                    itemNode = unityImage.GetRootedNode();
+                }
+                catch (Exception ex)
+                {
+                    labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+                    return;
+                }
+            }
+            else
+            {
+                // Item node = the <itemId> node directly under the img content tree.
+                Wz_Node imageContent;
+                try
+                {
+                    imageContent = unityImage.GetRootedNode();
+                }
+                catch (Exception ex)
+                {
+                    labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+                    return;
+                }
+
+                itemNode = GetUnityImageChildNode(selectedNode, imageContent);
+                int itemId;
+                if (itemNode == null || !int.TryParse(itemNode.Text, out itemId))
+                {
+                    // グループ img やディレクトリ自体を選択した場合は表示できるアイテムがありません。
+                    return;
+                }
+            }
+
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            Item item = null;
+            StringResult sr = null;
+            try
+            {
+                item = Item.CreateFromNode(itemNode, PluginManager.FindWz);
+                if (item != null && (stringLinker == null
+                    || !(stringLinker.StringItem.TryGetValue(item.ItemID, out sr)
+                        || stringLinker.StringEqp.TryGetValue(item.ItemID, out sr))))
+                {
+                    sr = new StringResult();
+                    sr.Name = "Unknown Item";
+                }
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (item == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeID = item.ItemID;
+            this.applyUnityStringToTooltip(sr, null, null);
+            this.showUnityTooltip(
+                item, "item_" + item.ItemID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png");
+        }
+
+        /// <summary>
+        /// Unity のクイックプレビューで tooltip を描く前に、WZ のプレビューと同じ補助データ
+        /// （セットアイテム、セット効果のオプション、ポイントアイテムなど）を読み込みます。
+        /// </summary>
+        private void ensureUnityTooltipData()
+        {
+            CharaSimLoader.LoadSetItemsIfEmpty();
+            CharaSimLoader.LoadAstraSubWeaponsIfEmpty();
+            CharaSimLoader.LoadExclusiveEquipsIfEmpty();
+            CharaSimLoader.LoadCommoditiesIfEmpty();
+            CharaSimLoader.LoadMsnMintableItemListIfEmpty();
+            CharaSimLoader.LoadGmsTucBlacklistItemsIfEmpty();
+            if (CharaSimConfig.Default.Misc.LocatePetEquip)
+            {
+                CharaSimLoader.LoadPetEquipInfoIfEmpty();
+            }
+        }
+
+        /// <summary>
+        /// Item の img が「1 id 1 img」（<c>Item/Pet/5002584</c>）かどうかを判定します。
+        /// グループ img（<c>Item/Consume/0200</c>）の末尾は 4 桁のグループ番号で、アイテム id ではありません。
+        /// </summary>
+        private static bool IsUnityPerItemImageKey(string imageName)
+        {
+            if (string.IsNullOrEmpty(imageName))
+            {
+                return false;
+            }
+            string[] keyParts = imageName.Split('/');
+            if (keyParts.Length != 3 || !string.Equals(keyParts[0], "Item", StringComparison.Ordinal))
+            {
+                return false;
+            }
+            string id = keyParts[2];
+            int ignore;
+            return (id.Length == 7 || id.Length == 8) && int.TryParse(id, out ignore);
+        }
+
+        /// <summary>
+        /// img 索引キーがどの分類に属するかを判定します（tooltip 用）:
+        /// <c>Item/&lt;分類&gt;/&lt;グループ&gt;</c>、<c>Character/&lt;分類&gt;/&lt;8 桁 id&gt;</c>、
+        /// <c>Mob/…/&lt;7 桁 id&gt;</c>、<c>Npc/&lt;7 桁 id&gt;</c>。
+        /// </summary>
+        private static UnityStringCategory GetUnityImageCategory(string imageName)
+        {
+            if (string.IsNullOrEmpty(imageName))
+            {
+                return UnityStringCategory.None;
+            }
+            string[] keyParts = imageName.Split('/');
+            if (keyParts.Length < 2)
+            {
+                return UnityStringCategory.None;
+            }
+
+            int id;
+            switch (keyParts[0])
+            {
+                case "Item":
+                    // グループ img（Item/Consume/0200）では、アイテムが img 内の子ノードです。
+                    return keyParts.Length >= 3 ? UnityStringCategory.Item : UnityStringCategory.None;
+                case "Character":
+                    // 1 id 1 img。Familiar は専用の tooltip があります。
+                    return keyParts.Length == 3
+                        && !string.Equals(keyParts[1], "Familiar", StringComparison.Ordinal)
+                        && int.TryParse(keyParts[2], out id)
+                        ? UnityStringCategory.Equip : UnityStringCategory.None;
+                case "Mob":
+                    return int.TryParse(keyParts[keyParts.Length - 1], out id)
+                        ? UnityStringCategory.Mob : UnityStringCategory.None;
+                case "Npc":
+                    return int.TryParse(keyParts[keyParts.Length - 1], out id)
+                        ? UnityStringCategory.Npc : UnityStringCategory.None;
+                case "Skill":
+                    // スキル img は Skill/<職業> で、スキル自体は img 内の skill/<id> ノードです。
+                    return UnityStringCategory.Skill;
+                case "Map":
+                    // マップ img は Map/Map/Map<先頭桁>/<9 桁 id> です。
+                    return keyParts.Length >= 4
+                        && keyParts[keyParts.Length - 1].Length == 9
+                        && int.TryParse(keyParts[keyParts.Length - 1], out id)
+                        ? UnityStringCategory.Map : UnityStringCategory.None;
+                case "Quest":
+                    // クエスト img は Quest/QuestInfo で、クエスト自体は img 内の <id> ノードです。
+                    return keyParts.Length == 2
+                        && string.Equals(keyParts[1], "QuestInfo", StringComparison.OrdinalIgnoreCase)
+                        ? UnityStringCategory.Quest : UnityStringCategory.None;
+                default:
+                    return UnityStringCategory.None;
+            }
+        }
+
+        /// <summary>文字列テーブルの内容で tooltip のタイトルと説明欄を補います。</summary>
+        private void applyUnityStringToTooltip(StringResult sr, StringResult monsterBook, StringResult worldArchive)
+        {
+            tooltipQuickView.NodeName = sr.Name;
+            tooltipQuickView.Desc = sr.Desc ?? monsterBook?.Desc;
+            tooltipQuickView.Pdesc = sr.Pdesc ?? worldArchive?.Desc;
+            tooltipQuickView.AutoDesc = sr.AutoDesc;
+            tooltipQuickView.Hdesc = sr["h"];
+            tooltipQuickView.DescLeftAlign = sr["desc_leftalign"];
+        }
+
+        /// <summary>直前の Unity tooltip の内容をクリアします。</summary>
+        private void resetUnityTooltip()
+        {
+            tooltipQuickView.TargetItem = null;
+            tooltipQuickView.NodeName = string.Empty;
+            tooltipQuickView.NodeID = 0;
+            tooltipQuickView.Desc = string.Empty;
+            tooltipQuickView.Pdesc = string.Empty;
+            tooltipQuickView.AutoDesc = string.Empty;
+            tooltipQuickView.Hdesc = string.Empty;
+            tooltipQuickView.DescLeftAlign = string.Empty;
+        }
+
+        private void showUnityTooltip(object obj, string fileName)
+        {
+            tooltipQuickView.TargetItem = obj;
+            tooltipQuickView.ImageFileName = fileName;
+            tooltipQuickView.Refresh();
+            tooltipQuickView.HideOnHover = false;
+            tooltipQuickView.Show();
+            if (Translator.IsTranslateEnabled) tooltipQuickView.QuickRefresh();
+        }
+
+        /// <summary>
+        /// Unity 装備（<c>Character/&lt;分類&gt;/&lt;8 桁 id&gt;</c>）のクイックプレビュー。
+        /// </summary>
+        private void quickViewUnityGear(Wz_Node imageNode)
+        {
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            CharaSimLoader.LoadSetItemsIfEmpty();
+            CharaSimLoader.LoadAstraSubWeaponsIfEmpty();
+            CharaSimLoader.LoadExclusiveEquipsIfEmpty();
+            CharaSimLoader.LoadCommoditiesIfEmpty();
+            CharaSimLoader.LoadMsnMintableItemListIfEmpty();
+            CharaSimLoader.LoadGmsTucBlacklistItemsIfEmpty();
+            if (CharaSimConfig.Default.Misc.LocatePetEquip) CharaSimLoader.LoadPetEquipInfoIfEmpty();
+
+            Gear gear = null;
+            StringResult sr = null;
+            try
+            {
+                gear = Gear.CreateFromNode(imageNode, PluginManager.FindWz);
+                if (gear != null && stringLinker != null)
+                {
+                    stringLinker.StringEqp.TryGetValue(gear.ItemID, out sr);
+                }
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (gear == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeID = gear.ItemID;
+            this.showUnityTooltip(
+                gear,
+                "eqp_" + gear.ItemID + "_" + RemoveInvalidFileNameChars(sr?.Name ?? "item") + ".png");
+        }
+
+        /// <summary>Unity モブ（<c>Mob/&lt;7 桁 id&gt;</c>）のクイックプレビュー。</summary>
+        private void quickViewUnityMob(Wz_Node imageNode)
+        {
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            Mob mob = null;
+            StringResult sr = null;
+            StringResult mbSr = null;
+            StringResult waSr = null;
+            try
+            {
+                mob = Mob.CreateFromNode(imageNode, PluginManager.FindWz);
+                if (mob != null)
+                {
+                    if (stringLinker == null || !stringLinker.StringMob.TryGetValue(mob.ID, out sr))
+                    {
+                        sr = new StringResult();
+                        sr.Name = "Unknown Mob";
+                    }
+
+                    if (stringLinker != null && CharaSimConfig.Default.Mob.EnableMonsterBook)
+                    {
+                        stringLinker.StringMonsterBook.TryGetValue(mob.ID, out mbSr);
+                    }
+
+                    if (stringLinker != null && CharaSimConfig.Default.Misc.EnableWorldArchive)
+                    {
+                        stringLinker.StringWorldArchiveMob.TryGetValue(mob.ID, out waSr);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (mob == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeID = mob.ID;
+            this.applyUnityStringToTooltip(sr, mbSr, waSr);
+            this.showUnityTooltip(
+                mob, "mob_" + mob.ID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png");
+        }
+
+        /// <summary>Unity NPC（<c>Npc/&lt;7 桁 id&gt;</c>）のクイックプレビュー。</summary>
+        private void quickViewUnityNpc(Wz_Node imageNode)
+        {
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            Npc npc = null;
+            StringResult sr = null;
+            StringResult waSr = null;
+            try
+            {
+                npc = Npc.CreateFromNode(
+                    imageNode, PluginManager.FindWz,
+                    getSpineDefaultFunc: this.pictureBoxEx1.GetSpineDefault);
+                if (npc != null)
+                {
+                    if (stringLinker == null || !stringLinker.StringNpc.TryGetValue(npc.ID, out sr))
+                    {
+                        sr = new StringResult();
+                        sr.Name = "Unknown NPC";
+                    }
+
+                    if (stringLinker != null && CharaSimConfig.Default.Misc.EnableWorldArchive)
+                    {
+                        stringLinker.StringWorldArchiveNpc.TryGetValue(npc.ID, out waSr);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (npc == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeID = npc.ID;
+            this.applyUnityStringToTooltip(sr, null, waSr);
+            this.showUnityTooltip(
+                npc, "npc_" + npc.ID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png");
+        }
+
+        /// <summary>
+        /// Unity データセットのノードに対応する <see cref="Wz_Type"/>（ディレクトリ → 型）。Unity 以外のノードでは null。
+        /// </summary>
+        private Wz_Type? ResolveUnityWzType(Wz_Node node)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+
+            // img 展開ツリー内のノード: 所属 img の索引キー（Character/Cap/01002000）で判定します。
+            for (Wz_Node cursor = node; cursor != null; cursor = cursor.ParentNode)
+            {
+                if (cursor.Value is UnityAssetImage image)
+                {
+                    return ClassicWzTypeMap.TryGetWzType(image.Name);
+                }
+                if (cursor.Value is UnityJsonAsset json)
+                {
+                    return ClassicWzTypeMap.TryGetWzType(json.ImageKey);
+                }
+            }
+
+            // ディレクトリ索引ツリー: データセットのルート直下のディレクトリ名で判定します。
+            if (this.openedUnitySources == null || this.openedUnitySources.Count == 0)
+            {
+                return null;
+            }
+            Wz_Node root = node;
+            while (root.ParentNode != null)
+            {
+                root = root.ParentNode;
+            }
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                if (!ReferenceEquals(document.RootNode, root))
+                {
+                    continue;
+                }
+                Wz_Node category = node;
+                while (category.ParentNode != null && !ReferenceEquals(category.ParentNode, root))
+                {
+                    category = category.ParentNode;
+                }
+                return ClassicWzTypeMap.TryGetWzType(category.Text);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Unity アセット img ノードの内容ルートノード（WZ の <see cref="Wz_Image"/> に相当）。
+        /// </summary>
+        private Wz_Node ResolveUnityImageNode(Wz_Node node)
+        {
+            if (!(node?.Value is UnityAssetImage image))
+            {
+                return null;
+            }
+            try
+            {
+                return image.GetRootedNode();
+            }
+            catch (Exception ex) when (ex is UnityException || ex is ClassicAssetException || ex is WzjsException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 開いている Unity データセット内を WZ 形式のパスで検索します（WZ で見つからない場合の代替）。
+        /// </summary>
+        private Wz_Node FindUnityNodeByPath(string wzPath)
+        {
+            if (this.openedUnitySources == null || this.openedUnitySources.Count == 0
+                || string.IsNullOrEmpty(wzPath))
+            {
+                return null;
+            }
+
+            // Unity クライアント比較中は、比較対象のデータセットだけを参照します（新旧の内容を混ぜない）。
+            ClassicWzSource preferredSource = Comparer.EasyComparer.PreferredUnitySource;
+            if (preferredSource != null)
+            {
+                UnityAssetDocument preferredDoc = this.openedUnitySources.Values
+                    .FirstOrDefault(doc => doc.Source == preferredSource);
+                return preferredDoc == null ? null : FindUnityNodeInDocument(preferredDoc, wzPath);
+            }
+
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                Wz_Node node = FindUnityNodeInDocument(document, wzPath);
+                if (node != null)
+                {
+                    return node;
+                }
+            }
+            return null;
+        }
+
+        private static Wz_Node FindUnityNodeInDocument(UnityAssetDocument document, string wzPath)
+        {
+            try
+            {
+                Wz_Node node = document.Source.FindNode(wzPath);
+                if (node != null)
+                {
+                    return RootUnityNode(node);
+                }
+                node = FindUnityNodeBySegments(document.RootNode, wzPath);
+                if (node != null)
+                {
+                    return RootUnityNode(node);
+                }
+            }
+            catch (Exception ex) when (ex is UnityException || ex is ClassicAssetException || ex is WzjsException)
+            {
+                // 単一アセットのデコード失敗は他の検索に影響しません。
+            }
+            return null;
+        }
+
+        /// <summary>img 内容ノードに上位ノードチェーンを補い、WZ 形式のパス判定を可能にします。</summary>
+        private static Wz_Node RootUnityNode(Wz_Node node)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+            UnityAssetImage image = node.Value as UnityAssetImage
+                ?? node.GetNodeWzImage() as UnityAssetImage;
+            if (image != null)
+            {
+                image.GetRootedNode();
+            }
+            return node;
+        }
+
+        /// <summary>
+        /// Unity ディレクトリ索引ツリーを 1 セグメントずつ辿ります（名前は <c>.img</c> の欠落を許容）。
+        /// img ノードに遭遇したら内容を展開してから続行します。
+        /// </summary>
+        private static Wz_Node FindUnityNodeBySegments(Wz_Node root, string wzPath)
+        {
+            if (root == null)
+            {
+                return null;
+            }
+            Wz_Node node = root;
+            foreach (string rawSegment in wzPath.Split('/', '\\'))
+            {
+                if (rawSegment.Length == 0)
+                {
+                    continue;
+                }
+                string segment = rawSegment.EndsWith(".img", StringComparison.OrdinalIgnoreCase)
+                    ? rawSegment.Substring(0, rawSegment.Length - 4)
+                    : rawSegment;
+                node = FindUnityChildByName(node, segment);
+                if (node == null)
+                {
+                    return null;
+                }
+                if (node.Value is UnityAssetImage image)
+                {
+                    node = image.GetRootedNode();
+                }
+            }
+            return node;
+        }
+
+        private static Wz_Node FindUnityChildByName(Wz_Node parent, string name)
+        {
+            foreach (Wz_Node child in parent.Nodes)
+            {
+                if (string.Equals(child.Text, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return child;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>Unity キャラクターアクション img の索引キー（各アクションのフレーム遅延の取得元）。</summary>
+        private const string UnityCharacterImageKey = "Character/00002000";
+
+        /// <summary>
+        /// Unity アセットのアクション遅延: <c>Character/00002000/&lt;action&gt;/&lt;frame&gt;/delay</c>
+        /// 絶対値を加算します。対応するデータがない場合は null を返します（tooltip には 0 が表示されます）。
+        /// </summary>
+        private int? ResolveUnityActionDelay(string actionName)
+        {
+            if (this.openedUnitySources == null || string.IsNullOrEmpty(actionName))
+            {
+                return null;
+            }
+
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                int? delay;
+                try
+                {
+                    delay = document.Source.GetActionDelay(UnityCharacterImageKey, actionName);
+                }
+                catch (Exception ex) when (ex is UnityException || ex is ClassicAssetException)
+                {
+                    continue;
+                }
+                if (delay.HasValue)
+                {
+                    return delay;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Unity マップ（<c>Map/Map/Map&lt;N&gt;/&lt;9 桁 id&gt;</c>）のクイックプレビュー（miniMap のサムネイルを含む）。
+        /// </summary>
+        private void quickViewUnityMap(Wz_Node imageNode, UnityWzImage unityImage)
+        {
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            Map map = null;
+            StringResult sr = null;
+            try
+            {
+                // Map.CreateFromNode は WZ 形式のパスで link / NPC / モブなどの関連ノードを検索するため、
+                // まず Unity データセットを検索し、見つからない場合のみ WZ にフォールバックします。
+                GlobalFindNodeFunction finder = path =>
+                    unityImage.FindNode(path) ?? PluginManager.FindWz(path);
+                map = Map.CreateFromNode(imageNode, finder);
+                if (map != null && (stringLinker == null
+                    || !stringLinker.StringMap.TryGetValue(map.MapID, out sr)))
+                {
+                    sr = new StringResult();
+                    sr.Name = "Unknown Map";
+                }
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (map == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeID = map.MapID;
+            this.applyUnityStringToTooltip(sr, null, null);
+            this.showUnityTooltip(
+                map, "map_" + map.MapID + "_"
+                    + RemoveInvalidFileNameChars((sr.Name ?? "unknown").Replace(" : ", ":")) + ".png");
+        }
+
+        /// <summary>
+        /// Unity クエスト（<c>Quest/QuestInfo/&lt;id&gt;</c>）のクイックプレビュー。
+        /// <para>
+        /// Classic ではクエストデータが <c>Quest/QuestInfo</c>、<c>Quest/Check</c>、
+        /// <c>Quest/Act</c>、<c>Quest/Say</c> の 4 つの img に分割され、テキストは
+        /// <c>String/&lt;locale&gt;/QuestData</c>。ここで従来の WZ の形に組み直します。
+        /// <c>Quest/QuestInfo.img/&lt;id&gt;</c> の形に整えたうえで <see cref="Quest.CreateFromNode"/> に渡します。
+        /// </para>
+        /// </summary>
+        private void quickViewUnityQuest(Wz_Node selectedNode, UnityWzImage unityImage)
+        {
+            Wz_Node questIdNode;
+            if (selectedNode.Value is UnityWzImage)
+            {
+                questIdNode = selectedNode;
+            }
+            else
+            {
+                try
+                {
+                    questIdNode = GetUnityImageChildNode(selectedNode, unityImage.GetRootedNode());
+                }
+                catch (Exception ex)
+                {
+                    labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+                    return;
+                }
+            }
+
+            int questId;
+            if (questIdNode == null || !int.TryParse(questIdNode.Text, out questId))
+            {
+                // QuestInfo img 自体を選択した場合は表示できるクエストがありません。
+                return;
+            }
+
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            Quest quest = null;
+            try
+            {
+                Wz_Node questImg = this.BuildUnityQuestImage(questIdNode, questId, unityImage);
+                GlobalFindNodeFunction finder = path =>
+                    unityImage.FindNode(path) ?? PluginManager.FindWz(path);
+                GlobalFindNodeFunction2 finder2 = (path, wzf) => finder(path);
+                quest = Quest.CreateFromNode(questImg, finder, finder2);
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (quest == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeName = quest.Name;
+            tooltipQuickView.Desc = string.Join("\r\n", quest.Desc);
+            tooltipQuickView.QuestLvmin = quest.Lvmin;
+            if (quest.Desc.Count() == 3)
+            {
+                tooltipQuickView.QuestAvailable = quest.Desc[0];
+                tooltipQuickView.QuestProgress = quest.Desc[1];
+                tooltipQuickView.QuestComplete = quest.Desc[2];
+            }
+            else
+            {
+                tooltipQuickView.QuestAvailable = "";
+                tooltipQuickView.QuestProgress = "";
+                tooltipQuickView.QuestComplete = "";
+            }
+            tooltipQuickView.QuestCategory = quest.Category.Count() == 2
+                ? "" + quest.Category[0] + "-" + quest.Category[1]
+                : "0-0";
+            tooltipQuickView.Pdesc = quest.DemandBase;
+            tooltipQuickView.Hdesc = quest.DemandSummary;
+            tooltipQuickView.AutoDesc = quest.PlaceSummary;
+            tooltipQuickView.DescLeftAlign = quest.Summary;
+            tooltipQuickView.NodeID = quest.ID;
+            quest.State = tooltipQuickView.QuestRender.DefaultState;
+            this.showUnityTooltip(
+                quest, "quest_" + quest.ID + "_" + RemoveInvalidFileNameChars(quest.Name) + ".png");
+        }
+
+        /// <summary>
+        /// Classic で分割されたクエストアセットを WZ 形式の img ノードに組み立てます:
+        /// <c>&lt;id&gt;/QuestInfo</c>（QuestInfo img）と <c>&lt;id&gt;/Check</c>（Check img）。
+        /// </summary>
+        private Wz_Node BuildUnityQuestImage(Wz_Node questInfoNode, int questId, UnityWzImage unityImage)
+        {
+            Wz_Node img = new Wz_Node(questId.ToString());
+
+            // QuestInfo/メッセージ: まずデータセット内のフィールドを設定し、文字列テーブルで上書きします（表示テキストは文字列テーブルが正）。
+            Wz_Node info = img.Nodes.Add("QuestInfo");
+            CopyWzNodeChildren(questInfoNode, info);
+
+            // データセット内の name はプレースホルダーノード（値が空）の場合があるため、先に除去して文字通りの "name" が表示されないようにします。
+            RemoveChildByName(info, "name");
+
+            Wz_Node check = unityImage.FindNode("Quest/Check/" + questId);
+            if (check != null)
+            {
+                Wz_Node checkImg = img.Nodes.Add("Check");
+                CopyWzNodeChildren(check, checkImg);
+            }
+
+            string name = this.ApplyQuestStrings(info, questId, unityImage);
+            SetOrAddChildValue(info, "name", string.IsNullOrEmpty(name) ? "Unknown Quest" : name);
+            return img;
+        }
+
+        /// <summary>
+        /// <c>String/&lt;locale&gt;/QuestData/&lt;id&gt;</c> でクエストの表示テキストを補います
+        /// （name → name、Info/&lt;n&gt; → 0/1/2、demandSummary/rewardSummary）。クエスト名を返します。
+        /// </summary>
+        private string ApplyQuestStrings(Wz_Node info, int questId, UnityWzImage unityImage)
+        {
+            UnityAssetDocument document = this.openedUnitySources == null ? null
+                : this.openedUnitySources.Values.FirstOrDefault(
+                    doc => ReferenceEquals(doc.Source, unityImage.Source));
+            Wz_Node questNode = document?.StringTables?.QuestNode;
+            if (questNode == null)
+            {
+                return null;
+            }
+
+            string id = questId.ToString();
+            Wz_Node questInfo = null;
+            Wz_Node dataNode = FindChildByName(questNode, "QuestData");
+            foreach (Wz_Node node in dataNode?.Nodes ?? Enumerable.Empty<Wz_Node>())
+            {
+                if (string.Equals(node.Text.Replace(".img", ""), id, StringComparison.Ordinal))
+                {
+                    questInfo = FindChildByName(node, "QuestInfo") ?? node;
+                    break;
+                }
+            }
+            if (questInfo == null)
+            {
+                return null;
+            }
+
+            // String/<region>/QuestData/<id>/name
+            string name = FindChildByName(questInfo, "name")?.GetValueEx<string>(null);
+
+            Wz_Node stringInfo = FindChildByName(questInfo, "Info");
+            foreach (Wz_Node node in stringInfo?.Nodes ?? Enumerable.Empty<Wz_Node>())
+            {
+                if (node.Value == null)
+                {
+                    continue;
+                }
+                string value = node.GetValueEx<string>(null);
+                int stage;
+                if (int.TryParse(node.Text, out stage))
+                {
+                    // 段階説明 → WZ の QuestInfo/0、1、2…
+                    SetOrAddChildValue(info, stage.ToString(), value);
+                    continue;
+                }
+                switch (node.Text.ToLowerInvariant())
+                {
+                    case "demandsummary":
+                        SetOrAddChildValue(info, "demandSummary", value);
+                        break;
+                    case "rewardsummary":
+                        SetOrAddChildValue(info, "rewardSummary", value);
+                        break;
+                }
+            }
+            return name;
+        }
+
+        /// <summary>名前で子ノードを検索します（まず完全一致、次に大文字小文字を無視）。</summary>
+        private static Wz_Node FindChildByName(Wz_Node parent, string name)
+        {
+            if (parent == null || name == null)
+            {
+                return null;
+            }
+            Wz_Node child = parent.Nodes[name];
+            if (child != null)
+            {
+                return child;
+            }
+            foreach (Wz_Node candidate in parent.Nodes)
+            {
+                if (string.Equals(candidate.Text, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return candidate;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>指定名の子ノードを削除します（大文字小文字を無視）。</summary>
+        private static void RemoveChildByName(Wz_Node parent, string name)
+        {
+            List<Wz_Node> keep = new List<Wz_Node>();
+            bool removed = false;
+            foreach (Wz_Node child in parent.Nodes)
+            {
+                if (string.Equals(child.Text, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    removed = true;
+                }
+                else
+                {
+                    keep.Add(child);
+                }
+            }
+            if (!removed)
+            {
+                return;
+            }
+            parent.Nodes.Clear();
+            foreach (Wz_Node child in keep)
+            {
+                parent.Nodes.Add(child);
+            }
+        }
+
+        /// <summary>コピー元ノードのサブツリーをコピー先ノード配下に複製します（親子関係は共有しません）。</summary>
+        private static void CopyWzNodeChildren(Wz_Node source, Wz_Node target)
+        {
+            foreach (Wz_Node child in source.Nodes)
+            {
+                target.Nodes.Add(CloneWzNode(child));
+            }
+        }
+
+        private static Wz_Node CloneWzNode(Wz_Node source)
+        {
+            Wz_Node clone = new Wz_Node(source.Text);
+            clone.Value = source.Value;
+            CopyWzNodeChildren(source, clone);
+            return clone;
+        }
+
+        /// <summary>子ノードの文字列値を設定します。ノードがなければ追加し、値が null なら変更しません。</summary>
+        private static void SetOrAddChildValue(Wz_Node parent, string name, string value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+            Wz_Node child = parent.Nodes[name];
+            if (child == null)
+            {
+                child = parent.Nodes.Add(name);
+            }
+            child.Value = value;
+        }
+
+        /// <summary>ノードが Unity のスキルノード（img 内の <c>skill/&lt;id&gt;</c>）か判定します。</summary>
+        private static bool IsUnitySkillNode(Wz_Node node)
+        {
+           return node != null
+               && node.ParentNode != null
+               && string.Equals(node.ParentNode.Text, "skill", StringComparison.OrdinalIgnoreCase)
+               && node.ParentNode.GetNodeWzImage() is UnityWzImage;
+        }
+
+        /// <summary>Finds the nearest <c>skill/&lt;id&gt;</c> node from the selected node.</summary>
+        private static Wz_Node FindUnitySkillNode(Wz_Node node)
+        {
+           for (Wz_Node cursor = node; cursor != null; cursor = cursor.ParentNode)
+           {
+               if (IsUnitySkillNode(cursor))
+               {
+                   return cursor;
+               }
+           }
+           return null;
+        }
+
+        /// <summary>
+        /// Unity スキル（<c>Skill/&lt;職業&gt;</c> img 内の <c>skill/&lt;id&gt;</c> ノード）のクイックプレビュー。
+        /// </summary>
+        private void quickViewUnitySkill(Wz_Node selectedNode)
+        {
+            // Corresponds to Skill.wz\<job>.img\skill\<id> in WZ. Even when a child node inside the img is selected,
+            // the tooltip is shown from the nearest skill/<id> node.
+            Wz_Node skillNode = FindUnitySkillNode(selectedNode);
+            if (skillNode == null)
+            {
+                return;
+            }
+
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+
+            Skill skill = null;
+            StringResult sr = null;
+            try
+            {
+                skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz, PluginManager.FindWz);
+                if (skill != null)
+                {
+                    switch (this.skillDefaultLevel)
+                    {
+                        case DefaultLevel.Level0: skill.Level = 0; break;
+                        case DefaultLevel.Level1: skill.Level = 1; break;
+                        case DefaultLevel.LevelMax: skill.Level = skill.MaxLevel; break;
+                        case DefaultLevel.LevelMaxWithCO: skill.Level = skill.MaxLevel + 2; break;
+                    }
+
+                    if (stringLinker == null || !stringLinker.StringSkill.TryGetValue(skill.SkillID, out sr))
+                    {
+                        sr = new StringResultSkill();
+                        sr.Name = "Unknown Skill";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                labelItemStatus.Text = "Failed to generate the tooltip: " + ex.Message;
+            }
+
+            if (skill == null)
+            {
+                return;
+            }
+
+            this.resetUnityTooltip();
+            tooltipQuickView.NodeID = skill.SkillID;
+            this.applyUnityStringToTooltip(sr, null, null);
+            this.showUnityTooltip(
+                skill, "skill_" + skill.SkillID + "_" + RemoveInvalidFileNameChars(sr.Name) + ".png");
+        }
+
         private void comboBoxItemLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
             DevComponents.Editors.ComboItem item = comboBoxItemLanguage.SelectedItem as DevComponents.Editors.ComboItem;
@@ -4411,6 +6450,139 @@ namespace WzComparerR2
             frmWorldArchiveBrowser._mainForm = this;
             frmWorldArchiveBrowser.LoadCmbRegion();
             frmWorldArchiveBrowser.Show();
+        }
+
+        private void btnMonsterBookBrowser_Click(object sender, EventArgs e)
+        {
+            int clientCount = this.openedWz.Count
+                + (this.openedUnitySources == null ? 0 : this.openedUnitySources.Count);
+            if (clientCount == 0)
+            {
+                ToastNotification.Show(this, "Error: no client data is open.", null, 2000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+            if (clientCount > 1)
+            {
+                ToastNotification.Show(this, "Error: open exactly one client before using this feature.", null, 4000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+
+            Wz_Node monsterBookNode = this.FindMonsterBookNode();
+            if (monsterBookNode == null)
+            {
+                ToastNotification.Show(this, "Error: the monster book is not available in this client.", null, 3000, eToastGlowColor.Red, eToastPosition.TopCenter);
+                return;
+            }
+            Wz_Node monsterBookStringNode = this.FindMonsterBookStringNode();
+            if (!this.stringLinker.HasValues)
+            {
+                this.LoadStringLinker();
+            }
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form is FrmMonsterBookBrowser && !form.IsDisposed)
+                {
+                    FrmMonsterBookBrowser openedForm = (FrmMonsterBookBrowser)form;
+                    openedForm.stringLinker = this.stringLinker;
+                    openedForm.MonsterBookNode = monsterBookNode;
+                    openedForm.MonsterBookStringNode = monsterBookStringNode;
+                    openedForm._mainForm = this;
+                    form.Show();
+                    form.BringToFront();
+                    openedForm.BeginLoadMobList();
+                    return;
+                }
+            }
+            FrmMonsterBookBrowser frmMonsterBookBrowser = new FrmMonsterBookBrowser();
+            frmMonsterBookBrowser.stringLinker = this.stringLinker;
+            frmMonsterBookBrowser.MonsterBookNode = monsterBookNode;
+            frmMonsterBookBrowser.MonsterBookStringNode = monsterBookStringNode;
+            frmMonsterBookBrowser._mainForm = this;
+            frmMonsterBookBrowser.Show();
+            frmMonsterBookBrowser.BeginLoadMobList();
+        }
+
+        /// <summary>
+        /// MonsterBook の内容ノードを探します。モンスター ID はこのノードの子として並びます。
+        /// Unity クライアントデータ（<c>/MonsterBook</c>）を優先し、WZ の
+        /// <c>String.wz/MonsterBook.img</c>、または単体で開いた <c>MonsterBook.img</c> にも対応します。
+        /// </summary>
+        private Wz_Node FindMonsterBookNode()
+        {
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                UnityWzImage unityImage = document.Source.GetWzImage("MonsterBook");
+                if (unityImage != null && unityImage.TryExtract())
+                {
+                    return unityImage.Node;
+                }
+            }
+
+            // WZ では展開済みの内容ノードが返るため、img ノードかどうかを確認します。
+            Wz_Node wzBookNode = PluginManager.FindWz(@"String\MonsterBook.img");
+            if (wzBookNode != null && !(wzBookNode.Value is Wz_Image))
+            {
+                return wzBookNode;
+            }
+
+            foreach (Wz_Structure wzs in this.openedWz)
+            {
+                Wz_Image image = FindMonsterBookImage(wzs.WzNode, 3);
+                if (image != null && image.TryExtract())
+                {
+                    return image.Node;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Unity データセットの文字列テーブル（<c>String/&lt;region&gt;/MonsterBook</c>）を返します。
+        /// 子ノード名がモンスター ID で、ノード値が説明文です（MonsterBook アセット側の
+        /// <c>episode</c> は話数の番号のみのため、説明文はこちらから取得します）。
+        /// </summary>
+        private Wz_Node FindMonsterBookStringNode()
+        {
+            if (this.openedUnitySources == null)
+            {
+                return null;
+            }
+
+            foreach (UnityAssetDocument document in this.openedUnitySources.Values)
+            {
+                Wz_Node node = document.StringTables?.StringNode?.FindNodeByPath("MonsterBook.img");
+                if (node != null && node.Nodes.Count > 0)
+                {
+                    return node;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>開いている WZ から <c>MonsterBook.img</c> のイメージノードを探します。</summary>
+        private static Wz_Image FindMonsterBookImage(Wz_Node node, int depth)
+        {
+            if (node == null || depth < 0)
+            {
+                return null;
+            }
+
+            if (string.Equals(node.Text, "MonsterBook.img", StringComparison.OrdinalIgnoreCase)
+                && node.Value is Wz_Image image)
+            {
+                return image;
+            }
+
+            foreach (Wz_Node child in node.Nodes)
+            {
+                Wz_Image found = FindMonsterBookImage(child, depth - 1);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+            return null;
         }
 
         public void RedirectToNode(Wz_Node node)
@@ -4797,7 +6969,17 @@ namespace WzComparerR2
                 return;
             }
 
-            if (openedWz.Count < 2)
+            List<UnityAssetDocument> unityDocuments = this.openedUnitySources == null
+                ? new List<UnityAssetDocument>()
+                : this.openedUnitySources.Values.ToList();
+            if (this.openedWz.Count > 0 && unityDocuments.Count > 0)
+            {
+                MessageBoxEx.Show("A WZ-based client cannot be compared with a Unity client.\r\nOpen at least two clients of the same kind.", "Error");
+                return;
+            }
+
+            bool compareUnity = unityDocuments.Count > 0;
+            if (compareUnity ? unityDocuments.Count < 2 : this.openedWz.Count < 2)
             {
                 MessageBoxEx.Show("Select two or more WZ files to begin comparing.", "Error");
                 return;
@@ -4861,6 +7043,13 @@ namespace WzComparerR2
                     comparer.LocatePetEquip = CharaSimConfig.Default.Misc.LocatePetEquip;
                     comparer.OutputChairAndRidingMount = chkOutputChairAndRidingMount.Checked;
                     comparer.AvatarCode = GetEasyCompareAvatarCode();
+                    if (compareUnity)
+                    {
+                        // A Unity client has no WZ Base.wz, so only the options that require WZ are disabled.
+                        // Tooltip output and chair avatar examples are generated from the structure of the Unity dataset.
+                        comparer.SkipKMSContent = false;
+                        comparer.SkipGodChangseopDuplicatedNodes = false;
+                    }
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
                     comparer.ColorTable = new List<System.Drawing.Color>()
@@ -4877,6 +7066,12 @@ namespace WzComparerR2
                     };
                     try
                     {
+                        if (compareUnity)
+                        {
+                            EasyCompareUnityClients(comparer, unityDocuments, dlg.SelectedPath);
+                            return;
+                        }
+
                         Wz_File fileNew = openedWz[0].wz_files[0];
                         Wz_File fileOld = openedWz[1].wz_files[0];
 
@@ -4891,35 +7086,7 @@ namespace WzComparerR2
                             switch (MessageBoxEx.Show(txt, "WZ Compare", MessageBoxButtons.YesNoCancel))
                             {
                                 case DialogResult.Yes:
-                                    btnEasyCompare.Enabled = false;
-                                    btnPreset.Enabled = false;
-                                    clbRootNode.Enabled = false;
-                                    btnSelectDeselectAllNode.Enabled = false;
-                                    btnReverseNodeSelection.Enabled = false;
-                                    btnCustomCSS.Enabled = false;
-                                    cmbComparePng.Enabled = false;
-                                    chkOutputPng.Enabled = false;
-                                    chkResolvePngLink.Enabled = false;
-                                    chkOutputAddedImg.Enabled = false;
-                                    chkOutputRemovedImg.Enabled = false;
-                                    chkOutputSkillTooltip.Enabled = false;
-                                    chkOutputItemTooltip.Enabled = false;
-                                    chkOutputEqpTooltip.Enabled = false;
-                                    chkOutputMapTooltip.Enabled = false;
-                                    chkOutputMobTooltip.Enabled = false;
-                                    chkOutputNpcTooltip.Enabled = false;
-                                    chkOutputQuestTooltip.Enabled = false;
-                                    chkOutputAchvTooltip.Enabled = false;
-                                    // chkOutputCashTooltip.Enabled = false;
-                                    chkShowObjectID.Enabled = false;
-                                    chkShowChangeType.Enabled = false;
-                                    chkShowLinkedTamingMob.Enabled = false;
-                                    chkHashPngFileName.Enabled = false;
-                                    chkSkipKMSContent.Enabled = false;
-                                    chkMseaMode.Enabled = false;
-                                    chkSkipGodChangseopDuplicatedNodes.Enabled = false;
-                                    chkOutputChairAndRidingMount.Enabled = false;
-                                    btnAvatarCode.Enabled = false;
+                                    SetEasyCompareControlsEnabled(false);
                                     if (chkSkipKMSContent.Checked)
                                     {
                                         switch (MessageBoxEx.Show(this, "Would you like to download database of KMS content?\r\n\r\nIf you select \"No\", only KMS Skills will be skipped. ", "WZ Compare", MessageBoxButtons.YesNo))
@@ -4964,35 +7131,7 @@ namespace WzComparerR2
                         compareThread = null;
                         labelXComp1.Text = "Comparison completed. Time elapsed: " + sw.Elapsed.ToString();
                         labelXComp2.Text = "";
-                        btnEasyCompare.Enabled = true;
-                        btnPreset.Enabled = true;
-                        clbRootNode.Enabled = true;
-                        btnSelectDeselectAllNode.Enabled = true;
-                        btnReverseNodeSelection.Enabled = true;
-                        btnCustomCSS.Enabled = true;
-                        cmbComparePng.Enabled = true;
-                        chkOutputPng.Enabled = true;
-                        chkResolvePngLink.Enabled = true;
-                        chkOutputAddedImg.Enabled = true;
-                        chkOutputRemovedImg.Enabled = true;
-                        chkOutputSkillTooltip.Enabled = true;
-                        chkOutputItemTooltip.Enabled = true;
-                        chkOutputEqpTooltip.Enabled = true;
-                        chkOutputMapTooltip.Enabled = true;
-                        chkOutputMobTooltip.Enabled = true;
-                        chkOutputNpcTooltip.Enabled = true;
-                        chkOutputQuestTooltip.Enabled = true;
-                        chkOutputAchvTooltip.Enabled = true;
-                        // chkOutputCashTooltip.Enabled = true;
-                        chkShowObjectID.Enabled = true;
-                        chkShowChangeType.Enabled = true;
-                        chkShowLinkedTamingMob.Enabled = true;
-                        chkHashPngFileName.Enabled = true;
-                        chkSkipKMSContent.Enabled = true;
-                        chkMseaMode.Enabled = true;
-                        chkSkipGodChangseopDuplicatedNodes.Enabled = true;
-                        chkOutputChairAndRidingMount.Enabled = true;
-                        btnAvatarCode.Enabled = chkOutputChairAndRidingMount.Checked;
+                        SetEasyCompareControlsEnabled(true);
                         if (comparer.FailToExportNodes.Count > 0 || comparer.FailToExportTooltips.Count > 0)
                         {
                             string failData = Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportNodes, Newtonsoft.Json.Formatting.Indented) + "\r\n" + Newtonsoft.Json.JsonConvert.SerializeObject(comparer.FailToExportTooltips, Newtonsoft.Json.Formatting.Indented); File.WriteAllText(Path.Combine(dlg.SelectedPath, "fail_to_export_nodes.log"), failData, Encoding.UTF8);
@@ -5013,6 +7152,83 @@ namespace WzComparerR2
                 compareThread.Priority = ThreadPriority.Highest;
                 compareThread.Start();
             }
+        }
+
+        /// <summary>Toggles the easy compare option controls as a group while a comparison is running.</summary>
+        private void SetEasyCompareControlsEnabled(bool enabled)
+        {
+            btnEasyCompare.Enabled = enabled;
+            btnPreset.Enabled = enabled;
+            clbRootNode.Enabled = enabled;
+            btnSelectDeselectAllNode.Enabled = enabled;
+            btnReverseNodeSelection.Enabled = enabled;
+            btnCustomCSS.Enabled = enabled;
+            cmbComparePng.Enabled = enabled;
+            chkOutputPng.Enabled = enabled;
+            chkResolvePngLink.Enabled = enabled;
+            chkOutputAddedImg.Enabled = enabled;
+            chkOutputRemovedImg.Enabled = enabled;
+            chkOutputSkillTooltip.Enabled = enabled;
+            chkOutputItemTooltip.Enabled = enabled;
+            chkOutputEqpTooltip.Enabled = enabled;
+            chkOutputMapTooltip.Enabled = enabled;
+            chkOutputMobTooltip.Enabled = enabled;
+            chkOutputNpcTooltip.Enabled = enabled;
+            chkOutputQuestTooltip.Enabled = enabled;
+            chkOutputAchvTooltip.Enabled = enabled;
+            // chkOutputCashTooltip.Enabled = enabled;
+            chkShowObjectID.Enabled = enabled;
+            chkShowChangeType.Enabled = enabled;
+            chkShowLinkedTamingMob.Enabled = enabled;
+            chkHashPngFileName.Enabled = enabled;
+            chkSkipKMSContent.Enabled = enabled;
+            chkMseaMode.Enabled = enabled;
+            chkSkipGodChangseopDuplicatedNodes.Enabled = enabled;
+            chkOutputChairAndRidingMount.Enabled = enabled;
+            btnAvatarCode.Enabled = enabled && chkOutputChairAndRidingMount.Checked;
+        }
+
+        /// <summary>Compares two Unity clients, letting the user swap the new and old versions.</summary>
+        private void EasyCompareUnityClients(EasyComparer comparer, List<UnityAssetDocument> documents, string outputDir)
+        {
+            int indexNew = 0;
+            int indexOld = 1;
+            while (true)
+            {
+                UnityAssetDocument docNew = documents[indexNew];
+                UnityAssetDocument docOld = documents[indexOld];
+                string labelNew = GetUnityClientLabel(docNew);
+                string labelOld = GetUnityClientLabel(docOld);
+
+                string txt = string.Format("Unity client:\r\n\r\n  New version: {0}\r\n  Old version: {1}\r\n\r\nClick \"Yes\" to start the comparison. Click \"No\" to swap the old and new versions.",
+                    labelNew,
+                    labelOld
+                    );
+                switch (MessageBoxEx.Show(txt, "Unity Compare", MessageBoxButtons.YesNoCancel))
+                {
+                    case DialogResult.Yes:
+                        SetEasyCompareControlsEnabled(false);
+                        comparer.EasyCompareUnity(labelNew, docNew.Source, labelOld, docOld.Source, outputDir);
+                        return;
+
+                    case DialogResult.No:
+                        int tmp = indexNew;
+                        indexNew = indexOld;
+                        indexOld = tmp;
+                        break;
+
+                    case DialogResult.Cancel:
+                    default:
+                        return;
+                }
+            }
+        }
+
+        private static string GetUnityClientLabel(UnityAssetDocument document)
+        {
+            string displayName = document == null || document.Source == null ? null
+                : document.Source.ClientInfo == null ? null : document.Source.ClientInfo.DisplayName;
+            return string.IsNullOrEmpty(displayName) ? document?.RootNode?.Text : displayName;
         }
 
         void comparer_StateDetailChanged(object sender, EventArgs e)
@@ -5243,7 +7459,7 @@ namespace WzComparerR2
                 {
                     sw.Start();
                     if (!this.stringLinker.HasValues)
-                        this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+                        this.LoadStringLinker();
 
                     CharaSimLoader.LoadPetEquipInfoIfEmpty();
 
@@ -5337,7 +7553,7 @@ namespace WzComparerR2
                         await Task.Run(() =>
                         {
                             if (!this.stringLinker.HasValues)
-                                this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+                                this.LoadStringLinker();
 
                             // Initialize VCore Dictionary
                             Dictionary<int, List<int>> FifthJobSkillToJobID = new Dictionary<int, List<int>>();
@@ -5721,7 +7937,7 @@ namespace WzComparerR2
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 if (!this.stringLinker.HasValues)
-                    this.stringLinker.Load(findStringWz(), findItemWz(), findEtcWz(), findQuestWz());
+                    this.LoadStringLinker();
 
                 DBConnection conn = new DBConnection(this.stringLinker);
                 conn.ExportSkillOption(dlg.SelectedPath);
@@ -5907,3 +8123,4 @@ namespace WzComparerR2
     }
     #endregion
 }
+
