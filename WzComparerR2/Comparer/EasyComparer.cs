@@ -119,7 +119,7 @@ namespace WzComparerR2.Comparer
         /// Configured from the settings dialog.
         /// </summary>
         public string AvatarCode { get; set; } = DefaultAvatarCode;
-        public const string DefaultAvatarCode = "2000,12000,51484,61183,1003968,1052667,1072867,1082552,1113329,1703113";
+        public const string DefaultAvatarCode = "2000,12000,20000,30000,1040036,1060026";
         public List<Color> ColorTable { get; set; }
         public Dictionary<string, bool> selectedNodes { get; set; }
 
