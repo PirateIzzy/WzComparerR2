@@ -389,11 +389,15 @@ namespace WzComparerR2.WzLib
                 this.Decrypt((ReadOnlySpan<byte>)data, data, keyOffset);
             }
 
-            public unsafe void Decrypt(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, int keyOffset)
+            public virtual unsafe void Decrypt(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, int keyOffset)
             {
                 if (inputBuffer.Length != outputBuffer.Length)
                 {
                     throw new ArgumentException("Input and output buffer lengths must match.");
+                }
+                if (keyOffset < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(keyOffset));
                 }
                 if ((inputBuffer.Length & 1) != 0)
                 {
@@ -406,19 +410,28 @@ namespace WzComparerR2.WzLib
 
                 this.CreateKeyIfNotExist();
 
-                /*
-                long keyVal = MemoryMarshal.Cast<byte, long>(this.keys)[0];
-                while (inputBuffer.Length >= 8)
+                int keyIndex = keyOffset % this.keys.Length;
+                while (inputBuffer.Length >= 8 && keyIndex + 8 <= this.keys.Length)
                 {
-                    MemoryMarshal.Cast<byte, long>(outputBuffer)[0] =
-                        MemoryMarshal.Cast<byte, long>(inputBuffer)[0] ^ keyVal;
+                    ulong keyVal = MemoryMarshal.Cast<byte, ulong>(this.keys.AsSpan(keyIndex, 8))[0];
+                    MemoryMarshal.Cast<byte, ulong>(outputBuffer)[0] =
+                        MemoryMarshal.Cast<byte, ulong>(inputBuffer)[0] ^ keyVal;
                     inputBuffer = inputBuffer.Slice(8);
                     outputBuffer = outputBuffer.Slice(8);
+                    keyIndex += 8;
+                    if (keyIndex == this.keys.Length)
+                    {
+                        keyIndex = 0;
+                    }
                 }
-                */
                 for (int i = 0; i < inputBuffer.Length; i++)
                 {
-                    outputBuffer[i] = (byte)(inputBuffer[i] ^ keys[i % keys.Length]);
+                    outputBuffer[i] = (byte)(inputBuffer[i] ^ this.keys[keyIndex]);
+                    keyIndex++;
+                    if (keyIndex == this.keys.Length)
+                    {
+                        keyIndex = 0;
+                    }
                 }
             }
         }
@@ -473,7 +486,6 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        // KMST1205, position-dependent 64-bit key.
         public class Pkg2DirStringKeyV5 : Pkg2DirStringKey, IWzStatefulDecrypter
         {
             public Pkg2DirStringKeyV5(ulong hash1, ulong hashVersion) : base(0)
@@ -486,78 +498,18 @@ namespace WzComparerR2.WzLib
             private readonly ulong hash1;
             private readonly ulong hashVersion;
 
-            private static ulong Sub1529FA450(ulong hash_ver, ulong hash1)
-            {
-                // v2 = __ROL8__(hash1 ^ 0x81B4A01224AAB10C, 31)
-                ulong v2 = ROL8(hash1 ^ 0x81B4A01224AAB10CUL, 31);
-
-                // MurmurHash3 fmix64 pass 1
-                ulong t1 = 0xFF51AFD7ED558CCDUL * (v2 ^ (v2 >> 33));
-                ulong v3 = 0xC4CEB9FE1A85EC53UL * (t1 ^ (t1 >> 29));
-                v3 ^= v3 >> 32;
-
-                // v4 = __ROR8__(0xBF58476D1CE4E5B9 * ((hash_ver - 0x2E4AB5CD2E6D12FD) ^ 0x84CAA73B2BB70682 ^ (... >> 30)), 27)
-                ulong a = hash_ver - 0x2E4AB5CD2E6D12FDUL;
-                ulong t2 = a ^ 0x84CAA73B2BB70682UL;
-                ulong v4 = ROR8(0xBF58476D1CE4E5B9UL * (t2 ^ (t2 >> 30)), 27);
-
-                // v5 = (0x94D049BB133111EB * (v4 ^ (v4 >> 27))) ^ ((...) >> 31)
-                ulong v5x = 0x94D049BB133111EBUL * (v4 ^ (v4 >> 27));
-                ulong v5 = v5x ^ (v5x >> 31);
-
-                // v6 = v5 + 0x510E527FADE682D1;  v7 = __ROL8__(v5, 17)
-                ulong v6 = v5 + 0x510E527FADE682D1UL;
-                ulong v7 = ROL8(v5, 17);
-
-                // v8 = 0x9FB21C651E98DF25 * ((v3+v6) ^ __ROR8__(v3+v6,25) ^ __ROR8__(v3+v6,47))
-                ulong tmp = v3 + v6;
-                ulong v8 = 0x9FB21C651E98DF25UL * (tmp ^ ROR8(tmp, 25) ^ ROR8(tmp, 47));
-
-                // 最终 mix: 0x94D049BB133111EB * (v3 ^ v8 ^ v7 ^ (v8>>28) ^ (..>>29)), 再 ^ (..>>32)
-                ulong f = v3 ^ v8 ^ v7 ^ (v8 >> 28);
-                ulong fx = 0x94D049BB133111EBUL * (f ^ (f >> 29));
-                return fx ^ (fx >> 32);
-            }
-
             public void ApplyState(ulong filePosition)
             {
-                ulong v33 = Sub1529FA450(hashVersion, hash1);
-
-                // v43 = 0xD1B54A32D192ED03 * (cur_pos - header_size)
-                //      ^ ROL8(0xD1B54A32D192ED03 * (cur_pos - header_size), 32)
-                ulong mul1 = 0xD1B54A32D192ED03UL * filePosition;
-                ulong v43 = mul1 ^ ROL8(mul1, 32);
-
-                // v44 = 0x2545F4914F6CDD1D * (v43 ^ v33 ^ 0x6A09E667F3BCC908
-                //       ^ ROL8(..., 23) ^ ROL8(..., 41))
-                ulong t1 = v43 ^ v33 ^ 0x6A09E667F3BCC908UL;
-                ulong v44 = 0x2545F4914F6CDD1DUL * (t1 ^ ROL8(t1, 23) ^ ROL8(t1, 41));
-
-                // v45 = 0x9FB21C651E98DF25 * ((v43 + v33 + 0x510E527FADE682D1)
-                //        ^ ROR8(..., 25) ^ ROR8(..., 47))
-                ulong sum1 = v43 + v33 + 0x510E527FADE682D1UL;
-                ulong v45 = 0x9FB21C651E98DF25UL * (sum1 ^ ROR8(sum1, 25) ^ ROR8(sum1, 47));
-
-                // v46 = ROL8(
-                //   v45
-                //   ^ (0xBF58476D1CE4E5B9 * (v44 ^ HIDWORD(v44)))
-                //   ^ ((0xBF58476D1CE4E5B9 * (v44 ^ HIDWORD(v44))) >> 29)
-                //   ^ (v45 >> 28),
-                //   v43 & 0x3F)
-                ulong t2 = 0xBF58476D1CE4E5B9UL * (v44 ^ (uint)(v44 >> 32));
-                ulong inner = v45 ^ t2 ^ (t2 >> 29) ^ (v45 >> 28);
-                ulong v46 = ROL8(inner, (int)(v43 & 0x3F));
-
-                // dir_name_key = v46 ^ (v46 >> 29)
-                ulong baseKey = v46 ^ (v46 >> 29);
-
+                ulong baseKey = Pkg2Kmst1205Hash.ComputeDirEntryNameKey(this.hash1, this.hashVersion, filePosition);
                 this.SetBaseKey(baseKey);
             }
         }
 
         public class Pkg2DirStringKeyV6 : Pkg2DirStringKeyV5
         {
-            public Pkg2DirStringKeyV6(ulong hash1, ulong hashVersion) : base(hash1, hashVersion) { }
+            public Pkg2DirStringKeyV6(ulong hash1, ulong hashVersion) : base(hash1, hashVersion)
+            {
+            }
 
             protected override void CreateKeyIfNotExist()
             {
@@ -565,6 +517,7 @@ namespace WzComparerR2.WzLib
                 {
                     return;
                 }
+
                 byte[] keys = new byte[16];
                 Span<ushort> u16Keys = MemoryMarshal.Cast<byte, ushort>(keys.AsSpan());
                 for (int i = 0; i < u16Keys.Length; i++)
@@ -572,6 +525,47 @@ namespace WzComparerR2.WzLib
                     u16Keys[i] = (ushort)(this.baseKey >> (8 * i));
                 }
                 this.keys = keys;
+            }
+        }
+
+        // KMST1208: position-dependent state with a per-character ROR64 cipher.
+        public class Pkg2DirStringKeyV7 : Pkg2DirStringKey, IWzStatefulDecrypter
+        {
+            public Pkg2DirStringKeyV7(ulong hash1, ulong hashVersion) : base(0)
+            {
+                this.c = Pkg2Kmst1208Hash.ComputeC(hashVersion, hash1);
+                this.ApplyState(0);
+            }
+
+            private readonly ulong c;
+            private ulong nameKey;
+
+            public void ApplyState(ulong filePosition)
+            {
+                this.nameKey = Pkg2Kmst1208Hash.ComputeDirEntryNameKey(this.c, (uint)filePosition);
+            }
+
+            public override void Decrypt(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, int keyOffset)
+            {
+                if (inputBuffer.Length != outputBuffer.Length)
+                {
+                    throw new ArgumentException("Input and output buffer lengths must match.");
+                }
+
+                int charCount = inputBuffer.Length / 2;
+                for (int i = 0; i < charCount; i++)
+                {
+                    ushort key = (ushort)ROR(this.nameKey, (31 + 11 * i) & 0x3F);
+                    ushort value = (ushort)(inputBuffer[2 * i] | (inputBuffer[2 * i + 1] << 8));
+                    value ^= key;
+                    outputBuffer[2 * i] = (byte)value;
+                    outputBuffer[2 * i + 1] = (byte)(value >> 8);
+                }
+
+                if ((inputBuffer.Length & 1) != 0)
+                {
+                    outputBuffer[inputBuffer.Length - 1] = inputBuffer[inputBuffer.Length - 1];
+                }
             }
         }
     }

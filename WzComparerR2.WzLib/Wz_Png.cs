@@ -85,17 +85,17 @@ namespace WzComparerR2.WzLib
         public Wz_Image WzImage { get; set; }
 
         /// <summary>
-        /// 非 WZ ファイルソース（例: Unity アセットの Canvas）の PNG バイト列提供者。
-        /// 設定すると <see cref="ExtractPng(int)"/> は WZ データストリームを読まず、この PNG を直接デコードします。
+        /// PNG bytes provider for non-WZ file sources (e.g. a Unity asset Canvas).
+        /// When set, <see cref="ExtractPng(int)"/> decodes this PNG directly instead of reading the WZ data stream.
         /// </summary>
         public Func<byte[]> PngDataProvider { get; set; }
 
         public int GetRawDataSize() => this.GetRawDataSizePerPage() * this.ActualPages;
 
         /// <summary>
-        /// 外部 PNG（<see cref="PngDataProvider"/>）のサイズとデータ長を補います。
-        /// これらの情報は PNG のヘッダーを読むだけで取得でき、画像全体をデコードする必要はありません。
-        /// WZ ソースの画像は元からこれらの値を持つため、このメソッドを呼んでも効果はありません。
+        /// Fills in the size and data length of an external PNG (<see cref="PngDataProvider"/>).
+        /// These values can be obtained by reading only the PNG header, without decoding the whole image.
+        /// Images from a WZ source already have these values, so calling this method has no effect on them.
         /// </summary>
         public void EnsureExternalPngInfo()
         {
@@ -176,7 +176,7 @@ namespace WzComparerR2.WzLib
         {
             if (this.WzImage == null)
             {
-                // 非 WZ 檔來源（例如 Unity canvas）沒有 WZ 資料流，改用 PngDataProvider。
+                // Non-WZ sources (e.g. a Unity canvas) have no WZ data stream; use PngDataProvider instead.
                 throw new NotSupportedException("Cannot read the raw data because this image does not originate from a WZ file.");
             }
             DeflateStream zlib;
@@ -187,7 +187,9 @@ namespace WzComparerR2.WzLib
             Span<byte> zlibHeader = stackalloc byte[2];
             stream.ReadExactly(zlibHeader);
 
-            if (MemoryMarshal.Read<ushort>(zlibHeader) == 0x9C78) //TODO: more generic zlib header validation
+            bool isZlib = (zlibHeader[0] & 0x0F) == 8 && (zlibHeader[0] >> 4) <= 7
+                && (zlibHeader[1] & 0x20) == 0 && ((zlibHeader[0] << 8) | zlibHeader[1]) % 31 == 0;
+            if (isZlib)
             {
                 Stream dataStream = new PartialStream(stream, stream.Position, endPosition - stream.Position, true);
                 zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
@@ -415,6 +417,7 @@ namespace WzComparerR2.WzLib
 
                 Wz_TextureFormat.ARGB8888 or
                 Wz_TextureFormat.RGBA1010102 => width * height * 4,
+
                 Wz_TextureFormat.DXT3 or
                 Wz_TextureFormat.DXT5 => ((width + 3) / 4) * ((height + 3) / 4) * 16,
 
@@ -422,8 +425,11 @@ namespace WzComparerR2.WzLib
                 Wz_TextureFormat.BC7 => width * (height & ~3),
 
                 Wz_TextureFormat.DXT1 => ((width + 3) / 4) * ((height + 3) / 4) * 8,
+
                 Wz_TextureFormat.A8 => width * height,
+
                 Wz_TextureFormat.RGBA32Float => width * height * 16,
+
                 _ => throw new ArgumentException($"Unknown texture format {(int)format}.")
             };
         }
@@ -445,6 +451,6 @@ namespace WzComparerR2.WzLib
         RGBA1010102 = 2562,
         DXT1 = 4097,
         BC7 = 4098,
-        RGBA32Float = 4100
+        RGBA32Float = 4100,
     }
 }

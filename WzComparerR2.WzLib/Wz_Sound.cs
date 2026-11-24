@@ -24,26 +24,26 @@ namespace WzComparerR2.WzLib
         private Wz_Image wz_i;
 
         /// <summary>
-        /// 非 WZ ファイルソース（例: Unity データセットの AudioClip）のサウンドデータ提供者。
-        /// 設定するとサウンドデータをここから取得し、<see cref="DataLength"/> も実際の長さになります。
+        /// Sound data provider for non-WZ file sources (e.g. a Unity dataset AudioClip).
+        /// When set, sound data is taken from here and <see cref="DataLength"/> reports the actual length.
         /// </summary>
         public Func<byte[]> DataProvider { get; set; }
 
-        /// <summary>非 WZ ソースのチャンネル数（WZ ソースでは null）。</summary>
+        /// <summary>Channel count of a non-WZ source (null for WZ sources).</summary>
         public int? ExternalChannels { get; set; }
 
-        /// <summary>非 WZ ソースのサンプリングレート（WZ ソースでは null）。</summary>
+        /// <summary>Sampling rate of a non-WZ source (null for WZ sources).</summary>
         public int? ExternalFrequency { get; set; }
 
-        /// <summary>非 WZ ソースの長さ（ミリ秒。WZ ソースでは null）。</summary>
+        /// <summary>Length of a non-WZ source in milliseconds (null for WZ sources).</summary>
         public int? ExternalMs { get; set; }
 
-        /// <summary>非 WZ ソースのサウンド形式。設定するとデータ内容からの推測を行いません。</summary>
+        /// <summary>Sound format of a non-WZ source. When set, the format is not guessed from the data.</summary>
         public Wz_SoundType? ExternalSoundType { get; set; }
 
         private byte[] providerCache;
 
-        /// <summary>外部ソースのサウンドデータを取得します（キャッシュあり）。</summary>
+        /// <summary>Gets sound data from an external source (cached).</summary>
         private byte[] GetProviderData()
         {
             Func<byte[]> provider = this.DataProvider;

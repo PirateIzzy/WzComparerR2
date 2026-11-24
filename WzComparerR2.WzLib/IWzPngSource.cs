@@ -3,16 +3,16 @@ using System;
 namespace WzComparerR2.WzLib
 {
     /// <summary>
-    /// PNG エンコードデータで画像を提供するノード値。
+    /// A node value that provides an image as PNG-encoded data.
     /// <para>
-    /// 従来の WZ の画像は <see cref="Wz_Png"/>（ピクセルは Wz ファイルのデータストリーム内）で、
-    /// その他のソース（例: Unity アセットの Canvas ノード）はこのインターフェイスを実装するだけで、
-    /// 既存の画像デコードと tooltip の流れをそのまま利用できます。
+    /// Classic WZ images are <see cref="Wz_Png"/> (pixels live inside the WZ file's data stream); other
+    /// sources (e.g. a Unity asset Canvas node) only need to implement this interface to reuse the
+    /// existing image decoding and tooltip flow as-is.
     /// </para>
     /// </summary>
     public interface IWzPngSource
     {
-        /// <summary>PNG エンコードされたバイト列を取得します。画像がない場合は null。</summary>
+        /// <summary>Gets the PNG-encoded bytes, or null when there is no image.</summary>
         byte[] GetPngData();
     }
 }

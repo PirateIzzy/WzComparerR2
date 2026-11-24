@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 using System.Reflection;
@@ -197,6 +196,11 @@ namespace WzComparerR2.WzLib
             if (this.value is T)
                 return (T)this.value;
 
+            if (this.value is uint uintValue && typeT == typeof(int))
+                return (T)(object)((int)uintValue);
+            if (this.value is int intValue && typeT == typeof(uint))
+                return (T)(object)((uint)intValue);
+
 
             if (this.value is string s)
             {
@@ -319,13 +323,23 @@ namespace WzComparerR2.WzLib
                 }
             }
 
-            private class InnerCollection : KeyedCollection<string, Wz_Node>
+            private class InnerCollection : IEnumerable<Wz_Node>
             {
                 public InnerCollection(Wz_Node owner)
-                    : base(null, 12)
                 {
                     this.parentNode = owner;
+                    this.items = new List<Wz_Node>();
                 }
+
+                private const int DictionaryCreationThreshold = 12;
+                private readonly Wz_Node parentNode;
+                private readonly List<Wz_Node> items;
+                // TODO: Replace Dictionary to a custom hash table implementation to reduce memory usage.
+                private Dictionary<string, Wz_Node> itemsByName;
+
+                public Wz_Node this[int index] => this.items[index];
+
+                public int Count => this.items.Count;
 
                 public Wz_Node Add(string nodeText)
                 {
@@ -334,48 +348,74 @@ namespace WzComparerR2.WzLib
                     return newNode;
                 }
 
-                public new void Add(Wz_Node item)
+                public void Add(Wz_Node item)
                 {
-                    base.Add(item);
                     if (item.parentNode != null)
                     {
-                        int index = item.parentNode.nodes.innerCollection.Items.IndexOf(item);
-                        if (index > -1)
+                        item.parentNode.nodes.innerCollection?.Remove(item);
+                    }
+                    this.items.Add(item);
+                    item.parentNode = this.parentNode;
+                    if (item.text != null)
+                    {
+                        if (this.itemsByName != null)
                         {
-                            item.parentNode.nodes.innerCollection.RemoveItem(index);
+                            this.itemsByName[item.text] = item;
+                        }
+                        else if (this.items.Count > DictionaryCreationThreshold)
+                        {
+                            this.CreateNameIndex();
                         }
                     }
-                    item.parentNode = this.parentNode;
                 }
 
-                protected override void RemoveItem(int index)
+                private void Remove(Wz_Node item)
                 {
-                    var item = this[index];
-                    if (item != null)
+                    int index = this.items.IndexOf(item);
+                    if (index < 0)
                     {
-                        item.parentNode = null;
+                        return;
                     }
-                    base.RemoveItem(index);
+                    this.items.RemoveAt(index);
+                    item.parentNode = null;
+                    if (this.itemsByName != null && this.items.Count <= DictionaryCreationThreshold)
+                    {
+                        this.itemsByName = null;
+                    }
+                    else if (this.itemsByName != null && item.text != null
+                        && this.itemsByName.TryGetValue(item.text, out Wz_Node indexedItem)
+                        && object.ReferenceEquals(indexedItem, item))
+                    {
+                        this.ReindexName(item.text);
+                    }
                 }
-
-                private readonly Wz_Node parentNode;
 
                 public void Sort()
                 {
-                    (base.Items as List<Wz_Node>)?.Sort();
+                    this.items.Sort();
                 }
 
                 public void Sort<T>(Func<Wz_Node, T> getKeyFunc) where T : IComparable<T>
                 {
-                    ListSorter.Sort(base.Items as List<Wz_Node>, getKeyFunc);
+                    ListSorter.Sort(this.items, getKeyFunc);
                 }
 
                 public void Trim()
                 {
-                    (base.Items as List<Wz_Node>)?.TrimExcess();
+                    this.items.TrimExcess();
                 }
 
-                public new Wz_Node this[string key]
+                public void Clear()
+                {
+                    foreach (Wz_Node item in this.items)
+                    {
+                        item.parentNode = null;
+                    }
+                    this.items.Clear();
+                    this.itemsByName = null;
+                }
+
+                public Wz_Node this[string key]
                 {
                     get
                     {
@@ -383,30 +423,55 @@ namespace WzComparerR2.WzLib
                         {
                             return null;
                         }
-                        if (this.Dictionary != null)
+                        if (this.itemsByName != null)
                         {
-                            Wz_Node node;
-                            this.Dictionary.TryGetValue(key, out node);
-                            return node;
+                            this.itemsByName.TryGetValue(key, out Wz_Node item);
+                            return item;
                         }
-                        else
+                        for (int i = this.items.Count - 1; i >= 0; i--)
                         {
-                            List<Wz_Node> list = this.Items as List<Wz_Node>;
-                            foreach (var node in list)
+                            if (string.Equals(this.items[i].text, key, StringComparison.Ordinal))
                             {
-                                if (this.Comparer.Equals(this.GetKeyForItem(node), key))
-                                {
-                                    return node;
-                                }
+                                return this.items[i];
                             }
-                            return null;
+                        }
+                        return null;
+                    }
+                }
+
+                public IEnumerator<Wz_Node> GetEnumerator()
+                {
+                    return this.items.GetEnumerator();
+                }
+
+                System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                {
+                    return this.GetEnumerator();
+                }
+
+                private void CreateNameIndex()
+                {
+                    this.itemsByName = new Dictionary<string, Wz_Node>(StringComparer.Ordinal);
+                    foreach (Wz_Node item in this.items)
+                    {
+                        if (item.text != null)
+                        {
+                            this.itemsByName[item.text] = item;
                         }
                     }
                 }
 
-                protected override string GetKeyForItem(Wz_Node item)
+                private void ReindexName(string name)
                 {
-                    return item.text;
+                    for (int i = this.items.Count - 1; i >= 0; i--)
+                    {
+                        if (string.Equals(this.items[i].text, name, StringComparison.Ordinal))
+                        {
+                            this.itemsByName[name] = this.items[i];
+                            return;
+                        }
+                    }
+                    this.itemsByName.Remove(name);
                 }
             }
 
@@ -463,19 +528,19 @@ namespace WzComparerR2.WzLib
     public static class Wz_NodeExtension
     {
         /// <summary>
-        /// 非 WZ ファイルソース（例: Unity データセット）の型解決処理。null を返すとそのノードは外部ソースに属しません。
+        /// Type resolution for non-WZ file sources (e.g. a Unity dataset). Returning null means the node does not belong to an external source.
         /// </summary>
         public static Func<Wz_Node, Wz_Type?> ExternalTypeResolver { get; set; }
 
         /// <summary>
-        /// 非 WZ ファイルソースの img 内容展開処理: img ノードを渡すと、その内容ルートノードを返します
-        /// （例: Unity アセットの <c>UnityWzImage</c>）。見つからない場合は null を返します。
+        /// Expands the img content of a non-WZ file source: given an img node, returns its content root
+        /// node (e.g. a Unity asset's <c>UnityWzImage</c>). Returns null when it cannot be found.
         /// </summary>
         public static Func<Wz_Node, Wz_Node> ExternalImageResolver { get; set; }
 
         /// <summary>
-        /// img ノードの内容ルートノードを取得します: 従来の WZ は <see cref="Wz_Image"/> を展開し、
-        /// その他のソース（例: Unity データセット）は <see cref="ExternalImageResolver"/> に委ねます。
+        /// Gets the content root node of an img node: classic WZ expands the <see cref="Wz_Image"/>, and
+        /// other sources (e.g. a Unity dataset) are delegated to <see cref="ExternalImageResolver"/>.
         /// </summary>
         public static Wz_Node GetImageContentNode(this Wz_Node imageNode)
         {
@@ -488,8 +553,8 @@ namespace WzComparerR2.WzLib
             {
                 if (image.WzFile == null)
                 {
-                    // 非 WZ ファイルソース（例: Unity アセット）: 外部リゾルバーで上位ノードチェーンを補い、
-                    // FullPathToFile などのパス判定を WZ のロジックのまま使えるようにします。
+                    // Non-WZ file source (e.g. a Unity asset): let the external resolver fill in the parent node
+                    // chain so path checks such as FullPathToFile keep working with the WZ logic.
                     Func<Wz_Node, Wz_Node> externalResolver = ExternalImageResolver;
                     Wz_Node external = externalResolver?.Invoke(imageNode);
                     if (external != null)
@@ -504,8 +569,8 @@ namespace WzComparerR2.WzLib
         }
 
         /// <summary>
-        /// ノードが属する WZ 型を取得します: まず所属する <see cref="Wz_File"/> を探し、
-        /// 見つからない場合は <see cref="ExternalTypeResolver"/>（例: Unity データセット）に問い合わせます。
+        /// Gets the WZ type the node belongs to: first look for the owning <see cref="Wz_File"/>, and when
+        /// it is not found, query <see cref="ExternalTypeResolver"/> (e.g. a Unity dataset).
         /// </summary>
         public static Wz_Type? GetNodeWzType(this Wz_Node node)
         {
