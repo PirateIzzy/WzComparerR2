@@ -328,4 +328,21 @@ namespace WzComparerR2.CharaSim
         public bool IgnoreEvalError { get; set; }
         public bool EndColorOnNewLine { get; set; }
     }
+
+    public interface ISkillPropertyResolver
+    {
+        bool TryResolve(string propertyName, int? skillId, int? skillLevel, out ResolvedSkillProperty value);
+    }
+
+    public readonly struct ResolvedSkillProperty
+    {
+        public ResolvedSkillProperty(string expression, int? evaluationLevel)
+        {
+            Expression = expression;
+            EvaluationLevel = evaluationLevel;
+        }
+
+        public string Expression { get; }
+        public int? EvaluationLevel { get; }
+    }
 }

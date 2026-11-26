@@ -84,7 +84,41 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_Image WzImage { get; set; }
 
+        /// <summary>
+        /// PNG bytes provider for non-WZ file sources (e.g. a Unity asset Canvas).
+        /// When set, <see cref="ExtractPng(int)"/> decodes this PNG directly instead of reading the WZ data stream.
+        /// </summary>
+        public Func<byte[]> PngDataProvider { get; set; }
+
         public int GetRawDataSize() => this.GetRawDataSizePerPage() * this.ActualPages;
+
+        /// <summary>
+        /// Fills in the size and data length of an external PNG (<see cref="PngDataProvider"/>).
+        /// These values can be obtained by reading only the PNG header, without decoding the whole image.
+        /// Images from a WZ source already have these values, so calling this method has no effect on them.
+        /// </summary>
+        public void EnsureExternalPngInfo()
+        {
+            Func<byte[]> provider = this.PngDataProvider;
+            if (provider == null)
+            {
+                return;
+            }
+
+            byte[] data = provider();
+            if (data == null || data.Length < 24)
+            {
+                return;
+            }
+
+            this.DataLength = data.Length;
+            if (data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47
+                && data[12] == 'I' && data[13] == 'H' && data[14] == 'D' && data[15] == 'R')
+            {
+                this.Width = (int)(((uint)data[16] << 24) | ((uint)data[17] << 16) | ((uint)data[18] << 8) | data[19]);
+                this.Height = (int)(((uint)data[20] << 24) | ((uint)data[21] << 16) | ((uint)data[22] << 8) | data[23]);
+            }
+        }
 
         public int GetRawDataSizePerPage() => GetUncompressedDataSize(this.Format, this.ActualScale, this.Width, this.Height);
 
@@ -140,6 +174,11 @@ namespace WzComparerR2.WzLib
 
         public Stream UnsafeOpenRead()
         {
+            if (this.WzImage == null)
+            {
+                // Non-WZ sources (e.g. a Unity canvas) have no WZ data stream; use PngDataProvider instead.
+                throw new NotSupportedException("Cannot read the raw data because this image does not originate from a WZ file.");
+            }
             DeflateStream zlib;
 
             var stream = this.WzImage.OpenRead();
@@ -148,7 +187,9 @@ namespace WzComparerR2.WzLib
             Span<byte> zlibHeader = stackalloc byte[2];
             stream.ReadExactly(zlibHeader);
 
-            if (MemoryMarshal.Read<ushort>(zlibHeader) == 0x9C78) //TODO: more generic zlib header validation
+            bool isZlib = (zlibHeader[0] & 0x0F) == 8 && (zlibHeader[0] >> 4) <= 7
+                && (zlibHeader[1] & 0x20) == 0 && ((zlibHeader[0] << 8) | zlibHeader[1]) % 31 == 0;
+            if (isZlib)
             {
                 Stream dataStream = new PartialStream(stream, stream.Position, endPosition - stream.Position, true);
                 zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
@@ -172,6 +213,12 @@ namespace WzComparerR2.WzLib
 
         public Bitmap ExtractPng(int page)
         {
+            Func<byte[]> provider = this.PngDataProvider;
+            if (provider != null)
+            {
+                return ExtractExternalPng(provider);
+            }
+
             if (this.Pages > 0)
             {
                 if (page < 0 || page >= this.Pages)
@@ -314,8 +361,24 @@ namespace WzComparerR2.WzLib
             return pngDecoded;
         }
 
-        private static void CopyBmpDataWithStride(byte[] source, int stride, BitmapData bmpData)
+        private Bitmap ExtractExternalPng(Func<byte[]> provider)
         {
+            byte[] data = provider();
+            if (data == null || data.Length == 0)
+            {
+                return null;
+            }
+            this.DataLength = data.Length;
+            using (var stream = new MemoryStream(data))
+            using (var decoded = new Bitmap(stream))
+            {
+                this.Width = decoded.Width;
+                this.Height = decoded.Height;
+                return new Bitmap(decoded);
+            }
+        }
+
+        private static void CopyBmpDataWithStride(byte[] source, int stride, BitmapData bmpData)        {
             if (bmpData.Stride == stride)
             {
                 Marshal.Copy(source, 0, bmpData.Scan0, source.Length);
@@ -354,6 +417,7 @@ namespace WzComparerR2.WzLib
 
                 Wz_TextureFormat.ARGB8888 or
                 Wz_TextureFormat.RGBA1010102 => width * height * 4,
+
                 Wz_TextureFormat.DXT3 or
                 Wz_TextureFormat.DXT5 => ((width + 3) / 4) * ((height + 3) / 4) * 16,
 
@@ -361,8 +425,11 @@ namespace WzComparerR2.WzLib
                 Wz_TextureFormat.BC7 => width * (height & ~3),
 
                 Wz_TextureFormat.DXT1 => ((width + 3) / 4) * ((height + 3) / 4) * 8,
+
                 Wz_TextureFormat.A8 => width * height,
+
                 Wz_TextureFormat.RGBA32Float => width * height * 16,
+
                 _ => throw new ArgumentException($"Unknown texture format {(int)format}.")
             };
         }
@@ -384,6 +451,6 @@ namespace WzComparerR2.WzLib
         RGBA1010102 = 2562,
         DXT1 = 4097,
         BC7 = 4098,
-        RGBA32Float = 4100
+        RGBA32Float = 4100,
     }
 }

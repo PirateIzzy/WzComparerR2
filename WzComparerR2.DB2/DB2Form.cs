@@ -123,6 +123,17 @@ namespace WzComparerR2.DB2
             return Db2Host.GetNode(Path);
         }
 
+        /// <summary>
+        /// データセットに存在しない節点（Unity データセットに無い分類など）でも
+        /// <c>.Nodes</c> の列挙で落ちないようにするための空ノード付き取得です。
+        /// </summary>
+        Wz_Node GetNodeOrEmpty(string Path)
+        {
+            return GetNode(Path) ?? EmptyNode;
+        }
+
+        private static readonly Wz_Node EmptyNode = new Wz_Node(string.Empty);
+
         void LoadItem()
         {
             var ItemDir = TabPage(tabIndex).Name;
@@ -145,7 +156,7 @@ namespace WzComparerR2.DB2
             Bitmap Icon = null;
 
 
-            foreach (var img in GetNode("Item/" + ItemDir).Nodes)
+            foreach (var img in GetNodeOrEmpty("Item/" + ItemDir).Nodes)
             {
                 if (!Char.IsNumber(img.Text[0]))
                     continue;
@@ -165,13 +176,13 @@ namespace WzComparerR2.DB2
                         continue;
 
                     List<string> CashPackages = new List<string>();
-                    foreach (var Iter in GetNode("Etc/CashPackage.img").Nodes)
+                    foreach (var Iter in GetNodeOrEmpty("Etc/CashPackage.img").Nodes)
                     {
                         CashPackages.Add(Iter.Text);
 
                     }
 
-                    foreach (var Iter in GetNode("Item/Special/0910.img").Nodes)
+                    foreach (var Iter in GetNodeOrEmpty("Item/Special/0910.img").Nodes)
                     {
                         if (CashPackages.Contains(Iter.Text))
                         {
@@ -185,7 +196,7 @@ namespace WzComparerR2.DB2
                 }
                 else
                 {
-                    foreach (var Iter in GetNode("Item/" + ItemDir + "/" + img.Text).Nodes)
+                    foreach (var Iter in GetNodeOrEmpty("Item/" + ItemDir + "/" + img.Text).Nodes)
                     {
                         DumpData2(Iter);
                         ID = Iter.Text.IDString();
@@ -433,7 +444,7 @@ namespace WzComparerR2.DB2
             string ID, Desc, h1;
             Bitmap Icon = null;
             string IName, Data = "", D;
-            foreach (var img in GetNode("Character/" + Dir).Nodes)
+            foreach (var img in GetNodeOrEmpty("Character/" + Dir).Nodes)
             {
                 if (LeftStr(img.Text, 1) != "0")
                     continue;
@@ -462,7 +473,7 @@ namespace WzComparerR2.DB2
                 RowList[Row] += ", " + Desc + h1;
 
                 Grid.Rows.Add(img.ImgID(), Icon, Child.GetValue2(ID + "/name", ""), "", RowList[Row]);
-                foreach (var Iter in GetNode("Character/" + Dir + '/' + img.Text).Nodes)
+                foreach (var Iter in GetNodeOrEmpty("Character/" + Dir + '/' + img.Text).Nodes)
                 {
                     foreach (var Iter2 in Iter.Nodes)
                     {
@@ -524,7 +535,7 @@ namespace WzComparerR2.DB2
                 {
                     if (GetNode("Skill/8000" + i.ToString() + ".img") != null)
                     {
-                        foreach (var Iter in GetNode("Skill/8000" + i.ToString() + ".img/skill").Nodes)
+                        foreach (var Iter in GetNodeOrEmpty("Skill/8000" + i.ToString() + ".img/skill").Nodes)
                         {
                             if ((Iter.GetNode("vehicleID") != null) && (!Dict.ContainsKey("0" + Iter.GetNode("vehicleID").Value.ToString())))
                                 Dict.Add("0" + Iter.GetNode("vehicleID").Value.ToString(), Iter.Text);
@@ -536,7 +547,7 @@ namespace WzComparerR2.DB2
                 {
                     if (GetNode("Skill/80011" + i.ToString() + ".img") != null)
                     {
-                        foreach (var Iter in GetNode("Skill/80011" + i.ToString() + ".img/skill").Nodes)
+                        foreach (var Iter in GetNodeOrEmpty("Skill/80011" + i.ToString() + ".img/skill").Nodes)
                         {
                             if ((Iter.GetNode("vehicleID") != null) && (!Dict.ContainsKey("0" + Iter.GetNode("vehicleID").Value.ToString())))
                                 Dict.Add("0" + Iter.GetNode("vehicleID").Value.ToString(), Iter.Text);
@@ -572,7 +583,7 @@ namespace WzComparerR2.DB2
             var Links = new List<(string, int)>();
             var MapNames = new Dictionary<string, (string, string)>();
             string StreetName, MapName;
-            foreach (var Iter in GetNode("String/Map.img").Nodes)
+            foreach (var Iter in GetNodeOrEmpty("String/Map.img").Nodes)
             {
                 foreach (var Iter2 in Iter.Nodes)
                 {
@@ -771,7 +782,7 @@ namespace WzComparerR2.DB2
                 string Data = "", D = "";
                 Bitmap Icon = null;
 
-                foreach (var Iter in GetNode("String/Mob.img").Nodes)
+                foreach (var Iter in GetNodeOrEmpty("String/Mob.img").Nodes)
                 {
                     var ID = Iter.Text.PadLeft(7, '0');
                     if (GetNode("Mob/" + ID + ".img") == null)
@@ -812,7 +823,7 @@ namespace WzComparerR2.DB2
                         Icon = Child.ExtractPng();
                     Grid.Rows.Add(ID, Icon, GetNode("String/Mob.img/" + Iter.Text).GetValue2("name", ""), "");
 
-                    foreach (var Iter2 in GetNode("Mob/" + ID + ".img" + "/info").Nodes)
+                    foreach (var Iter2 in GetNodeOrEmpty("Mob/" + ID + ".img" + "/info").Nodes)
                     {
                         if ((Iter2.Text == "category") && (Category.ContainsKey(Iter2.ValueToStr())))
                             Data = Category[Iter2.ValueToStr()];
@@ -864,7 +875,7 @@ namespace WzComparerR2.DB2
                 var Row = -1;
                 string Data = "", D = "";
                 Bitmap Icon = null;
-                foreach (var Iter in GetNode("Mob").Nodes)
+                foreach (var Iter in GetNodeOrEmpty("Mob").Nodes)
                 {
                     if (RightStr(Iter.Text, 4) != ".img")
                         continue;
@@ -901,7 +912,7 @@ namespace WzComparerR2.DB2
                     if (Link != null)
                         Links.Add((Link.Value.ToString() + ".img", Row));
 
-                    foreach (var Iter2 in GetNode("Mob/" + Iter.Text + "/info").Nodes)
+                    foreach (var Iter2 in GetNodeOrEmpty("Mob/" + Iter.Text + "/info").Nodes)
                     {
                         if ((Iter2.Text == "category") && (Category.ContainsKey(Iter2.ValueToStr())))
                             Data = Category[Iter2.ValueToStr()];
@@ -1002,7 +1013,7 @@ namespace WzComparerR2.DB2
 
                         Grid.Rows.Add(BookID, Icon, BookName, "", "");
 
-                        foreach (var Iter in GetNode("Skill/" + img.Text).Nodes)
+                        foreach (var Iter in GetNodeOrEmpty("Skill/" + img.Text).Nodes)
                         {
                             foreach (var Iter2 in Iter.Nodes)
                             {
@@ -1069,7 +1080,7 @@ namespace WzComparerR2.DB2
             var Row = -1;
             var Links = new List<(string, int)>();
             Bitmap Icon = null;
-            foreach (var Img in GetNode("Npc").Nodes)
+            foreach (var Img in GetNodeOrEmpty("Npc").Nodes)
             {
                 if (!Char.IsNumber(Img.Text[0]))
                     continue;
@@ -1100,7 +1111,7 @@ namespace WzComparerR2.DB2
                 Grid[3, i].Value = RowList[i];
             ColList.Clear();
             RowList.Clear();
-            foreach (var Img in GetNode("Npc").Nodes)
+            foreach (var Img in GetNodeOrEmpty("Npc").Nodes)
             {
                 DumpData2(GetNode("Npc/" + Img.Text + "/info"));
             }
@@ -1116,13 +1127,13 @@ namespace WzComparerR2.DB2
             var Dict = new Dictionary<string, (string, string)>();
             var imgs = new List<string>();
             string Desc = "", Name = "";
-            foreach (var Iter in GetNode("String/Consume.img").Nodes)
+            foreach (var Iter in GetNodeOrEmpty("String/Consume.img").Nodes)
             {
                 Desc = Iter.GetValue2("desc", "");
                 Name = Iter.GetValue2("name", "");
                 Dict.Add(Iter.Text, (Name, Desc));
             }
-            foreach (var img in GetNode("Morph").Nodes)
+            foreach (var img in GetNodeOrEmpty("Morph").Nodes)
             {
                 if (!Char.IsNumber(img.Text[0]))
                     continue;
@@ -1130,7 +1141,7 @@ namespace WzComparerR2.DB2
             }
             Bitmap Icon = null;
             Bitmap MorphPic = null;
-            foreach (var Iter in GetNode("Item/Consume/0221.img").Nodes)
+            foreach (var Iter in GetNodeOrEmpty("Item/Consume/0221.img").Nodes)
             {
                 DumpData2(Iter);
                 var ID = Iter.Text;
@@ -1165,7 +1176,7 @@ namespace WzComparerR2.DB2
             Wz_Node CardEntry;
             Bitmap MobPic = null, Icon = null;
             string CardID = "", MobID = "";
-            foreach (var img in GetNode("Character/Familiar").Nodes)
+            foreach (var img in GetNodeOrEmpty("Character/Familiar").Nodes)
             {
                 var ID = img.ImgID();
                 var Entry = GetNode("Character/Familiar/" + img.Text);
@@ -1246,7 +1257,7 @@ namespace WzComparerR2.DB2
             Bitmap Icon = null, Sample = null;
             Bitmap bb = new Bitmap(20, 20);
 
-            foreach (var Iter in GetNode("String/Consume.img").Nodes)
+            foreach (var Iter in GetNodeOrEmpty("String/Consume.img").Nodes)
             {
                 var Name = Iter.GetValue2("name", "");
                 if ((Name.Contains("字型")) || (Name.Contains("ジスキン")) || (Name.Contains("스킨")) || (Name.Contains
@@ -1284,7 +1295,7 @@ namespace WzComparerR2.DB2
             var Links = new List<(string, int)>();
             Bitmap Icon = null;
 
-            foreach (var img in GetNode("Reactor").Nodes)
+            foreach (var img in GetNodeOrEmpty("Reactor").Nodes)
             {
                 if (!Char.IsNumber(img.Text[0]))
                     continue;

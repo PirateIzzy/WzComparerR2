@@ -2099,15 +2099,20 @@ namespace WzComparerR2.CharaSimControl
                         string exclusiveEquip;
                         if (!string.IsNullOrEmpty(kv.Value.Info))
                         {
-                            var itemGroup = kv.Value.Info;
-                            var delStr = "s cannot be stacked.";
-                            if (kv.Value.Info.Contains(delStr))
+                            // The info of a Classic World (Unity client) item may be a script string key.
+                            var itemGroup = CharaSimLoader.ResolveScriptString(kv.Value.Info);
+                            if (itemGroup == null)
                             {
-                                itemGroup = itemGroup.Replace(delStr, "");
-                            }
-                            else
-                            {
-                                itemGroup += " Type Item";
+                                itemGroup = kv.Value.Info;
+                                var delStr = "s cannot be stacked.";
+                                if (kv.Value.Info.Contains(delStr))
+                                {
+                                    itemGroup = itemGroup.Replace(delStr, "");
+                                }
+                                else
+                                {
+                                    itemGroup += " Type Item";
+                                }
                             }
                             exclusiveEquip = $"#$rCan't Equip Duplicate# ({itemGroup}) #$rItems#";
                         }

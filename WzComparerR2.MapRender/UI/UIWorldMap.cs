@@ -246,6 +246,9 @@ namespace WzComparerR2.MapRender.UI
             this.worldMaps.Clear();
             this.CurrentWorldMap = null;
 
+            // Classic（Unity）ではスポット画像が 1 枚しかないため、実際に使われている種別を記録します。
+            var spotTypes = new HashSet<int>();
+
             foreach (var imgNode in worldmapNode.Nodes)
             {
                 var img = imgNode.GetNodeWzImage();
@@ -266,8 +269,11 @@ namespace WzComparerR2.MapRender.UI
                     }
                     if (string.IsNullOrEmpty(worldMapInfo.Name))
                     {
-                        var m = Regex.Match(img.Name, @"^(.*)\.img$");
-                        worldMapInfo.Name = m.Success ? m.Result("$1") : img.Name;
+                        // WZ の img 名は "WorldMap000.img"、Unity アセットの img 名は索引キー
+                        // （Map/WorldMap/WorldMap000）なので、どちらでも動くようノード名から取得します。
+                        string imageText = string.IsNullOrEmpty(img.Node?.Text) ? img.Name : img.Node.Text;
+                        var m = Regex.Match(imageText, @"^(.*)\.img$");
+                        worldMapInfo.Name = m.Success ? m.Result("$1") : imageText;
                     }
 
                     //加载地图名称
@@ -285,13 +291,24 @@ namespace WzComparerR2.MapRender.UI
                         worldMapInfo.DisplayName = nameDictionary[worldMapInfo.Name];
                     }
 
+                    // Classic（Unity）の MapLink には toolTip が無く、表示文字列は
+                    // String/<region>/WorldMap/<id>/values/<index>_toolTip に格納されています。
+                    Wz_Node worldMapStringValues = null;
+                    string worldMapStringId = GetWorldMapStringId(worldMapInfo.Name);
+                    if (worldMapStringId != null)
+                    {
+                        worldMapStringValues = PluginBase.PluginManager.FindWz(
+                            "String/WorldMap.img/" + worldMapStringId + "/values");
+                    }
+
                     //加载baseImg
                     node = img.Node.Nodes["BaseImg"]?.Nodes["0"];
-                    if (node == null)
+                    if (node != null)
                     {
-                        continue;
+                        worldMapInfo.BaseImg = LoadTextureItem(node);
                     }
-                    worldMapInfo.BaseImg = LoadTextureItem(node);
+                    // Classic（Unity）データセットには BaseImg を持つワールドマップが一部しかありません。
+                    // 画像がなくても一覧には載せ、スポットだけを表示します（WZ は全 img に BaseImg があるため影響なし）。
 
                     //加载地图列表
                     node = img.Node.Nodes["MapList"];
@@ -302,12 +319,13 @@ namespace WzComparerR2.MapRender.UI
                             child,
                             index = int.TryParse(child.Text, out var nodeInex) ? nodeInex : -1,
                         }).Where(item => item.index > -1)
-                            .OrderBy(item => item.index)
-                            .Select(item => item.child);
+                            .OrderBy(item => item.index);
 
-                        foreach (var spotNode in spotNodes)
+                        foreach (var spotItem in spotNodes)
                         {
+                            var spotNode = spotItem.child;
                             var spot = new MapSpot();
+                            spot.Index = spotItem.index;
                             var location = spotNode.Nodes["spot"]?.GetValueEx<Wz_Vector>(null);
                             if (location != null)
                             {
@@ -320,8 +338,11 @@ namespace WzComparerR2.MapRender.UI
                                     spotNode.Nodes["y"].GetValueEx<int>(0));
                             }
                             spot.Type = spotNode.Nodes["type"].GetValueEx<int>(0);
-                            spot.Title = spotNode.Nodes["title"].GetValueEx<string>(null);
-                            spot.Desc = spotNode.Nodes["desc"].GetValueEx<string>(null);
+                            spotTypes.Add(spot.Type);
+                            spot.Title = spotNode.Nodes["title"].GetValueEx<string>(null)
+                                ?? worldMapStringValues?.Nodes[spot.Index + "_title"].GetValueEx<string>(null);
+                            spot.Desc = spotNode.Nodes["desc"].GetValueEx<string>(null)
+                                ?? worldMapStringValues?.Nodes[spot.Index + "_desc"].GetValueEx<string>(null);
                             spot.NoTooltip = spotNode.Nodes["noToolTip"].GetValueEx<int>(0) != 0;
                             var pathNode = spotNode.Nodes["path"];
                             if (pathNode != null)
@@ -333,7 +354,12 @@ namespace WzComparerR2.MapRender.UI
                             {
                                 foreach (var subNode in mapNoNode.Nodes)
                                 {
-                                    spot.MapNo.Add(subNode.GetValue<int>());
+                                    // 数値でないノード（Classic データの空ノードなど）は無視して読み込みを継続します。
+                                    int? mapNo = subNode.GetValueEx<int?>(null);
+                                    if (mapNo != null)
+                                    {
+                                        spot.MapNo.Add(mapNo.Value);
+                                    }
                                 }
                             }
                             worldMapInfo.MapList.Add(spot);
@@ -346,9 +372,16 @@ namespace WzComparerR2.MapRender.UI
                     {
                         foreach (var mapLinkNode in node.Nodes)
                         {
+                            int linkIndex;
+                            if (!int.TryParse(mapLinkNode.Text, out linkIndex))
+                            {
+                                continue;
+                            }
+
                             var link = new MapLink();
-                            link.Index = int.Parse(mapLinkNode.Text);
-                            link.Tooltip = mapLinkNode.Nodes["toolTip"].GetValueEx<string>(null);
+                            link.Index = linkIndex;
+                            link.Tooltip = mapLinkNode.Nodes["toolTip"].GetValueEx<string>(null)
+                                ?? worldMapStringValues?.Nodes[linkIndex + "_toolTip"].GetValueEx<string>(null);
                             link.Desc = mapLinkNode.Nodes["desc"].GetValueEx<string>(null);
                             var linkNode = mapLinkNode.Nodes["link"];
                             if (linkNode != null)
@@ -409,11 +442,24 @@ namespace WzComparerR2.MapRender.UI
             var mapImageNode = worldMapResNode?.Nodes["mapImage"];
             if (mapImageNode != null)
             {
-                foreach (var imgNode in mapImageNode.Nodes)
+                if (mapImageNode.Nodes.Count > 0)
                 {
-                    var texture = this.LoadTextureItem(imgNode);
-                    var key = "mapImage/" + imgNode.Text;
-                    this.Resources[key] = texture;
+                    foreach (var imgNode in mapImageNode.Nodes)
+                    {
+                        var texture = this.LoadTextureItem(imgNode);
+                        var key = "mapImage/" + imgNode.Text;
+                        this.Resources[key] = texture;
+                    }
+                }
+                else if (mapImageNode.Value is Wz_Png)
+                {
+                    // Classic（Unity）データセットのスポット画像は単一の canvas だけなので、
+                    // 読み込んだ全ワールドマップに現れるスポット種別へ同じ画像を割り当てます。
+                    var texture = this.LoadTextureItem(mapImageNode);
+                    foreach (int spotType in spotTypes)
+                    {
+                        this.Resources["mapImage/" + spotType] = texture;
+                    }
                 }
             }
 
@@ -536,17 +582,49 @@ namespace WzComparerR2.MapRender.UI
             this.CurrentWorldMap = this.worldMaps.FirstOrDefault();
         }
 
+        /// <summary>
+        /// ワールドマップ名から String/WorldMap.img の id を求めます。
+        /// ルートの "WorldMap" は "0"、番号付きは 3 桁ゼロ埋め（"WorldMap010" → "010"）です。
+        /// </summary>
+        private static string GetWorldMapStringId(string worldMapName)
+        {
+            if (string.IsNullOrEmpty(worldMapName))
+            {
+                return null;
+            }
+            var m = Regex.Match(worldMapName, @"^WorldMap(\d*)$");
+            if (!m.Success)
+            {
+                return null;
+            }
+            string digits = m.Groups[1].Value;
+            if (digits.Length == 0)
+            {
+                return "0";
+            }
+            int id;
+            return int.TryParse(digits, out id) ? id.ToString("000") : null;
+        }
+
         private TextureItem LoadTextureItem(Wz_Node node, bool loadHitMap = false)
         {
             var item = new TextureItem();
-            var linkNode = node.GetLinkedSourceNode(PluginBase.PluginManager.FindWz);
-            item.Texture = UIHelper.LoadTexture(linkNode);
-            item.Z = node.Nodes["z"].GetValueEx<int>(0);
-            var origin = node.Nodes["origin"]?.GetValueEx<Wz_Vector>(null);
-            item.Origin = origin.ToPointF();
-            if (item.Texture != null && loadHitMap)
+            try
             {
-                item.HitMap = UIHelper.CreateHitMap(item.Texture.GetNativeTexture() as Microsoft.Xna.Framework.Graphics.Texture2D);
+                var linkNode = node.GetLinkedSourceNode(PluginBase.PluginManager.FindWz);
+                item.Texture = UIHelper.LoadTexture(linkNode);
+                item.Z = node.Nodes["z"].GetValueEx<int>(0);
+                var origin = node.Nodes["origin"]?.GetValueEx<Wz_Vector>(null);
+                item.Origin = origin.ToPointF();
+                if (item.Texture != null && loadHitMap)
+                {
+                    item.HitMap = UIHelper.CreateHitMap(item.Texture.GetNativeTexture() as Microsoft.Xna.Framework.Graphics.Texture2D);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 画像 1 枚の失敗でワールドマップ全体の読み込みを止めないようにします。
+                PluginBase.PluginManager.LogError("MapRender", ex, "Failed to load the world map image: " + node?.FullPathToFile);
             }
             return item;
         }
@@ -895,6 +973,7 @@ namespace WzComparerR2.MapRender.UI
 
         public class MapSpot
         {
+            public int Index { get; set; }
             public PointF Spot { get; set; }
             public bool IsPreBB { get; set; }
             public int Type { get; set; }

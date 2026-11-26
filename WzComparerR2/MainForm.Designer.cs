@@ -235,6 +235,8 @@ namespace WzComparerR2
             this.chkSkipKMSContent = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkMseaMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkSkipGodChangseopDuplicatedNodes = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkOutputChairAndRidingMount = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.btnAvatarCode = new DevComponents.DotNetBar.ButtonX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -291,6 +293,7 @@ namespace WzComparerR2
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
             this.chkHashPngFileName = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
+            this.btnItemOpenUnityFolder = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
@@ -304,6 +307,7 @@ namespace WzComparerR2
             this.btnPetEquipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnSkillTooltipExport = new DevComponents.DotNetBar.ButtonX();
             this.btnWorldArchiveBrowser = new DevComponents.DotNetBar.ButtonItem();
+            this.btnMonsterBookBrowser = new DevComponents.DotNetBar.ButtonItem();
             this.btnPreset = new DevComponents.DotNetBar.ButtonX();
             this.btnMusicChannel = new DevComponents.DotNetBar.ButtonItem();
             this.btnSkillChangeInfo = new DevComponents.DotNetBar.ButtonItem();
@@ -812,6 +816,12 @@ namespace WzComparerR2
             this.buttonItemCharaEquip.Tooltip = "Open/close Equipment window";
             this.buttonItemCharaEquip.CheckedChanged += new System.EventHandler(this.buttonItemCharaEquip_CheckedChanged);
             // 
+            // btnMonsterBookBrowser
+            // 
+            this.btnMonsterBookBrowser.Name = "btnMonsterBookBrowser";
+            this.btnMonsterBookBrowser.Text = "Monster Book";
+            this.btnMonsterBookBrowser.Click += new System.EventHandler(this.btnMonsterBookBrowser_Click);
+            // 
             // itemContainer32
             // 
             // 
@@ -835,6 +845,7 @@ namespace WzComparerR2
             // 
             // 
             this.itemContainer33.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer33.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemContainer33.Name = "itemContainer33";
             this.itemContainer33.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonItemAddItem});
@@ -856,9 +867,11 @@ namespace WzComparerR2
             // 
             // 
             this.itemContainer34.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer34.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemContainer34.Name = "itemContainer34";
             this.itemContainer34.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.btnWorldArchiveBrowser});
+            this.btnWorldArchiveBrowser,
+            this.btnMonsterBookBrowser});
             //
             // btnWorldArchiveBrowser
             //
@@ -1718,6 +1731,7 @@ namespace WzComparerR2
             this.itemContainer3.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.btnItemOpenWz,
             this.btnItemOpenImg,
+            this.btnItemOpenUnityFolder,
             this.buttonItemClose,
             this.buttonItemCloseAll});
             // 
@@ -1738,6 +1752,12 @@ namespace WzComparerR2
             this.btnItemOpenImg.Name = "btnItemOpenImg";
             this.btnItemOpenImg.Text = "Open IMG";
             this.btnItemOpenImg.Click += new System.EventHandler(this.btnItemOpenImg_Click);
+            // 
+            // btnItemOpenUnityFolder
+            // 
+            this.btnItemOpenUnityFolder.Name = "btnItemOpenUnityFolder";
+            this.btnItemOpenUnityFolder.Text = "Open Unity Asset Folder(&U)...";
+            this.btnItemOpenUnityFolder.Click += new System.EventHandler(this.btnItemOpenUnityFolder_Click);
             // 
             // buttonItemClose
             // 
@@ -2654,6 +2674,8 @@ namespace WzComparerR2
             this.superTabControlPanel2.Controls.Add(this.chkSkipKMSContent);
             this.superTabControlPanel2.Controls.Add(this.chkMseaMode);
             this.superTabControlPanel2.Controls.Add(this.chkSkipGodChangseopDuplicatedNodes);
+            this.superTabControlPanel2.Controls.Add(this.chkOutputChairAndRidingMount);
+            this.superTabControlPanel2.Controls.Add(this.btnAvatarCode);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2764,7 +2786,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkOutputMapTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputMapTooltip.Location = new System.Drawing.Point(550, 142);
+            this.chkOutputMapTooltip.Location = new System.Drawing.Point(550, 169);
             this.chkOutputMapTooltip.Name = "chkOutputMapTooltip";
             this.chkOutputMapTooltip.Size = new System.Drawing.Size(155, 23);
             this.chkOutputMapTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2777,7 +2799,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkOutputMobTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputMobTooltip.Location = new System.Drawing.Point(550, 169);
+            this.chkOutputMobTooltip.Location = new System.Drawing.Point(550, 195);
             this.chkOutputMobTooltip.Name = "chkOutputMobTooltip";
             this.chkOutputMobTooltip.Size = new System.Drawing.Size(155, 23);
             this.chkOutputMobTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2790,7 +2812,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkOutputNpcTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputNpcTooltip.Location = new System.Drawing.Point(550, 196);
+            this.chkOutputNpcTooltip.Location = new System.Drawing.Point(550, 221);
             this.chkOutputNpcTooltip.Name = "chkOutputNpcTooltip";
             this.chkOutputNpcTooltip.Size = new System.Drawing.Size(135, 23);
             this.chkOutputNpcTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2803,7 +2825,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkOutputQuestTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputQuestTooltip.Location = new System.Drawing.Point(550, 223);
+            this.chkOutputQuestTooltip.Location = new System.Drawing.Point(550, 247);
             this.chkOutputQuestTooltip.Name = "chkOutputQuestTooltip";
             this.chkOutputQuestTooltip.Size = new System.Drawing.Size(135, 23);
             this.chkOutputQuestTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2817,7 +2839,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkOutputAchvTooltip.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputAchvTooltip.Location = new System.Drawing.Point(550, 250);
+            this.chkOutputAchvTooltip.Location = new System.Drawing.Point(550, 273);
             this.chkOutputAchvTooltip.Name = "chkOutputAchvTooltip";
             this.chkOutputAchvTooltip.Size = new System.Drawing.Size(200, 23);
             this.chkOutputAchvTooltip.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2831,7 +2853,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkShowObjectID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowObjectID.Location = new System.Drawing.Point(550, 277);
+            this.chkShowObjectID.Location = new System.Drawing.Point(550, 299);
             this.chkShowObjectID.Name = "chkShowObjectID";
             this.chkShowObjectID.Size = new System.Drawing.Size(185, 23);
             this.chkShowObjectID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2845,7 +2867,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkShowChangeType.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowChangeType.Location = new System.Drawing.Point(550, 304);
+            this.chkShowChangeType.Location = new System.Drawing.Point(550, 325);
             this.chkShowChangeType.Name = "chkShowChangeType";
             this.chkShowChangeType.Size = new System.Drawing.Size(135, 23);
             this.chkShowChangeType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2860,7 +2882,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkShowLinkedTamingMob.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkShowLinkedTamingMob.Location = new System.Drawing.Point(550, 331);
+            this.chkShowLinkedTamingMob.Location = new System.Drawing.Point(550, 351);
             this.chkShowLinkedTamingMob.Name = "chkShowLinkedTamingMob";
             this.chkShowLinkedTamingMob.Size = new System.Drawing.Size(185, 23);
             this.chkShowLinkedTamingMob.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2875,7 +2897,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkSkipKMSContent.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkSkipKMSContent.Location = new System.Drawing.Point(550, 358);
+            this.chkSkipKMSContent.Location = new System.Drawing.Point(550, 377);
             this.chkSkipKMSContent.Name = "chkSkipKMSContent";
             this.chkSkipKMSContent.Size = new System.Drawing.Size(185, 23);
             this.chkSkipKMSContent.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2890,7 +2912,7 @@ namespace WzComparerR2
             // 
             // 
             this.chkMseaMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkMseaMode.Location = new System.Drawing.Point(550, 385);
+            this.chkMseaMode.Location = new System.Drawing.Point(550, 403);
             this.chkMseaMode.Name = "chkMseaMode";
             this.chkMseaMode.Size = new System.Drawing.Size(185, 23);
             this.chkMseaMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2905,13 +2927,44 @@ namespace WzComparerR2
             // 
             // 
             this.chkSkipGodChangseopDuplicatedNodes.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkSkipGodChangseopDuplicatedNodes.Location = new System.Drawing.Point(550, 412);
+            this.chkSkipGodChangseopDuplicatedNodes.Location = new System.Drawing.Point(550, 429);
             this.chkSkipGodChangseopDuplicatedNodes.Name = "chkSkipGodChangseopDuplicatedNodes";
             this.chkSkipGodChangseopDuplicatedNodes.Size = new System.Drawing.Size(185, 25);
             this.chkSkipGodChangseopDuplicatedNodes.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkSkipGodChangseopDuplicatedNodes.TabIndex = 26;
             this.chkSkipGodChangseopDuplicatedNodes.Text = "Skip Duplicated Nodes\r\n(Ending With \"_.img\")";
             this.chkSkipGodChangseopDuplicatedNodes.Checked = true;
+            // 
+            // chkOutputChairAndRidingMount
+            // 
+            // 
+            // 
+            // 
+            this.chkOutputChairAndRidingMount.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkOutputChairAndRidingMount.Location = new System.Drawing.Point(550, 142);
+            this.chkOutputChairAndRidingMount.Name = "chkOutputChairAndRidingMount";
+            this.chkOutputChairAndRidingMount.Size = new System.Drawing.Size(200, 25);
+            this.chkOutputChairAndRidingMount.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkOutputChairAndRidingMount, new DevComponents.DotNetBar.SuperTooltipInfo("Output Chair/Mount Examples", "", "Outputs changed chairs and riding mounts (TamingMob) as animated images with an avatar applied.\r\nOutput folder: ChairExamples / TamingMobExamples", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(240, 300)));
+            this.chkOutputChairAndRidingMount.TabIndex = 27;
+            this.chkOutputChairAndRidingMount.Text = "Output Chair/Mount Examples";
+            this.chkOutputChairAndRidingMount.CheckedChanged += new System.EventHandler(this.chkOutputChairAndRidingMount_CheckedChanged);
+            // 
+            // btnAvatarCode
+            // 
+            // 
+            // 
+            // 
+            this.btnAvatarCode.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnAvatarCode.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnAvatarCode.Location = new System.Drawing.Point(328, 88);
+            this.btnAvatarCode.Name = "btnAvatarCode";
+            this.btnAvatarCode.Size = new System.Drawing.Size(135, 23);
+            this.btnAvatarCode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.btnAvatarCode, new DevComponents.DotNetBar.SuperTooltipInfo("Avatar Code Settings", "", "Set the avatar code used for the chair and riding mount output.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(200, 70)));
+            this.btnAvatarCode.TabIndex = 28;
+            this.btnAvatarCode.Text = "Avatar Code";
+            this.btnAvatarCode.Click += new System.EventHandler(this.btnAvatarCode_Click);
             // 
             // chkOutputRemovedImg
             // 
@@ -3946,6 +3999,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
         private DevComponents.DotNetBar.ButtonItem btnItemOpenImg;
+        private DevComponents.DotNetBar.ButtonItem btnItemOpenUnityFolder;
         private DevComponents.DotNetBar.ButtonItem buttonItemSaveWithOptions;
         private DevComponents.DotNetBar.ButtonItem buttonCaptureAni;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
@@ -3968,6 +4022,8 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipKMSContent;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkMseaMode;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkSkipGodChangseopDuplicatedNodes;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputChairAndRidingMount;
+        private DevComponents.DotNetBar.ButtonX btnAvatarCode;
         private DevComponents.Editors.ComboItem comboItem19;
         private DevComponents.Editors.ComboItem comboItem20;
         private DevComponents.Editors.ComboItem comboItem21;
@@ -3985,6 +4041,7 @@ namespace WzComparerR2
         private DevComponents.DotNetBar.ButtonX btnPetEquipExport;
         private DevComponents.DotNetBar.ButtonX btnSkillTooltipExport;
         private DevComponents.DotNetBar.ButtonItem btnWorldArchiveBrowser;
+        private DevComponents.DotNetBar.ButtonItem btnMonsterBookBrowser;
         private DevComponents.DotNetBar.ButtonX btnPreset;
         private DevComponents.DotNetBar.ButtonItem btnMusicChannel;
         private DevComponents.DotNetBar.ButtonItem btnSkillChangeInfo;

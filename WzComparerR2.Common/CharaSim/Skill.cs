@@ -36,6 +36,14 @@ namespace WzComparerR2.CharaSim
         internal List<Dictionary<string, string>> levelCommon;
         internal Dictionary<string, string> common;
 
+        /// <summary>common 内の攻撃範囲（すべてのレベルで共通）。</summary>
+        private Point commonLT;
+        private Point commonRB;
+
+        /// <summary>各レベルの攻撃範囲（<c>level/&lt;n&gt;/lt</c>、<c>rb</c>）。</summary>
+        private Dictionary<int, Point> levelLT;
+        private Dictionary<int, Point> levelRB;
+
         public Dictionary<string, string> Common
         {
             get
@@ -45,6 +53,24 @@ namespace WzComparerR2.CharaSim
                 else
                     return common;
             }
+        }
+
+        /// <summary>
+        /// Returns the properties for the given level: the shared <c>common</c> node merged with the level-specific values.
+        /// </summary>
+        public Dictionary<string, string> GetCommon(int level)
+        {
+            var result = this.common == null
+                ? new Dictionary<string, string>()
+                : new Dictionary<string, string>(this.common);
+            if (this.levelCommon != null && level > 0 && level <= levelCommon.Count)
+            {
+                foreach (var kv in levelCommon[level - 1])
+                {
+                    result[kv.Key] = kv.Value;
+                }
+            }
+            return result;
         }
 
         public Dictionary<string, string> PVPcommon { get; private set; }
@@ -112,8 +138,142 @@ namespace WzComparerR2.CharaSim
         public Dictionary<string, Wz_Vector> Rb { get; set; }
         public Dictionary<int, Dictionary<string, string>> PerJobAttackInfo { get; set; }
 
-        public Point LT { get; set; }
-        public Point RB { get; set; }
+        /// <summary>
+        /// 攻撃範囲の左上。レベル専用の <c>level/&lt;n&gt;/lt</c> を優先し、
+        /// それ以外の場合は <c>common/lt</c> を使用します。
+        /// </summary>
+        public Point LT
+        {
+            get { return this.GetLevelPoint(this.levelLT, this.level) ?? this.commonLT; }
+            set { this.commonLT = value; }
+        }
+
+        /// <summary>
+        /// 攻撃範囲の右下。レベル専用の <c>level/&lt;n&gt;/rb</c> を優先し、
+        /// それ以外の場合は <c>common/rb</c> を使用します。
+        /// </summary>
+        public Point RB
+        {
+            get { return this.GetLevelPoint(this.levelRB, this.level) ?? this.commonRB; }
+            set { this.commonRB = value; }
+        }
+
+        /// <summary>指定レベルの攻撃範囲を取得します（レベル専用を優先し、なければ common）。</summary>
+        public void GetAttackRange(int level, out Point lt, out Point rb)
+        {
+            lt = this.GetLevelPoint(this.levelLT, level) ?? this.commonLT;
+            rb = this.GetLevelPoint(this.levelRB, level) ?? this.commonRB;
+        }
+
+        /// <summary>
+        /// 指定レベルの攻撃範囲面積が最高レベルの何パーセントか（小数第 1 位まで保持）。
+        /// 範囲データがない場合は null を返します。
+        /// </summary>
+        public double? GetRangeAreaPercent(int level)
+        {
+            double area = this.GetRangeArea(level);
+            if (area <= 0)
+            {
+                return null;
+            }
+
+            int maxLevel = this.MaxLevel > 0 ? this.MaxLevel : level;
+            double maxArea = this.GetRangeArea(maxLevel);
+            if (maxArea <= 0)
+            {
+                return null;
+            }
+
+            return Math.Round(area / maxArea * 100d, 1, MidpointRounding.AwayFromZero);
+        }
+
+        private double GetRangeArea(int level)
+        {
+            Point lt, rb;
+            this.GetAttackRange(level, out lt, out rb);
+            return Math.Abs((double)rb.X - lt.X) * Math.Abs((double)rb.Y - lt.Y);
+        }
+
+        private Point? GetLevelPoint(Dictionary<int, Point> points, int level)
+        {
+            if (points == null || points.Count == 0)
+            {
+                return null;
+            }
+
+            Point point;
+            if (level > 0 && points.TryGetValue(level, out point))
+            {
+                return point;
+            }
+
+            // ちょうど一致するレベルがない場合（Combat Orders で上限超過、または Level 0 など）は、
+            // 現在のレベルを超えない最大のレベルを選び、それもなければ最低レベルに戻します。
+            int best = 0;
+            int lowest = int.MaxValue;
+            foreach (int key in points.Keys)
+            {
+                if (key <= level && key > best)
+                {
+                    best = key;
+                }
+                if (key < lowest)
+                {
+                    lowest = key;
+                }
+            }
+            if (best != 0)
+            {
+                return points[best];
+            }
+            return lowest == int.MaxValue ? (Point?)null : points[lowest];
+        }
+
+        /// <summary>
+        /// あるレベルの攻撃範囲を記録します（<c>level/&lt;n&gt;/lt</c>、<c>rb</c>）。
+        /// 値は vector（type 14）または 2 つの数値の組み合わせ（type 8）の場合があります。
+        /// </summary>
+        private bool SetLevelPoint(int level, string name, object value)
+        {
+            if (level <= 0 || !TryGetPoint(value, out Point point))
+            {
+                return false;
+            }
+            switch (name.ToLowerInvariant())
+            {
+                case "lt":
+                    if (this.levelLT == null) this.levelLT = new Dictionary<int, Point>();
+                    this.levelLT[level] = point;
+                    return true;
+                case "rb":
+                    if (this.levelRB == null) this.levelRB = new Dictionary<int, Point>();
+                    this.levelRB[level] = point;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>ノード値を座標点として解釈します（vector または 2 つの数値の組み合わせ）。</summary>
+        private static bool TryGetPoint(object value, out Point point)
+        {
+            switch (value)
+            {
+                case Wz_Vector vector:
+                    point = new Point(vector.X, vector.Y);
+                    return true;
+                case int[] intPair when intPair.Length == 2:
+                    point = new Point(intPair[0], intPair[1]);
+                    return true;
+                case float[] floatPair when floatPair.Length == 2:
+                    point = new Point(
+                        (int)Math.Round(floatPair[0]), (int)Math.Round(floatPair[1]));
+                    return true;
+                default:
+                    point = Point.Empty;
+                    return false;
+            }
+        }
 
         public int MaxLevel
         {
@@ -131,7 +291,9 @@ namespace WzComparerR2.CharaSim
         public static Skill CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode, GlobalFindNodeFunction2 findNode2, Wz_File wzf = null)
         {
             if (node == null) return null;
-            if (node.GetNodeWzFile().Type != Wz_Type.Skill && node.GetNodeWzFile().Type != Wz_Type.Etc) return null;
+            // ノード種別は WZ ファイルまたは外部型解決（Unity データセットのディレクトリ）で判定します。
+            if (node.GetNodeWzType() is Wz_Type wzType
+                && wzType != Wz_Type.Skill && wzType != Wz_Type.Etc) return null;
 
             Skill skill = new Skill();
             int skillID;
@@ -320,10 +482,20 @@ namespace WzComparerR2.CharaSim
 
                             foreach (Wz_Node commonNode in levelNode.Nodes)
                             {
-                                if (commonNode.Value != null && !(commonNode.Value is Wz_Vector))
+                                if (commonNode.Value == null)
                                 {
-                                    levelInfo[commonNode.Text] = commonNode.Value.ToString();
+                                    continue;
                                 }
+                                // Classic クライアントでは攻撃範囲が各レベル配下（level/<n>/lt、rb）に置かれています。
+                                if (skill.SetLevelPoint(i, commonNode.Text, commonNode.Value))
+                                {
+                                    continue;
+                                }
+                                if (commonNode.Value is Wz_Vector)
+                                {
+                                    continue; // その他の vector 属性は従来どおり（levelCommon に入れない）
+                                }
+                                levelInfo[commonNode.Text] = commonNode.Value.ToString();
                             }
 
                             skill.levelCommon.Add(levelInfo);

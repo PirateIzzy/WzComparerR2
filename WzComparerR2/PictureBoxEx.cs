@@ -71,10 +71,13 @@ namespace WzComparerR2
         {
             if (this.ShowOverlayAni) return; // 애니메이션 중첩 중일때는 자동 png 미리보기 없음
 
+            var texture = png.ToTexture(page, this.GraphicsDevice);
+            if (texture == null) return; // 画像をデコードできない場合（例: データセットに該 sprite がない）は表示しない
+
             //添加到动画控件
             var frame = new Animation.Frame()
             {
-                Texture = png.ToTexture(page, this.GraphicsDevice),
+                Texture = texture,
                 Png = png,
                 Page = page,
                 Delay = 0,
@@ -85,6 +88,31 @@ namespace WzComparerR2
             frameData.Frames.Add(frame);
 
             this.ShowAnimation(frameData);
+        }
+
+        /// <summary>
+        /// 顯示記憶體中的 PNG（Unity 資產的 Canvas 節點以此型別存放圖片）。
+        /// </summary>
+        public void ShowImage(byte[] pngData)
+        {
+            if (this.ShowOverlayAni || pngData == null || pngData.Length == 0) return;
+
+            using (var stream = new MemoryStream(pngData))
+            using (var bitmap = new System.Drawing.Bitmap(stream))
+            {
+                var frame = new Animation.Frame()
+                {
+                    Texture = bitmap.ToTexture(this.GraphicsDevice),
+                    Page = 0,
+                    Delay = 0,
+                    Origin = Point.Zero,
+                };
+
+                var frameData = new Animation.FrameAnimationData();
+                frameData.Frames.Add(frame);
+
+                this.ShowAnimation(frameData);
+            }
         }
 
         public FrameAnimationData LoadVideo(Wz_Video wzVideo, Wz_Vector origin = null)
@@ -1044,7 +1072,12 @@ namespace WzComparerR2
 
             if ((e.Item as FrameAnimator)?.Data.Frames.Count == 1)
             {
-                using (var bmp = (e.Item as FrameAnimator).Data.Frames[0].Png.ExtractPng())
+                var png = (e.Item as FrameAnimator).Data.Frames[0].Png;
+                if (png == null)
+                {
+                    return; // 記憶體中的 PNG（Unity 資產）沒有 Wz_Png 可供匯出
+                }
+                using (var bmp = png.ExtractPng())
                 {
                     bmp.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
                 }

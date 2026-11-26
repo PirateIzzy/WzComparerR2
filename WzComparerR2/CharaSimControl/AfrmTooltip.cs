@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WzComparerR2.AvatarCommon;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
 using WzComparerR2.Controls;
@@ -29,11 +31,13 @@ namespace WzComparerR2.CharaSimControl
             this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Copy String to Clipboard", null, tsmiCopyText_Click));
             this.menu.Items.Add(new ToolStripMenuItem("Copy Translated String to Clipboard", null, tsmiCopyTranslate_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Copy Voucher Content IDs", null, tsmiCopyPackageID_Click));
             this.menu.Items.Add(new ToolStripSeparator());
             this.menu.Items.Add(new ToolStripMenuItem("Close (Esc)", null, tsmiClose_Click));
             this.ContextMenuStrip = this.menu;
 
             this.Size = new Size(1, 1);
+            this.PackageIDs = new List<int>();
             this.HideOnHover = true;
             this.GearRender = new GearTooltipRender2();
             this.GearRender22 = new GearTooltipRender22();
@@ -51,6 +55,7 @@ namespace WzComparerR2.CharaSimControl
             this.AchievementRender = new AchievementTooltipRenderer();
             this.FamiliarRender = new FamiliarTooltipRenderer(); // used in CMS/TMS
             this.FamiliarRender2 = new FamiliarTooltipRenderer2(); // used in GMS/JMS
+            this.TargetCashPackage = new CashPackage();
             this.SizeChanged += AfrmTooltip_SizeChanged;
 
             this.MouseClick += AfrmTooltip_MouseClick;
@@ -100,6 +105,7 @@ namespace WzComparerR2.CharaSimControl
         public AchievementTooltipRenderer AchievementRender { get; private set; }
         public FamiliarTooltipRenderer FamiliarRender { get; private set; }
         public FamiliarTooltipRenderer2 FamiliarRender2 { get; private set; }
+        private CashPackage TargetCashPackage;
 
         public string ImageFileName { get; set; }
         public string NodeName { get; set; }
@@ -116,6 +122,7 @@ namespace WzComparerR2.CharaSimControl
         public int NodeID { get; set; }
         public int PreferredStringCopyMethod { get; set; }
         public bool CopyParsedSkillString { get; set; }
+        private List<int> PackageIDs;
 
         public event ObjectMouseEventHandler ObjectMouseMove;
         public event EventHandler ObjectMouseLeave;
@@ -346,6 +353,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 AvatarBitmap = (this.TargetItem as Item).AvatarBitmap;
                 SampleBitmap = (this.TargetItem as Item).Sample.Bitmap;
+                TargetCashPackage = ItemRender22.TargetCashPackage ?? ItemRender.TargetCashPackage ?? new CashPackage();
                 if ((this.TargetItem as Item).DamageSkinID != null)
                 {
                     DamageSkinSampleNonCriticalBitmap = (this.TargetItem as Item).DamageSkinSampleNonCriticalBitmap;
@@ -441,32 +449,9 @@ namespace WzComparerR2.CharaSimControl
         void tsmiCopyText_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            if (String.IsNullOrEmpty(this.Desc)) this.Desc = "";
-            if (String.IsNullOrEmpty(this.Pdesc)) this.Pdesc = "";
-            if (String.IsNullOrEmpty(this.AutoDesc)) this.AutoDesc = "";
-            if (String.IsNullOrEmpty(this.Hdesc)) this.Hdesc = "";
-            if (String.IsNullOrEmpty(this.DescLeftAlign)) this.DescLeftAlign = "";
-            if (String.IsNullOrEmpty(this.QuestAvailable)) this.QuestAvailable = "";
-            if (String.IsNullOrEmpty(this.QuestProgress)) this.QuestProgress = "";
-            if (String.IsNullOrEmpty(this.QuestComplete)) this.QuestComplete = "";
-            if (this.CopyParsedSkillString && item is Skill) this.Hdesc = this.SkillRender.ParsedHdesc;
-
-            if (this.item is Quest)
-            {
-                Desc = ReplaceQuestString(Desc, this.item as Quest);
-                Pdesc = ReplaceQuestString(Pdesc, this.item as Quest);
-                AutoDesc = ReplaceQuestString(AutoDesc, this.item as Quest);
-                Hdesc = ReplaceQuestString(Hdesc, this.item as Quest);
-                DescLeftAlign = ReplaceQuestString(DescLeftAlign, this.item as Quest);
-                QuestAvailable = ReplaceQuestString(QuestAvailable, this.item as Quest);
-                QuestProgress = ReplaceQuestString(QuestProgress, this.item as Quest);
-                QuestComplete = ReplaceQuestString(QuestComplete, this.item as Quest);
-            }
-            else
-            {
-                if (this.PreferredStringCopyMethod == 2) sb.AppendLine(this.NodeID.ToString());
-                if (!String.IsNullOrEmpty(this.NodeName)) sb.AppendLine(this.NodeName);
-            }
+            PreProcessText();
+            if (this.PreferredStringCopyMethod == 2) sb.AppendLine(this.NodeID.ToString());
+            if (!String.IsNullOrEmpty(this.NodeName)) sb.AppendLine(this.NodeName);
             switch (this.PreferredStringCopyMethod)
             {
                 default:
@@ -575,9 +560,55 @@ namespace WzComparerR2.CharaSimControl
             sb.Clear();
         }
 
+        private void PreProcessText()
+        {
+            if (String.IsNullOrEmpty(this.Desc)) this.Desc = "";
+            if (String.IsNullOrEmpty(this.Pdesc)) this.Pdesc = "";
+            if (String.IsNullOrEmpty(this.AutoDesc)) this.AutoDesc = "";
+            if (String.IsNullOrEmpty(this.Hdesc)) this.Hdesc = "";
+            if (String.IsNullOrEmpty(this.DescLeftAlign)) this.DescLeftAlign = "";
+            if (String.IsNullOrEmpty(this.QuestAvailable)) this.QuestAvailable = "";
+            if (String.IsNullOrEmpty(this.QuestProgress)) this.QuestProgress = "";
+            if (String.IsNullOrEmpty(this.QuestComplete)) this.QuestComplete = "";
+            if (this.CopyParsedSkillString)
+            {
+                if (item is Skill)
+                {
+                    this.Hdesc = this.SkillRender.ParsedHdesc;
+                }
+            }
+
+            if (this.item is Quest)
+            {
+                Desc = ReplaceQuestString(Desc, this.item as Quest);
+                Pdesc = ReplaceQuestString(Pdesc, this.item as Quest);
+                AutoDesc = ReplaceQuestString(AutoDesc, this.item as Quest);
+                Hdesc = ReplaceQuestString(Hdesc, this.item as Quest);
+                DescLeftAlign = ReplaceQuestString(DescLeftAlign, this.item as Quest);
+                QuestAvailable = ReplaceQuestString(QuestAvailable, this.item as Quest);
+                QuestProgress = ReplaceQuestString(QuestProgress, this.item as Quest);
+                QuestComplete = ReplaceQuestString(QuestComplete, this.item as Quest);
+            }
+            else
+            {
+                Quest nullQuest = new Quest();
+                nullQuest.ID = -1;
+                this.Desc = ReplaceQuestString(Desc, nullQuest);
+                this.AutoDesc = ReplaceQuestString(AutoDesc, nullQuest);
+                this.DescLeftAlign = ReplaceQuestString(DescLeftAlign, nullQuest);
+                if (this.item is Item)
+                {
+                    this.Desc = ReplaceCosmeticEULOTag(this.Desc, (Item)item);
+                    this.AutoDesc = ReplaceCosmeticEULOTag(this.AutoDesc, (Item)item);
+                    this.DescLeftAlign = ReplaceCosmeticEULOTag(this.DescLeftAlign, (Item)item);
+                }
+            }
+        }
+
         async void tsmiCopyTranslate_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
+            PreProcessText();
             if (this.PreferredStringCopyMethod == 2) sb.AppendLine(this.NodeID.ToString());
             if (!String.IsNullOrEmpty(this.NodeName)) sb.AppendLine(this.NodeName);
             if (String.IsNullOrEmpty(this.Desc)) this.Desc = "";
@@ -605,6 +636,26 @@ namespace WzComparerR2.CharaSimControl
             finally
             {
                 OnStatusUpdate?.Invoke("");
+            }
+        }
+
+        void tsmiCopyPackageID_Click(object sender, EventArgs e)
+        {
+            PreProcessText();
+            foreach (var i in this.TargetCashPackage.SN)
+            {
+                Commodity commodity;
+                if (!CharaSimLoader.LoadedCommoditiesBySN.TryGetValue(i, out commodity) || commodity == null)
+                {
+                    // Commodity 表に無い SN（削除済み・別バージョンのデータなど）は無視します。
+                    continue;
+                }
+                if (commodity.ItemId > 0) this.PackageIDs.Add(commodity.ItemId);
+            }
+            if (this.PackageIDs.Count > 0)
+            {
+                string packageIdString = string.Join(",", this.PackageIDs);
+                Clipboard.SetText(packageIdString);
             }
         }
 
@@ -911,6 +962,7 @@ namespace WzComparerR2.CharaSimControl
                         {
                             StringLinker.StringEqp.TryGetValue(id, out sr);
                         }
+                        PackageIDs.Add(id);
                         return isMapleWiki ? $"{{{{QuestTextHighlight|item|{sr?.Name ?? id.ToString()}}}}}" : $"{sr?.Name ?? id.ToString()}";
 
                     case "q":
@@ -1034,6 +1086,30 @@ namespace WzComparerR2.CharaSimControl
             text = text.Replace("#E", "");
             text = text.Replace("#n", " ");
 
+            return text;
+        }
+
+        private string ReplaceCosmeticEULOTag(string text, Item item)
+        {
+            if (text.Contains("#cosmetic_EULO#"))
+            {
+                item.Specs.TryGetValue(ItemSpecType.cosmetic, out long cosmeticID);
+                var gender = Gear.GetGender((int)cosmeticID);
+                var name = "";
+                if (StringLinker == null || !StringLinker.StringEqp.TryGetValue((int)cosmeticID, out var sr))
+                {
+                    sr = new StringResult();
+                    sr.Name = "(null)";
+                }
+                name = $"#c{sr.Name}{(gender == 0 ? "(Male)" : (gender == 1 ? "(Female)" : ""))}#";
+
+                foreach (var color in AvatarCanvas.HairColor)
+                {
+                    name = name.Replace($"{color} ", "");
+                }
+
+                text = text.Replace("#cosmetic_EULO#", name);
+            }
             return text;
         }
 

@@ -27,6 +27,35 @@ namespace WzComparerR2.CharaSim
 
         public static Dictionary<int, SetItem> LoadedSetItems { get; private set; }
         public static Dictionary<int, AstraSubWeaponInfo> LoadedAstraSubWeapons { get; private set; }
+
+        /// <summary>
+        /// Finds a node by its <c>*.img</c> name. Unity dataset trees have no <c>.img</c> extension, so when the img
+        /// is not found the name without the extension is also tried (the img returns its expanded content).
+        /// </summary>
+        private static Wz_Node FindImgNode(Wz_Node root, string imgName, string innerPath = null)
+        {
+            if (root == null || string.IsNullOrEmpty(imgName))
+            {
+                return null;
+            }
+            string name = imgName.EndsWith(".img", StringComparison.OrdinalIgnoreCase)
+                ? imgName.Substring(0, imgName.Length - 4)
+                : imgName;
+            foreach (string candidate in new[]
+            {
+                innerPath == null ? imgName : imgName + "\\" + innerPath,
+                innerPath == null ? name : name + "\\" + innerPath,
+            })
+            {
+                Wz_Node node = root.FindNodeByPath(candidate, true);
+                if (node != null)
+                {
+                    return node;
+                }
+            }
+            return null;
+        }
+
         public static Dictionary<int, ExclusiveEquip> LoadedExclusiveEquips { get; private set; }
         public static Dictionary<int, Commodity> LoadedCommoditiesBySN { get; private set; }
         public static Dictionary<int, Commodity> LoadedCommoditiesByItemId { get; private set; }
@@ -52,7 +81,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node etcWz = PluginManager.FindWz(Wz_Type.Etc, sourceWzFile, true);
             if (etcWz == null)
                 return;
-            Wz_Node setItemNode = etcWz.FindNodeByPath("SetItemInfo.img", true);
+            Wz_Node setItemNode = FindImgNode(etcWz, "SetItemInfo.img");
             if (setItemNode == null)
                 return;
 
@@ -60,7 +89,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, sourceWzFile, true);
             if (itemWz == null)
                 return;
-            Wz_Node optionNode = itemWz.FindNodeByPath("ItemOption.img", true);
+            Wz_Node optionNode = FindImgNode(itemWz, "ItemOption.img");
             if (optionNode == null)
                 return;
 
@@ -72,7 +101,10 @@ namespace WzComparerR2.CharaSim
                 {
                     SetItem setItem = SetItem.CreateFromNode(node, optionNode);
                     if (setItem != null)
+                    {
+                        ResolveSetItemName(setItem);
                         LoadedSetItems[setItemIndex] = setItem;
+                    }
                 }
             }
         }
@@ -91,7 +123,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node etcWz = PluginManager.FindWz(Wz_Type.Etc, sourceWzFile);
             if (etcWz == null)
                 return;
-            Wz_Node astraNode = etcWz.FindNodeByPath("SubWeaponTransferData.img\\Job", true);
+            Wz_Node astraNode = FindImgNode(etcWz, "SubWeaponTransferData.img", "Job");
             if (astraNode == null)
                 return;
 
@@ -149,7 +181,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, sourceWzFile);
             if (itemWz == null)
                 return;
-            Wz_Node mintableListNode = itemWz.FindNodeByPath("MintableList.img", true);
+            Wz_Node mintableListNode = FindImgNode(itemWz, "MintableList.img");
             if (mintableListNode == null)
                 return;
 
@@ -203,7 +235,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node etcWz = PluginManager.FindWz(Wz_Type.Etc, sourceWzFile);
             if (etcWz == null)
                 return;
-            Wz_Node gmsTucBlacklistNode = etcWz.FindNodeByPath("TUC_Blacklist_GL.img\\ItemList", true);
+            Wz_Node gmsTucBlacklistNode = FindImgNode(etcWz, "TUC_Blacklist_GL.img", "ItemList");
             if (gmsTucBlacklistNode == null)
                 return;
             foreach (var i in gmsTucBlacklistNode.Nodes)
@@ -264,7 +296,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node etcWz = PluginManager.FindWz(Wz_Type.Etc, sourceWzFile);
             if (etcWz == null)
                 return null;
-            Wz_Node setItemNode = etcWz.FindNodeByPath("SetItemInfo.img", true);
+            Wz_Node setItemNode = FindImgNode(etcWz, "SetItemInfo.img");
             if (setItemNode == null)
                 return null;
 
@@ -272,7 +304,7 @@ namespace WzComparerR2.CharaSim
             Wz_Node itemWz = PluginManager.FindWz(Wz_Type.Item, sourceWzFile);
             if (itemWz == null)
                 return null;
-            Wz_Node optionNode = itemWz.FindNodeByPath("ItemOption.img", true);
+            Wz_Node optionNode = FindImgNode(itemWz, "ItemOption.img");
             if (optionNode == null)
                 return null;
 
@@ -283,12 +315,32 @@ namespace WzComparerR2.CharaSim
                 {
                     SetItem setItem = SetItem.CreateFromNode(node, optionNode);
                     if (setItem != null)
+                    {
+                        ResolveSetItemName(setItem);
                         return setItem;
+                    }
                     else
                         return null;
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// セット名がスクリプト文字列キー（例: <c>SID_WONDERPET_...</c>）の場合、文字列テーブルから解決します。
+        /// Classic（Unity）クライアントではセット名がキーで格納されています。
+        /// </summary>
+        private static void ResolveSetItemName(SetItem setItem)
+        {
+            if (setItem == null)
+            {
+                return;
+            }
+            string resolved = ResolveScriptString(setItem.SetItemName);
+            if (!string.IsNullOrEmpty(resolved))
+            {
+                setItem.SetItemName = resolved;
+            }
         }
 
         public static void LoadExclusiveEquipsIfEmpty(Wz_File sourceWzFile = null)
@@ -385,6 +437,56 @@ namespace WzComparerR2.CharaSim
             LoadedGmsTucBlacklistItems.Clear();
         }
 
+        /// <summary>
+        /// WZ 以外のアクション遅延ソース（例: Unity アセット）。データがない場合は null を返します。
+        /// </summary>
+        public static Func<string, int?> ActionDelayResolver { get; set; }
+
+        /// <summary>
+        /// クライアントのスクリプト文字列キー（例: <c>SID_EXCLUSIVE_EQUIP_ADMIN_INFO</c>）を
+        /// <c>String/&lt;region&gt;/StringTable</c> から解決します。キー形式でない文字列や未解決の場合は null。
+        /// </summary>
+        public static string ResolveScriptString(string key)
+        {
+            if (!IsScriptStringKey(key))
+            {
+                return null;
+            }
+            Wz_Node node = PluginManager.FindWz("String/StringTable/" + key);
+            string text = node == null ? null : node.Value as string;
+            return string.IsNullOrEmpty(text) ? null : text;
+        }
+
+        /// <summary>空白や記号を含まない <c>AAA_BBB</c> 形式のキーかどうか。</summary>
+        private static bool IsScriptStringKey(string key)
+        {
+            if (string.IsNullOrEmpty(key) || key.Length > 128)
+            {
+                return false;
+            }
+            bool hasUnderscore = false;
+            bool hasLetter = false;
+            foreach (char c in key)
+            {
+                if (c == '_')
+                {
+                    hasUnderscore = true;
+                }
+                else if (c >= '0' && c <= '9')
+                {
+                }
+                else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                {
+                    hasLetter = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return hasUnderscore && hasLetter;
+        }
+
         public static int GetActionDelay(string actionName, Wz_Node wzNode = null)
         {
             if (string.IsNullOrEmpty(actionName))
@@ -395,6 +497,15 @@ namespace WzComparerR2.CharaSim
                 PluginManager.FindWz("Character/00002000.img/" + actionName, wzNode.GetNodeWzFile());
             if (actionNode == null)
             {
+                Func<string, int?> resolver = ActionDelayResolver;
+                if (resolver != null)
+                {
+                    int? resolved = resolver(actionName);
+                    if (resolved.HasValue)
+                    {
+                        return resolved.Value;
+                    }
+                }
                 return 0;
             }
 

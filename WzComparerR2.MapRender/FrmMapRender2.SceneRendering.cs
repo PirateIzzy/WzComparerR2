@@ -1267,7 +1267,17 @@ namespace WzComparerR2.MapRender
             var renderObj = GetRenderObject(portal.View.IsEditorMode ? portal.View.EditorAnimator : portal.View.Animator);
             if (renderObj == null)
             {
-                return null;
+                // Classic（Unity）データセットでも MapHelper.img/portal の画像は spriteset として収録されています。
+                // 画像が見つからない場合は、設定で有効にしたときだけ代替マーカーを描画します
+                // （編集モードでは全種別、通常表示では WZ で画像が用意される種別のみ）。
+                if (this.showPortalMarker && (portal.View.IsEditorMode || IsVisiblePortalType(portal.Type)))
+                {
+                    renderObj = PortalMarker.GetFrame(this.batcher.GraphicsDevice);
+                }
+                if (renderObj == null)
+                {
+                    return null;
+                }
             }
             var mesh = batcher.MeshPop();
             mesh.RenderObject = renderObj;
@@ -1275,6 +1285,16 @@ namespace WzComparerR2.MapRender
             mesh.Z0 = ((renderObj as Frame)?.Z ?? 0);
             mesh.Z1 = portal.Index;
             return mesh;
+        }
+
+        /// <summary>
+        /// ゲーム内で画像が描画されるポータル種別かどうか（<c>pv</c> / <c>ph</c> / <c>psh</c>）。
+        /// <c>pgi</c>（7）は <c>pv</c> の画像で描画されます。出現地点（<c>sp</c>）や
+        /// 不可視ポータル（<c>pi</c>）などは本来見えません。
+        /// </summary>
+        private static bool IsVisiblePortalType(int portalType)
+        {
+            return portalType == 2 || portalType == 7 || portalType == 10 || portalType == 11;
         }
 
         private MeshItem[] GetMeshesIlluminantCluster(IlluminantClusterItem illuminantCluster)

@@ -41,7 +41,8 @@ namespace WzComparerR2.CharaSim
         {
             Map map = new Map();
             int mapID;
-            Match m = Regex.Match(node.Text, @"^(\d{9})\.img$");
+            // Unity アセットの img ノード名には .img 拡張子がありません（例: Map/Map/Map0/100000000）。
+            Match m = Regex.Match(node.Text, @"^(\d{9})(?:\.img)?$");
             if (!(m.Success && Int32.TryParse(m.Result("$1"), out mapID)))
             {
                 return null;

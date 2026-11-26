@@ -298,7 +298,7 @@ namespace WzComparerR2.MapRender
                 var png = node.GetValue<Wz_Png>();
                 if (png != null)
                 {
-                    return new TextureAtlas(png.ToTexture(this.GraphicsDevice));
+                    return new TextureAtlas(this.LoadTexture(png, node, 1, 1));
                 }
             }
             else if (assetType == typeof(Texture2D))
@@ -306,7 +306,7 @@ namespace WzComparerR2.MapRender
                 var png = node.GetValue<Wz_Png>();
                 if (png != null)
                 {
-                    return png.ToTexture(this.GraphicsDevice);
+                    return this.LoadTexture(png, node, 1, 1);
                 }
             }
             else if (assetType == typeof(Music))
@@ -507,6 +507,30 @@ namespace WzComparerR2.MapRender
 
             //特殊处理
             return (Texture2D)holder.Resource;
+        }
+
+        /// <summary>
+        /// ノードの画像テクスチャを取得します。画像がない場合（例: Unity データセットに該当 sprite がない）は空のテクスチャで代用し、
+        /// マップを読み込めるようにし、描画処理全体が失敗しないようにします。
+        /// </summary>
+        private Texture2D LoadTexture(Wz_Png png, Wz_Node node, int fallbackWidth, int fallbackHeight)
+        {
+            Texture2D texture = null;
+            try
+            {
+                texture = png.ToTexture(this.GraphicsDevice);
+            }
+            catch (Exception ex)
+            {
+                PluginManager.LogError("MapRender", ex, "Failed to load the texture: " + node.FullPathToFile);
+            }
+
+            if (texture == null)
+            {
+                texture = this.CreateEmptyTexture(
+                    node.FullPathToFile + "#empty", Math.Max(fallbackWidth, 1), Math.Max(fallbackHeight, 1));
+            }
+            return texture;
         }
 
         private MsCustomSpriteData LoadMsSpriteData(Wz_Node node)

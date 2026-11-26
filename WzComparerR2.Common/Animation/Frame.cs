@@ -97,42 +97,70 @@ namespace WzComparerR2.Animation
                 {
                     Png = png,
                 };
-
-                foreach (Wz_Node propNode in frameNode.Nodes)
-                {
-                    switch (propNode.Text)
-                    {
-                        case "origin":
-                            frame.Origin = (propNode.Value as Wz_Vector).ToPoint();
-                            break;
-                        case "lt":
-                            frame.LT = (propNode.Value as Wz_Vector).ToPoint();
-                            break;
-                        case "rb":
-                            frame.RB = (propNode.Value as Wz_Vector).ToPoint();
-                            break;
-                        case "delay":
-                            frame.Delay = propNode.GetValue<int>();
-                            break;
-                        case "z":
-                            frame.Z = propNode.GetValue<int>();
-                            break;
-                        case "a0":
-                            frame.A0 = propNode.GetValue<int>();
-                            break;
-                        case "a1":
-                            frame.A1 = propNode.GetValue<int>();
-                            break;
-                    }
-                }
-
-                if (frame.Delay == 0)
-                {
-                    frame.Delay = 120;//给予默认delay
-                }
-                return frame;
+                return FillFrameFromNode(frame, frameNode);
+            }
+            else if (frameNode.Value is IWzPngSource pngSource)
+            {
+                // Unity アセットの Canvas ノード: 画像は PNG エンコードで提供され、Wz_Png を割り当てられません。
+                var frame = new Frame(loadTexture ? pngSource.ToTexture(graphicsDevice) : null);
+                return FillFrameFromNode(frame, frameNode);
             }
             return null;
+        }
+
+        private static Frame FillFrameFromNode(Frame frame, Wz_Node frameNode)
+        {
+            foreach (Wz_Node propNode in frameNode.Nodes)
+            {
+                switch (propNode.Text)
+                {
+                    case "origin":
+                        frame.Origin = ToPoint(propNode.Value);
+                        break;
+                    case "lt":
+                        frame.LT = ToPoint(propNode.Value);
+                        break;
+                    case "rb":
+                        frame.RB = ToPoint(propNode.Value);
+                        break;
+                    case "delay":
+                        frame.Delay = propNode.GetValue<int>();
+                        break;
+                    case "z":
+                        frame.Z = propNode.GetValue<int>();
+                        break;
+                    case "a0":
+                        frame.A0 = propNode.GetValue<int>();
+                        break;
+                    case "a1":
+                        frame.A1 = propNode.GetValue<int>();
+                        break;
+                }
+            }
+
+            if (frame.Delay == 0)
+            {
+                frame.Delay = 120;//既定の delay を与える
+            }
+            return frame;
+        }
+
+        /// <summary>座標ノードは <see cref="Wz_Vector"/> の場合もあれば int/float 配列の場合もあります。</summary>
+        private static Point ToPoint(object value)
+        {
+            if (value is Wz_Vector vector)
+            {
+                return new Point(vector.X, vector.Y);
+            }
+            if (value is int[] ints && ints.Length >= 2)
+            {
+                return new Point(ints[0], ints[1]);
+            }
+            if (value is float[] floats && floats.Length >= 2)
+            {
+                return new Point((int)Math.Round(floats[0]), (int)Math.Round(floats[1]));
+            }
+            return Point.Zero;
         }
     }
 }

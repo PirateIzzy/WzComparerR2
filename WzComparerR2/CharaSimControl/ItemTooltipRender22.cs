@@ -71,6 +71,7 @@ namespace WzComparerR2.CharaSimControl
         public TooltipRender LinkDamageSkinRender { get; set; }
         public TooltipRender SetItemRender { get; set; }
         public TooltipRender CashPackageRender { get; set; }
+        public CashPackage TargetCashPackage { get; set; }
         public TooltipRender FamiliarRender { get; set; }
         private AvatarCanvasManager avatar { get; set; }
         private bool isMsnClient;
@@ -101,8 +102,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Special\{0:D4}.img\{1}", this.item.ItemID / 10000, this.item.ItemID), this.SourceWzFile);
                 Wz_Node cashPackageNode = PluginBase.PluginManager.FindWz(string.Format(@"Etc\CashPackage.img\{0}", this.item.ItemID), this.SourceWzFile);
-                CashPackage cashPackage = CashPackage.CreateFromNode(itemNode, cashPackageNode, PluginBase.PluginManager.FindWz);
-                return RenderCashPackage(cashPackage);
+                TargetCashPackage = CashPackage.CreateFromNode(itemNode, cashPackageNode, PluginBase.PluginManager.FindWz);
+                return RenderCashPackage(TargetCashPackage);
             }
 
             Action<int> AppendGearOrItem = (int itemID) =>
@@ -814,9 +815,19 @@ namespace WzComparerR2.CharaSimControl
                 picH = Math.Max(picH + 7, iconY + 87);
                 if (item.Sample.Bitmap != null)
                 {
-                    g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
-                    picH += item.Sample.Bitmap.Height;
-                    picH += 2;
+                    if (item.Sample.Bitmap.Width > 270)
+                    {
+                        Bitmap bmp = new Bitmap(item.Sample.Bitmap, new Size(270, (int)(item.Sample.Bitmap.Height * 270.0 / item.Sample.Bitmap.Width)));
+                        g.DrawImage(bmp, (tooltip.Width - bmp.Width) / 2, picH);
+                        picH += bmp.Height;
+                        picH += 4;
+                    }
+                    else
+                    {
+                        g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
+                        picH += item.Sample.Bitmap.Height;
+                        picH += 2;
+                    }
                 }
                 else if (item.DamageSkinID != null)
                 {
@@ -1146,10 +1157,10 @@ namespace WzComparerR2.CharaSimControl
             }
             if (!string.IsNullOrEmpty(descLeftAlign))
             {
-                tags.Add(descLeftAlign);
+                tags.Add(ReplaceDescTags(descLeftAlign));
                 if (isTranslateRequired)
                 {
-                    tags.Add(Translator.TranslateString(descLeftAlign));
+                    tags.Add(Translator.TranslateString(ReplaceDescTags(descLeftAlign)));
                 }
             }
 
@@ -1687,6 +1698,28 @@ namespace WzComparerR2.CharaSimControl
 
                 text = text.Replace("#cosmetic_EULO#", name);
             }
+
+            text = Regex.Replace(text, @$"#(t)\s*(\d{{1,9}}).*?#", match => // id should be less than 1,000,000,000
+            {
+                string tag = match.Groups[1].Value;
+                if (!int.TryParse(match.Groups[2].Value, out int id)) id = -1;
+                StringResult sr;
+                var name = "";
+                switch (tag)
+                {
+                    case "t":
+                        StringLinker.StringItem.TryGetValue(id, out sr);
+                        if (sr == null)
+                        {
+                            StringLinker.StringEqp.TryGetValue(id, out sr);
+                        }
+                        name = sr?.Name ?? id.ToString();
+                        return $"{name}";
+
+                    default:
+                        return id.ToString();
+                }
+            });
 
             return text;
         }

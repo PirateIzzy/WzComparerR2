@@ -1332,7 +1332,16 @@ namespace WzComparerR2.CharaSimControl
                     string exclusiveEquip;
                     if (!string.IsNullOrEmpty(kv.Value.Info))
                     {
-                        exclusiveEquip = "#cCannot equip multiple " + kv.Value.Info + " items.#";
+                        // The info of a Classic World (Unity client) item may be a script string key.
+                        string infoText = CharaSimLoader.ResolveScriptString(kv.Value.Info) ?? kv.Value.Info;
+                        if (infoText.EndsWith("。") || infoText.EndsWith("."))
+                        {
+                            exclusiveEquip = "#c" + infoText + "#";
+                        }
+                        else
+                        {
+                            exclusiveEquip = "#cCannot equip multiple " + infoText + " items.#";
+                        }
                     }
                     else
                     {

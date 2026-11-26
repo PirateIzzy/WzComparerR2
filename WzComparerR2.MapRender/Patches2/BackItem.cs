@@ -34,7 +34,9 @@ namespace WzComparerR2.MapRender.Patches2
             {
                 BS = node.Nodes["bS"].GetValueEx<string>(null),
                 Ani = node.Nodes["ani"].GetValueEx<int>(0),
-                No = node.Nodes["no"].GetValueEx<string>(null),
+                // Unity 由来の JSON は 0 の項目を省略するため、no が無い場合は "0" として扱います。
+                // 空のまま組み立てると親ディレクトリを指してしまい、img 内の別画像をまとめてアニメーションしてしまいます。
+                No = node.Nodes["no"].GetValueEx<string>("0"),
                 SpineAni = node.Nodes["spineAni"].GetValueEx<string>(null),
                 SpineNo = node.Nodes["spineNo"].GetValueEx<int?>(null),
 

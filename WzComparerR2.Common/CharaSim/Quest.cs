@@ -58,7 +58,8 @@ namespace WzComparerR2.CharaSim
         public static Quest CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode, GlobalFindNodeFunction2 findNode2, Wz_File wzf = null, int? fromInfoNode = null)
         {
             if (node == null) return null;
-            if (node.GetNodeWzFile().Type != Wz_Type.Quest) return null;
+            // ノード種別は WZ ファイルまたは外部型解決（Unity データセットのディレクトリ）で判定します。
+            if (node.GetNodeWzType() is Wz_Type wzType && wzType != Wz_Type.Quest) return null;
 
             int questID = -1;
             if (fromInfoNode != null)
@@ -67,7 +68,8 @@ namespace WzComparerR2.CharaSim
             }
             else
             {
-                Match m = Regex.Match(node.Text, @"^(\d+)\.img$");
+                // Unity アセットの img ノード名には .img 拡張子がありません（例: Quest/QuestInfo/1234）。
+                Match m = Regex.Match(node.Text, @"^(\d+)(?:\.img)?$");
                 if (!(m.Success && Int32.TryParse(m.Result("$1"), out questID)))
                 {
                     return null;
@@ -137,7 +139,8 @@ namespace WzComparerR2.CharaSim
                             var npcID = propNode.GetValueEx<int>(0);
                             Wz_Node npcNode = findNode2.Invoke(string.Format("Npc/{0:D7}.img", npcID), wzf);
                             if (npcNode == null) npcNode = findNode2.Invoke("Npc/9001000.img", wzf); // Use Cokebear Operator (blank NPC) as placeholder NPC when NPC IMG does not exist
-                            quest.Check0Npc = Npc.CreateFromNode(npcNode, findNode); break;
+                            if (npcNode != null) quest.Check0Npc = Npc.CreateFromNode(npcNode, findNode);
+                            break;
                         case "lvmin":
                             quest.Lvmin = propNode.GetValueEx<int>(0); break;
                         case "lvmax":
